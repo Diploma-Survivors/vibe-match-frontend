@@ -1,1 +1,1 @@
-npx biome check --staged
+npx lint-staged
