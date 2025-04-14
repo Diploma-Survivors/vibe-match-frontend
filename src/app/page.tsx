@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Slider } from '@/components/ui/slider';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Toggle } from '@/components/ui/toggle';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Layers, Move, RotateCcw, Settings, Sparkles, Zap } from 'lucide-react';
-import { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Toggle } from "@/components/ui/toggle";
+import { AnimatePresence, motion } from "framer-motion";
+import { Layers, Move, RotateCcw, Settings, Sparkles, Zap } from "lucide-react";
+import { useState } from "react";
 
 export default function FramerMotionPlayground() {
   const [animation, setAnimation] = useState({
@@ -23,7 +23,7 @@ export default function FramerMotionPlayground() {
     floating: false,
   });
 
-  const [activeTab, setActiveTab] = useState('buttons');
+  const [activeTab, setActiveTab] = useState("buttons");
 
   const toggleElement = (element: keyof typeof activeElements) => {
     setActiveElements((prev) => ({
@@ -33,12 +33,12 @@ export default function FramerMotionPlayground() {
   };
 
   const colors = [
-    'bg-purple-500',
-    'bg-blue-500',
-    'bg-green-500',
-    'bg-pink-500',
-    'bg-yellow-500',
-    'bg-red-500',
+    "bg-purple-500",
+    "bg-blue-500",
+    "bg-green-500",
+    "bg-pink-500",
+    "bg-yellow-500",
+    "bg-red-500",
   ];
 
   // Framer Motion variants
@@ -59,7 +59,7 @@ export default function FramerMotionPlayground() {
       y: 0,
       transition: {
         duration: animation.duration,
-        type: 'spring',
+        type: "spring",
         stiffness: animation.stiffness,
         damping: animation.damping,
       },
@@ -75,7 +75,7 @@ export default function FramerMotionPlayground() {
       transition: {
         duration: 4,
         repeat: Number.POSITIVE_INFINITY,
-        ease: 'easeInOut',
+        ease: "easeInOut",
       },
     },
   };
@@ -89,7 +89,7 @@ export default function FramerMotionPlayground() {
       transition: {
         duration: 2,
         repeat: Number.POSITIVE_INFINITY,
-        ease: 'easeInOut',
+        ease: "easeInOut",
       },
     },
   };
@@ -103,7 +103,7 @@ export default function FramerMotionPlayground() {
       transition: {
         duration: 3,
         repeat: Number.POSITIVE_INFINITY,
-        ease: 'linear',
+        ease: "linear",
       },
     },
   };
@@ -124,7 +124,7 @@ export default function FramerMotionPlayground() {
       transition: {
         duration: 3 + (i % 3),
         repeat: Number.POSITIVE_INFINITY,
-        ease: 'easeInOut',
+        ease: "easeInOut",
       },
     }),
   };
@@ -156,7 +156,7 @@ export default function FramerMotionPlayground() {
                   custom={i}
                   variants={confettiVariants}
                   initial="hidden"
-                  animate={['visible', 'float']}
+                  animate={["visible", "float"]}
                 />
               ))}
             </div>
@@ -167,12 +167,12 @@ export default function FramerMotionPlayground() {
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{
-              type: 'spring',
+              type: "spring",
               stiffness: animation.stiffness,
               damping: animation.damping,
             }}
           >
-            {'Motion Playground Pro'.split('').map((char, i) => {
+            {"Motion Playground Pro".split("").map((char, i) => {
               // Use stable id based on character and position
               const charId = `char-${char}-${i}-${char.charCodeAt(0)}`;
               return (
@@ -183,11 +183,11 @@ export default function FramerMotionPlayground() {
                   transition={{
                     duration: 1.5,
                     repeat: Number.POSITIVE_INFINITY,
-                    repeatType: 'reverse',
+                    repeatType: "reverse",
                     delay: i * 0.05,
                   }}
                 >
-                  {char === ' ' ? '\u00A0' : char}
+                  {char === " " ? "\u00A0" : char}
                 </motion.span>
               );
             })}
@@ -298,21 +298,21 @@ export default function FramerMotionPlayground() {
                   <div className="grid grid-cols-3 gap-3">
                     <Toggle
                       pressed={activeElements.confetti}
-                      onPressedChange={() => toggleElement('confetti')}
+                      onPressedChange={() => toggleElement("confetti")}
                       className="data-[state=on]:bg-purple-600 data-[state=on]:text-white"
                     >
                       Confetti
                     </Toggle>
                     <Toggle
                       pressed={activeElements.pulse}
-                      onPressedChange={() => toggleElement('pulse')}
+                      onPressedChange={() => toggleElement("pulse")}
                       className="data-[state=on]:bg-blue-600 data-[state=on]:text-white"
                     >
                       Pulse
                     </Toggle>
                     <Toggle
                       pressed={activeElements.floating}
-                      onPressedChange={() => toggleElement('floating')}
+                      onPressedChange={() => toggleElement("floating")}
                       className="data-[state=on]:bg-green-600 data-[state=on]:text-white"
                     >
                       Float
@@ -459,7 +459,7 @@ export default function FramerMotionPlayground() {
                   variants={itemVariants}
                 >
                   <motion.div
-                    animate={activeElements.pulse ? 'pulse' : 'initial'}
+                    animate={activeElements.pulse ? "pulse" : "initial"}
                     variants={pulseVariants}
                   >
                     <motion.div
@@ -469,7 +469,7 @@ export default function FramerMotionPlayground() {
                       }}
                       whileTap={{ scale: 0.9 }}
                       transition={{
-                        type: 'spring',
+                        type: "spring",
                         stiffness: animation.stiffness,
                         damping: animation.damping,
                       }}
@@ -490,13 +490,13 @@ export default function FramerMotionPlayground() {
                   variants={itemVariants}
                 >
                   <motion.div
-                    animate={activeElements.floating ? 'floating' : 'initial'}
+                    animate={activeElements.floating ? "floating" : "initial"}
                     variants={floatingVariants}
                   >
                     <motion.div
                       whileHover={{
                         scale: 1.05,
-                        boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.1)',
+                        boxShadow: "0px 5px 15px rgba(0, 0, 0, 0.1)",
                       }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -521,10 +521,10 @@ export default function FramerMotionPlayground() {
                         rotateY: 15,
                         rotateX: 10,
                         z: 10,
-                        boxShadow: '0px 10px 20px rgba(0, 0, 0, 0.2)',
+                        boxShadow: "0px 10px 20px rgba(0, 0, 0, 0.2)",
                       }}
                       transition={{
-                        type: 'spring',
+                        type: "spring",
                         stiffness: animation.stiffness,
                         damping: animation.damping,
                       }}
@@ -552,7 +552,7 @@ export default function FramerMotionPlayground() {
                 {[1, 2, 3].map((item, idx) => (
                   <motion.div key={item} custom={idx} variants={itemVariants}>
                     <motion.div
-                      animate={activeElements.floating ? 'floating' : 'initial'}
+                      animate={activeElements.floating ? "floating" : "initial"}
                       variants={floatingVariants}
                       custom={idx}
                     >
@@ -560,10 +560,10 @@ export default function FramerMotionPlayground() {
                         whileHover={{
                           scale: 1.05,
                           y: -10,
-                          boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.08)',
+                          boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.08)",
                         }}
                         transition={{
-                          type: 'spring',
+                          type: "spring",
                           stiffness: animation.stiffness,
                           damping: animation.damping,
                         }}
@@ -618,7 +618,7 @@ export default function FramerMotionPlayground() {
                   variants={itemVariants}
                 >
                   <motion.div
-                    animate={activeElements.pulse ? 'pulse' : 'initial'}
+                    animate={activeElements.pulse ? "pulse" : "initial"}
                     variants={pulseVariants}
                   >
                     <label
@@ -630,10 +630,10 @@ export default function FramerMotionPlayground() {
                     <motion.div
                       whileFocus={{
                         scale: 1.02,
-                        boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.3)',
+                        boxShadow: "0 0 0 2px rgba(59, 130, 246, 0.3)",
                       }}
                       transition={{
-                        type: 'spring',
+                        type: "spring",
                         stiffness: animation.stiffness,
                         damping: animation.damping,
                       }}
@@ -664,15 +664,15 @@ export default function FramerMotionPlayground() {
                   <div className="relative">
                     <motion.span
                       className="absolute left-3 top-2.5 text-slate-500"
-                      animate={activeElements.pulse ? 'pulse' : 'initial'}
+                      animate={activeElements.pulse ? "pulse" : "initial"}
                       variants={pulseVariants}
                       whileHover={{
                         rotate: 15,
                         scale: 1.2,
-                        color: '#a855f7',
+                        color: "#a855f7",
                       }}
                       transition={{
-                        type: 'spring',
+                        type: "spring",
                         stiffness: animation.stiffness,
                         damping: animation.damping,
                       }}
@@ -722,11 +722,11 @@ export default function FramerMotionPlayground() {
                 >
                   <motion.div
                     className="w-32 h-32 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full shadow-lg"
-                    animate={activeElements.pulse ? 'pulse' : 'initial'}
+                    animate={activeElements.pulse ? "pulse" : "initial"}
                     variants={pulseVariants}
                     whileHover={{ scale: 1.2, rotate: 15 }}
                     transition={{
-                      type: 'spring',
+                      type: "spring",
                       stiffness: animation.stiffness,
                       damping: animation.damping,
                     }}
@@ -743,14 +743,14 @@ export default function FramerMotionPlayground() {
                 >
                   <motion.div
                     className="w-32 h-32 bg-gradient-to-br from-purple-500 to-pink-500 shadow-lg"
-                    animate={activeElements.floating ? 'floating' : 'initial'}
+                    animate={activeElements.floating ? "floating" : "initial"}
                     variants={floatingVariants}
                     whileHover={{
                       rotate: 45,
-                      borderRadius: '24px',
+                      borderRadius: "24px",
                     }}
                     transition={{
-                      type: 'spring',
+                      type: "spring",
                       stiffness: animation.stiffness,
                       damping: animation.damping,
                     }}
@@ -766,11 +766,11 @@ export default function FramerMotionPlayground() {
                   variants={itemVariants}
                 >
                   <motion.div
-                    animate={activeElements.confetti ? 'spin' : 'initial'}
+                    animate={activeElements.confetti ? "spin" : "initial"}
                     variants={spinVariants}
                     whileHover={{ scale: 1.2, y: -10 }}
                     transition={{
-                      type: 'spring',
+                      type: "spring",
                       stiffness: animation.stiffness,
                       damping: animation.damping,
                     }}
@@ -787,15 +787,15 @@ export default function FramerMotionPlayground() {
                         fill="url(#triangleGradient)"
                         animate={{
                           fill: activeElements.pulse
-                            ? ['#10b981', '#6366f1', '#10b981']
-                            : '#10b981',
+                            ? ["#10b981", "#6366f1", "#10b981"]
+                            : "#10b981",
                         }}
                         transition={{
                           duration: 2,
                           repeat: activeElements.pulse
                             ? Number.POSITIVE_INFINITY
                             : 0,
-                          ease: 'easeInOut',
+                          ease: "easeInOut",
                         }}
                       />
                       <defs>
@@ -860,7 +860,7 @@ export default function FramerMotionPlayground() {
                           custom={i}
                           variants={confettiVariants}
                           initial="hidden"
-                          animate={['visible', 'float']}
+                          animate={["visible", "float"]}
                         />
                       ))}
                     </motion.div>
@@ -876,16 +876,16 @@ export default function FramerMotionPlayground() {
                 >
                   {[
                     {
-                      color: 'bg-gradient-to-br from-blue-500 to-cyan-500',
-                      icon: '🌊',
+                      color: "bg-gradient-to-br from-blue-500 to-cyan-500",
+                      icon: "🌊",
                     },
                     {
-                      color: 'bg-gradient-to-br from-purple-500 to-pink-500',
-                      icon: '🔮',
+                      color: "bg-gradient-to-br from-purple-500 to-pink-500",
+                      icon: "🔮",
                     },
                     {
-                      color: 'bg-gradient-to-br from-amber-500 to-red-500',
-                      icon: '🔥',
+                      color: "bg-gradient-to-br from-amber-500 to-red-500",
+                      icon: "🔥",
                     },
                   ].map((item, idx) => (
                     <motion.div
@@ -913,7 +913,7 @@ export default function FramerMotionPlayground() {
                           zIndex: 50,
                         }}
                         animate={
-                          activeElements.floating ? 'floating' : 'initial'
+                          activeElements.floating ? "floating" : "initial"
                         }
                         variants={floatingVariants}
                         custom={idx}
