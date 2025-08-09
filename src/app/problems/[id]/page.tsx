@@ -35,12 +35,12 @@ export default function ProblemSolvingPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white dark:bg-slate-900">
       {/* Problem Navigation */}
       <ProblemNavbar activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-6 bg-white dark:bg-slate-900">
         {activeTab === "submit" || activeTab === "status" ? (
           /* Submit and Status Tabs - Full Width Layout */
           <div>
