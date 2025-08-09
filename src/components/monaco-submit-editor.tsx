@@ -12,13 +12,17 @@ import Editor from "@monaco-editor/react";
 import {
   Code2,
   Copy,
+  FileText,
   Maximize2,
   Moon,
   Play,
+  Plus,
   RotateCcw,
+  Save,
   Send,
   Settings,
   Sun,
+  X,
 } from "lucide-react";
 import type { editor } from "monaco-editor";
 import { useEffect, useRef, useState } from "react";
@@ -127,6 +131,16 @@ const themes = [
   { value: "hc-black", label: "High Contrast", icon: Settings },
 ];
 
+// Tab interface
+interface CodeTab {
+  id: string;
+  name: string;
+  language: string;
+  code: string;
+  isModified: boolean;
+  icon?: string;
+}
+
 interface MonacoSubmitEditorProps {
   onRun?: (code: string, language: string) => void;
   onSubmit?: (code: string, language: string) => void;
@@ -141,15 +155,138 @@ export default function MonacoSubmitEditor({
   isSubmitting = false,
 }: MonacoSubmitEditorProps) {
   const [selectedLanguage, setSelectedLanguage] = useState("python");
-  const [code, setCode] = useState(defaultCode.python);
   const [theme, setTheme] = useState("light");
   const [fontSize, setFontSize] = useState(14);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
+  // Tab state
+  const [tabs, setTabs] = useState<CodeTab[]>([
+    {
+      id: "tab-1",
+      name: "Solution.py",
+      language: "python",
+      code: defaultCode.python,
+      isModified: false,
+      icon: "🐍",
+    },
+  ]);
+  const [activeTabId, setActiveTabId] = useState("tab-1");
+
+  // Get current active tab
+  const activeTab = tabs.find((tab) => tab.id === activeTabId);
+  const currentCode = activeTab?.code || "";
+  const currentLanguage = activeTab?.language || "python";
+
+  // Tab functions
+  const createNewTab = () => {
+    const newTabId = `tab-${Date.now()}`;
+    const languageConfig = languages.find(
+      (lang) => lang.value === selectedLanguage
+    );
+    const extension = languageConfig?.extension || ".py";
+    const icon =
+      selectedLanguage === "python"
+        ? "🐍"
+        : selectedLanguage === "cpp"
+          ? "⚡"
+          : selectedLanguage === "java"
+            ? "☕"
+            : selectedLanguage === "javascript"
+              ? "🟡"
+              : selectedLanguage === "csharp"
+                ? "🔷"
+                : selectedLanguage === "typescript"
+                  ? "🔵"
+                  : "📄";
+
+    const newTab: CodeTab = {
+      id: newTabId,
+      name: `Solution${extension}`,
+      language: selectedLanguage,
+      code: defaultCode[selectedLanguage as keyof typeof defaultCode],
+      isModified: false,
+      icon,
+    };
+
+    setTabs((prev) => [...prev, newTab]);
+    setActiveTabId(newTabId);
+  };
+
+  const closeTab = (tabId: string) => {
+    if (tabs.length === 1) return; // Don't close last tab
+
+    const newTabs = tabs.filter((tab) => tab.id !== tabId);
+    setTabs(newTabs);
+
+    if (activeTabId === tabId) {
+      setActiveTabId(newTabs[0].id);
+    }
+  };
+
+  const updateTabCode = (tabId: string, newCode: string) => {
+    setTabs((prev) =>
+      prev.map((tab) =>
+        tab.id === tabId
+          ? {
+              ...tab,
+              code: newCode,
+              isModified:
+                newCode !==
+                defaultCode[tab.language as keyof typeof defaultCode],
+            }
+          : tab
+      )
+    );
+  };
+
+  const saveTab = (tabId: string) => {
+    setTabs((prev) =>
+      prev.map((tab) =>
+        tab.id === tabId ? { ...tab, isModified: false } : tab
+      )
+    );
+  };
+
+  const switchTab = (tabId: string) => {
+    setActiveTabId(tabId);
+  };
+
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
-    setCode(defaultCode[language as keyof typeof defaultCode]);
+    if (activeTab) {
+      const languageConfig = languages.find((lang) => lang.value === language);
+      const extension = languageConfig?.extension || ".py";
+      const icon =
+        language === "python"
+          ? "🐍"
+          : language === "cpp"
+            ? "⚡"
+            : language === "java"
+              ? "☕"
+              : language === "javascript"
+                ? "🟡"
+                : language === "csharp"
+                  ? "🔷"
+                  : language === "typescript"
+                    ? "🔵"
+                    : "📄";
+
+      setTabs((prev) =>
+        prev.map((tab) =>
+          tab.id === activeTabId
+            ? {
+                ...tab,
+                language,
+                name: `Solution${extension}`,
+                code: defaultCode[language as keyof typeof defaultCode],
+                icon,
+                isModified: false,
+              }
+            : tab
+        )
+      );
+    }
   };
 
   const handleThemeChange = (newTheme: string) => {
@@ -157,19 +294,24 @@ export default function MonacoSubmitEditor({
   };
 
   const handleReset = () => {
-    setCode(defaultCode[selectedLanguage as keyof typeof defaultCode]);
+    if (activeTab) {
+      updateTabCode(
+        activeTabId,
+        defaultCode[activeTab.language as keyof typeof defaultCode]
+      );
+    }
   };
 
   const copyCode = () => {
-    navigator.clipboard.writeText(code);
+    navigator.clipboard.writeText(currentCode);
   };
 
   const handleRun = () => {
-    onRun?.(code, selectedLanguage);
+    onRun?.(currentCode, currentLanguage);
   };
 
   const handleSubmit = () => {
-    onSubmit?.(code, selectedLanguage);
+    onSubmit?.(currentCode, currentLanguage);
   };
 
   const handleEditorDidMount = (
@@ -231,7 +373,7 @@ export default function MonacoSubmitEditor({
 
   const getCurrentLanguage = () => {
     return (
-      languages.find((lang) => lang.value === selectedLanguage)?.monacoLang ||
+      languages.find((lang) => lang.value === currentLanguage)?.monacoLang ||
       "python"
     );
   };
@@ -260,7 +402,7 @@ export default function MonacoSubmitEditor({
 
         <div className="flex items-center gap-2">
           {/* Language Selector */}
-          <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+          <Select value={currentLanguage} onValueChange={handleLanguageChange}>
             <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
               <SelectValue placeholder="Select language" />
             </SelectTrigger>
@@ -321,6 +463,17 @@ export default function MonacoSubmitEditor({
             <Button
               variant="outline"
               size="sm"
+              onClick={() => activeTab && saveTab(activeTab.id)}
+              className="border-slate-200 dark:border-slate-700"
+              disabled={!activeTab?.isModified}
+            >
+              <Save className="w-4 h-4 mr-1" />
+              Save
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setIsFullscreen(!isFullscreen)}
               className="border-slate-200 dark:border-slate-700"
             >
@@ -330,13 +483,81 @@ export default function MonacoSubmitEditor({
         </div>
       </div>
 
+      {/* Tabs Bar */}
+      <div className="flex items-center bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-750 border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
+        <div className="flex items-center min-w-0 flex-1">
+          {tabs.map((tab) => (
+            <button
+              type="button"
+              key={tab.id}
+              className={`group relative flex items-center gap-2 px-4 py-3 cursor-pointer transition-all duration-200 border-r border-slate-200 dark:border-slate-700 min-w-0 border-0 bg-transparent ${
+                activeTabId === tab.id
+                  ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm"
+                  : "hover:bg-white/70 dark:hover:bg-slate-800/70 text-slate-600 dark:text-slate-400"
+              }`}
+              onClick={() => switchTab(tab.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  switchTab(tab.id);
+                }
+              }}
+            >
+              {/* Tab Indicator */}
+              <div
+                className={`absolute top-0 left-0 right-0 h-0.5 transition-all duration-200 ${
+                  activeTabId === tab.id
+                    ? "bg-gradient-to-r from-blue-500 to-purple-600"
+                    : "bg-transparent"
+                }`}
+              />
+
+              {/* Tab Icon */}
+              <span className="text-sm flex-shrink-0">{tab.icon}</span>
+
+              {/* Tab Name */}
+              <span className="text-sm font-medium truncate min-w-0">
+                {tab.name}
+                {tab.isModified && (
+                  <span className="ml-1 w-1.5 h-1.5 bg-orange-500 rounded-full inline-block animate-pulse" />
+                )}
+              </span>
+
+              {/* Close Button */}
+              {tabs.length > 1 && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    closeTab(tab.id);
+                  }}
+                  className="ml-2 p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-700 opacity-0 group-hover:opacity-100 transition-all duration-200 flex-shrink-0"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* New Tab Button */}
+        <button
+          type="button"
+          onClick={createNewTab}
+          className="flex items-center gap-1 px-3 py-2 m-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all duration-200 flex-shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+        >
+          <Plus className="w-4 h-4" />
+          <span className="text-sm font-medium">New</span>
+        </button>
+      </div>
+
       {/* Monaco Editor */}
       <div className="flex-1">
         <Editor
           height="100%"
           language={getCurrentLanguage()}
-          value={code}
-          onChange={(value) => setCode(value || "")}
+          value={currentCode}
+          onChange={(value) => updateTabCode(activeTabId, value || "")}
           theme={theme}
           onMount={handleEditorDidMount}
           options={{
@@ -374,14 +595,22 @@ export default function MonacoSubmitEditor({
       {/* Footer with Action Buttons */}
       <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
         <div className="flex items-center justify-between">
-          <div className="text-sm text-slate-600 dark:text-slate-400">
-            Lines: {code.split("\n").length} | Chars: {code.length} | Theme:{" "}
-            {getSelectedTheme()?.label}
+          <div className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-4">
+            <span>Lines: {currentCode.split("\n").length}</span>
+            <span>Chars: {currentCode.length}</span>
+            <span>Theme: {getSelectedTheme()?.label}</span>
+            <span>Tab: {activeTab?.name}</span>
+            {activeTab?.isModified && (
+              <span className="flex items-center gap-1 text-orange-600 dark:text-orange-400">
+                <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" />
+                Modified
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <Button
               onClick={handleRun}
-              disabled={isRunning || !code.trim()}
+              disabled={isRunning || !currentCode.trim()}
               variant="outline"
               size="sm"
               className="border-blue-200 dark:border-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
@@ -400,7 +629,7 @@ export default function MonacoSubmitEditor({
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting || !code.trim()}
+              disabled={isSubmitting || !currentCode.trim()}
               className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg"
               size="sm"
             >
