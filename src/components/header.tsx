@@ -67,8 +67,9 @@ export default function Header() {
     return (
       <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center">
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+          <Link href="/" className="flex items-center gap-3">
+            <img src="/logo.svg" alt="SolVibe Logo" className="w-8 h-8" />
+            <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
               SolVibe
             </span>
           </Link>
@@ -91,8 +92,9 @@ export default function Header() {
       }`}
     >
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center">
-          <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+        <Link href="/" className="flex items-center gap-3">
+          <img src="/logo.svg" alt="SolVibe Logo" className="w-8 h-8" />
+          <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
             SolVibe
           </span>
         </Link>
@@ -105,14 +107,14 @@ export default function Header() {
                   <button
                     type="button"
                     onClick={item.onClick}
-                    className="text-black hover:text-purple-600 transition-colors"
+                    className="text-black hover:text-green-600 transition-colors"
                   >
                     {item.name}
                   </button>
                 ) : (
                   <Link
                     href={item.href}
-                    className="text-black hover:text-purple-600 transition-colors"
+                    className="text-black hover:text-green-600 transition-colors"
                   >
                     {item.name}
                   </Link>
@@ -122,8 +124,8 @@ export default function Header() {
                   href={item.href}
                   className={`transition-colors ${
                     pathname === item.href
-                      ? "text-purple-600 font-semibold"
-                      : "text-black hover:text-purple-600"
+                      ? "text-green-600 font-semibold"
+                      : "text-black hover:text-green-600"
                   }`}
                 >
                   {item.name}

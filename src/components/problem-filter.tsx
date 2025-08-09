@@ -47,10 +47,10 @@ export default function ProblemFilter({
       <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600">
+            <div className="p-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600">
               <Search className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h3 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
               Bộ lọc tìm kiếm
             </h3>
           </div>
@@ -79,7 +79,7 @@ export default function ProblemFilter({
               placeholder="Nhập mã bài..."
               value={filters.id || ""}
               onChange={(e) => handleFilterChange("id", e.target.value)}
-              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200"
             />
           </div>
 
@@ -96,7 +96,7 @@ export default function ProblemFilter({
               placeholder="Nhập tên bài..."
               value={filters.title || ""}
               onChange={(e) => handleFilterChange("title", e.target.value)}
-              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500 transition-all duration-200"
+              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200"
             />
           </div>
 
@@ -111,7 +111,7 @@ export default function ProblemFilter({
                 handleFilterChange("difficulty", value === "all" ? "" : value)
               }
             >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
                 <SelectValue placeholder="Tất cả" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
@@ -139,7 +139,7 @@ export default function ProblemFilter({
                 handleFilterChange("category", value === "all" ? "" : value)
               }
             >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
                 <SelectValue placeholder="Tham lam" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
@@ -167,7 +167,7 @@ export default function ProblemFilter({
                 handleFilterChange("subject", value === "all" ? "" : value)
               }
             >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
                 <SelectValue placeholder="Lập trình cơ bản" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
@@ -195,7 +195,7 @@ export default function ProblemFilter({
                 handleFilterChange("chapter", value === "all" ? "" : value)
               }
             >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
                 <SelectValue placeholder="2. Lệnh rẽ nhánh" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
@@ -223,7 +223,7 @@ export default function ProblemFilter({
                 handleFilterChange("problemType", value === "all" ? "" : value)
               }
             >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
                 <SelectValue placeholder="Tất cả" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
@@ -245,7 +245,7 @@ export default function ProblemFilter({
         <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
           <Button
             onClick={onSearch}
-            className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
             <Search className="w-5 h-5 mr-2" />
             Tìm kiếm

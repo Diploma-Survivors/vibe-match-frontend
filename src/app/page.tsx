@@ -73,7 +73,7 @@ export default function HomePage() {
                 className="max-w-xl"
               >
                 <h1 className="text-5xl md:text-6xl font-bold text-black mb-4">
-                  <span className="bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                     SolVibe
                   </span>
                 </h1>
@@ -145,32 +145,32 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
-                icon: <Lock className="h-12 w-12 text-purple-600" />,
+                icon: <Lock className="h-12 w-12 text-green-600" />,
                 title: "Content Censorship",
                 description:
                   "Content removed or restricted by central authorities.",
               },
               {
-                icon: <Shield className="h-12 w-12 text-purple-600" />,
+                icon: <Shield className="h-12 w-12 text-green-600" />,
                 title: "Data Privacy",
                 description:
                   "User data stored centrally, vulnerable to exploitation.",
               },
               {
-                icon: <DollarSign className="h-12 w-12 text-purple-600" />,
+                icon: <DollarSign className="h-12 w-12 text-green-600" />,
                 title: "Unfair Profit Distribution",
                 description:
                   "Creators receive little to no deserved compensation.",
               },
               {
-                icon: <Award className="h-12 w-12 text-purple-600" />,
+                icon: <Award className="h-12 w-12 text-green-600" />,
                 title: "Copyright Violations",
                 description:
                   "Content easily misused without clear ownership proof.",
               },
             ].map((problem, index) => (
               <motion.div
-                key={index}
+                key={problem.title}
                 initial={{ opacity: 0, y: 30 }}
                 animate={problemsInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.1 * index }}
@@ -207,37 +207,37 @@ export default function HomePage() {
               initial={{ opacity: 0, x: -30 }}
               animate={solanaInView ? { opacity: 1, x: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="bg-gradient-to-br from-purple-600 to-indigo-600 p-1 rounded-2xl"
+              className="bg-gradient-to-br from-green-600 to-emerald-600 p-1 rounded-2xl"
             >
               <div className="bg-white/95 backdrop-blur-sm p-8 rounded-2xl h-full">
                 <div className="grid grid-cols-1 gap-6">
                   {[
                     {
-                      icon: <Zap className="h-8 w-8 text-purple-600" />,
+                      icon: <Zap className="h-8 w-8 text-green-600" />,
                       title: "High Transaction Speed",
                       description:
                         "Thousands of transactions per second (TPS), ideal for social media interactions.",
                     },
                     {
-                      icon: <DollarSign className="h-8 w-8 text-purple-600" />,
+                      icon: <DollarSign className="h-8 w-8 text-green-600" />,
                       title: "Low Cost",
                       description:
                         "Average transaction fee of ~$0.00025, perfect for NFT minting and microtransactions.",
                     },
                     {
-                      icon: <Database className="h-8 w-8 text-purple-600" />,
+                      icon: <Database className="h-8 w-8 text-green-600" />,
                       title: "Strong Ecosystem",
                       description:
                         "Tools like Anchor, Metaplex, and Solana Wallet Adapter support efficient development.",
                     },
                     {
-                      icon: <Users className="h-8 w-8 text-purple-600" />,
+                      icon: <Users className="h-8 w-8 text-green-600" />,
                       title: "Scalability",
                       description:
                         "Accommodates user growth without performance impact.",
                     },
                   ].map((feature, index) => (
-                    <div key={index} className="flex items-start">
+                    <div key={feature.title} className="flex items-start">
                       <div className="mr-4">{feature.icon}</div>
                       <div>
                         <h3 className="text-lg font-semibold mb-1">
@@ -273,7 +273,7 @@ export default function HomePage() {
                   initial={{ width: 0 }}
                   animate={solanaInView ? { width: "95%" } : {}}
                   transition={{ duration: 1.5, delay: 0.6 }}
-                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full"
+                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-600 to-emerald-600 rounded-full"
                 />
                 <div className="absolute inset-0 flex items-center justify-center text-white font-medium">
                   95% Lower Fees Than Ethereum
@@ -341,11 +341,11 @@ export default function HomePage() {
               },
             ].map((feature, index) => (
               <motion.div
-                key={index}
+                key={feature.title}
                 initial={{ opacity: 0, y: 30 }}
                 animate={featuresInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: feature.delay }}
-                className="bg-white/90 backdrop-blur-sm p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow border-t-4 border-purple-600"
+                className="bg-white/90 backdrop-blur-sm p-8 rounded-xl shadow-sm hover:shadow-md transition-shadow border-t-4 border-green-600"
               >
                 <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
@@ -387,10 +387,10 @@ export default function HomePage() {
                 },
               ].map((step, index) => (
                 <div
-                  key={index}
+                  key={step.step}
                   className="flex flex-col items-center max-w-xs"
                 >
-                  <div className="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold mb-4">
+                  <div className="w-12 h-12 rounded-full bg-green-600 text-white flex items-center justify-center font-bold mb-4">
                     {step.step}
                   </div>
                   <h4 className="text-lg font-semibold mb-2">{step.title}</h4>
@@ -398,7 +398,7 @@ export default function HomePage() {
                     {step.description}
                   </p>
                   {index < 3 && (
-                    <div className="hidden md:block h-0.5 w-12 bg-purple-600 absolute translate-x-[150px] mt-6" />
+                    <div className="hidden md:block h-0.5 w-12 bg-green-600 absolute translate-x-[150px] mt-6" />
                   )}
                 </div>
               ))}
@@ -458,13 +458,13 @@ export default function HomePage() {
               },
             ].map((audience, index) => (
               <motion.div
-                key={index}
+                key={audience.title}
                 initial={{ opacity: 0, y: 30 }}
                 animate={audienceInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: audience.delay }}
-                className="bg-gradient-to-br from-purple-50/90 to-indigo-50/90 backdrop-blur-sm p-8 rounded-xl hover:shadow-md transition-shadow"
+                className="bg-gradient-to-br from-green-50/90 to-emerald-50/90 backdrop-blur-sm p-8 rounded-xl hover:shadow-md transition-shadow"
               >
-                <h3 className="text-xl font-semibold mb-3 text-purple-700">
+                <h3 className="text-xl font-semibold mb-3 text-green-700">
                   {audience.title}
                 </h3>
                 <p className="text-gray-700">{audience.description}</p>
@@ -473,142 +473,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="py-12 relative">
-        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm" />
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
-                SolVibe
-              </h3>
-              <p className="text-gray-400">
-                Empowering creators with decentralized ownership, privacy, and
-                fair rewards.
-              </p>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-white">
-                Platform
-              </h4>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Features
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Roadmap
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Token
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    NFTs
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-white">
-                Resources
-              </h4>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Documentation
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Whitepaper
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    GitHub
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    FAQ
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-lg font-semibold mb-4 text-white">Connect</h4>
-              <ul className="space-y-2">
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Twitter
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Discord
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Telegram
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="#"
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    Medium
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>© {new Date().getFullYear()} SolVibe. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

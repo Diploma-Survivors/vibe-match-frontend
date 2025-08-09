@@ -1,5 +1,6 @@
 import type React from "react";
 import "./globals.css";
+import Footer from "@/components/footer";
 import Header from "@/components/header";
 import { ThemeProvider } from "@/components/theme-provider";
 import type { Metadata } from "next";
@@ -24,6 +25,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <Header />
           <main className="pt-16">{children}</main>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/table";
 import type { Problem } from "@/types/problem";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
 interface ProblemTableProps {
@@ -62,7 +63,7 @@ export default function ProblemTable({
                 <TableHead className="w-16 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 rounded border-2 border-slate-300 text-blue-600 focus:ring-blue-500"
+                    className="w-4 h-4 rounded border-2 border-slate-300 text-green-600 focus:ring-green-500"
                   />
                 </TableHead>
                 <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
@@ -100,24 +101,26 @@ export default function ProblemTable({
                   <TableCell className="text-center px-4 py-4">
                     <input
                       type="checkbox"
-                      className="w-4 h-4 rounded border-2 border-slate-300 text-blue-600 focus:ring-blue-500"
+                      className="w-4 h-4 rounded border-2 border-slate-300 text-green-600 focus:ring-green-500"
                     />
                   </TableCell>
                   <TableCell className="text-center px-4 py-4">
-                    <div className="inline-flex px-3 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg border border-blue-200 dark:border-blue-700">
-                      <code className="text-blue-700 dark:text-blue-300 font-bold text-sm">
+                    <div className="inline-flex px-3 py-2 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg border border-green-200 dark:border-green-700">
+                      <code className="text-green-700 dark:text-green-300 font-bold text-sm">
                         {problem.id}
                       </code>
                     </div>
                   </TableCell>
                   <TableCell className="px-4 py-4">
                     <div className="space-y-3">
-                      <button
-                        type="button"
-                        className="text-left group-hover:text-blue-600 dark:group-hover:text-blue-400 font-semibold text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"
-                      >
-                        {problem.title}
-                      </button>
+                      <Link href={`/problems/${problem.id}`}>
+                        <button
+                          type="button"
+                          className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-semibold text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"
+                        >
+                          {problem.title}
+                        </button>
+                      </Link>
                       <div className="flex items-center gap-3 flex-wrap">
                         <div
                           className={`${getDifficultyColor(problem.difficulty)} font-medium px-3 py-1 rounded-lg border text-xs inline-block`}
@@ -183,8 +186,8 @@ export default function ProblemTable({
                     </div>
                   </TableCell>
                   <TableCell className="text-center px-4 py-4">
-                    <div className="inline-flex items-center justify-center w-16 h-8 bg-gradient-to-r from-purple-100 to-violet-100 dark:from-purple-900/30 dark:to-violet-900/30 rounded-full border border-purple-200 dark:border-purple-700">
-                      <span className="font-bold text-purple-700 dark:text-purple-300 text-xs">
+                    <div className="inline-flex items-center justify-center w-16 h-8 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-full border border-green-200 dark:border-green-700">
+                      <span className="font-bold text-green-700 dark:text-green-300 text-xs">
                         {problem.submissionCount.toLocaleString()}
                       </span>
                     </div>
@@ -236,7 +239,7 @@ export default function ProblemTable({
                     onClick={() => onPageChange(pageNum)}
                     className={`w-10 h-10 p-0 rounded-xl transition-all duration-200 ${
                       currentPage === pageNum
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                        ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg"
                         : "border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600"
                     }`}
                   >

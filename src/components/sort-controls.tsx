@@ -65,7 +65,7 @@ export default function SortControls({
       </div>
 
       <Select value={sortField} onValueChange={handleFieldChange}>
-        <SelectTrigger className="w-48 h-10 rounded-xl border-0 bg-slate-100 dark:bg-slate-700/50 focus:ring-2 focus:ring-purple-500 transition-all duration-200">
+        <SelectTrigger className="w-48 h-10 rounded-xl border-0 bg-slate-100 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">

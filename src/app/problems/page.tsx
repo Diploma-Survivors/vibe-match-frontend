@@ -133,13 +133,13 @@ export default function ProblemsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-900 dark:to-indigo-900 pt-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100 dark:from-slate-900 dark:via-green-900 dark:to-emerald-900 pt-4">
       {/* Header */}
       <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-white/20 dark:border-slate-700/50">
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
                 Vibe Match Problems
               </h1>
               <p className="text-slate-600 dark:text-slate-400 text-lg">
@@ -217,7 +217,7 @@ export default function ProblemsPage() {
             </div>
             <p className="mt-4 text-slate-500 dark:text-slate-500">
               Tổng cộng{" "}
-              <strong className="text-indigo-600 dark:text-indigo-400">
+              <strong className="text-green-600 dark:text-emerald-400">
                 {mockProblems.length}
               </strong>{" "}
               bài tập từ nhiều chủ đề

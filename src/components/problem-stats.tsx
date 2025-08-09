@@ -31,7 +31,7 @@ export default function ProblemStats({ problems }: ProblemStatsProps) {
       label: "Tổng bài",
       value: stats.total.toLocaleString(),
       bgColor: "bg-blue-50 dark:bg-blue-900/20",
-      iconColor: "text-blue-600 dark:text-blue-400",
+      iconColor: "text-green-600 dark:text-emerald-400",
     },
     {
       icon: TrendingUp,
@@ -44,8 +44,8 @@ export default function ProblemStats({ problems }: ProblemStatsProps) {
       icon: Users,
       label: "Lượt nộp",
       value: stats.totalSubmissions.toLocaleString(),
-      bgColor: "bg-purple-50 dark:bg-purple-900/20",
-      iconColor: "text-purple-600 dark:text-purple-400",
+      bgColor: "bg-green-50 dark:bg-green-900/20",
+      iconColor: "text-green-600 dark:text-green-400",
     },
   ];
 
