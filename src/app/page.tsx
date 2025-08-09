@@ -1,25 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Wallet,
-  ChevronDown,
-  Shield,
-  Zap,
-  Database,
-  Users,
-  Lock,
-  DollarSign,
-  Award,
-} from "lucide-react";
-import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
 import { ParticleBackground } from "@/components/particle-background";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import {
+  Award,
+  ChevronDown,
+  Database,
+  DollarSign,
+  Lock,
+  Shield,
+  Users,
+  Wallet,
+  Zap,
+} from "lucide-react";
+import { useState } from "react";
+import { useInView } from "react-intersection-observer";
 
 export default function HomePage() {
   const [walletConnected, setWalletConnected] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
 
   // Intersection observer hooks for animations
   const [heroRef, heroInView] = useInView({
@@ -43,17 +42,6 @@ export default function HomePage() {
     threshold: 0.1,
   });
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   const connectWallet = () => {
     // This would be replaced with actual Solana wallet connection logic
     setWalletConnected(!walletConnected);
@@ -71,56 +59,6 @@ export default function HomePage() {
     <div className="relative min-h-screen overflow-x-hidden">
       {/* Full-page background */}
       <ParticleBackground />
-
-      {/* Navigation Bar */}
-      <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-white/80 backdrop-blur-md shadow-md" : "bg-transparent"
-        }`}
-      >
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center">
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              SolVibe
-            </span>
-          </div>
-
-          <div className="hidden md:flex items-center space-x-8">
-            <button
-              onClick={() => scrollToSection("problems")}
-              className="text-black hover:text-purple-600 transition-colors"
-            >
-              Problems
-            </button>
-            <button
-              onClick={() => scrollToSection("why-solana")}
-              className="text-black hover:text-purple-600 transition-colors"
-            >
-              Why Solana
-            </button>
-            <button
-              onClick={() => scrollToSection("features")}
-              className="text-black hover:text-purple-600 transition-colors"
-            >
-              Features
-            </button>
-            <button
-              onClick={() => scrollToSection("audience")}
-              className="text-black hover:text-purple-600 transition-colors"
-            >
-              Audience
-            </button>
-          </div>
-
-          <Button
-            onClick={connectWallet}
-            className="flex items-center gap-2 bg-black hover:bg-black/90 text-white"
-          >
-            <Wallet size={18} />
-            {walletConnected ? "Connected" : "Connect Wallet"}
-          </Button>
-        </div>
-      </nav>
 
       {/* Hero Section */}
       <div className="relative w-full h-screen" id="hero">
@@ -155,8 +93,11 @@ export default function HomePage() {
                   <Button
                     variant="outline"
                     className="text-black border-black hover:bg-black/10 px-8 py-6"
+                    onClick={() => {
+                      window.location.href = "/problems";
+                    }}
                   >
-                    Learn More
+                    Browse Problems
                   </Button>
                 </div>
               </motion.div>
@@ -457,7 +398,7 @@ export default function HomePage() {
                     {step.description}
                   </p>
                   {index < 3 && (
-                    <div className="hidden md:block h-0.5 w-12 bg-purple-600 absolute translate-x-[150px] mt-6"></div>
+                    <div className="hidden md:block h-0.5 w-12 bg-purple-600 absolute translate-x-[150px] mt-6" />
                   )}
                 </div>
               ))}
@@ -535,7 +476,7 @@ export default function HomePage() {
 
       {/* Footer */}
       <footer className="py-12 relative">
-        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm"></div>
+        <div className="absolute inset-0 bg-gray-900/95 backdrop-blur-sm" />
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
