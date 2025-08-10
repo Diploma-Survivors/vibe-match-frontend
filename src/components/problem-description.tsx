@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import ProblemSidebar from "@/components/problem-sidebar";
 import {
   Select,
   SelectContent,
@@ -72,8 +73,12 @@ export default function ProblemDescription({
 
   // Status tab state
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSubmissionId, setSelectedSubmissionId] = useState<number | null>(null);
-  const [submissionNotes, setSubmissionNotes] = useState<Record<number, string>>({});
+  const [selectedSubmissionId, setSelectedSubmissionId] = useState<
+    number | null
+  >(null);
+  const [submissionNotes, setSubmissionNotes] = useState<
+    Record<number, string>
+  >({});
 
   // Publish Solution Modal state
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
@@ -156,7 +161,8 @@ for i in range(1, n + 1):
 for i in range(1, n + 1):
     # Wrong implementation
     print(i, end=" ")`,
-      result: "Expected output: 1 1 2 1 4 2 6 1 6 2\nActual output: 1 2 3 4 5 6 7 8 9 10",
+      result:
+        "Expected output: 1 1 2 1 4 2 6 1 6 2\nActual output: 1 2 3 4 5 6 7 8 9 10",
     },
     {
       id: 1003,
@@ -239,7 +245,9 @@ for i in range(1, n + 1):
   ];
 
   // Get selected submission details
-  const selectedSubmission = mockUserSubmissions.find(sub => sub.id === selectedSubmissionId);
+  const selectedSubmission = mockUserSubmissions.find(
+    (sub) => sub.id === selectedSubmissionId
+  );
 
   // Auto-select first submission if none selected
   if (!selectedSubmissionId && mockUserSubmissions.length > 0) {
@@ -308,8 +316,7 @@ for i in range(1, n + 1):
   // Filter and sort submissions
   const filteredSubmissions = mockUserSubmissions
     .filter((submission) => {
-      const matchesSearch =
-        submission.id.toString().includes(searchTerm);
+      const matchesSearch = submission.id.toString().includes(searchTerm);
       const matchesVerdict =
         verdictFilter === "all" || submission.verdict === verdictFilter;
       const matchesLanguage =
@@ -333,13 +340,10 @@ for i in range(1, n + 1):
   );
 
   // Calculate verdict statistics
-  const verdictStats = mockUserSubmissions.reduce(
-    (acc, submission) => {
-      acc[submission.verdict] = (acc[submission.verdict] || 0) + 1;
-      return acc;
-    },
-    {} as Record<string, number>
-  );
+  const verdictStats = mockUserSubmissions.reduce((acc, submission) => {
+    acc[submission.verdict] = (acc[submission.verdict] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
   const totalSubmissions = mockUserSubmissions.length;
   const chartData = Object.entries(verdictStats)
@@ -392,7 +396,15 @@ for i in range(1, n + 1):
 
       setSubmissions([newSubmission, ...submissions]);
       setOutput(
-        `✅ Submission #${newSubmission.id} completed!\n\nStatus: ${newSubmission.status}\nRuntime: ${newSubmission.runtime}\nMemory: ${newSubmission.memory}\nScore: ${newSubmission.score}/100\n\nTest case 1: Passed (0.08s)\nTest case 2: Passed (0.12s)\nTest case 3: ${newSubmission.status === "Accepted" ? "Passed" : "Failed"} (0.15s)`
+        `✅ Submission #${newSubmission.id} completed!\n\nStatus: ${
+          newSubmission.status
+        }\nRuntime: ${newSubmission.runtime}\nMemory: ${
+          newSubmission.memory
+        }\nScore: ${
+          newSubmission.score
+        }/100\n\nTest case 1: Passed (0.08s)\nTest case 2: Passed (0.12s)\nTest case 3: ${
+          newSubmission.status === "Accepted" ? "Passed" : "Failed"
+        } (0.15s)`
       );
       setIsSubmitting(false);
     }, 3000);
@@ -542,7 +554,9 @@ Hãy hỏi cụ thể hơn nhé!`;
   const handlePublishSolution = () => {
     if (selectedSubmission) {
       setPublishTitle(`Optimal Solution for ${problem.title}`);
-      setPublishDescription("This is my efficient solution that passes all test cases with good performance.");
+      setPublishDescription(
+        "This is my efficient solution that passes all test cases with good performance."
+      );
       setIsPublishModalOpen(true);
     }
   };
@@ -572,7 +586,11 @@ Hãy hỏi cụ thể hơn nhé!`;
   };
 
   // Test Cases Functions
-  const handleTestCaseChange = (id: number, field: "input" | "output", value: string) => {
+  const handleTestCaseChange = (
+    id: number,
+    field: "input" | "output",
+    value: string
+  ) => {
     setTestCases((prev) =>
       prev.map((testCase) =>
         testCase.id === id ? { ...testCase, [field]: value } : testCase
@@ -583,7 +601,9 @@ Hãy hỏi cụ thể hơn nhé!`;
   const handleTestCaseEdit = (id: number) => {
     setTestCases((prev) =>
       prev.map((testCase) =>
-        testCase.id === id ? { ...testCase, isEditing: !testCase.isEditing } : testCase
+        testCase.id === id
+          ? { ...testCase, isEditing: !testCase.isEditing }
+          : testCase
       )
     );
   };
@@ -729,7 +749,11 @@ Hãy hỏi cụ thể hơn nhé!`;
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleTestCaseDelete(testCases[activeTestCase].id)}
+                              onClick={() =>
+                                handleTestCaseDelete(
+                                  testCases[activeTestCase].id
+                                )
+                              }
                               className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                             >
                               <X className="w-3 h-3" />
@@ -753,7 +777,11 @@ Hãy hỏi cụ thể hơn nhé!`;
                             <div className="flex gap-2">
                               <Button
                                 size="sm"
-                                onClick={() => handleTestCaseSave(testCases[activeTestCase].id)}
+                                onClick={() =>
+                                  handleTestCaseSave(
+                                    testCases[activeTestCase].id
+                                  )
+                                }
                                 className="bg-green-600 hover:bg-green-700 text-white text-xs"
                               >
                                 Save
@@ -761,7 +789,11 @@ Hãy hỏi cụ thể hơn nhé!`;
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleTestCaseEdit(testCases[activeTestCase].id)}
+                                onClick={() =>
+                                  handleTestCaseEdit(
+                                    testCases[activeTestCase].id
+                                  )
+                                }
                                 className="text-xs"
                               >
                                 Cancel
@@ -770,7 +802,9 @@ Hãy hỏi cụ thể hơn nhé!`;
                           </div>
                         ) : (
                           <div
-                            onClick={() => handleTestCaseEdit(testCases[activeTestCase].id)}
+                            onClick={() =>
+                              handleTestCaseEdit(testCases[activeTestCase].id)
+                            }
                             className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
                           >
                             <div className="flex items-center justify-between mb-2">
@@ -780,7 +814,8 @@ Hãy hỏi cụ thể hơn nhé!`;
                               <Code className="w-3 h-3 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
                             </div>
                             <pre className="text-sm font-mono text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
-                              {testCases[activeTestCase].input || "Enter input..."}
+                              {testCases[activeTestCase].input ||
+                                "Enter input..."}
                             </pre>
                           </div>
                         )}
@@ -807,7 +842,9 @@ Hãy hỏi cụ thể hơn nhé!`;
                           />
                         ) : (
                           <div
-                            onClick={() => handleTestCaseEdit(testCases[activeTestCase].id)}
+                            onClick={() =>
+                              handleTestCaseEdit(testCases[activeTestCase].id)
+                            }
                             className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
                           >
                             <div className="flex items-center justify-between mb-2">
@@ -817,7 +854,8 @@ Hãy hỏi cụ thể hơn nhé!`;
                               <Code className="w-3 h-3 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
                             </div>
                             <pre className="text-sm font-mono text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
-                              {testCases[activeTestCase].output || "Enter expected output..."}
+                              {testCases[activeTestCase].output ||
+                                "Enter expected output..."}
                             </pre>
                           </div>
                         )}
@@ -831,7 +869,9 @@ Hãy hỏi cụ thể hơn nhé!`;
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setActiveTestCase(Math.max(0, activeTestCase - 1))}
+                        onClick={() =>
+                          setActiveTestCase(Math.max(0, activeTestCase - 1))
+                        }
                         disabled={activeTestCase === 0}
                         className="flex items-center gap-2"
                       >
@@ -844,7 +884,11 @@ Hãy hỏi cụ thể hơn nhé!`;
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => setActiveTestCase(Math.min(testCases.length - 1, activeTestCase + 1))}
+                        onClick={() =>
+                          setActiveTestCase(
+                            Math.min(testCases.length - 1, activeTestCase + 1)
+                          )
+                        }
                         disabled={activeTestCase === testCases.length - 1}
                         className="flex items-center gap-2"
                       >
@@ -907,7 +951,9 @@ Hãy hỏi cụ thể hơn nhé!`;
                       {aiMessages.map((message) => (
                         <div
                           key={message.timestamp}
-                          className={`flex items-start gap-3 ${message.role === "user" ? "flex-row-reverse" : ""}`}
+                          className={`flex items-start gap-3 ${
+                            message.role === "user" ? "flex-row-reverse" : ""
+                          }`}
                         >
                           <div
                             className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
@@ -1065,11 +1111,10 @@ Hãy hỏi cụ thể hơn nhé!`;
                                 submission.status === "Accepted"
                                   ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                                   : submission.status === "Wrong Answer"
-                                    ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                                    : submission.status ===
-                                        "Time Limit Exceeded"
-                                      ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-                                      : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
+                                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                  : submission.status === "Time Limit Exceeded"
+                                  ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                                  : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
                               }`}
                             >
                               {submission.status === "Accepted" ? (
@@ -1144,22 +1189,36 @@ Hãy hỏi cụ thể hơn nhé!`;
                 <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
                   <div className="flex flex-wrap items-center gap-3">
                     {/* Verdict Filter */}
-                    <Select value={verdictFilter} onValueChange={setVerdictFilter}>
+                    <Select
+                      value={verdictFilter}
+                      onValueChange={setVerdictFilter}
+                    >
                       <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                         <SelectValue placeholder="All verdicts" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="all">All verdicts</SelectItem>
                         <SelectItem value="Accepted">Accepted</SelectItem>
-                        <SelectItem value="Wrong Answer">Wrong Answer</SelectItem>
-                        <SelectItem value="Time Limit Exceeded">Time Limit Exceeded</SelectItem>
-                        <SelectItem value="Compilation Error">Compilation Error</SelectItem>
-                        <SelectItem value="Runtime Error">Runtime Error</SelectItem>
+                        <SelectItem value="Wrong Answer">
+                          Wrong Answer
+                        </SelectItem>
+                        <SelectItem value="Time Limit Exceeded">
+                          Time Limit Exceeded
+                        </SelectItem>
+                        <SelectItem value="Compilation Error">
+                          Compilation Error
+                        </SelectItem>
+                        <SelectItem value="Runtime Error">
+                          Runtime Error
+                        </SelectItem>
                       </SelectContent>
                     </Select>
 
                     {/* Language Filter */}
-                    <Select value={languageFilter} onValueChange={setLanguageFilter}>
+                    <Select
+                      value={languageFilter}
+                      onValueChange={setLanguageFilter}
+                    >
                       <SelectTrigger className="w-32 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                         <SelectValue placeholder="Language" />
                       </SelectTrigger>
@@ -1222,7 +1281,9 @@ Hãy hỏi cụ thể hơn nhé!`;
                           <td className="px-4 py-4">
                             <div className="flex items-center gap-2">
                               <div
-                                className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getVerdictColor(submission.verdict)}`}
+                                className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getVerdictColor(
+                                  submission.verdict
+                                )}`}
                               >
                                 {getVerdictIcon(submission.verdict)}
                                 {submission.verdict}
@@ -1300,7 +1361,7 @@ Hãy hỏi cụ thể hơn nhé!`;
                           </p>
                         </div>
                       </div>
-                      
+
                       {/* Publish Solution Button - Only for Accepted submissions */}
                       {selectedSubmission.verdict === "Accepted" && (
                         <Button
@@ -1317,7 +1378,9 @@ Hãy hỏi cụ thể hơn nhé!`;
 
                     {/* Status Badge */}
                     <div
-                      className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold ${getVerdictColor(selectedSubmission.verdict)}`}
+                      className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold ${getVerdictColor(
+                        selectedSubmission.verdict
+                      )}`}
                     >
                       {getVerdictIcon(selectedSubmission.verdict)}
                       {selectedSubmission.verdict}
@@ -1389,7 +1452,9 @@ Hãy hỏi cụ thể hơn nhé!`;
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => copyToClipboard(selectedSubmission.code, -1)}
+                          onClick={() =>
+                            copyToClipboard(selectedSubmission.code, -1)
+                          }
                           className="text-xs"
                         >
                           <Copy className="w-3 h-3 mr-1" />
@@ -1507,20 +1572,26 @@ Hãy hỏi cụ thể hơn nhé!`;
                       </h4>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400">Runtime</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">
+                            Runtime
+                          </div>
                           <div className="text-lg font-bold text-green-600 dark:text-green-400 font-mono">
                             {selectedSubmission?.time}
                           </div>
                         </div>
                         <div>
-                          <div className="text-xs text-slate-500 dark:text-slate-400">Memory</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">
+                            Memory
+                          </div>
                           <div className="text-lg font-bold text-green-600 dark:text-green-400 font-mono">
                             {selectedSubmission?.memory}
                           </div>
                         </div>
                       </div>
                       <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
-                        <div className="text-xs text-slate-500 dark:text-slate-400">Language</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400">
+                          Language
+                        </div>
                         <div className="text-sm font-medium text-slate-800 dark:text-slate-100">
                           {selectedSubmission?.lang}
                         </div>
@@ -1546,7 +1617,8 @@ Hãy hỏi cụ thể hơn nhé!`;
               <div className="p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-slate-600 dark:text-slate-400">
-                    Your solution will be visible to other users in the community solutions section.
+                    Your solution will be visible to other users in the
+                    community solutions section.
                   </div>
                   <div className="flex items-center gap-3">
                     <Button
@@ -1559,7 +1631,11 @@ Hãy hỏi cụ thể hơn nhé!`;
                     </Button>
                     <Button
                       onClick={handlePublishSubmit}
-                      disabled={isPublishing || !publishTitle.trim() || !publishDescription.trim()}
+                      disabled={
+                        isPublishing ||
+                        !publishTitle.trim() ||
+                        !publishDescription.trim()
+                      }
                       className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white disabled:opacity-50"
                     >
                       {isPublishing ? (
@@ -1886,10 +1962,10 @@ Hãy hỏi cụ thể hơn nhé!`;
                                     entry.level === "Expert"
                                       ? "text-purple-600 dark:text-purple-400"
                                       : entry.level === "Advanced"
-                                        ? "text-blue-600 dark:text-blue-400"
-                                        : entry.level === "Intermediate"
-                                          ? "text-green-600 dark:text-green-400"
-                                          : "text-yellow-600 dark:text-yellow-400"
+                                      ? "text-blue-600 dark:text-blue-400"
+                                      : entry.level === "Intermediate"
+                                      ? "text-green-600 dark:text-green-400"
+                                      : "text-yellow-600 dark:text-yellow-400"
                                   }`}
                                 >
                                   {entry.level}
@@ -1903,13 +1979,13 @@ Hãy hỏi cụ thể hơn nhé!`;
                                 entry.lang.includes("C++")
                                   ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
                                   : entry.lang.includes("Python")
-                                    ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                                    : entry.lang.includes("Java")
-                                      ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300"
-                                      : entry.lang.includes("JavaScript") ||
-                                          entry.lang.includes("TypeScript")
-                                        ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
-                                        : "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
+                                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
+                                  : entry.lang.includes("Java")
+                                  ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300"
+                                  : entry.lang.includes("JavaScript") ||
+                                    entry.lang.includes("TypeScript")
+                                  ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
+                                  : "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
                               }`}
                             >
                               {entry.lang}
@@ -1974,160 +2050,175 @@ Hãy hỏi cụ thể hơn nhé!`;
   ];
 
   return (
-    <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
-      <div className="p-8 space-y-8">
-        {/* Simple Problem Title Header */}
-        <div className="pb-6 border-b border-slate-200 dark:border-slate-700">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent mb-4">
-            {problem.title}
-          </h1>
-          <div className="flex items-center gap-4">
-            <div
-              className={`px-3 py-1 rounded-full text-sm font-semibold shadow-md ${
-                problem.difficulty === "Dễ"
-                  ? "bg-gradient-to-r from-green-400 to-green-500 text-white"
-                  : problem.difficulty === "Trung bình"
-                    ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white"
-                    : "bg-gradient-to-r from-red-400 to-red-500 text-white"
-              }`}
-            >
-              {problem.difficulty}
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* Left Column - Problem Description */}
+      <div className="lg:col-span-8 xl:col-span-9">
+        <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
+          <div className="p-8 space-y-8">
+            {/* Simple Problem Title Header */}
+            <div className="pb-6 border-b border-slate-200 dark:border-slate-700">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent mb-4">
+                {problem.title}
+              </h1>
+              <div className="flex items-center gap-4">
+                <div
+                  className={`px-3 py-1 rounded-full text-sm font-semibold shadow-md ${
+                    problem.difficulty === "Dễ"
+                      ? "bg-gradient-to-r from-green-400 to-green-500 text-white"
+                      : problem.difficulty === "Trung bình"
+                      ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white"
+                      : "bg-gradient-to-r from-red-400 to-red-500 text-white"
+                  }`}
+                >
+                  {problem.difficulty}
+                </div>
+                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
+                  <Timer className="w-4 h-4" />
+                  2.0s time limit
+                </div>
+                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
+                  <MemoryStick className="w-4 h-4" />
+                  256MB memory
+                </div>
+                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
+                  <FileText className="w-4 h-4" />
+                  {problem.points} điểm
+                </div>
+              </div>
             </div>
-            <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
-              <Timer className="w-4 h-4" />
-              2.0s time limit
-            </div>
-            <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
-              <MemoryStick className="w-4 h-4" />
-              256MB memory
-            </div>
-            <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
-              <FileText className="w-4 h-4" />
-              {problem.points} điểm
-            </div>
+
+            {/* Problem Description */}
+            <section>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
+                Mô tả bài toán
+              </h2>
+              <div className="prose prose-slate dark:prose-invert max-w-none">
+                <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                  Cho số nguyên dương <strong>N</strong>, liệt kê phi hàm euler
+                  của các số từ 1 tới N và in ra màn hình.
+                </p>
+                <p className="text-slate-700 dark:text-slate-300 leading-relaxed mt-4">
+                  Phi hàm euler của số <strong>X</strong> hiển số lượng số
+                  nguyên tố cùng nhau với <strong>X</strong> nằm trong khoảng từ
+                  [1, X].
+                </p>
+              </div>
+            </section>
+
+            {/* Input Format */}
+            <section>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
+                Đầu vào
+              </h2>
+              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                <p className="text-slate-700 dark:text-slate-300">
+                  • Số nguyên N
+                </p>
+              </div>
+            </section>
+
+            {/* Constraints */}
+            <section>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
+                Giới hạn
+              </h2>
+              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                <p className="text-slate-700 dark:text-slate-300">• 1≤N≤10^6</p>
+              </div>
+            </section>
+
+            {/* Output Format */}
+            <section>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
+                Đầu ra
+              </h2>
+              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                <p className="text-slate-700 dark:text-slate-300">
+                  • In ra phi hàm euler của các số từ 1 tới N
+                </p>
+              </div>
+            </section>
+
+            {/* Sample Cases */}
+            <section>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
+                Ví dụ
+              </h2>
+              {sampleCases.map((testCase, index) => (
+                <div
+                  key={`testcase-${index}-${testCase.input.slice(0, 10)}`}
+                  className="mb-6 last:mb-0"
+                >
+                  <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-3">
+                    Test case {index + 1}
+                  </h3>
+
+                  {/* Input */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                        Input
+                      </h4>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          copyToClipboard(testCase.input, index * 2)
+                        }
+                        className="h-6 px-2 text-xs"
+                      >
+                        <Copy className="w-3 h-3 mr-1" />
+                        {copiedIndex === index * 2 ? "Copied!" : "Copy"}
+                      </Button>
+                    </div>
+                    <div className="bg-slate-100 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                      <code className="text-slate-800 dark:text-slate-200 font-mono text-sm">
+                        {testCase.input}
+                      </code>
+                    </div>
+                  </div>
+
+                  {/* Output */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                        Output
+                      </h4>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() =>
+                          copyToClipboard(testCase.output, index * 2 + 1)
+                        }
+                        className="h-6 px-2 text-xs"
+                      >
+                        <Copy className="w-3 h-3 mr-1" />
+                        {copiedIndex === index * 2 + 1 ? "Copied!" : "Copy"}
+                      </Button>
+                    </div>
+                    <div className="bg-slate-100 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                      <code className="text-slate-800 dark:text-slate-200 font-mono text-sm">
+                        {testCase.output}
+                      </code>
+                    </div>
+                  </div>
+
+                  {/* Explanation */}
+                  {testCase.explanation && (
+                    <div className="text-sm text-slate-600 dark:text-slate-400 italic">
+                      {testCase.explanation}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </section>
           </div>
         </div>
+      </div>
 
-        {/* Problem Description */}
-        <section>
-          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-            Mô tả bài toán
-          </h2>
-          <div className="prose prose-slate dark:prose-invert max-w-none">
-            <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-              Cho số nguyên dương <strong>N</strong>, liệt kê phi hàm euler của
-              các số từ 1 tới N và in ra màn hình.
-            </p>
-            <p className="text-slate-700 dark:text-slate-300 leading-relaxed mt-4">
-              Phi hàm euler của số <strong>X</strong> hiển số lượng số nguyên tố
-              cùng nhau với <strong>X</strong> nằm trong khoảng từ [1, X].
-            </p>
-          </div>
-        </section>
-
-        {/* Input Format */}
-        <section>
-          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-            Đầu vào
-          </h2>
-          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-            <p className="text-slate-700 dark:text-slate-300">• Số nguyên N</p>
-          </div>
-        </section>
-
-        {/* Constraints */}
-        <section>
-          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-            Giới hạn
-          </h2>
-          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-            <p className="text-slate-700 dark:text-slate-300">• 1≤N≤10^6</p>
-          </div>
-        </section>
-
-        {/* Output Format */}
-        <section>
-          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-            Đầu ra
-          </h2>
-          <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-            <p className="text-slate-700 dark:text-slate-300">
-              • In ra phi hàm euler của các số từ 1 tới N
-            </p>
-          </div>
-        </section>
-
-        {/* Sample Cases */}
-        <section>
-          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-            Ví dụ
-          </h2>
-          {sampleCases.map((testCase, index) => (
-            <div
-              key={`testcase-${index}-${testCase.input.slice(0, 10)}`}
-              className="mb-6 last:mb-0"
-            >
-              <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-3">
-                Test case {index + 1}
-              </h3>
-
-              {/* Input */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                    Input
-                  </h4>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => copyToClipboard(testCase.input, index * 2)}
-                    className="h-6 px-2 text-xs"
-                  >
-                    <Copy className="w-3 h-3 mr-1" />
-                    {copiedIndex === index * 2 ? "Copied!" : "Copy"}
-                  </Button>
-                </div>
-                <div className="bg-slate-100 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                  <code className="text-slate-800 dark:text-slate-200 font-mono text-sm">
-                    {testCase.input}
-                  </code>
-                </div>
-              </div>
-
-              {/* Output */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                    Output
-                  </h4>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      copyToClipboard(testCase.output, index * 2 + 1)
-                    }
-                    className="h-6 px-2 text-xs"
-                  >
-                    <Copy className="w-3 h-3 mr-1" />
-                    {copiedIndex === index * 2 + 1 ? "Copied!" : "Copy"}
-                  </Button>
-                </div>
-                <div className="bg-slate-100 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                  <code className="text-slate-800 dark:text-slate-200 font-mono text-sm">
-                    {testCase.output}
-                  </code>
-                </div>
-              </div>
-
-              {/* Explanation */}
-              {testCase.explanation && (
-                <div className="text-sm text-slate-600 dark:text-slate-400 italic">
-                  {testCase.explanation}
-                </div>
-              )}
-            </div>
-          ))}
-        </section>
+      {/* Right Column - Problem Sidebar (only for problem tab) */}
+      <div className="lg:col-span-4 xl:col-span-3">
+        <ProblemSidebar problem={problem} />
       </div>
     </div>
   );

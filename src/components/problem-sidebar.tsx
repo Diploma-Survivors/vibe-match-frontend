@@ -209,7 +209,7 @@ export default function ProblemSidebar({ problem }: ProblemSidebarProps) {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
+      {/* <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
         <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4">
           Thao tác nhanh
         </h3>
@@ -240,7 +240,7 @@ export default function ProblemSidebar({ problem }: ProblemSidebarProps) {
             📊 Xem submission
           </Button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }
