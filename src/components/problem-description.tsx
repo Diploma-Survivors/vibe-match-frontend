@@ -28,9 +28,11 @@ import {
   Play,
   Search,
   Send,
+  Share,
   Sparkles,
   TestTube,
   Timer,
+  X,
   XCircle,
 } from "lucide-react";
 import { useState } from "react";
@@ -69,6 +71,14 @@ export default function ProblemDescription({
 
   // Status tab state
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSubmissionId, setSelectedSubmissionId] = useState<number | null>(null);
+  const [submissionNotes, setSubmissionNotes] = useState<Record<number, string>>({});
+
+  // Publish Solution Modal state
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
+  const [publishTitle, setPublishTitle] = useState("");
+  const [publishDescription, setPublishDescription] = useState("");
+  const [isPublishing, setIsPublishing] = useState(false);
 
   // AI Assistant state
   const [aiMessages, setAiMessages] = useState<
@@ -82,360 +92,135 @@ export default function ProblemDescription({
   const [currentPage, setCurrentPage] = useState(1);
   const submissionsPerPage = 20;
 
-  // Mock submissions data for Status tab
-  const mockSubmissions = [
+  // Mock submissions data for Status tab - Current User Only
+  const mockUserSubmissions = [
     {
       id: 1001,
       when: "2025-08-09 14:30:25",
-      who: "user123",
-      fullName: "Nguyễn Văn A",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=user123",
-      userRank: "expert",
-      problem: problem.title,
-      lang: "Python 3.11",
       verdict: "Accepted",
       time: "124ms",
       memory: "2.1MB",
       testCase: null,
+      lang: "Python 3.11",
+      code: `def euler_phi(n):
+    result = n
+    p = 2
+    while p * p <= n:
+        if n % p == 0:
+            while n % p == 0:
+                n //= p
+            result -= result // p
+        p += 1
+    if n > 1:
+        result -= result // n
+    return result
+
+n = int(input())
+for i in range(1, n + 1):
+    print(euler_phi(i), end=" ")`,
+      result: "All test cases passed successfully",
     },
     {
       id: 1002,
       when: "2025-08-09 14:25:15",
-      who: "coder456",
-      fullName: "Trần Thị B",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=coder456",
-      userRank: "candidate master",
-      problem: problem.title,
-      lang: "C++17",
       verdict: "Wrong Answer",
       time: "89ms",
       memory: "1.8MB",
       testCase: "Failed on test 5",
+      lang: "Python 3.11",
+      code: `n = int(input())
+for i in range(1, n + 1):
+    # Wrong implementation
+    print(i, end=" ")`,
+      result: "Expected output: 1 1 2 1 4 2 6 1 6 2\nActual output: 1 2 3 4 5 6 7 8 9 10",
     },
     {
       id: 1003,
       when: "2025-08-09 14:20:10",
-      who: "pythonist",
-      fullName: "Lê Văn C",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=pythonist",
-      userRank: "specialist",
-      problem: problem.title,
-      lang: "Java 17",
       verdict: "Time Limit Exceeded",
       time: "2000ms",
       memory: "3.2MB",
       testCase: "Failed on test 12",
+      lang: "Python 3.11",
+      code: `def euler_phi(n):
+    # Inefficient implementation
+    count = 0
+    for i in range(1, n + 1):
+        if gcd(i, n) == 1:
+            count += 1
+    return count
+
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+
+n = int(input())
+for i in range(1, n + 1):
+    print(euler_phi(i), end=" ")`,
+      result: "Time limit exceeded on test case with large input",
     },
     {
       id: 1004,
       when: "2025-08-09 14:15:05",
-      who: "newbie_coder",
-      fullName: "Phạm Thị D",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=newbie_coder",
-      userRank: "newbie",
-      problem: problem.title,
-      lang: "Python 3.11",
       verdict: "Compilation Error",
       time: "-",
       memory: "-",
       testCase: "Syntax error at line 15",
+      lang: "Python 3.11",
+      code: `def euler_phi(n):
+    result = n
+    p = 2
+    while p * p <= n:
+        if n % p == 0:
+            while n % p == 0:
+                n //= p
+            result -= result // p
+        p += 1
+    if n > 1:
+        result -= result // n
+    return result
+
+n = int(input())
+for i in range(1, n + 1):
+    print(euler_phi(i), end=" "  # Missing closing parenthesis`,
+      result: "SyntaxError: '(' was never closed",
     },
     {
       id: 1005,
       when: "2025-08-09 14:10:00",
-      who: "master_dev",
-      fullName: "Hoàng Văn E",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=master_dev",
-      userRank: "master",
-      problem: problem.title,
-      lang: "C++17",
-      verdict: "Accepted",
-      time: "67ms",
-      memory: "1.4MB",
-      testCase: null,
-    },
-    {
-      id: 1006,
-      when: "2025-08-09 14:05:30",
-      who: "java_expert",
-      fullName: "Vũ Thị F",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=java_expert",
-      userRank: "international master",
-      problem: problem.title,
-      lang: "Java 17",
-      verdict: "Runtime Error",
-      time: "156ms",
-      memory: "2.8MB",
-      testCase: "Runtime error on test 8",
-    },
-    {
-      id: 1007,
-      when: "2025-08-09 14:00:45",
-      who: "algorithm_pro",
-      fullName: "Đặng Văn G",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=algorithm_pro",
-      userRank: "grandmaster",
-      problem: problem.title,
-      lang: "C++17",
-      verdict: "Accepted",
-      time: "45ms",
-      memory: "1.2MB",
-      testCase: null,
-    },
-    {
-      id: 1008,
-      when: "2025-08-09 13:55:20",
-      who: "student_coder",
-      fullName: "Bùi Thị H",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=student_coder",
-      userRank: "pupil",
-      problem: problem.title,
-      lang: "Python 3.11",
-      verdict: "Memory Limit Exceeded",
-      time: "1800ms",
-      memory: "256MB",
-      testCase: "Memory limit exceeded on test 15",
-    },
-    {
-      id: 1009,
-      when: "2025-08-09 13:50:10",
-      who: "competitive_coder",
-      fullName: "Ngô Văn I",
-      avatar:
-        "https://api.dicebear.com/7.x/avataaars/svg?seed=competitive_coder",
-      userRank: "expert",
-      problem: problem.title,
-      lang: "JavaScript",
-      verdict: "Wrong Answer",
-      time: "234ms",
-      memory: "3.5MB",
-      testCase: "Wrong answer on test 3",
-    },
-    {
-      id: 1010,
-      when: "2025-08-09 13:45:00",
-      who: "beginner123",
-      fullName: "Cao Thị J",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=beginner123",
-      userRank: "newbie",
-      problem: problem.title,
-      lang: "Python 3.11",
-      verdict: "Accepted",
-      time: "189ms",
-      memory: "2.3MB",
-      testCase: null,
-    },
-    {
-      id: 1011,
-      when: "2025-08-09 13:40:15",
-      who: "algo_master",
-      fullName: "Lý Văn K",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=algo_master",
-      userRank: "international master",
-      problem: problem.title,
-      lang: "C++17",
-      verdict: "Accepted",
-      time: "34ms",
-      memory: "1.1MB",
-      testCase: null,
-    },
-    {
-      id: 1012,
-      when: "2025-08-09 13:35:30",
-      who: "python_lover",
-      fullName: "Trịnh Thị L",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=python_lover",
-      userRank: "expert",
-      problem: problem.title,
-      lang: "Python 3.11",
-      verdict: "Time Limit Exceeded",
-      time: "2000ms",
-      memory: "1.9MB",
-      testCase: "Time limit exceeded on test 18",
-    },
-    {
-      id: 1013,
-      when: "2025-08-09 13:30:45",
-      who: "js_dev",
-      fullName: "Đinh Văn M",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=js_dev",
-      userRank: "specialist",
-      problem: problem.title,
-      lang: "JavaScript",
-      verdict: "Wrong Answer",
-      time: "145ms",
-      memory: "2.7MB",
-      testCase: "Wrong answer on test 7",
-    },
-    {
-      id: 1014,
-      when: "2025-08-09 13:25:20",
-      who: "code_ninja",
-      fullName: "Võ Thị N",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=code_ninja",
-      userRank: "candidate master",
-      problem: problem.title,
-      lang: "Java 17",
-      verdict: "Accepted",
-      time: "98ms",
-      memory: "2.4MB",
-      testCase: null,
-    },
-    {
-      id: 1015,
-      when: "2025-08-09 13:20:10",
-      who: "swift_coder",
-      fullName: "Dương Văn O",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=swift_coder",
-      userRank: "pupil",
-      problem: problem.title,
-      lang: "C++17",
-      verdict: "Compilation Error",
-      time: "-",
-      memory: "-",
-      testCase: "Compilation error: missing semicolon",
-    },
-    {
-      id: 1016,
-      when: "2025-08-09 13:15:55",
-      who: "data_scientist",
-      fullName: "Lương Thị P",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=data_scientist",
-      userRank: "master",
-      problem: problem.title,
-      lang: "Python 3.11",
       verdict: "Runtime Error",
       time: "67ms",
       memory: "1.8MB",
       testCase: "Runtime error on test 4",
-    },
-    {
-      id: 1017,
-      when: "2025-08-09 13:10:30",
-      who: "full_stack",
-      fullName: "Phan Văn Q",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=full_stack",
-      userRank: "expert",
-      problem: problem.title,
-      lang: "JavaScript",
-      verdict: "Accepted",
-      time: "123ms",
-      memory: "3.1MB",
-      testCase: null,
-    },
-    {
-      id: 1018,
-      when: "2025-08-09 13:05:45",
-      who: "algorithm_god",
-      fullName: "Tôn Thị R",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=algorithm_god",
-      userRank: "grandmaster",
-      problem: problem.title,
-      lang: "C++17",
-      verdict: "Accepted",
-      time: "23ms",
-      memory: "0.9MB",
-      testCase: null,
-    },
-    {
-      id: 1019,
-      when: "2025-08-09 13:00:20",
-      who: "beginner_dev",
-      fullName: "Hồ Văn S",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=beginner_dev",
-      userRank: "newbie",
-      problem: problem.title,
       lang: "Python 3.11",
-      verdict: "Memory Limit Exceeded",
-      time: "1456ms",
-      memory: "256MB",
-      testCase: "Memory limit exceeded on test 11",
-    },
-    {
-      id: 1020,
-      when: "2025-08-09 12:55:10",
-      who: "competitive_ace",
-      fullName: "Lê Thị T",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=competitive_ace",
-      userRank: "international master",
-      problem: problem.title,
-      lang: "C++17",
-      verdict: "Accepted",
-      time: "56ms",
-      memory: "1.3MB",
-      testCase: null,
-    },
-    {
-      id: 1021,
-      when: "2025-08-09 12:50:35",
-      who: "java_pro",
-      fullName: "Nguyễn Văn U",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=java_pro",
-      userRank: "specialist",
-      problem: problem.title,
-      lang: "Java 17",
-      verdict: "Wrong Answer",
-      time: "234ms",
-      memory: "3.8MB",
-      testCase: "Wrong answer on test 14",
-    },
-    {
-      id: 1022,
-      when: "2025-08-09 12:45:50",
-      who: "python_expert",
-      fullName: "Trần Thị V",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=python_expert",
-      userRank: "master",
-      problem: problem.title,
-      lang: "Python 3.11",
-      verdict: "Accepted",
-      time: "167ms",
-      memory: "2.6MB",
-      testCase: null,
-    },
-    {
-      id: 1023,
-      when: "2025-08-09 12:40:25",
-      who: "code_wizard",
-      fullName: "Phạm Văn W",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=code_wizard",
-      userRank: "candidate master",
-      problem: problem.title,
-      lang: "C++17",
-      verdict: "Time Limit Exceeded",
-      time: "2000ms",
-      memory: "2.1MB",
-      testCase: "Time limit exceeded on test 20",
-    },
-    {
-      id: 1024,
-      when: "2025-08-09 12:35:15",
-      who: "student_ace",
-      fullName: "Hoàng Thị X",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=student_ace",
-      userRank: "pupil",
-      problem: problem.title,
-      lang: "JavaScript",
-      verdict: "Accepted",
-      time: "289ms",
-      memory: "4.2MB",
-      testCase: null,
-    },
-    {
-      id: 1025,
-      when: "2025-08-09 12:30:40",
-      who: "pro_coder",
-      fullName: "Vũ Văn Y",
-      avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=pro_coder",
-      userRank: "expert",
-      problem: problem.title,
-      lang: "Java 17",
-      verdict: "Runtime Error",
-      time: "156ms",
-      memory: "2.9MB",
-      testCase: "Runtime error on test 6",
+      code: `def euler_phi(n):
+    result = n
+    p = 2
+    while p * p <= n:
+        if n % p == 0:
+            while n % p == 0:
+                n //= p
+            result -= result // p  # Division by zero possible
+        p += 1
+    if n > 1:
+        result -= result // n
+    return result
+
+n = int(input())
+for i in range(1, n + 1):
+    print(euler_phi(i), end=" ")`,
+      result: "ZeroDivisionError: integer division or modulo by zero",
     },
   ];
+
+  // Get selected submission details
+  const selectedSubmission = mockUserSubmissions.find(sub => sub.id === selectedSubmissionId);
+
+  // Auto-select first submission if none selected
+  if (!selectedSubmissionId && mockUserSubmissions.length > 0) {
+    setSelectedSubmissionId(mockUserSubmissions[0].id);
+  }
 
   const getRankColor = (rank: string) => {
     switch (rank) {
@@ -497,10 +282,9 @@ export default function ProblemDescription({
   };
 
   // Filter and sort submissions
-  const filteredSubmissions = mockSubmissions
+  const filteredSubmissions = mockUserSubmissions
     .filter((submission) => {
       const matchesSearch =
-        submission.problem.toLowerCase().includes(searchTerm.toLowerCase()) ||
         submission.id.toString().includes(searchTerm);
       const matchesVerdict =
         verdictFilter === "all" || submission.verdict === verdictFilter;
@@ -525,7 +309,7 @@ export default function ProblemDescription({
   );
 
   // Calculate verdict statistics
-  const verdictStats = mockSubmissions.reduce(
+  const verdictStats = mockUserSubmissions.reduce(
     (acc, submission) => {
       acc[submission.verdict] = (acc[submission.verdict] || 0) + 1;
       return acc;
@@ -533,7 +317,7 @@ export default function ProblemDescription({
     {} as Record<string, number>
   );
 
-  const totalSubmissions = mockSubmissions.length;
+  const totalSubmissions = mockUserSubmissions.length;
   const chartData = Object.entries(verdictStats)
     .map(([verdict, count]) => ({
       verdict,
@@ -728,6 +512,39 @@ Hãy hỏi cụ thể hơn nhé!`;
     };
 
     handleAiMessage(messages[action as keyof typeof messages] || action);
+  };
+
+  // Publish Solution Functions
+  const handlePublishSolution = () => {
+    if (selectedSubmission) {
+      setPublishTitle(`Optimal Solution for ${problem.title}`);
+      setPublishDescription("This is my efficient solution that passes all test cases with good performance.");
+      setIsPublishModalOpen(true);
+    }
+  };
+
+  const handlePublishSubmit = async () => {
+    if (!publishTitle.trim() || !publishDescription.trim()) {
+      return;
+    }
+
+    setIsPublishing(true);
+
+    // Simulate publishing
+    setTimeout(() => {
+      setIsPublishing(false);
+      setIsPublishModalOpen(false);
+      setPublishTitle("");
+      setPublishDescription("");
+      // You could show a success notification here
+      alert("Solution published successfully!");
+    }, 2000);
+  };
+
+  const handlePublishCancel = () => {
+    setIsPublishModalOpen(false);
+    setPublishTitle("");
+    setPublishDescription("");
   };
 
   // Submit Tab Content
@@ -1037,426 +854,462 @@ Hãy hỏi cụ thể hơn nhé!`;
   // Status Tab Content
   if (activeTab === "status") {
     return (
-      <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
-        <div>
-          {/* Header */}
-          <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
-              📊 Submission Status
-            </h2>
-          </div>
-          {/* Verdict Analysis Chart */}
-          <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100 mb-4 flex items-center gap-2">
-              📈 Verdict Analysis
-            </h3>
+      <div className="min-h-screen bg-white dark:bg-slate-900">
+        <div className="p-8">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            {/* Left Column - User Submissions List */}
+            <div className="xl:col-span-1">
+              <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
+                {/* Header */}
+                <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+                  <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">
+                    📊 My Submissions
+                  </h2>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Your submission history for {problem.title}
+                  </p>
+                </div>
 
-            {/* Summary Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              {chartData.slice(0, 4).map((data) => (
-                <div
-                  key={data.verdict}
-                  className="bg-slate-50/50 dark:bg-slate-700/30 rounded-xl p-4 border border-slate-200/50 dark:border-slate-600/50"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    {getVerdictIcon(data.verdict)}
-                    <span className="text-xs font-medium text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                      {data.verdict}
-                    </span>
-                  </div>
-                  <div className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-                    {data.count}
-                  </div>
-                  <div className="text-sm text-slate-500 dark:text-slate-500">
-                    {data.percentage}%
+                {/* Filters */}
+                <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50">
+                  <div className="flex flex-wrap items-center gap-3">
+                    {/* Verdict Filter */}
+                    <Select value={verdictFilter} onValueChange={setVerdictFilter}>
+                      <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                        <SelectValue placeholder="All verdicts" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All verdicts</SelectItem>
+                        <SelectItem value="Accepted">Accepted</SelectItem>
+                        <SelectItem value="Wrong Answer">Wrong Answer</SelectItem>
+                        <SelectItem value="Time Limit Exceeded">Time Limit Exceeded</SelectItem>
+                        <SelectItem value="Compilation Error">Compilation Error</SelectItem>
+                        <SelectItem value="Runtime Error">Runtime Error</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {/* Language Filter */}
+                    <Select value={languageFilter} onValueChange={setLanguageFilter}>
+                      <SelectTrigger className="w-32 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                        <SelectValue placeholder="Language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All languages</SelectItem>
+                        <SelectItem value="Python">Python</SelectItem>
+                        <SelectItem value="C++">C++</SelectItem>
+                        <SelectItem value="Java">Java</SelectItem>
+                        <SelectItem value="JavaScript">JavaScript</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {/* Sort Order */}
+                    <Select value={sortOrder} onValueChange={setSortOrder}>
+                      <SelectTrigger className="w-32 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+                        <SelectValue placeholder="Sort by" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="newest">Newest first</SelectItem>
+                        <SelectItem value="oldest">Oldest first</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Horizontal Bar Chart */}
-            <div className="space-y-3">
-              {chartData.map((data) => (
-                <div key={data.verdict} className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 w-40 flex-shrink-0">
-                    {getVerdictIcon(data.verdict)}
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate">
-                      {data.verdict}
-                    </span>
-                  </div>
-
-                  <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-3 relative overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        data.verdict === "Accepted"
-                          ? "bg-green-500"
-                          : data.verdict === "Wrong Answer"
-                            ? "bg-red-500"
-                            : data.verdict === "Time Limit Exceeded"
-                              ? "bg-orange-500"
-                              : data.verdict === "Compilation Error"
-                                ? "bg-gray-500"
-                                : data.verdict === "Runtime Error"
-                                  ? "bg-purple-500"
-                                  : data.verdict === "Memory Limit Exceeded"
-                                    ? "bg-yellow-500"
-                                    : "bg-slate-500"
-                      }`}
-                      style={{ width: `${data.percentage}%` }}
-                    />
-                  </div>
-
-                  <div className="flex items-center gap-2 w-20 flex-shrink-0 text-right">
-                    <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      {data.count}
-                    </span>
-                    <span className="text-xs text-slate-500 dark:text-slate-500">
-                      ({data.percentage}%)
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Overall Stats */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-900/20 dark:to-slate-800/20 rounded-xl border border-slate-200/50 dark:border-slate-700/50">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                    <CheckCircle className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-slate-600 dark:text-slate-400">
-                      Overall Acceptance Rate
-                    </div>
-                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-                      {(
-                        ((verdictStats.Accepted || 0) / totalSubmissions) *
-                        100
-                      ).toFixed(1)}
-                      %
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm text-slate-600 dark:text-slate-400">
-                    Total Submissions
-                  </div>
-                  <div className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-                    {totalSubmissions}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Filters */}
-          <div className="p-6 border-b border-slate-200 dark:border-slate-700">
-            <div className="flex flex-wrap items-center gap-4">
-              {/* Search */}
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <Input
-                  placeholder="Search by problem or ID..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-64 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
-                />
-              </div>
-
-              {/* Verdict Filter */}
-              <Select value={verdictFilter} onValueChange={setVerdictFilter}>
-                <SelectTrigger className="w-48 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-                  <SelectValue placeholder="Filter by verdict" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All verdicts</SelectItem>
-                  <SelectItem value="Accepted">Accepted</SelectItem>
-                  <SelectItem value="Wrong Answer">Wrong Answer</SelectItem>
-                  <SelectItem value="Time Limit Exceeded">
-                    Time Limit Exceeded
-                  </SelectItem>
-                  <SelectItem value="Memory Limit Exceeded">
-                    Memory Limit Exceeded
-                  </SelectItem>
-                  <SelectItem value="Compilation Error">
-                    Compilation Error
-                  </SelectItem>
-                  <SelectItem value="Runtime Error">Runtime Error</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Language Filter */}
-              <Select value={languageFilter} onValueChange={setLanguageFilter}>
-                <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-                  <SelectValue placeholder="Language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All languages</SelectItem>
-                  <SelectItem value="Python">Python</SelectItem>
-                  <SelectItem value="C++">C++</SelectItem>
-                  <SelectItem value="Java">Java</SelectItem>
-                  <SelectItem value="JavaScript">JavaScript</SelectItem>
-                  <SelectItem value="C#">C#</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Sort Order */}
-              <Select value={sortOrder} onValueChange={setSortOrder}>
-                <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">Newest first</SelectItem>
-                  <SelectItem value="oldest">Oldest first</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          {/* Submissions Table */}
-          <div>
-            <table className="w-full table-auto">
-              <thead className="bg-slate-50/80 dark:bg-slate-800/80 sticky top-0 backdrop-blur-sm">
-                <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                    #
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                    When
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 min-w-[200px]">
-                    Who
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700 min-w-[300px]">
-                    Problem
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                    Lang
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                    Verdict
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                    Time
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider border-b border-slate-200 dark:border-slate-700">
-                    Memory
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
-                {paginatedSubmissions.map((submission, index) => {
-                  return (
-                    <tr
-                      key={submission.id}
-                      className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-200"
-                    >
-                      {/* ID */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <button
-                          type="button"
-                          className="text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:underline font-semibold transition-colors"
+                {/* Submissions Table */}
+                <div className="overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-slate-50 dark:bg-slate-800">
+                      <tr>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                          Language
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                          Runtime
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                          Memory
+                        </th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                          Notes
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
+                      {mockUserSubmissions.map((submission) => (
+                        <tr
+                          key={submission.id}
+                          onClick={() => setSelectedSubmissionId(submission.id)}
+                          className={`cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors ${
+                            selectedSubmissionId === submission.id
+                              ? "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500"
+                              : ""
+                          }`}
                         >
-                          {submission.id}
-                        </button>
-                      </td>
-
-                      {/* When */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-slate-600 dark:text-slate-400 font-mono">
-                          {submission.when}
-                        </div>
-                      </td>
-
-                      {/* Who */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-3">
-                          <img
-                            src={submission.avatar}
-                            alt={submission.fullName}
-                            className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 ring-2 ring-slate-200 dark:ring-slate-600"
-                          />
-                          <div className="flex flex-col">
-                            <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                              {submission.fullName}
-                            </span>
-                            <span
-                              className={`text-xs font-medium ${getRankColor(submission.userRank)}`}
-                            >
-                              @{submission.who}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-
-                      {/* Problem */}
-                      <td className="px-6 py-4">
-                        <button
-                          type="button"
-                          className="text-slate-900 dark:text-slate-100 hover:text-green-600 dark:hover:text-green-400 hover:underline text-sm font-medium max-w-xs truncate text-left transition-colors"
-                        >
-                          {submission.problem}
-                        </button>
-                      </td>
-
-                      {/* Language */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <Code2 className="w-4 h-4 text-slate-500" />
-                          <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">
-                            {submission.lang}
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Verdict */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="relative group">
-                          <div
-                            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold cursor-pointer ${getVerdictColor(submission.verdict)}`}
-                          >
-                            {getVerdictIcon(submission.verdict)}
-                            {submission.verdict}
-                          </div>
-                          {/* Tooltip */}
-                          {submission.testCase && (
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 dark:bg-slate-700 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-                              {submission.testCase}
-                              <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-slate-900 dark:border-t-slate-700" />
+                          {/* Status */}
+                          <td className="px-4 py-4">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getVerdictColor(submission.verdict)}`}
+                              >
+                                {getVerdictIcon(submission.verdict)}
+                                {submission.verdict}
+                              </div>
                             </div>
-                          )}
-                        </div>
-                      </td>
+                          </td>
 
-                      {/* Time */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-slate-700 dark:text-slate-300 font-mono font-medium">
-                          {submission.time}
-                        </span>
-                      </td>
+                          {/* Language */}
+                          <td className="px-4 py-4">
+                            <span className="text-sm text-slate-700 dark:text-slate-300 font-medium">
+                              {submission.lang}
+                            </span>
+                          </td>
 
-                      {/* Memory */}
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-slate-700 dark:text-slate-300 font-mono font-medium">
-                          {submission.memory}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                          {/* Runtime */}
+                          <td className="px-4 py-4">
+                            <span className="text-sm text-slate-700 dark:text-slate-300 font-mono">
+                              {submission.time}
+                            </span>
+                          </td>
 
-            {/* No results */}
-            {filteredSubmissions.length === 0 && (
-              <div className="text-center py-16 bg-white dark:bg-slate-800">
-                <div className="text-slate-400 dark:text-slate-500 mb-4">
-                  <Search className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                </div>
-                <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
-                  No submissions found
-                </h3>
-                <p className="text-slate-500 dark:text-slate-500">
-                  No submissions match your search criteria. Try adjusting your
-                  filters.
-                </p>
-              </div>
-            )}
-          </div>
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between p-6 border-t border-slate-200/50 dark:border-slate-700/50 bg-slate-50/30 dark:bg-slate-700/10">
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="w-10 h-10 p-0 rounded-xl border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-50 transition-all duration-200"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
+                          {/* Memory */}
+                          <td className="px-4 py-4">
+                            <span className="text-sm text-slate-700 dark:text-slate-300 font-mono">
+                              {submission.memory}
+                            </span>
+                          </td>
 
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let pageNum: number;
-                    if (totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= totalPages - 2) {
-                      pageNum = totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
+                          {/* Notes */}
+                          <td className="px-4 py-4">
+                            <div className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[100px]">
+                              {submissionNotes[submission.id] || "No notes"}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
 
-                    return (
-                      <Button
-                        key={pageNum}
-                        variant={
-                          currentPage === pageNum ? "default" : "outline"
-                        }
-                        size="sm"
-                        onClick={() => setCurrentPage(pageNum)}
-                        className={`w-10 h-10 p-0 rounded-xl transition-all duration-200 ${
-                          currentPage === pageNum
-                            ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg"
-                            : "border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600"
-                        }`}
-                      >
-                        {pageNum}
-                      </Button>
-                    );
-                  })}
-                </div>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() =>
-                    setCurrentPage(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="w-10 h-10 p-0 rounded-xl border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-50 transition-all duration-200"
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
-
-              {/* Page info and items per page */}
-              <div className="flex items-center gap-6">
-                <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                  Hiển thị{" "}
-                  <span className="font-bold text-slate-900 dark:text-slate-100">
-                    {startIndex + 1}
-                  </span>{" "}
-                  -{" "}
-                  <span className="font-bold text-slate-900 dark:text-slate-100">
-                    {Math.min(
-                      startIndex + submissionsPerPage,
-                      filteredSubmissions.length
-                    )}
-                  </span>{" "}
-                  trong tổng số{" "}
-                  <span className="font-bold text-slate-900 dark:text-slate-100">
-                    {filteredSubmissions.length}
-                  </span>{" "}
-                  submissions
-                </div>
-
-                <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                  Trang{" "}
-                  <span className="font-bold text-slate-900 dark:text-slate-100">
-                    {currentPage}
-                  </span>{" "}
-                  /{" "}
-                  <span className="font-bold text-slate-900 dark:text-slate-100">
-                    {totalPages}
-                  </span>
+                  {/* No submissions */}
+                  {mockUserSubmissions.length === 0 && (
+                    <div className="text-center py-16">
+                      <div className="text-slate-400 dark:text-slate-500 mb-4">
+                        <Code2 className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
+                        No submissions yet
+                      </h3>
+                      <p className="text-slate-500 dark:text-slate-500">
+                        Submit your first solution to see it here.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-          )}
+
+            {/* Right Column - Submission Details */}
+            <div className="xl:col-span-1">
+              {selectedSubmission ? (
+                <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
+                  {/* Header */}
+                  <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                          <FileText className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                            Submission #{selectedSubmission.id}
+                          </h3>
+                          <p className="text-sm text-slate-600 dark:text-slate-400">
+                            {selectedSubmission.when}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      {/* Publish Solution Button - Only for Accepted submissions */}
+                      {selectedSubmission.verdict === "Accepted" && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handlePublishSolution}
+                          className="gap-2 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30"
+                        >
+                          <Share className="w-4 h-4" />
+                          Publish Solution
+                        </Button>
+                      )}
+                    </div>
+
+                    {/* Status Badge */}
+                    <div
+                      className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold ${getVerdictColor(selectedSubmission.verdict)}`}
+                    >
+                      {getVerdictIcon(selectedSubmission.verdict)}
+                      {selectedSubmission.verdict}
+                    </div>
+                  </div>
+
+                  {/* Details */}
+                  <div className="p-6 space-y-6">
+                    {/* Performance Metrics */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-3">
+                        Performance
+                      </h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+                          <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                            Runtime
+                          </div>
+                          <div className="text-lg font-bold text-slate-800 dark:text-slate-100 font-mono">
+                            {selectedSubmission.time}
+                          </div>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+                          <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">
+                            Memory
+                          </div>
+                          <div className="text-lg font-bold text-slate-800 dark:text-slate-100 font-mono">
+                            {selectedSubmission.memory}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Language */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-2">
+                        Language
+                      </h4>
+                      <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+                        <span className="text-sm font-medium text-slate-800 dark:text-slate-100">
+                          {selectedSubmission.lang}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Result */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-2">
+                        Result
+                      </h4>
+                      <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3">
+                        <pre className="text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+                          {selectedSubmission.result}
+                        </pre>
+                      </div>
+                    </div>
+
+                    {/* Code */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-2">
+                        Submitted Code
+                      </h4>
+                      <div className="bg-slate-900 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                        <pre className="text-xs text-green-400 dark:text-green-300 font-mono whitespace-pre-wrap overflow-x-auto">
+                          {selectedSubmission.code}
+                        </pre>
+                      </div>
+                      <div className="mt-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(selectedSubmission.code, -1)}
+                          className="text-xs"
+                        >
+                          <Copy className="w-3 h-3 mr-1" />
+                          Copy Code
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Notes Section */}
+                    <div>
+                      <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-2">
+                        Notes
+                      </h4>
+                      <textarea
+                        value={submissionNotes[selectedSubmission.id] || ""}
+                        onChange={(e) =>
+                          setSubmissionNotes((prev) => ({
+                            ...prev,
+                            [selectedSubmission.id]: e.target.value,
+                          }))
+                        }
+                        placeholder="Add your notes about this submission..."
+                        className="w-full h-24 p-3 text-sm bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-slate-100"
+                      />
+                      <div className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                        Notes are saved automatically as you type
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-8 text-center">
+                  <div className="text-slate-400 dark:text-slate-500 mb-4">
+                    <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-600 dark:text-slate-400 mb-2">
+                    Select a submission
+                  </h3>
+                  <p className="text-slate-500 dark:text-slate-500">
+                    Click on any submission from the left to view details
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
+
+        {/* Publish Solution Modal */}
+        {isPublishModalOpen && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+              {/* Modal Header */}
+              <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                      <Share className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">
+                        Publish Solution
+                      </h2>
+                      <p className="text-sm text-slate-600 dark:text-slate-400">
+                        Share your accepted solution with the community
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handlePublishCancel}
+                    className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                  >
+                    <X className="w-5 h-5" />
+                  </Button>
+                </div>
+              </div>
+
+              {/* Modal Content */}
+              <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Left Column - Form */}
+                  <div className="space-y-6">
+                    {/* Title Input */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-800 dark:text-slate-100 mb-2">
+                        Solution Title
+                      </label>
+                      <Input
+                        value={publishTitle}
+                        onChange={(e) => setPublishTitle(e.target.value)}
+                        placeholder="Enter a descriptive title for your solution"
+                        className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700"
+                      />
+                    </div>
+
+                    {/* Description Input */}
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-800 dark:text-slate-100 mb-2">
+                        Description
+                      </label>
+                      <textarea
+                        value={publishDescription}
+                        onChange={(e) => setPublishDescription(e.target.value)}
+                        placeholder="Explain your approach, algorithm complexity, and any insights..."
+                        rows={8}
+                        className="w-full p-3 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-green-500 text-slate-800 dark:text-slate-100"
+                      />
+                    </div>
+
+                    {/* Solution Stats */}
+                    <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                      <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-3">
+                        Solution Performance
+                      </h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">Runtime</div>
+                          <div className="text-lg font-bold text-green-600 dark:text-green-400 font-mono">
+                            {selectedSubmission?.time}
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">Memory</div>
+                          <div className="text-lg font-bold text-green-600 dark:text-green-400 font-mono">
+                            {selectedSubmission?.memory}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
+                        <div className="text-xs text-slate-500 dark:text-slate-400">Language</div>
+                        <div className="text-sm font-medium text-slate-800 dark:text-slate-100">
+                          {selectedSubmission?.lang}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column - Code Preview */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-3">
+                      Code Preview
+                    </h4>
+                    <div className="bg-slate-900 dark:bg-slate-950 rounded-lg p-4 border border-slate-200 dark:border-slate-700 h-[400px] overflow-y-auto">
+                      <pre className="text-xs text-green-400 dark:text-green-300 font-mono whitespace-pre-wrap">
+                        {selectedSubmission?.code}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-slate-600 dark:text-slate-400">
+                    Your solution will be visible to other users in the community solutions section.
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={handlePublishCancel}
+                      disabled={isPublishing}
+                      className="border-slate-200 dark:border-slate-700"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handlePublishSubmit}
+                      disabled={isPublishing || !publishTitle.trim() || !publishDescription.trim()}
+                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white disabled:opacity-50"
+                    >
+                      {isPublishing ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Publishing...
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <Share className="w-4 h-4" />
+                          Publish Solution
+                        </div>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
