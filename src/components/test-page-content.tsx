@@ -127,10 +127,6 @@ export default function TestPageContent() {
   const [isRunning, setIsRunning] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleThemeChange = (newTheme: string) => {
-    setTheme(newTheme);
-  };
-
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
     const langConfig = PROGRAMMING_LANGUAGES.find(
@@ -271,23 +267,6 @@ export default function TestPageContent() {
                         }`}
                       />
                       {lang.label}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            {/* Theme Selector */}
-            <Select value={theme} onValueChange={handleThemeChange}>
-              <SelectTrigger className="w-32 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-                <SelectValue placeholder="Theme" />
-              </SelectTrigger>
-              <SelectContent>
-                {themes.map((themeOption) => (
-                  <SelectItem key={themeOption.value} value={themeOption.value}>
-                    <div className="flex items-center gap-2">
-                      <themeOption.icon className="w-3 h-3" />
-                      {themeOption.label}
                     </div>
                   </SelectItem>
                 ))}
