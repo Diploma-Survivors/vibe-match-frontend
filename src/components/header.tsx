@@ -93,9 +93,9 @@ export default function Header() {
     >
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center gap-3">
-          <img src="/logo.svg" alt="SolVibe Logo" className="w-8 h-8" />
+          <img src="/logo.svg" alt="Vibe Match Logo" className="w-8 h-8" />
           <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-            SolVibe
+            Vibe Match
           </span>
         </Link>
 

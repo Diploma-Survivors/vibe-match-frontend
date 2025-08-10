@@ -37,6 +37,7 @@ import { useState } from "react";
 import CodeEditor from "./code-editor";
 import MonacoSubmitEditor from "./monaco-submit-editor";
 import SimpleSubmitEditor from "./simple-submit-editor";
+import TestPageContent from "./test-page-content";
 
 interface ProblemDescriptionProps {
   problem: Problem;
@@ -1017,6 +1018,17 @@ Hãy hỏi cụ thể hơn nhé!`;
               )}
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Test Tab Content
+  if (activeTab === "test") {
+    return (
+      <div className="min-h-screen bg-white dark:bg-slate-900">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          <TestPageContent />
         </div>
       </div>
     );

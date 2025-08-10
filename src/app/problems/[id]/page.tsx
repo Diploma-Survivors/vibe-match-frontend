@@ -41,8 +41,10 @@ export default function ProblemSolvingPage() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-6 bg-white dark:bg-slate-900">
-        {activeTab === "submit" || activeTab === "status" ? (
-          /* Submit and Status Tabs - Full Width Layout */
+        {activeTab === "submit" ||
+        activeTab === "status" ||
+        activeTab === "test" ? (
+          /* Submit, Status and Test Tabs - Full Width Layout */
           <div>
             <ProblemDescription problem={problem} activeTab={activeTab} />
           </div>

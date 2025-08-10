@@ -10,7 +10,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Brand Section */}
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-green-400">SolVibe</h2>
+            <h2 className="text-2xl font-bold text-green-400">Vibe Match</h2>
             <p className="text-slate-300 text-sm leading-relaxed">
               Empowering creators with decentralized ownership, privacy, and
               fair rewards.
@@ -139,7 +139,7 @@ export default function Footer() {
         <div className="border-t border-slate-700 pt-8">
           <div className="text-center">
             <p className="text-slate-400 text-sm">
-              © 2025 SolVibe. All rights reserved.
+              © 2025 Vibe Match. All rights reserved.
             </p>
           </div>
         </div>
