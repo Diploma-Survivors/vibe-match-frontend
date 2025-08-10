@@ -13,6 +13,26 @@ export interface Problem {
   problemType: string;
 }
 
+export interface Solution {
+  id: string;
+  title: string;
+  description: string;
+  author: {
+    name: string;
+    level: string;
+    avatar: string;
+  };
+  code: string;
+  language: string;
+  runtime: string;
+  memory: string;
+  views: number;
+  supports: number;
+  comments: number;
+  createdAt: string;
+  tags: string[];
+}
+
 export interface ProblemFilters {
   id?: string;
   title?: string;

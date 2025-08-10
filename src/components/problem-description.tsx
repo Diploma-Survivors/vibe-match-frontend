@@ -26,6 +26,7 @@ import {
   MemoryStick,
   MessageCircle,
   Play,
+  Plus,
   Search,
   Send,
   Share,
@@ -79,6 +80,29 @@ export default function ProblemDescription({
   const [publishTitle, setPublishTitle] = useState("");
   const [publishDescription, setPublishDescription] = useState("");
   const [isPublishing, setIsPublishing] = useState(false);
+
+  // Sample Test Cases state
+  const [testCases, setTestCases] = useState([
+    {
+      id: 1,
+      input: "5",
+      output: "1 1 2 1 4",
+      isEditing: false,
+    },
+    {
+      id: 2,
+      input: "10",
+      output: "1 1 2 1 4 2 6 1 6 2",
+      isEditing: false,
+    },
+    {
+      id: 3,
+      input: "3",
+      output: "1 1 2",
+      isEditing: false,
+    },
+  ]);
+  const [activeTestCase, setActiveTestCase] = useState(0);
 
   // AI Assistant state
   const [aiMessages, setAiMessages] = useState<
@@ -547,6 +571,47 @@ Hãy hỏi cụ thể hơn nhé!`;
     setPublishDescription("");
   };
 
+  // Test Cases Functions
+  const handleTestCaseChange = (id: number, field: "input" | "output", value: string) => {
+    setTestCases((prev) =>
+      prev.map((testCase) =>
+        testCase.id === id ? { ...testCase, [field]: value } : testCase
+      )
+    );
+  };
+
+  const handleTestCaseEdit = (id: number) => {
+    setTestCases((prev) =>
+      prev.map((testCase) =>
+        testCase.id === id ? { ...testCase, isEditing: !testCase.isEditing } : testCase
+      )
+    );
+  };
+
+  const handleTestCaseDelete = (id: number) => {
+    setTestCases((prev) => prev.filter((testCase) => testCase.id !== id));
+    // Adjust active test case if necessary
+    if (activeTestCase >= testCases.length - 1) {
+      setActiveTestCase(Math.max(0, testCases.length - 2));
+    }
+  };
+
+  const handleTestCaseAdd = () => {
+    const newTestCase = {
+      id: Date.now(),
+      input: "",
+      output: "",
+      isEditing: true,
+    };
+    setTestCases((prev) => [...prev, newTestCase]);
+    setActiveTestCase(testCases.length); // Set to the new test case
+  };
+
+  const handleTestCaseSave = (id: number) => {
+    // Here you can add any validation if needed
+    handleTestCaseEdit(id);
+  };
+
   // Submit Tab Content
   if (activeTab === "submit") {
     return (
@@ -555,7 +620,7 @@ Hãy hỏi cụ thể hơn nhé!`;
           {/* Main Content - Two Columns */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             {/* Left Column - Code Editor */}
-            <div className="xl:col-span-2">
+            <div className="xl:col-span-2 space-y-6">
               <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
                 <div className="h-[650px]">
                   <MonacoSubmitEditor
@@ -584,6 +649,211 @@ Hãy hỏi cụ thể hơn nhé!`;
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* Sample Test Cases Section */}
+              <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
+                <div className="p-6 border-b border-slate-200/50 dark:border-slate-700/50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                        <TestTube className="w-4 h-4 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+                          Sample Test Cases
+                        </h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">
+                          Test your code with these examples
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRun}
+                      disabled={isRunning}
+                      className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white border-0"
+                    >
+                      {isRunning ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
+                          Running...
+                        </>
+                      ) : (
+                        <>
+                          <Play className="w-4 h-4 mr-2" />
+                          Test Run
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="p-6">
+                  {/* Test Case Tabs */}
+                  <div className="flex items-center gap-2 mb-6 overflow-x-auto">
+                    {testCases.map((testCase, index) => (
+                      <button
+                        key={testCase.id}
+                        onClick={() => setActiveTestCase(index)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                          activeTestCase === index
+                            ? "bg-blue-500 text-white shadow-md"
+                            : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
+                        }`}
+                      >
+                        Case {index + 1}
+                      </button>
+                    ))}
+                    <button
+                      onClick={handleTestCaseAdd}
+                      className="px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all duration-200 flex items-center gap-1"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span className="text-sm font-medium">Add</span>
+                    </button>
+                  </div>
+
+                  {/* Active Test Case Content */}
+                  {testCases[activeTestCase] && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Input Section */}
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2">
+                            <span className="text-blue-500">📥</span>
+                            Input
+                          </h4>
+                          {testCases.length > 1 && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleTestCaseDelete(testCases[activeTestCase].id)}
+                              className="h-6 px-2 text-xs text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                            >
+                              <X className="w-3 h-3" />
+                            </Button>
+                          )}
+                        </div>
+                        {testCases[activeTestCase].isEditing ? (
+                          <div className="space-y-2">
+                            <textarea
+                              value={testCases[activeTestCase].input}
+                              onChange={(e) =>
+                                handleTestCaseChange(
+                                  testCases[activeTestCase].id,
+                                  "input",
+                                  e.target.value
+                                )
+                              }
+                              placeholder="Enter input values..."
+                              className="w-full h-24 p-3 text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-slate-200"
+                            />
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => handleTestCaseSave(testCases[activeTestCase].id)}
+                                className="bg-green-600 hover:bg-green-700 text-white text-xs"
+                              >
+                                Save
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleTestCaseEdit(testCases[activeTestCase].id)}
+                                className="text-xs"
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div
+                            onClick={() => handleTestCaseEdit(testCases[activeTestCase].id)}
+                            className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs text-slate-500 dark:text-slate-400">
+                                Click to edit
+                              </span>
+                              <Code className="w-3 h-3 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
+                            </div>
+                            <pre className="text-sm font-mono text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
+                              {testCases[activeTestCase].input || "Enter input..."}
+                            </pre>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Output Section */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3 flex items-center gap-2">
+                          <span className="text-green-500">📤</span>
+                          Expected Output
+                        </h4>
+                        {testCases[activeTestCase].isEditing ? (
+                          <textarea
+                            value={testCases[activeTestCase].output}
+                            onChange={(e) =>
+                              handleTestCaseChange(
+                                testCases[activeTestCase].id,
+                                "output",
+                                e.target.value
+                              )
+                            }
+                            placeholder="Enter expected output..."
+                            className="w-full h-24 p-3 text-sm font-mono bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-slate-200"
+                          />
+                        ) : (
+                          <div
+                            onClick={() => handleTestCaseEdit(testCases[activeTestCase].id)}
+                            className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg p-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs text-slate-500 dark:text-slate-400">
+                                Click to edit
+                              </span>
+                              <Code className="w-3 h-3 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
+                            </div>
+                            <pre className="text-sm font-mono text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
+                              {testCases[activeTestCase].output || "Enter expected output..."}
+                            </pre>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Test Case Navigation */}
+                  {testCases.length > 1 && (
+                    <div className="flex items-center justify-between mt-6 pt-4 border-t border-slate-200 dark:border-slate-700">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setActiveTestCase(Math.max(0, activeTestCase - 1))}
+                        disabled={activeTestCase === 0}
+                        className="flex items-center gap-2"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                        Previous
+                      </Button>
+                      <span className="text-sm text-slate-600 dark:text-slate-400">
+                        {activeTestCase + 1} of {testCases.length}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setActiveTestCase(Math.min(testCases.length - 1, activeTestCase + 1))}
+                        disabled={activeTestCase === testCases.length - 1}
+                        className="flex items-center gap-2"
+                      >
+                        Next
+                        <ChevronRight className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
