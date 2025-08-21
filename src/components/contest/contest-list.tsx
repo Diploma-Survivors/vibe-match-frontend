@@ -1,6 +1,6 @@
 "use client";
 
-import ContestTable from "./contest-table";
+import ContestCardList from "./contest-card-list";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getContestsByStatus } from "@/lib/data/mock-contests";
 import type { Contest } from "@/types/contest";
@@ -103,7 +103,7 @@ export default function ContestList() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <ContestTable
+                            <ContestCardList
                                 contests={getPaginatedContests(upcoming, "upcoming")}
                                 currentPage={currentPage.upcoming}
                                 totalPages={getTotalPages(upcoming)}
@@ -132,7 +132,7 @@ export default function ContestList() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <ContestTable
+                            <ContestCardList
                                 contests={getPaginatedContests(ongoing, "ongoing")}
                                 currentPage={currentPage.ongoing}
                                 totalPages={getTotalPages(ongoing)}
@@ -161,7 +161,7 @@ export default function ContestList() {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <ContestTable
+                            <ContestCardList
                                 contests={getPaginatedContests(finished, "finished")}
                                 currentPage={currentPage.finished}
                                 totalPages={getTotalPages(finished)}
