@@ -1,6 +1,6 @@
 "use client";
 
-import ContestTable from "@/components/contest-table";
+import ContestTable from "./contest-table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getContestsByStatus } from "@/lib/data/mock-contests";
 import type { Contest } from "@/types/contest";

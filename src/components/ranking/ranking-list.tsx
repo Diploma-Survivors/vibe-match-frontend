@@ -1,6 +1,6 @@
 "use client";
 
-import RankingItem from "@/components/ranking-item";
+import RankingItem from "./ranking-item";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { mockGlobalRanking } from "@/lib/data/mock-contests";
 import { motion } from "framer-motion";
