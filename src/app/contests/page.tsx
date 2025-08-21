@@ -1,7 +1,7 @@
 "use client";
 
-import ContestList from "@/components/contest-list";
-import RankingList from "@/components/ranking-list";
+import { ContestList } from "@/components/contest";
+import { RankingList } from "@/components/ranking";
 import { motion } from "framer-motion";
 
 export default function ContestsPage() {

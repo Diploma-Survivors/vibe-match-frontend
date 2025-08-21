@@ -1,4 +1,5 @@
 export { default as ContestCard } from './contest-card';
+export { default as ContestCardList } from './contest-card-list';
 export { default as ContestInfo } from './contest-info';
 export { default as ContestList } from './contest-list';
 export { default as ContestNavbar } from './contest-navbar';
