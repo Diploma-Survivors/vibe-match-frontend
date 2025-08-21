@@ -1,0 +1,22 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="40" cy="40" r="40" fill="#98FB98"/>
+  <!-- Bear face -->
+  <circle cx="40" cy="42" r="22" fill="#8B4513"/>
+  <!-- Ears -->
+  <circle cx="25" cy="25" r="8" fill="#8B4513"/>
+  <circle cx="55" cy="25" r="8" fill="#8B4513"/>
+  <circle cx="25" cy="25" r="4" fill="#DEB887"/>
+  <circle cx="55" cy="25" r="4" fill="#DEB887"/>
+  <!-- Eyes -->
+  <circle cx="32" cy="38" r="3" fill="black"/>
+  <circle cx="48" cy="38" r="3" fill="black"/>
+  <circle cx="33" cy="37" r="1" fill="white"/>
+  <circle cx="49" cy="37" r="1" fill="white"/>
+  <!-- Snout -->
+  <ellipse cx="40" cy="48" rx="6" ry="4" fill="#DEB887"/>
+  <!-- Nose -->
+  <ellipse cx="40" cy="46" rx="2" ry="1.5" fill="black"/>
+  <!-- Mouth -->
+  <path d="M40 48 Q35 52 30 50" stroke="black" stroke-width="1.5" fill="none"/>
+  <path d="M40 48 Q45 52 50 50" stroke="black" stroke-width="1.5" fill="none"/>
+</svg>
