@@ -6,7 +6,7 @@ import { mockProblems } from "@/lib/data/mock-problems";
 import { Copy, Timer, MemoryStick, FileText } from "lucide-react";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import ProblemSidebar from "@/components/problem-sidebar";
+import { ProblemSidebar } from "@/components/problem";
 
 export default function ProblemDescriptionPage() {
   const params = useParams();
@@ -54,8 +54,8 @@ export default function ProblemDescriptionPage() {
                     problem.difficulty === "Dễ"
                       ? "bg-gradient-to-r from-green-400 to-green-500 text-white"
                       : problem.difficulty === "Trung bình"
-                      ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white"
-                      : "bg-gradient-to-r from-red-400 to-red-500 text-white"
+                        ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white"
+                        : "bg-gradient-to-r from-red-400 to-red-500 text-white"
                   }`}
                 >
                   {problem.difficulty}

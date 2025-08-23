@@ -1,6 +1,6 @@
 "use client";
 
-import ProblemNavbar from "@/components/problem-navbar";
+import { ProblemNavbar } from "@/components/problem";
 import { mockProblems } from "@/lib/data/mock-problems";
 import type { Problem } from "@/types/problem";
 import { useParams, usePathname, useRouter } from "next/navigation";
@@ -18,7 +18,7 @@ export default function ProblemLayout({
   const [problem, setProblem] = useState<Problem | null>(null);
 
   // Extract active tab from pathname
-  const activeTab = pathname.split('/').pop() || 'problem';
+  const activeTab = pathname.split("/").pop() || "problem";
 
   useEffect(() => {
     const foundProblem = mockProblems.find((p) => p.id === problemId);

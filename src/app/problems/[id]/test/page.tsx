@@ -1,6 +1,6 @@
 "use client";
 
-import CodeEditor from "@/components/code-editor-new";
+import { CodeEditorNew } from "@/components/editor";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -264,12 +264,12 @@ export default function TestPageContent() {
                               lang.value === "python"
                                 ? "bg-blue-500"
                                 : lang.value === "cpp"
-                                ? "bg-red-500"
-                                : lang.value === "java"
-                                ? "bg-orange-500"
-                                : lang.value === "javascript"
-                                ? "bg-yellow-500"
-                                : "bg-purple-500"
+                                  ? "bg-red-500"
+                                  : lang.value === "java"
+                                    ? "bg-orange-500"
+                                    : lang.value === "javascript"
+                                      ? "bg-yellow-500"
+                                      : "bg-purple-500"
                             }`}
                           />
                           {lang.label}
@@ -355,12 +355,12 @@ export default function TestPageContent() {
                     {selectedLanguage === "python"
                       ? "🐍"
                       : selectedLanguage === "cpp"
-                      ? "⚡"
-                      : selectedLanguage === "java"
-                      ? "☕"
-                      : selectedLanguage === "javascript"
-                      ? "🟡"
-                      : "📄"}
+                        ? "⚡"
+                        : selectedLanguage === "java"
+                          ? "☕"
+                          : selectedLanguage === "javascript"
+                            ? "🟡"
+                            : "📄"}
                   </span>
 
                   {/* Tab Name */}
@@ -376,7 +376,7 @@ export default function TestPageContent() {
 
             {/* Code Editor */}
             <div className="flex-1 relative">
-              <CodeEditor
+              <CodeEditorNew
                 language={selectedLanguage}
                 value={code}
                 onChange={setCode}
@@ -490,12 +490,12 @@ export default function TestPageContent() {
                   {selectedLanguage === "python"
                     ? "🐍"
                     : selectedLanguage === "cpp"
-                    ? "⚡"
-                    : selectedLanguage === "java"
-                    ? "☕"
-                    : selectedLanguage === "javascript"
-                    ? "🟡"
-                    : "📄"}
+                      ? "⚡"
+                      : selectedLanguage === "java"
+                        ? "☕"
+                        : selectedLanguage === "javascript"
+                          ? "🟡"
+                          : "📄"}
                   {
                     PROGRAMMING_LANGUAGES.find(
                       (lang) => lang.value === selectedLanguage

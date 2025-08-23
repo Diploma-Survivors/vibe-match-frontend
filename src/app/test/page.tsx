@@ -1,6 +1,6 @@
 "use client";
 
-import CodeEditor from "@/components/code-editor-new";
+import { CodeEditorNew } from "@/components/editor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -476,7 +476,7 @@ export default function TestPage() {
                 </div>
 
                 <div className="border rounded-lg overflow-hidden shadow-inner">
-                  <CodeEditor
+                  <CodeEditorNew
                     language={selectedLanguage}
                     value={code}
                     onChange={setCode}

@@ -1,13 +1,12 @@
 "use client";
 
-import ProblemFilter from "@/components/problem-filter";
-import ProblemStats from "@/components/problem-stats";
-import ProblemTable from "@/components/problem-table";
-import QuickFilters from "@/components/quick-filters";
-import SortControls, {
-  type SortField,
-  type SortOrder,
-} from "@/components/sort-controls";
+import {
+  ProblemFilter,
+  ProblemStats,
+  ProblemTable,
+} from "@/components/problem";
+import { QuickFilters, SortControls } from "@/components/common";
+import type { SortField, SortOrder } from "@/components/common/sort-controls";
 import { mockProblems } from "@/lib/data/mock-problems";
 import type { Problem, ProblemFilters } from "@/types/problem";
 import React, { useState, useMemo } from "react";

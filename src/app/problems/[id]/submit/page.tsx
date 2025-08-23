@@ -2,7 +2,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import MonacoSubmitEditor from "@/components/monaco-submit-editor";
+import { MonacoSubmitEditor } from "@/components/editor";
 import { mockProblems } from "@/lib/data/mock-problems";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -801,10 +801,10 @@ export default function SubmitPage() {
                               submission.status === "Accepted"
                                 ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                                 : submission.status === "Wrong Answer"
-                                ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                                : submission.status === "Time Limit Exceeded"
-                                ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-                                : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
+                                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
+                                  : submission.status === "Time Limit Exceeded"
+                                    ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
+                                    : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
                             }`}
                           >
                             {submission.status === "Accepted" ? (

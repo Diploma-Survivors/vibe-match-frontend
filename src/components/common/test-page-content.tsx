@@ -1,6 +1,6 @@
 "use client";
 
-import CodeEditor from "@/components/code-editor-new";
+import { CodeEditorNew } from "@/components/editor";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -350,7 +350,7 @@ export default function TestPageContent() {
 
         {/* Code Editor */}
         <div className="flex-1 relative">
-          <CodeEditor
+          <CodeEditorNew
             language={selectedLanguage}
             value={code}
             onChange={setCode}

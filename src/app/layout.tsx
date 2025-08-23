@@ -1,8 +1,7 @@
 import type React from "react";
 import "./globals.css";
-import Footer from "@/components/footer";
-import Header from "@/components/header";
-import { ThemeProvider } from "@/components/theme-provider";
+import { Footer, Header } from "@/components/layout";
+import { ThemeProvider } from "@/components/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 

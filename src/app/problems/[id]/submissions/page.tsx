@@ -3,7 +3,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import ProblemSidebar from "@/components/problem-sidebar";
+import { ProblemSidebar } from "@/components/problem";
 import {
   Select,
   SelectContent,
@@ -38,10 +38,9 @@ import {
   X,
   XCircle,
 } from "lucide-react";
-import CodeEditor from "@/components/code-editor";
-import MonacoSubmitEditor from "@components/monaco-submit-editor";
+import { CodeEditor, MonacoSubmitEditor } from "@/components/editor";
 // import SimpleSubmitEditor from "./simple-submit-editor"; // Ensure the file exists or correct the path
-import TestPageContent from "@/components/test-page-content";
+import { TestPageContent } from "@/components/common";
 
 import { mockProblems } from "@/lib/data/mock-problems";
 import { useParams } from "next/navigation";
@@ -344,10 +343,13 @@ export default function StatusPage() {
   );
 
   // Calculate verdict statistics
-  const verdictStats = mockUserSubmissions.reduce((acc, submission) => {
-    acc[submission.verdict] = (acc[submission.verdict] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  const verdictStats = mockUserSubmissions.reduce(
+    (acc, submission) => {
+      acc[submission.verdict] = (acc[submission.verdict] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
 
   const totalSubmissions = mockUserSubmissions.length;
   const chartData = Object.entries(verdictStats)
