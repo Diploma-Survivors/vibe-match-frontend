@@ -28,5 +28,5 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
-      - name: Build NestJS project
+      - name: Build NextJS project
         run: npm run build
