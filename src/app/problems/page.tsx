@@ -164,11 +164,11 @@ export default function ProblemsPage() {
                   onReset={handleReset}
                 />
 
-                <QuickFilters
+                {/* <QuickFilters
                   activeFilters={filters}
                   onRemoveFilter={handleRemoveFilter}
                   onClearAll={handleClearAllFilters}
-                />
+                /> */}
               </div>
             </div>
           </div>
