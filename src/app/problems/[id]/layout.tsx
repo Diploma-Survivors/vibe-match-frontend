@@ -50,7 +50,7 @@ export default function ProblemLayout({
       <ProblemNavbar activeTab={activeTab} onTabChange={handleTabChange} />
 
       {/* Main Content - Full Width for all tabs */}
-      <div className="container mx-auto px-4 py-6 bg-white dark:bg-slate-900">
+      <div className="container mx-auto px-4 bg-white dark:bg-slate-900">
         {children}
       </div>
     </div>

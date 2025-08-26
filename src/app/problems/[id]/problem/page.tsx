@@ -54,7 +54,7 @@ export default function ProblemDescriptionPage() {
   >([]);
 
   // Resizable panel state for horizontal (left/right)
-  const [leftWidth, setLeftWidth] = useState(60); // percentage
+  const [leftWidth, setLeftWidth] = useState(40); // percentage
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -281,16 +281,17 @@ export default function ProblemDescriptionPage() {
     <div 
       ref={containerRef}
       className="flex h-full gap-0 relative"
-      style={{ height: "calc(100vh - 120px)" }}
+      style={{ height: "calc(100vh - 60px)" }}
     >
       {/* Left Panel - Problem Description */}
       <div 
-        className="overflow-y-auto"
+        className="overflow-y-auto pb-4"
         style={{ width: `${leftWidth}%` }}
       >
-        <div className="pr-3">
+        <div className="pr-3 rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
           <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
-            <div className="p-8 space-y-8">
+          <div className="p-8 space-y-8" style={{ borderWidth: 1, borderRadius: "inherit" }}>
+
               {/* Problem Title Header */}
               <div className="pb-6 border-b border-slate-200 dark:border-slate-700">
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent mb-4">
@@ -468,7 +469,7 @@ export default function ProblemDescriptionPage() {
       {/* Right Panel - Editor and Test Cases */}
       <div 
         ref={rightPanelRef}
-        className="flex flex-col overflow-hidden"
+        className="flex flex-col overflow-hidden pb-4"
         style={{ width: `${100 - leftWidth}%` }}
       >
         <div className="pl-3 flex flex-col h-full gap-0">
