@@ -4,6 +4,7 @@ import { Footer, Header } from "@/components/layout";
 import { ThemeProvider } from "@/components/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import LayoutWrapper from "@/components/layout/layout-wrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,13 +19,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <Header />
-          <main className="pt-16">{children}</main>
-          <Footer />
+          <LayoutWrapper>{children}</LayoutWrapper>
         </ThemeProvider>
       </body>
     </html>
