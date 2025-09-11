@@ -6,25 +6,26 @@ import {getSession} from "next-auth/react";
 
 // Create a custom Axios instance
 const clientApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.escuelajs.co/api/v1', // Replace with your API base URL
-  timeout: 5000, // Request timeout in milliseconds
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/api/v1',
+  timeout: 5000,
   headers: {
     'Content-Type': 'application/json',
   },
-});
+  withCredentials: true,
+}); 
 
-clientApi.interceptors.request.use(
-  async (config) => {
-    const session = await getSession();
-    if (session?.accessToken) {
-      config.headers.Authorization = `Bearer ${session.accessToken}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// clientApi.interceptors.request.use(
+//   async (config) => {
+//     const session = await getSession();
+//     if (session?.accessToken) {
+//       config.headers.Authorization = `Bearer ${session.accessToken}`;
+//     }
+//     return config;
+//   },
+//   (error) => {
+//     return Promise.reject(error);
+//   }
+// );
 
 // Optional: Add response interceptors
 clientApi.interceptors.response.use(
