@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
   const resolvedParams = await params;
   return handleProxy(request, resolvedParams.path, 'GET');
@@ -10,7 +10,7 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+    { params }: { params: Promise<{ path: string[] }> }
 ) {
   const resolvedParams = await params;
   const requestPath = resolvedParams.path.join('/');
@@ -57,13 +57,13 @@ export async function POST(
     }
   }
 
-  return handleProxy(request, params.path, 'POST');
+  return handleProxy(request, resolvedParams.path, 'POST');
 
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+    { params }: { params: Promise<{ path: string[] }> }
 ) {
   const resolvedParams = await params;
   return handleProxy(request, resolvedParams.path, 'PUT');
@@ -71,7 +71,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+    { params }: { params: Promise<{ path: string[] }> }
 ) {
   const resolvedParams = await params;
   return handleProxy(request, resolvedParams.path, 'DELETE');
@@ -79,7 +79,7 @@ export async function DELETE(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+    { params }: { params: Promise<{ path: string[] }> }
 ) {
   const resolvedParams = await params;
   return handleProxy(request, resolvedParams.path, 'PATCH');
