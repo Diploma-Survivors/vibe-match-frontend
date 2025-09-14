@@ -5,10 +5,26 @@ import { Button } from "@/components/ui/button";
 import { mockProblems } from "@/lib/data/mock-problems";
 import { Copy, Timer, MemoryStick, FileText } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ProblemSidebar } from "@/components/problem";
+import clientApi from "@/lib/apis/axios-client";
 
 export default function ProblemDescriptionPage() {
+  
+  useEffect(() => {
+    // this is for test
+    const fetchData = async () => {
+      try {
+        const response = await clientApi.get('/auth');
+        // console.log('User data:', response.data);
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+    
+    fetchData();
+  })
+
   const params = useParams();
   const problemId = params.id as string;
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);

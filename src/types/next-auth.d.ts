@@ -5,11 +5,14 @@ declare module "next-auth" {
   interface User extends DefaultUser {
     accessToken?: string
     refreshToken?: string
+    redirect?: string
+    callbackUrl?: string
   }
 
   interface Session extends DefaultSession {
     user?: User
     accessToken?: string
+    redirect?: string
   }
 }
 
