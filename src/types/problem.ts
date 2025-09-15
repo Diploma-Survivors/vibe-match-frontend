@@ -1,8 +1,7 @@
 export interface Problem {
   id: string;
   title: string;
-  group: string;
-  category: string;
+  topic: string; // Replaced group and category with single topic field
   difficulty: "Dễ" | "Trung bình" | "Khó";
   points: number;
   acceptanceRate: number;
@@ -37,9 +36,10 @@ export interface ProblemFilters {
   id?: string;
   title?: string;
   difficulty?: string;
-  category?: string;
+  topic?: string; // Changed from category to topic
   subject?: string;
   chapter?: string;
+  tags?: string[];
   problemType?: string;
 }
 
@@ -50,10 +50,12 @@ export const DIFFICULTY_OPTIONS = [
   { value: "Khó", label: "Khó" },
 ];
 
-export const CATEGORY_OPTIONS = [
-  { value: "all", label: "Tham lam" },
+export const TOPIC_OPTIONS = [
+  { value: "all", label: "Tất cả" },
   { value: "Mảng 1 Chiều Cơ Bản", label: "Mảng 1 Chiều Cơ Bản" },
   { value: "Lý Thuyết Số - Toán Học", label: "Lý Thuyết Số - Toán Học" },
+  { value: "Thuật toán tham lam", label: "Thuật toán tham lam" },
+  { value: "Cấu trúc dữ liệu", label: "Cấu trúc dữ liệu" },
 ];
 
 export const SUBJECT_OPTIONS = [
