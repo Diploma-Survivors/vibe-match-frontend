@@ -4,12 +4,8 @@ import type { NextAuthOptions } from 'next-auth'
 import { getServerSession } from 'next-auth' // Add this import
 import type { JWT } from 'next-auth/jwt'
 import {jwtDecode} from "jwt-decode";
+import { DecodedAccessToken } from '@/types/states'
 
-type DecodedToken = {
-  exp: number; // expiry timestamp (seconds since epoch)
-  iat?: number;
-  [key: string]: any;
-};
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
@@ -78,7 +74,7 @@ export const authOptions: NextAuthOptions = {
         token.callbackUrl = user.callbackUrl;
 
         try {
-          const decoded: DecodedToken = jwtDecode(user.accessToken as string);
+          const decoded: DecodedAccessToken = jwtDecode(user.accessToken as string);
           token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
         } catch (err) {
           console.error("Failed to decode access token:", err);
@@ -91,7 +87,7 @@ export const authOptions: NextAuthOptions = {
           const data = await refreshAccessToken(token);
           token.accessToken = data.accessToken;
           token.refreshToken = data.refreshToken;
-          const decoded: DecodedToken = jwtDecode(user.accessToken as string);
+          const decoded: DecodedAccessToken = jwtDecode(user.accessToken as string);
           token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
         } catch (err) {
           console.error("Failed to decode access token:", err);
