@@ -385,25 +385,22 @@ export default function MonacoSubmitEditor({
   return (
     <div className="h-full flex flex-col bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+      <div className="flex items-center justify-between p-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
             <Code2 className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+            <h3 className="font-bold text-slate-800 dark:text-slate-100">
               Code Editor
             </h3>
-            <p className="text-xs text-slate-600 dark:text-slate-400">
-              Write and test your solution
-            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-xs">
           {/* Language Selector */}
           <Select value={currentLanguage} onValueChange={handleLanguageChange}>
-            <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+            <SelectTrigger className="w-30 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-sm">
               <SelectValue placeholder="Select language" />
             </SelectTrigger>
             <SelectContent>
@@ -484,13 +481,13 @@ export default function MonacoSubmitEditor({
       </div>
 
       {/* Tabs Bar */}
-      <div className="flex items-center bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-750 border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
+      <div className="flex leading-[0.75] items-center bg-gradient-to-r from-slate-100 to-slate-50 dark:from-slate-800 dark:to-slate-750 border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
         <div className="flex items-center min-w-0 flex-1">
           {tabs.map((tab) => (
             <button
               type="button"
               key={tab.id}
-              className={`group relative flex items-center gap-2 px-4 py-3 cursor-pointer transition-all duration-200 border-r border-slate-200 dark:border-slate-700 min-w-0 border-0 bg-transparent ${
+              className={`group relative flex items-center gap-2 px-3 py-2 cursor-pointer transition-all duration-200 border-r border-slate-200 dark:border-slate-700 min-w-0 border-0 bg-transparent ${
                 activeTabId === tab.id
                   ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm"
                   : "hover:bg-white/70 dark:hover:bg-slate-800/70 text-slate-600 dark:text-slate-400"
@@ -544,7 +541,7 @@ export default function MonacoSubmitEditor({
         <button
           type="button"
           onClick={createNewTab}
-          className="flex items-center gap-1 px-3 py-2 m-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all duration-200 flex-shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+          className="flex items-center gap-1 px-3 py-1 m-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all duration-200 flex-shrink-0 border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
         >
           <Plus className="w-4 h-4" />
           <span className="text-sm font-medium">New</span>
@@ -593,7 +590,7 @@ export default function MonacoSubmitEditor({
       </div>
 
       {/* Footer with Action Buttons */}
-      <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+      <div className="p-2 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
         <div className="flex items-center justify-between">
           <div className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-4">
             <span>Lines: {currentCode.split("\n").length}</span>

@@ -38,9 +38,7 @@ export default function ProblemsPage() {
       if (filters.difficulty && problem.difficulty !== filters.difficulty) {
         return false;
       }
-      if (filters.category && problem.category !== filters.category) {
-        return false;
-      }
+
       if (filters.subject && problem.subject !== filters.subject) {
         return false;
       }
@@ -164,11 +162,11 @@ export default function ProblemsPage() {
                   onReset={handleReset}
                 />
 
-                <QuickFilters
+                {/* <QuickFilters
                   activeFilters={filters}
                   onRemoveFilter={handleRemoveFilter}
                   onClearAll={handleClearAllFilters}
-                />
+                /> */}
               </div>
             </div>
           </div>

@@ -27,9 +27,9 @@ export default function QuickFilters({
   onRemoveFilter,
   onClearAll,
 }: QuickFiltersProps) {
-  const hasActiveFilters = Object.values(activeFilters).some(
-    (value) => value && value.trim() !== ""
-  );
+  // const hasActiveFilters = Object.values(activeFilters).some(
+  //   (value) => value && value.trim() !== ""
+  // );
 
   const getFilterLabel = (key: keyof ProblemFilters, value: string) => {
     switch (key) {
@@ -39,8 +39,6 @@ export default function QuickFilters({
         return `Tên: ${value}`;
       case "difficulty":
         return `Độ khó: ${value}`;
-      case "category":
-        return `Dạng: ${value}`;
       case "subject":
         return `Môn: ${value}`;
       case "chapter":
@@ -87,8 +85,7 @@ export default function QuickFilters({
           );
         })}
 
-        {/* Clear All Button */}
-        {hasActiveFilters && (
+        {/* {hasActiveFilters && (
           <Button
             variant="outline"
             size="sm"
@@ -98,17 +95,16 @@ export default function QuickFilters({
             <X className="w-4 h-4 mr-2" />
             Xóa tất cả
           </Button>
-        )}
+        )} */}
 
-        {/* Show message if no filters */}
-        {!hasActiveFilters && (
+        {/* {!hasActiveFilters && (
           <div className="flex items-center gap-2 px-4 py-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
             <div className="w-2 h-2 bg-slate-400 rounded-full animate-pulse" />
             <span className="text-sm text-slate-500 dark:text-slate-400 italic">
               Chưa có bộ lọc nào được áp dụng
             </span>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

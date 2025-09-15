@@ -31,7 +31,7 @@ export default function ContestNavbar({
   return (
     <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-white/20 dark:border-slate-700/50 sticky top-0 z-40">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-12">
           <Link href="/contests">
             <Button
               variant="ghost"
