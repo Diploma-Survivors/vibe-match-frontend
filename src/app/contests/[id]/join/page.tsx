@@ -34,7 +34,8 @@ export default function ContestJoinPage() {
           )}
         </div>
       );
-    } else if (problem.points > 0) {
+    } 
+    if (problem.points > 0) {
       return (
         <div className="text-center">
           <div className="text-green-600 dark:text-green-400 font-medium">
