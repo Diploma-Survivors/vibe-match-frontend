@@ -10,20 +10,6 @@ import { ProblemSidebar } from "@/components/problem";
 import clientApi from "@/lib/apis/axios-client";
 
 export default function ProblemDescriptionPage() {
-  
-  useEffect(() => {
-    // this is for test
-    const fetchData = async () => {
-      try {
-        const response = await clientApi.get('/auth');
-        // console.log('User data:', response.data);
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-    
-    fetchData();
-  })
 
   const params = useParams();
   const problemId = params.id as string;

@@ -56,7 +56,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.accessToken) return null;
-        
+        console.log("accessToken", credentials.accessToken);
         return {
           id: "sso-user",
           accessToken: credentials.accessToken,

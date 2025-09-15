@@ -19,7 +19,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const response = await serverApi.get('/auth');;
 
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
