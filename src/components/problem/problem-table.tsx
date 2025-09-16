@@ -70,22 +70,13 @@ export default function ProblemTable({
                   ID
                 </TableHead>
                 <TableHead className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 w-96">
-                  Bài tập
+                  Tên
                 </TableHead>
-                <TableHead className="w-32 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                  Nhóm
-                </TableHead>
-                <TableHead className="w-32 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                  Dạng
-                </TableHead>
-                <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                  Điểm
+                <TableHead className="w-48 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
+                  Topic
                 </TableHead>
                 <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
                   % AC
-                </TableHead>
-                <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                  # AC
                 </TableHead>
                 <TableHead className="w-24 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
                   Trạng thái
@@ -148,30 +139,14 @@ export default function ProblemTable({
                   <TableCell className="text-center px-4 py-4">
                     <div className="space-y-2">
                       <div className="font-semibold text-slate-900 dark:text-slate-100 text-sm break-words">
-                        {problem.group}
+                        {problem.topic}
                       </div>
                       <div className="text-xs text-slate-600 dark:text-slate-400 break-words">
                         {problem.subject}
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-center px-4 py-4">
-                    <div className="space-y-2">
-                      <div className="font-semibold text-slate-900 dark:text-slate-100 text-sm break-words">
-                        {problem.category}
-                      </div>
-                      <div className="text-xs text-slate-600 dark:text-slate-400 break-words">
-                        {problem.chapter}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center px-4 py-4">
-                    <div className="inline-flex items-center justify-center w-16 h-10 bg-gradient-to-br from-yellow-100 to-amber-100 dark:from-yellow-900/30 dark:to-amber-900/30 rounded-xl border border-yellow-200 dark:border-yellow-700">
-                      <span className="font-bold text-yellow-700 dark:text-yellow-300 text-sm">
-                        {problem.points.toFixed(2)}
-                      </span>
-                    </div>
-                  </TableCell>
+
                   <TableCell className="text-center px-4 py-4">
                     <div
                       className={`inline-flex items-center justify-center w-16 h-8 rounded-full text-xs font-bold ${
@@ -183,13 +158,6 @@ export default function ProblemTable({
                       }`}
                     >
                       {problem.acceptanceRate.toFixed(1)}%
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-center px-4 py-4">
-                    <div className="inline-flex items-center justify-center w-16 h-8 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-full border border-green-200 dark:border-green-700">
-                      <span className="font-bold text-green-700 dark:text-green-300 text-xs">
-                        {problem.submissionCount.toLocaleString()}
-                      </span>
                     </div>
                   </TableCell>
                   <TableCell className="text-center px-4 py-4">

@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/select";
 import type { ProblemFilters } from "@/types/problem";
 import {
-  CATEGORY_OPTIONS,
   CHAPTER_OPTIONS,
   DIFFICULTY_OPTIONS,
-  PROBLEM_TYPE_OPTIONS,
+  TOPIC_OPTIONS,
   SUBJECT_OPTIONS,
+  PROBLEM_TYPE_OPTIONS,
 } from "@/types/problem";
 import { RotateCcw, Search } from "lucide-react";
 import React, { useState } from "react";
@@ -28,13 +28,28 @@ interface ProblemFilterProps {
   onReset: () => void;
 }
 
+// Add this export for the tag options
+export const TAG_OPTIONS = [
+  { value: "math", label: "Toán học" },
+  { value: "physics", label: "Vật lý" },
+  { value: "chemistry", label: "Hóa học" },
+  { value: "biology", label: "Sinh học" },
+  { value: "algorithm", label: "Thuật toán" },
+  { value: "data-structure", label: "Cấu trúc dữ liệu" },
+  { value: "beginner", label: "Người mới" },
+  { value: "advanced", label: "Nâng cao" },
+  { value: "contest", label: "Thi đấu" },
+  { value: "practice", label: "Luyện tập" },
+];
+
+
 export default function ProblemFilter({
   filters,
   onFiltersChange,
   onSearch,
   onReset,
 }: ProblemFilterProps) {
-  const handleFilterChange = (key: keyof ProblemFilters, value: string) => {
+  const handleFilterChange = (key: keyof ProblemFilters, value: string | string[]) => {
     onFiltersChange({
       ...filters,
       [key]: value,
@@ -128,106 +143,22 @@ export default function ProblemFilter({
             </Select>
           </div>
 
-          {/* Dạng bài */}
+          {/* Topic (replaced Dạng bài) */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Dạng bài:
+              Topic:
             </label>
             <Select
-              value={filters.category || "all"}
+              value={filters.topic || "all"}
               onValueChange={(value) =>
-                handleFilterChange("category", value === "all" ? "" : value)
-              }
-            >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
-                <SelectValue placeholder="Tham lam" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-                {CATEGORY_OPTIONS.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="rounded-lg"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Lựa chọn môn học */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Lựa chọn môn học:
-            </label>
-            <Select
-              value={filters.subject || "all"}
-              onValueChange={(value) =>
-                handleFilterChange("subject", value === "all" ? "" : value)
-              }
-            >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
-                <SelectValue placeholder="Lập trình cơ bản" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-                {SUBJECT_OPTIONS.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="rounded-lg"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Chương - mục */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Chương - mục:
-            </label>
-            <Select
-              value={filters.chapter || "all"}
-              onValueChange={(value) =>
-                handleFilterChange("chapter", value === "all" ? "" : value)
-              }
-            >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
-                <SelectValue placeholder="2. Lệnh rẽ nhánh" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-                {CHAPTER_OPTIONS.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="rounded-lg"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Thể loại */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Thể loại:
-            </label>
-            <Select
-              value={filters.problemType || "all"}
-              onValueChange={(value) =>
-                handleFilterChange("problemType", value === "all" ? "" : value)
+                handleFilterChange("topic", value === "all" ? "" : value)
               }
             >
               <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
                 <SelectValue placeholder="Tất cả" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-                {PROBLEM_TYPE_OPTIONS.map((option) => (
+                {TOPIC_OPTIONS.map((option) => (
                   <SelectItem
                     key={option.value}
                     value={option.value}
@@ -239,6 +170,74 @@ export default function ProblemFilter({
               </SelectContent>
             </Select>
           </div>
+
+
+         
+          {/* Lựa chọn tag */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Lựa chọn tag:
+            </label>
+            <Select>
+              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
+                <SelectValue 
+                  placeholder={
+                    filters.tags && filters.tags.length > 0
+                      ? `${filters.tags.length} tag được chọn`
+                      : "Chọn tag..."
+                  }
+                />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
+                {TAG_OPTIONS.filter(option => option.value !== "all").map((option) => (
+                  <div
+                    key={option.value}
+                    className="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const currentTags = filters.tags || [];
+                      const isSelected = currentTags.includes(option.value);
+                      
+                      if (isSelected) {
+                        // Remove from selection
+                        const newTags = currentTags.filter(t => t !== option.value);
+                        handleFilterChange("tags", newTags);
+                      } else {
+                        // Add to selection
+                        const newTags = [...currentTags, option.value];
+                        handleFilterChange("tags", newTags);
+                      }
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={filters.tags?.includes(option.value) || false}
+                      onChange={() => {}} // Handled by parent div onClick
+                      className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                    />
+                    <span className="text-sm">{option.label}</span>
+                  </div>
+                ))}
+                {filters.tags && filters.tags.length > 0 && (
+                  <div className="border-t border-slate-200 dark:border-slate-700 mt-2 pt-2">
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleFilterChange("tags", []);
+                      }}
+                      className="w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    >
+                      Xóa tất cả
+                    </button>
+                  </div>
+                )}
+              </SelectContent>
+            </Select>
+          </div>        
+       
+                  
+
+
         </div>
 
         {/* Buttons */}

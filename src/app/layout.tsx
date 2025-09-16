@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import {serverApi} from "@/lib/apis/axios-server";
+import LayoutWrapper from "@/components/layout/layout-wrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,8 +26,7 @@ export default async function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <Header />
-          <main className="pt-16">{children}</main>
-          <Footer />
+          <LayoutWrapper>{children}</LayoutWrapper>
         </ThemeProvider>
       </body>
     </html>
