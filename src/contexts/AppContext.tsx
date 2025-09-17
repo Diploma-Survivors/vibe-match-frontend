@@ -14,8 +14,6 @@ interface AppContextType {
 
   // Issuer information
   issuer: 'local' | 'moodle';
-  isMoodleIssuer: boolean;
-  isLocalIssuer: boolean;
   isInDedicatedPages: boolean;
 
   // UI state based on issuer
@@ -36,17 +34,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [issuer, setIssuer] = useState<'local' | 'moodle'>('local');
   const [isLoading, setIsLoading] = useState(true);
+  const [shouldHideNavigation, setShouldHideNavigation] = useState(false);
   const pathname = usePathname();
 
 
   // Derived states
-  const isMoodleIssuer = issuer === 'moodle';
-  const isLocalIssuer = issuer === 'local';
   // we can add contest page later on
   const isInDedicatedPages = /^\/problems\/[^\/]+\/(problem|submit|submissions|solutions|standing|test)$/.test(pathname);
-  const shouldHideNavigation = isInDedicatedPages && isMoodleIssuer;
 
   const initializeFromToken = (accessToken: string) => {
+    console.log('🔑 Initializing from access token', accessToken);
     try {
       const decoded: DecodedAccessToken = jwtDecode(accessToken);
 
@@ -61,16 +58,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       };
 
       // Determine issuer
+      console.log("Decoded token:", decoded);
       const issuerType: 'local' | 'moodle' = decoded.iss?.includes('local') ? 'local' : 'moodle';
 
       setUser(userInfo);
       setIssuer(issuerType);
-
-      console.log('🔐 User initialized from token:', {
-        user: userInfo,
-        issuer: issuerType,
-        shouldHideNavigation: issuerType === 'moodle'
-      });
 
     } catch (error) {
       console.error('❌ Failed to decode access token:', error);
@@ -90,6 +82,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       return;
     }
+    console.log("Session status:", status, session);
 
     if (session?.accessToken) {
       initializeFromToken(session.accessToken);
@@ -100,11 +93,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, [session, status]);
 
+  useEffect(() => {
+    setShouldHideNavigation(issuer === 'moodle' && isInDedicatedPages);
+  }, [issuer, isInDedicatedPages]);
+
+  console.log({
+    user,
+    issuer,
+    isInDedicatedPages,
+    shouldHideNavigation,
+    isLoading
+  })
+
   const value: AppContextType = {
     user,
     issuer,
-    isMoodleIssuer,
-    isLocalIssuer,
     isInDedicatedPages,
     shouldHideNavigation,
     isLoading,
@@ -134,6 +137,6 @@ export function useUser() {
 }
 
 export function useIssuer() {
-  const { issuer, isMoodleIssuer, isInDedicatedPages, isLocalIssuer, shouldHideNavigation } = useApp();
-  return { issuer, isMoodleIssuer, isInDedicatedPages, isLocalIssuer, shouldHideNavigation };
+  const { issuer, isInDedicatedPages, shouldHideNavigation } = useApp();
+  return { issuer, isInDedicatedPages, shouldHideNavigation };
 }

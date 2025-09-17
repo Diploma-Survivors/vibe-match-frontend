@@ -34,7 +34,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     console.error('Error refreshing access token:', error)
     return {
       ...token,
-      error: 'RefreshAccessTokenError', // This will be used on the client to trigger a sign-out
+      error: 'RefreshAccessTokenError',
     }
   }
 }
@@ -52,7 +52,6 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.accessToken) return null;
-        console.log("accessToken", credentials.accessToken);
         return {
           id: "sso-user",
           accessToken: credentials.accessToken,
@@ -78,11 +77,9 @@ export const authOptions: NextAuthOptions = {
           token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
         } catch (err) {
           console.error("Failed to decode access token:", err);
-          // fallback: expire in 1 hour
-          token.accessTokenExpires = Date.now() + 60 * 60 * 1000;
         }
       }
-      if (Date.now() > (token.accessTokenExpires as number)) {
+      if (!token.accessToken || Date.now() > (token.accessTokenExpires as number)) {
         try {
           const data = await refreshAccessToken(token);
           token.accessToken = data.accessToken;
@@ -91,8 +88,6 @@ export const authOptions: NextAuthOptions = {
           token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
         } catch (err) {
           console.error("Failed to decode access token:", err);
-          // fallback: expire in 1 hour
-          token.accessTokenExpires = Date.now() + 60 * 60 * 1000;
         }
       }
       return token;
@@ -110,7 +105,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/auth/signin/abc',
-    error: '/auth/error',
+    error: '/',
   },
   session: {
     strategy: 'jwt',
