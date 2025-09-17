@@ -4,6 +4,7 @@ import { Footer, Header } from "@/components/layout";
 import { ThemeProvider } from "@/components/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import {serverApi} from "@/lib/apis/axios-server";
 import LayoutWrapper from "@/components/layout/layout-wrapper";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
     "Empowering creators with decentralized ownership, privacy, and fair rewards.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;

@@ -2,9 +2,13 @@
 
 import { mockProblems } from "@/lib/data/mock-problems";
 import { useParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import { ProblemSidebar } from "@/components/problem";
+import clientApi from "@/lib/apis/axios-client";
 import ProblemDetail from "@/components/problem/problem-detail-tab";
 
 export default function ProblemDescriptionPage() {
+
   const params = useParams();
   const problemId = params.id as string;
 
