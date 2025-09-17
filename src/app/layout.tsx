@@ -1,33 +1,31 @@
 import type React from "react";
 import "./globals.css";
-import { Footer, Header } from "@/components/layout";
-import { ThemeProvider } from "@/components/providers";
+import { ThemeProvider, ClientProvider } from "@/components/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import {serverApi} from "@/lib/apis/axios-server";
-import LayoutWrapper from "@/components/layout/layout-wrapper";
+import { AppProvider } from "@/contexts/AppContext";
+import { SessionProvider } from "next-auth/react";
+import { ConditionalLayout } from "@/components/layout";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "SolVibe - Decentralized Social Media on Solana",
+  title: "Vibe Match - Decentralized Social Media",
   description:
     "Empowering creators with decentralized ownership, privacy, and fair rewards.",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <Header />
-          <LayoutWrapper>{children}</LayoutWrapper>
-        </ThemeProvider>
+        <ClientProvider>
+          <ConditionalLayout>{children}</ConditionalLayout>
+        </ClientProvider>
       </body>
     </html>
   );

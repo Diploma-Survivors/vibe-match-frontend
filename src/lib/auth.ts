@@ -4,12 +4,8 @@ import type { NextAuthOptions } from 'next-auth'
 import { getServerSession } from 'next-auth' // Add this import
 import type { JWT } from 'next-auth/jwt'
 import {jwtDecode} from "jwt-decode";
+import { DecodedAccessToken } from '@/types/states'
 
-type DecodedToken = {
-  exp: number; // expiry timestamp (seconds since epoch)
-  iat?: number;
-  [key: string]: any;
-};
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
@@ -38,7 +34,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     console.error('Error refreshing access token:', error)
     return {
       ...token,
-      error: 'RefreshAccessTokenError', // This will be used on the client to trigger a sign-out
+      error: 'RefreshAccessTokenError',
     }
   }
 }
@@ -56,7 +52,6 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.accessToken) return null;
-        console.log("accessToken", credentials.accessToken);
         return {
           id: "sso-user",
           accessToken: credentials.accessToken,
@@ -78,25 +73,21 @@ export const authOptions: NextAuthOptions = {
         token.callbackUrl = user.callbackUrl;
 
         try {
-          const decoded: DecodedToken = jwtDecode(user.accessToken as string);
+          const decoded: DecodedAccessToken = jwtDecode(user.accessToken as string);
           token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
         } catch (err) {
           console.error("Failed to decode access token:", err);
-          // fallback: expire in 1 hour
-          token.accessTokenExpires = Date.now() + 60 * 60 * 1000;
         }
       }
-      if (Date.now() > (token.accessTokenExpires as number)) {
+      if (!token.accessToken || Date.now() > (token.accessTokenExpires as number)) {
         try {
           const data = await refreshAccessToken(token);
           token.accessToken = data.accessToken;
           token.refreshToken = data.refreshToken;
-          const decoded: DecodedToken = jwtDecode(user.accessToken as string);
+          const decoded: DecodedAccessToken = jwtDecode(user.accessToken as string);
           token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
         } catch (err) {
           console.error("Failed to decode access token:", err);
-          // fallback: expire in 1 hour
-          token.accessTokenExpires = Date.now() + 60 * 60 * 1000;
         }
       }
       return token;
@@ -114,7 +105,7 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: '/auth/signin/abc',
-    error: '/auth/error',
+    error: '/',
   },
   session: {
     strategy: 'jwt',

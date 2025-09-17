@@ -5,12 +5,14 @@ import { mockProblems } from "@/lib/data/mock-problems";
 import type { Problem } from "@/types/problem";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useApp } from "@/contexts/AppContext";
 
 export default function ProblemLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { shouldHideNavigation } = useApp();
   const params = useParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -47,7 +49,7 @@ export default function ProblemLayout({
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900">
       {/* Problem Navigation */}
-      <ProblemNavbar activeTab={activeTab} onTabChange={handleTabChange} />
+      <ProblemNavbar activeTab={activeTab} onTabChange={handleTabChange} hideNavigation={shouldHideNavigation}/>
 
       {/* Main Content - Full Width for all tabs */}
       <div className="container mx-auto px-4 bg-white dark:bg-slate-900">
