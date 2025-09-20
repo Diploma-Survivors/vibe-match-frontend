@@ -151,31 +151,40 @@ function generateAuthForm(
     
   return `
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang="vi">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Redirecting...</title>
+        <title>Đang chuyển hướng...</title>
         <style>
             body {
-                font-family: Arial, sans-serif;
+                font-family: 'Geist Sans', Arial, sans-serif;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 height: 100vh;
                 margin: 0;
-                background-color: #f5f5f5;
+                background: linear-gradient(
+                    to bottom right,
+                    rgb(248 250 252),
+                    rgb(241 245 249),
+                    rgb(248 250 252)
+                );
+                background-attachment: fixed;
             }
             .loading {
                 text-align: center;
-                padding: 20px;
+                padding: 24px;
                 background: white;
-                border-radius: 8px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                border-radius: 0.625rem;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+                border: 1px solid rgba(226, 232, 240, 1);
+                max-width: 90%;
+                width: 400px;
             }
             .spinner {
-                border: 4px solid #f3f3f3;
-                border-top: 4px solidrgb(1, 145, 47);
+                border: 4px solid rgba(241, 245, 249, 1);
+                border-top: 4px solid rgb(22, 163, 74);
                 border-radius: 50%;
                 width: 40px;
                 height: 40px;
@@ -186,38 +195,87 @@ function generateAuthForm(
                 0% { transform: rotate(0deg); }
                 100% { transform: rotate(360deg); }
             }
+            h2 {
+                color: rgb(15, 23, 42);
+                font-weight: 600;
+                margin-bottom: 12px;
+            }
+            p {
+                color: rgb(71, 85, 105);
+                margin-bottom: 12px;
+            }
+            small {
+                color: rgb(100, 116, 139);
+            }
+            button {
+                padding: 10px 20px;
+                background: rgb(22, 163, 74);
+                color: white;
+                border: none;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                font-weight: 500;
+                transition: all 0.2s ease;
+            }
+            button:hover {
+                background: rgb(21, 128, 61);
+                box-shadow: 0 2px 10px rgba(22, 163, 74, 0.2);
+            }
+            @media (prefers-color-scheme: dark) {
+                body {
+                    background: linear-gradient(
+                        to bottom right,
+                        rgb(15, 23, 42),
+                        rgb(30, 41, 59),
+                        rgb(15, 23, 42)
+                    );
+                }
+                .loading {
+                    background: rgb(30, 41, 59);
+                    border-color: rgb(51, 65, 85);
+                }
+                h2 {
+                    color: rgb(241, 245, 249);
+                }
+                p {
+                    color: rgb(148, 163, 184);
+                }
+                small {
+                    color: rgb(100, 116, 139);
+                }
+                .spinner {
+                    border-color: rgb(51, 65, 85);
+                    border-top-color: rgb(34, 197, 94);
+                }
+            }
         </style>
     </head>
     <body>
         <div class="loading">
             <div class="spinner"></div>
-            <h2>Redirecting...</h2>
-            <p>Please wait while we process your authentication...</p>
-            <p><small>If this page doesn't redirect automatically, please click submit below.</small></p>
+            <h2>Đang chuyển hướng...</h2>
+            <p>Vui lòng đợi trong khi chúng tôi xử lý xác thực của bạn...</p>
+            <p><small>Nếu trang này không tự động chuyển hướng, vui lòng nhấn nút bên dưới.</small></p>
             
             <form id="postRedirectForm" action="${targetUrl}" method="POST" style="margin-top: 20px;">
                 <input type="hidden" name="accessToken" value="${accessToken}" />
                 <input type="hidden" name="refreshToken" value="${refreshToken}" />
                 <input type="hidden" name="csrfToken" value="${csrfToken}" />
                 <input type="hidden" name="callbackUrl" value="${redirectPath}" />
-                <button type="submit" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    Continue
+                <button type="submit">
+                    Tiếp tục
                 </button>
             </form>
         </div>
         
         <script type="text/javascript">
-            console.log('🚀 Form generated with CSRF token');
-            console.log('Target URL:', '${targetUrl}');
-            console.log('Redirect path:', '${redirectPath}');
             
-            // Auto-submit the form after a short delay
+            // Tự động gửi form sau một khoảng thời gian ngắn
             setTimeout(() => {
-                console.log('⏰ Auto-submitting form...');
                 document.getElementById('postRedirectForm').submit();
             }, 1000);
             
-            // Fallback: submit on page load
+            // Dự phòng: gửi khi trang đã tải xong
             window.addEventListener('load', () => {
                 setTimeout(() => {
                     if (!document.hidden) {

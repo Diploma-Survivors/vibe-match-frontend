@@ -3,9 +3,10 @@ import "./globals.css";
 import { ThemeProvider, ClientProvider } from "@/components/providers";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { AppProvider } from "@/contexts/AppContext";
+import { AppProvider } from "@/contexts/app-context";
 import { SessionProvider } from "next-auth/react";
 import { ConditionalLayout } from "@/components/layout";
+import { ServerProvider } from "@/components/providers/server-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,9 +24,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={inter.className}>
-        <ClientProvider>
+        <ServerProvider>
           <ConditionalLayout>{children}</ConditionalLayout>
-        </ClientProvider>
+        </ServerProvider>
       </body>
     </html>
   );
