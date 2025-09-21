@@ -1,17 +1,10 @@
-"use client";
 
 import { mockProblems } from "@/lib/data/mock-problems";
-import { useParams } from "next/navigation";
 import ProblemDetail from "@/components/problem/problem-detail-tab";
-import { useState, useEffect } from "react";
-import { ProblemSidebar } from "@/components/problem";
-import clientApi from "@/lib/apis/axios-client";
 
-export default function ProblemDescriptionPage() {
-
-  const params = useParams();
-  const problemId = params.id as string;
-
+export default async function ProblemDescriptionPage({ params }: {params: Promise<{id: string}>; }) {
+  const resolvedParams = await params;
+  const problemId = resolvedParams.id;
   const problem = mockProblems.find((p) => p.id === problemId);
 
   if (!problem) return null;
@@ -23,8 +16,6 @@ export default function ProblemDescriptionPage() {
     />
   );
 }
-
-
 
 
 // "use client";

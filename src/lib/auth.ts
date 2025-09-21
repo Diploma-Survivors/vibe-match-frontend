@@ -84,7 +84,7 @@ export const authOptions: NextAuthOptions = {
           const data = await refreshAccessToken(token);
           token.accessToken = data.accessToken;
           token.refreshToken = data.refreshToken;
-          const decoded: DecodedAccessToken = jwtDecode(user.accessToken as string);
+          const decoded: DecodedAccessToken = jwtDecode(data.accessToken as string);
           token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
         } catch (err) {
           console.error("Failed to decode access token:", err);

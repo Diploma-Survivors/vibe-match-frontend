@@ -1,7 +1,7 @@
 "use client";
 
 import { Footer, Header } from "@/components/layout";
-import { useApp } from "@/contexts/AppContext";
+import { useApp } from "@/contexts/app-context";
 
 export default function ConditionalLayout({ 
   children 
@@ -9,7 +9,6 @@ export default function ConditionalLayout({
   children: React.ReactNode 
 }) {
   const { shouldHideNavigation, isLoading, isInDedicatedPages } = useApp();
-  console.log('IN conditional layout', { shouldHideNavigation, isLoading, isInDedicatedPages });
 
   if (isLoading) {
     return (
