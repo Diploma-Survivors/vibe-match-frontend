@@ -2,12 +2,9 @@
 import { mockProblems } from "@/lib/data/mock-problems";
 import ProblemDetail from "@/components/problem/problem-detail-tab";
 
-export default async function ProblemDescriptionPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const problemId = params.id;
+export default async function ProblemDescriptionPage({ params }: {params: Promise<{id: string}>; }) {
+  const resolvedParams = await params;
+  const problemId = resolvedParams.id;
   const problem = mockProblems.find((p) => p.id === problemId);
 
   if (!problem) return null;
