@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { jwtDecode } from "jwt-decode";
 import { DecodedAccessToken, UserInfo } from "@/types/states";
 import { ClientProvider } from "./client-provider";
-import { authOptions } from "@lib/auth"; 
+import { authOptions } from "@/lib/auth"; 
 
 interface ServerProviderProps {
   children: ReactNode;

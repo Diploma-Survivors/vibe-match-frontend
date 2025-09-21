@@ -20,22 +20,24 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
+const DEDICATED_PAGES_REGEX =
+/^\/problems\/[^\/]+(?:\/(problem|submit|submissions|solutions|standing|test))?$/;
 
 export function AppProvider({ children, initialUser, initialIssuer }: AppProviderProps) {
-  console.log('In App provider:',initialUser, initialIssuer);
   const [user, setUser] = useState<UserInfo | null>(initialUser);
   const [issuer, setIssuer] = useState<"local" | "moodle">(initialIssuer);
   const [isLoading, setIsLoading] = useState(false);
 
+
+
   const pathname = usePathname();
 
-  const isInDedicatedPages = /^\/problems\/[^\/]+(?:\/(problem|submit|submissions|solutions|standing|test))?$/.test(pathname);
+  const isInDedicatedPages = DEDICATED_PAGES_REGEX.test(pathname);
   const shouldHideNavigation = issuer === "moodle" && isInDedicatedPages;
 
   const clearUserData = () => {
     setUser(null);
     setIssuer("local");
-    console.log("🧹 User data cleared");
   };
 
 
