@@ -97,10 +97,8 @@ export const authOptions: NextAuthOptions = {
       session.redirect = token.redirect as string;
       return session
     },
-    async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      if (url.startsWith(baseUrl)) return url;
-      return baseUrl; // fallback
+    async redirect({ url }) {
+      return url;
     },
   },
   pages: {
