@@ -20,8 +20,9 @@ interface AppContextType {
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
-const DEDICATED_PAGES_REGEX =
-/^\/problems\/[^\/]+(?:\/(problem|submit|submissions|solutions|standing|test))?$/;
+const dedicatedPagesPattern = process.env.NEXT_PUBLIC_DEDICATED_PAGES_PATTERN || "^/problems/[^/]+(?:/(problem|submit|submissions|solutions|standing|test))?$";
+const DEDICATED_PAGES_REGEX = new RegExp(`^${dedicatedPagesPattern}$`);
+
 
 export function AppProvider({ children, initialUser, initialIssuer }: AppProviderProps) {
   const [user, setUser] = useState<UserInfo | null>(initialUser);
