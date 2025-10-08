@@ -51,6 +51,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,md,css,scss}": [
+      "biome format --write",
       "biome check --apply"
     ]
   }

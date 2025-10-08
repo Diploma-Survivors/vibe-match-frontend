@@ -9,10 +9,15 @@
       "recommended": true,
       "a11y": {
         "noLabelWithoutControl": "off",
-        "useValidAnchor": "off"
+        "useValidAnchor": "off",
+        "useSemanticElements": "warn"
+      },
+      "complexity": {
+        "noStaticOnlyClass": "warn"
       },
       "suspicious": {
-        "noArrayIndexKey": "warn"
+        "noArrayIndexKey": "warn",
+        "noExplicitAny": "off"
       }
     }
   },
@@ -23,7 +28,7 @@
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "double",
+      "quoteStyle": "single",
       "trailingCommas": "es5",
       "semicolons": "always"
     }
