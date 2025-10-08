@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Copy, Timer, MemoryStick, FileText } from "lucide-react";
-import { MonacoSubmitEditor } from "@/components/editor";
-import React, { useState, useRef, useCallback } from "react";
+import { MonacoSubmitEditor } from '@/components/editor';
+import { Button } from '@/components/ui/button';
+import type { Problem } from '@/types/problem';
+import { Copy, FileText, MemoryStick, Timer } from 'lucide-react';
 import {
   CheckCircle,
   ChevronLeft,
@@ -12,10 +12,10 @@ import {
   Play,
   Plus,
   TestTube,
+  Trophy,
   X,
-  Trophy
-} from "lucide-react";
-import type { Problem } from "@/types/problem";
+} from 'lucide-react';
+import React, { useState, useRef, useCallback } from 'react';
 
 interface ProblemDetailProps {
   problem: Problem;
@@ -24,22 +24,26 @@ interface ProblemDetailProps {
   contestTimeRemaining?: string;
 }
 
-export default function ProblemDetail({ 
-  problem, 
+export default function ProblemDetail({
+  problem,
   showContestInfo = false,
   contestName,
-  contestTimeRemaining 
+  contestTimeRemaining,
 }: ProblemDetailProps) {
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [output, setOutput] = useState("");
+  const [output, setOutput] = useState('');
   const [activeTestCase, setActiveTestCase] = useState(0);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [submissions, setSubmissions] = useState<
     Array<{
       id: number;
       timestamp: string;
-      status: "Accepted" | "Wrong Answer" | "Time Limit Exceeded" | "Runtime Error";
+      status:
+        | 'Accepted'
+        | 'Wrong Answer'
+        | 'Time Limit Exceeded'
+        | 'Runtime Error';
       runtime: string;
       memory: string;
       score: number;
@@ -60,20 +64,20 @@ export default function ProblemDetail({
   const [testCases, setTestCases] = useState([
     {
       id: 1,
-      input: "5",
-      output: "1 1 2 1 4",
+      input: '5',
+      output: '1 1 2 1 4',
       isEditing: false,
     },
     {
       id: 2,
-      input: "10",
-      output: "1 1 2 1 4 2 6 1 6 2",
+      input: '10',
+      output: '1 1 2 1 4 2 6 1 6 2',
       isEditing: false,
     },
     {
       id: 3,
-      input: "3",
-      output: "1 1 2",
+      input: '3',
+      output: '1 1 2',
       isEditing: false,
     },
   ]);
@@ -131,28 +135,35 @@ export default function ProblemDetail({
   // Add global mouse event listeners
   React.useEffect(() => {
     if (isDragging) {
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
-      document.body.style.cursor = "col-resize";
-      document.body.style.userSelect = "none";
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
     }
 
     if (isVerticalDragging) {
-      document.addEventListener("mousemove", handleVerticalMouseMove);
-      document.addEventListener("mouseup", handleVerticalMouseUp);
-      document.body.style.cursor = "row-resize";
-      document.body.style.userSelect = "none";
+      document.addEventListener('mousemove', handleVerticalMouseMove);
+      document.addEventListener('mouseup', handleVerticalMouseUp);
+      document.body.style.cursor = 'row-resize';
+      document.body.style.userSelect = 'none';
     }
 
     return () => {
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.removeEventListener("mousemove", handleVerticalMouseMove);
-      document.removeEventListener("mouseup", handleVerticalMouseUp);
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', handleVerticalMouseMove);
+      document.removeEventListener('mouseup', handleVerticalMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
     };
-  }, [isDragging, isVerticalDragging, handleMouseMove, handleMouseUp, handleVerticalMouseMove, handleVerticalMouseUp]);
+  }, [
+    isDragging,
+    isVerticalDragging,
+    handleMouseMove,
+    handleMouseUp,
+    handleVerticalMouseMove,
+    handleVerticalMouseUp,
+  ]);
 
   // Test case handlers
   const handleTestCaseSave = (id: number) => {
@@ -171,7 +182,7 @@ export default function ProblemDetail({
 
   const handleTestCaseChange = (
     id: number,
-    field: "input" | "output",
+    field: 'input' | 'output',
     value: string
   ) => {
     setTestCases((prev) =>
@@ -184,8 +195,8 @@ export default function ProblemDetail({
   const handleTestCaseAdd = () => {
     const newTestCase = {
       id: Date.now(),
-      input: "",
-      output: "",
+      input: '',
+      output: '',
       isEditing: true,
     };
     setTestCases((prev) => [...prev, newTestCase]);
@@ -201,11 +212,11 @@ export default function ProblemDetail({
 
   const handleRun = async () => {
     setIsRunning(true);
-    setOutput("Running...");
+    setOutput('Running...');
 
     setTimeout(() => {
       setOutput(
-        "Sample Input: 5\\nSample Output: 1 1 2 3 5\\n\\nExecution time: 0.12s\\nMemory used: 2.4 MB\\n\\n✅ Test passed!"
+        'Sample Input: 5\\nSample Output: 1 1 2 3 5\\n\\nExecution time: 0.12s\\nMemory used: 2.4 MB\\n\\n✅ Test passed!'
       );
       setIsRunning(false);
     }, 2000);
@@ -213,19 +224,19 @@ export default function ProblemDetail({
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    setOutput("Submitting...");
+    setOutput('Submitting...');
 
     setTimeout(() => {
       const statusOptions: Array<
-        "Accepted" | "Wrong Answer" | "Time Limit Exceeded" | "Runtime Error"
-      > = ["Accepted", "Wrong Answer", "Time Limit Exceeded", "Runtime Error"];
+        'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Runtime Error'
+      > = ['Accepted', 'Wrong Answer', 'Time Limit Exceeded', 'Runtime Error'];
       const randomStatus =
         statusOptions[Math.floor(Math.random() * statusOptions.length)];
 
       const newSubmission = {
         id: submissions.length + 1,
         timestamp: new Date().toLocaleString(),
-        status: Math.random() > 0.3 ? ("Accepted" as const) : randomStatus,
+        status: Math.random() > 0.3 ? ('Accepted' as const) : randomStatus,
         runtime: `${(Math.random() * 2).toFixed(2)}s`,
         memory: `${(Math.random() * 50 + 10).toFixed(1)}MB`,
         score: Math.random() > 0.3 ? 100 : Math.floor(Math.random() * 60 + 20),
@@ -240,7 +251,7 @@ export default function ProblemDetail({
         }\nScore: ${
           newSubmission.score
         }/100\n\nTest case 1: Passed (0.08s)\nTest case 2: Passed (0.12s)\nTest case 3: ${
-          newSubmission.status === "Accepted" ? "Passed" : "Failed"
+          newSubmission.status === 'Accepted' ? 'Passed' : 'Failed'
         } (0.15s)`
       );
       setIsSubmitting(false);
@@ -255,14 +266,14 @@ export default function ProblemDetail({
 
   const sampleCases = [
     {
-      input: "5",
-      output: "1 1 2 3 5",
-      explanation: "First 5 Fibonacci numbers",
+      input: '5',
+      output: '1 1 2 3 5',
+      explanation: 'First 5 Fibonacci numbers',
     },
     {
-      input: "8",
-      output: "1 1 2 3 5 8 13 21",
-      explanation: "First 8 Fibonacci numbers",
+      input: '8',
+      output: '1 1 2 3 5 8 13 21',
+      explanation: 'First 8 Fibonacci numbers',
     },
   ];
 
@@ -297,19 +308,24 @@ export default function ProblemDetail({
         </div>
       )}
 
-      <div 
+      <div
         ref={containerRef}
         className="flex h-full gap-0 relative"
-        style={{ height: showContestInfo ? "calc(100vh - 60px)" : "calc(100vh - 60px)" }}
+        style={{
+          height: showContestInfo ? 'calc(100vh - 60px)' : 'calc(100vh - 60px)',
+        }}
       >
         {/* Left Panel - Problem Description */}
-        <div 
+        <div
           className="overflow-y-auto pb-4"
           style={{ width: `${leftWidth}%` }}
         >
           <div className="pr-3 rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
             <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
-              <div className="p-8 space-y-8" style={{ borderWidth: 1, borderRadius: "inherit" }}>
+              <div
+                className="p-8 space-y-8"
+                style={{ borderWidth: 1, borderRadius: 'inherit' }}
+              >
                 {/* Problem Title Header */}
                 <div className="pb-6 border-b border-slate-200 dark:border-slate-700">
                   <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent mb-4">
@@ -318,11 +334,11 @@ export default function ProblemDetail({
                   <div className="flex items-center gap-4 flex-wrap">
                     <div
                       className={`px-3 py-1 rounded-full text-sm font-semibold shadow-md ${
-                        problem.difficulty === "Dễ"
-                          ? "bg-gradient-to-r from-green-400 to-green-500 text-white"
-                          : problem.difficulty === "Trung bình"
-                          ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white"
-                          : "bg-gradient-to-r from-red-400 to-red-500 text-white"
+                        problem.difficulty === 'Dễ'
+                          ? 'bg-gradient-to-r from-green-400 to-green-500 text-white'
+                          : problem.difficulty === 'Trung bình'
+                            ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white'
+                            : 'bg-gradient-to-r from-red-400 to-red-500 text-white'
                       }`}
                     >
                       {problem.difficulty}
@@ -349,13 +365,13 @@ export default function ProblemDetail({
                   </h2>
                   <div className="prose prose-slate dark:prose-invert max-w-none">
                     <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                      Cho số nguyên dương <strong>N</strong>, liệt kê phi hàm euler
-                      của các số từ 1 tới N và in ra màn hình.
+                      Cho số nguyên dương <strong>N</strong>, liệt kê phi hàm
+                      euler của các số từ 1 tới N và in ra màn hình.
                     </p>
                     <p className="text-slate-700 dark:text-slate-300 leading-relaxed mt-4">
                       Phi hàm euler của số <strong>X</strong> hiển số lượng số
-                      nguyên tố cùng nhau với <strong>X</strong> nằm trong khoảng từ
-                      [1, X].
+                      nguyên tố cùng nhau với <strong>X</strong> nằm trong
+                      khoảng từ [1, X].
                     </p>
                   </div>
                 </section>
@@ -378,7 +394,9 @@ export default function ProblemDetail({
                     Giới hạn
                   </h2>
                   <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                    <p className="text-slate-700 dark:text-slate-300">• 1≤N≤10^6</p>
+                    <p className="text-slate-700 dark:text-slate-300">
+                      • 1≤N≤10^6
+                    </p>
                   </div>
                 </section>
 
@@ -423,7 +441,7 @@ export default function ProblemDetail({
                             className="h-6 px-2 text-xs"
                           >
                             <Copy className="w-3 h-3 mr-1" />
-                            {copiedIndex === index * 2 ? "Copied!" : "Copy"}
+                            {copiedIndex === index * 2 ? 'Copied!' : 'Copy'}
                           </Button>
                         </div>
                         <div className="bg-slate-100 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
@@ -448,7 +466,7 @@ export default function ProblemDetail({
                             className="h-6 px-2 text-xs"
                           >
                             <Copy className="w-3 h-3 mr-1" />
-                            {copiedIndex === index * 2 + 1 ? "Copied!" : "Copy"}
+                            {copiedIndex === index * 2 + 1 ? 'Copied!' : 'Copy'}
                           </Button>
                         </div>
                         <div className="bg-slate-100 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
@@ -475,25 +493,24 @@ export default function ProblemDetail({
         {/* Horizontal Resizer */}
         <div
           className={`w-1 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 cursor-col-resize transition-colors flex-shrink-0 ${
-            isDragging ? "bg-blue-500 dark:bg-blue-400" : ""
+            isDragging ? 'bg-blue-500 dark:bg-blue-400' : ''
           }`}
           onMouseDown={handleMouseDown}
         >
           <div className="h-full w-full flex items-center justify-center">
-            <div className="w-0.5 h-8 bg-slate-400 dark:bg-slate-500 rounded-full opacity-50"></div>
+            <div className="w-0.5 h-8 bg-slate-400 dark:bg-slate-500 rounded-full opacity-50" />
           </div>
         </div>
 
         {/* Right Panel - Editor and Test Cases */}
-        <div 
+        <div
           ref={rightPanelRef}
           className="flex flex-col overflow-hidden pb-4"
           style={{ width: `${100 - leftWidth}%` }}
         >
           <div className="pl-3 flex flex-col h-full gap-0">
-            
             {/* Editor Section */}
-            <div 
+            <div
               className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden"
               style={{ height: `${editorHeight}%` }}
             >
@@ -531,17 +548,17 @@ export default function ProblemDetail({
             {/* Vertical Resizer */}
             <div
               className={`h-1 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 cursor-row-resize transition-colors flex-shrink-0 my-3 ${
-                isVerticalDragging ? "bg-blue-500 dark:bg-blue-400" : ""
+                isVerticalDragging ? 'bg-blue-500 dark:bg-blue-400' : ''
               }`}
               onMouseDown={handleVerticalMouseDown}
             >
               <div className="h-full w-full flex items-center justify-center">
-                <div className="h-0.5 w-8 bg-slate-400 dark:bg-slate-500 rounded-full opacity-50"></div>
+                <div className="h-0.5 w-8 bg-slate-400 dark:bg-slate-500 rounded-full opacity-50" />
               </div>
             </div>
 
             {/* Test Cases Section */}
-            <div 
+            <div
               className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden flex flex-col"
               style={{ height: `${100 - editorHeight}%` }}
             >
@@ -585,8 +602,8 @@ export default function ProblemDetail({
                       onClick={() => setActiveTestCase(index)}
                       className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                         activeTestCase === index
-                          ? "bg-blue-500 text-white shadow-md"
-                          : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
+                          ? 'bg-blue-500 text-white shadow-md'
+                          : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
                       }`}
                     >
                       Case {index + 1}
@@ -631,7 +648,7 @@ export default function ProblemDetail({
                             onChange={(e) =>
                               handleTestCaseChange(
                                 testCases[activeTestCase].id,
-                                "input",
+                                'input',
                                 e.target.value
                               )
                             }
@@ -674,7 +691,8 @@ export default function ProblemDetail({
                             <Code className="w-3 h-3 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300" />
                           </div>
                           <pre className="text-sm font-mono text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
-                            {testCases[activeTestCase].input || "Enter input..."}
+                            {testCases[activeTestCase].input ||
+                              'Enter input...'}
                           </pre>
                         </div>
                       )}
@@ -692,7 +710,7 @@ export default function ProblemDetail({
                           onChange={(e) =>
                             handleTestCaseChange(
                               testCases[activeTestCase].id,
-                              "output",
+                              'output',
                               e.target.value
                             )
                           }
@@ -714,7 +732,7 @@ export default function ProblemDetail({
                           </div>
                           <pre className="text-sm font-mono text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
                             {testCases[activeTestCase].output ||
-                              "Enter expected output..."}
+                              'Enter expected output...'}
                           </pre>
                         </div>
                       )}

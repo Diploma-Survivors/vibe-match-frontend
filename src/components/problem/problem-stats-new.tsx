@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import type { Problem } from "@/types/problem";
-import { BookOpen, TrendingUp, Users } from "lucide-react";
-import React, { useMemo } from "react";
+import type { Problem } from '@/types/problem';
+import { BookOpen, TrendingUp, Users } from 'lucide-react';
+import React, { useMemo } from 'react';
 
 interface ProblemStatsProps {
   problems: Problem[];
@@ -28,24 +28,24 @@ export default function ProblemStats({ problems }: ProblemStatsProps) {
   const statItems = [
     {
       icon: BookOpen,
-      label: "Tổng bài",
+      label: 'Tổng bài',
       value: stats.total.toLocaleString(),
-      bgColor: "bg-blue-50 dark:bg-blue-900/20",
-      iconColor: "text-green-600 dark:text-emerald-400",
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+      iconColor: 'text-green-600 dark:text-emerald-400',
     },
     {
       icon: TrendingUp,
-      label: "Tỷ lệ AC",
+      label: 'Tỷ lệ AC',
       value: `${stats.avgAcceptance.toFixed(1)}%`,
-      bgColor: "bg-green-50 dark:bg-green-900/20",
-      iconColor: "text-green-600 dark:text-green-400",
+      bgColor: 'bg-green-50 dark:bg-green-900/20',
+      iconColor: 'text-green-600 dark:text-green-400',
     },
     {
       icon: Users,
-      label: "Lượt nộp",
+      label: 'Lượt nộp',
       value: stats.totalSubmissions.toLocaleString(),
-      bgColor: "bg-green-50 dark:bg-green-900/20",
-      iconColor: "text-green-600 dark:text-green-400",
+      bgColor: 'bg-green-50 dark:bg-green-900/20',
+      iconColor: 'text-green-600 dark:text-green-400',
     },
   ];
 

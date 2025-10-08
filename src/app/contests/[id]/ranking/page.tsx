@@ -1,5 +1,5 @@
-"use client";
-import { useParams } from "next/navigation";
+'use client';
+import { useParams } from 'next/navigation';
 
 export default function ContestRankingPage() {
   const params = useParams();
@@ -8,31 +8,31 @@ export default function ContestRankingPage() {
   const rankings = [
     {
       rank: 1,
-      username: "nmhienbn",
+      username: 'nmhienbn',
       score: 5500,
-      time: "01:49:27",
+      time: '01:49:27',
       problems: [
-        { points: 500, time: "01:28:42", attempts: null },
-        { points: 0, time: "01:42:35", attempts: 2 },
-        { points: 1500, time: "01:49:27", attempts: null },
-        { points: 1000, time: "01:22:10", attempts: null },
-        { points: 2500, time: "01:14:05", attempts: null },
-        { points: 0, time: "01:57:46", attempts: 1 },
-        { points: 0, time: "01:59:41", attempts: 3 },
-        { points: 0, time: "02:08:10", attempts: 1 },
+        { points: 500, time: '01:28:42', attempts: null },
+        { points: 0, time: '01:42:35', attempts: 2 },
+        { points: 1500, time: '01:49:27', attempts: null },
+        { points: 1000, time: '01:22:10', attempts: null },
+        { points: 2500, time: '01:14:05', attempts: null },
+        { points: 0, time: '01:57:46', attempts: 1 },
+        { points: 0, time: '01:59:41', attempts: 3 },
+        { points: 0, time: '02:08:10', attempts: 1 },
       ],
     },
     {
       rank: 2,
-      username: "NguyenKhangNinh_69",
+      username: 'NguyenKhangNinh_69',
       score: 4000,
-      time: "05:26:00",
+      time: '05:26:00',
       problems: [
-        { points: 500, time: "00:39:26", attempts: 1 },
-        { points: 1250, time: "02:15:54", attempts: 4 },
-        { points: 1500, time: "03:29:45", attempts: 2 },
+        { points: 500, time: '00:39:26', attempts: 1 },
+        { points: 1250, time: '02:15:54', attempts: 4 },
+        { points: 1500, time: '03:29:45', attempts: 2 },
         { points: 0, time: null, attempts: null },
-        { points: 750, time: "04:51:00", attempts: null },
+        { points: 750, time: '04:51:00', attempts: null },
         { points: 0, time: null, attempts: null },
         { points: 0, time: null, attempts: null },
         { points: 0, time: null, attempts: null },
@@ -40,15 +40,15 @@ export default function ContestRankingPage() {
     },
     {
       rank: 3,
-      username: "mondellbit009",
+      username: 'mondellbit009',
       score: 3500,
-      time: "02:27:27",
+      time: '02:27:27',
       problems: [
-        { points: 500, time: "01:53:47", attempts: null },
-        { points: 500, time: "02:27:27", attempts: null },
-        { points: 0, time: "04:47:49", attempts: 1 },
+        { points: 500, time: '01:53:47', attempts: null },
+        { points: 500, time: '02:27:27', attempts: null },
+        { points: 0, time: '04:47:49', attempts: 1 },
         { points: 0, time: null, attempts: null },
-        { points: 2500, time: "01:52:48", attempts: null },
+        { points: 2500, time: '01:52:48', attempts: null },
         { points: 0, time: null, attempts: null },
         { points: 0, time: null, attempts: null },
         { points: 0, time: null, attempts: null },
@@ -56,15 +56,15 @@ export default function ContestRankingPage() {
     },
     {
       rank: 4,
-      username: "khoa2310",
+      username: 'khoa2310',
       score: 2750,
-      time: "04:53:17",
+      time: '04:53:17',
       problems: [
-        { points: 500, time: "02:05:07", attempts: null },
+        { points: 500, time: '02:05:07', attempts: null },
         { points: 0, time: null, attempts: null },
-        { points: 1500, time: "03:28:20", attempts: 5 },
+        { points: 1500, time: '03:28:20', attempts: 5 },
         { points: 0, time: null, attempts: null },
-        { points: 750, time: "04:28:17", attempts: null },
+        { points: 750, time: '04:28:17', attempts: null },
         { points: 0, time: null, attempts: null },
         { points: 0, time: null, attempts: null },
         { points: 0, time: null, attempts: null },
@@ -72,18 +72,18 @@ export default function ContestRankingPage() {
     },
     {
       rank: 5,
-      username: "ahungg_2610",
+      username: 'ahungg_2610',
       score: 2500,
-      time: "00:56:19",
+      time: '00:56:19',
       problems: [
-        { points: 0, time: "00:06:28", attempts: 7 },
-        { points: 0, time: "00:14:18", attempts: 2 },
-        { points: 0, time: "03:47:08", attempts: 2 },
-        { points: 0, time: "03:40:12", attempts: 1 },
-        { points: 2500, time: "00:56:19", attempts: null },
-        { points: 0, time: "01:05:09", attempts: 2 },
-        { points: 0, time: "03:32:12", attempts: 1 },
-        { points: 0, time: "01:22:02", attempts: 1 },
+        { points: 0, time: '00:06:28', attempts: 7 },
+        { points: 0, time: '00:14:18', attempts: 2 },
+        { points: 0, time: '03:47:08', attempts: 2 },
+        { points: 0, time: '03:40:12', attempts: 1 },
+        { points: 2500, time: '00:56:19', attempts: null },
+        { points: 0, time: '01:05:09', attempts: 2 },
+        { points: 0, time: '03:32:12', attempts: 1 },
+        { points: 0, time: '01:22:02', attempts: 1 },
       ],
     },
   ];
@@ -101,7 +101,7 @@ export default function ContestRankingPage() {
           )}
         </div>
       );
-    } 
+    }
     if (problem.points > 0) {
       return (
         <div className="text-center">
@@ -172,7 +172,7 @@ export default function ContestRankingPage() {
               {rankings.map((user, index) => (
                 <tr
                   key={user.rank}
-                  className={`border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/30 ${index % 2 === 0 ? "bg-white dark:bg-slate-800" : "bg-slate-50 dark:bg-slate-800/50"}`}
+                  className={`border-b border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/30 ${index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50 dark:bg-slate-800/50'}`}
                 >
                   <td className="px-4 py-3 text-center font-bold text-lg">
                     {user.rank}
@@ -181,14 +181,14 @@ export default function ContestRankingPage() {
                     <div
                       className={`font-medium ${
                         user.rank === 1
-                          ? "text-orange-600 dark:text-orange-400"
+                          ? 'text-orange-600 dark:text-orange-400'
                           : user.rank === 2
-                            ? "text-purple-600 dark:text-purple-400"
+                            ? 'text-purple-600 dark:text-purple-400'
                             : user.rank === 3
-                              ? "text-blue-600 dark:text-blue-400"
+                              ? 'text-blue-600 dark:text-blue-400'
                               : user.rank === 4
-                                ? "text-blue-600 dark:text-blue-400"
-                                : "text-slate-600 dark:text-slate-400"
+                                ? 'text-blue-600 dark:text-blue-400'
+                                : 'text-slate-600 dark:text-slate-400'
                       }`}
                     >
                       {user.username}

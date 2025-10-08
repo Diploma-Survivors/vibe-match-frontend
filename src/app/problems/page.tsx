@@ -1,23 +1,23 @@
-"use client";
+'use client';
 
+import { QuickFilters, SortControls } from '@/components/common';
+import type { SortField, SortOrder } from '@/components/common/sort-controls';
 import {
   ProblemFilter,
   ProblemStats,
   ProblemTable,
-} from "@/components/problem";
-import { QuickFilters, SortControls } from "@/components/common";
-import type { SortField, SortOrder } from "@/components/common/sort-controls";
-import { mockProblems } from "@/lib/data/mock-problems";
-import type { Problem, ProblemFilters } from "@/types/problem";
-import React, { useState, useMemo } from "react";
+} from '@/components/problem';
+import { mockProblems } from '@/lib/data/mock-problems';
+import type { Problem, ProblemFilters } from '@/types/problem';
+import React, { useState, useMemo } from 'react';
 
 const ITEMS_PER_PAGE = 10;
 
 export default function ProblemsPage() {
   const [filters, setFilters] = useState<ProblemFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortField, setSortField] = useState<SortField>("id");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [sortField, setSortField] = useState<SortField>('id');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
   // Filter and sort problems
   const filteredAndSortedProblems = useMemo(() => {
@@ -57,8 +57,8 @@ export default function ProblemsPage() {
       let bValue: string | number = b[sortField];
 
       // Handle special sorting for difficulty
-      if (sortField === "difficulty") {
-        const difficultyOrder = { Dễ: 1, "Trung bình": 2, Khó: 3 };
+      if (sortField === 'difficulty') {
+        const difficultyOrder = { Dễ: 1, 'Trung bình': 2, Khó: 3 };
         aValue =
           difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0;
         bValue =
@@ -66,12 +66,12 @@ export default function ProblemsPage() {
       }
 
       // Handle string sorting
-      if (typeof aValue === "string" && typeof bValue === "string") {
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
         aValue = aValue.toLowerCase();
         bValue = bValue.toLowerCase();
       }
 
-      if (sortOrder === "asc") {
+      if (sortOrder === 'asc') {
         return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
       }
       return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
@@ -119,7 +119,7 @@ export default function ProblemsPage() {
   const handleRemoveFilter = (key: keyof ProblemFilters) => {
     setFilters((prev) => ({
       ...prev,
-      [key]: "",
+      [key]: '',
     }));
     setCurrentPage(1);
   };
@@ -186,7 +186,7 @@ export default function ProblemsPage() {
                 <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">
                   <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full">
                     <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                    {paginatedProblems.length} /{" "}
+                    {paginatedProblems.length} /{' '}
                     {filteredAndSortedProblems.length} bài tập
                   </span>
                 </div>
@@ -200,25 +200,6 @@ export default function ProblemsPage() {
                 onPageChange={handlePageChange}
               />
             </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-16 pt-8 border-t border-white/20 dark:border-slate-700/50">
-          <div className="text-center">
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-lg">
-              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-slate-600 dark:text-slate-400 font-medium">
-                Dữ liệu được đồng bộ real-time từ Vibe Match
-              </span>
-            </div>
-            <p className="mt-4 text-slate-500 dark:text-slate-500">
-              Tổng cộng{" "}
-              <strong className="text-green-600 dark:text-emerald-400">
-                {mockProblems.length}
-              </strong>{" "}
-              bài tập từ nhiều chủ đề
-            </p>
           </div>
         </div>
       </div>

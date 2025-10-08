@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import Editor from "@monaco-editor/react";
+} from '@/components/ui/select';
+import Editor from '@monaco-editor/react';
 import {
   Code2,
   Copy,
@@ -23,31 +23,31 @@ import {
   Settings,
   Sun,
   X,
-} from "lucide-react";
-import type { editor } from "monaco-editor";
-import { useEffect, useRef, useState } from "react";
+} from 'lucide-react';
+import type { editor } from 'monaco-editor';
+import { useEffect, useRef, useState } from 'react';
 
 const languages = [
   {
-    value: "python",
-    label: "Python 3",
-    extension: ".py",
-    monacoLang: "python",
+    value: 'python',
+    label: 'Python 3',
+    extension: '.py',
+    monacoLang: 'python',
   },
-  { value: "cpp", label: "C++17", extension: ".cpp", monacoLang: "cpp" },
-  { value: "java", label: "Java 17", extension: ".java", monacoLang: "java" },
+  { value: 'cpp', label: 'C++17', extension: '.cpp', monacoLang: 'cpp' },
+  { value: 'java', label: 'Java 17', extension: '.java', monacoLang: 'java' },
   {
-    value: "javascript",
-    label: "JavaScript",
-    extension: ".js",
-    monacoLang: "javascript",
+    value: 'javascript',
+    label: 'JavaScript',
+    extension: '.js',
+    monacoLang: 'javascript',
   },
-  { value: "csharp", label: "C# 10", extension: ".cs", monacoLang: "csharp" },
+  { value: 'csharp', label: 'C# 10', extension: '.cs', monacoLang: 'csharp' },
   {
-    value: "typescript",
-    label: "TypeScript",
-    extension: ".ts",
-    monacoLang: "typescript",
+    value: 'typescript',
+    label: 'TypeScript',
+    extension: '.ts',
+    monacoLang: 'typescript',
   },
 ];
 
@@ -126,9 +126,9 @@ for (let i = 1; i <= n; i++) {
 };
 
 const themes = [
-  { value: "vs-dark", label: "Dark", icon: Moon },
-  { value: "light", label: "Light", icon: Sun },
-  { value: "hc-black", label: "High Contrast", icon: Settings },
+  { value: 'vs-dark', label: 'Dark', icon: Moon },
+  { value: 'light', label: 'Light', icon: Sun },
+  { value: 'hc-black', label: 'High Contrast', icon: Settings },
 ];
 
 // Tab interface
@@ -154,8 +154,8 @@ export default function MonacoSubmitEditor({
   isRunning = false,
   isSubmitting = false,
 }: MonacoSubmitEditorProps) {
-  const [selectedLanguage, setSelectedLanguage] = useState("python");
-  const [theme, setTheme] = useState("light");
+  const [selectedLanguage, setSelectedLanguage] = useState('python');
+  const [theme, setTheme] = useState('light');
   const [fontSize, setFontSize] = useState(14);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -163,20 +163,20 @@ export default function MonacoSubmitEditor({
   // Tab state
   const [tabs, setTabs] = useState<CodeTab[]>([
     {
-      id: "tab-1",
-      name: "Solution.py",
-      language: "python",
+      id: 'tab-1',
+      name: 'Solution.py',
+      language: 'python',
       code: defaultCode.python,
       isModified: false,
-      icon: "🐍",
+      icon: '🐍',
     },
   ]);
-  const [activeTabId, setActiveTabId] = useState("tab-1");
+  const [activeTabId, setActiveTabId] = useState('tab-1');
 
   // Get current active tab
   const activeTab = tabs.find((tab) => tab.id === activeTabId);
-  const currentCode = activeTab?.code || "";
-  const currentLanguage = activeTab?.language || "python";
+  const currentCode = activeTab?.code || '';
+  const currentLanguage = activeTab?.language || 'python';
 
   // Tab functions
   const createNewTab = () => {
@@ -184,21 +184,21 @@ export default function MonacoSubmitEditor({
     const languageConfig = languages.find(
       (lang) => lang.value === selectedLanguage
     );
-    const extension = languageConfig?.extension || ".py";
+    const extension = languageConfig?.extension || '.py';
     const icon =
-      selectedLanguage === "python"
-        ? "🐍"
-        : selectedLanguage === "cpp"
-          ? "⚡"
-          : selectedLanguage === "java"
-            ? "☕"
-            : selectedLanguage === "javascript"
-              ? "🟡"
-              : selectedLanguage === "csharp"
-                ? "🔷"
-                : selectedLanguage === "typescript"
-                  ? "🔵"
-                  : "📄";
+      selectedLanguage === 'python'
+        ? '🐍'
+        : selectedLanguage === 'cpp'
+          ? '⚡'
+          : selectedLanguage === 'java'
+            ? '☕'
+            : selectedLanguage === 'javascript'
+              ? '🟡'
+              : selectedLanguage === 'csharp'
+                ? '🔷'
+                : selectedLanguage === 'typescript'
+                  ? '🔵'
+                  : '📄';
 
     const newTab: CodeTab = {
       id: newTabId,
@@ -256,21 +256,21 @@ export default function MonacoSubmitEditor({
     setSelectedLanguage(language);
     if (activeTab) {
       const languageConfig = languages.find((lang) => lang.value === language);
-      const extension = languageConfig?.extension || ".py";
+      const extension = languageConfig?.extension || '.py';
       const icon =
-        language === "python"
-          ? "🐍"
-          : language === "cpp"
-            ? "⚡"
-            : language === "java"
-              ? "☕"
-              : language === "javascript"
-                ? "🟡"
-                : language === "csharp"
-                  ? "🔷"
-                  : language === "typescript"
-                    ? "🔵"
-                    : "📄";
+        language === 'python'
+          ? '🐍'
+          : language === 'cpp'
+            ? '⚡'
+            : language === 'java'
+              ? '☕'
+              : language === 'javascript'
+                ? '🟡'
+                : language === 'csharp'
+                  ? '🔷'
+                  : language === 'typescript'
+                    ? '🔵'
+                    : '📄';
 
       setTabs((prev) =>
         prev.map((tab) =>
@@ -316,28 +316,28 @@ export default function MonacoSubmitEditor({
 
   const handleEditorDidMount = (
     editorInstance: editor.IStandaloneCodeEditor,
-    monaco: typeof import("monaco-editor")
+    monaco: typeof import('monaco-editor')
   ) => {
     editorRef.current = editorInstance;
 
     // Define custom themes
-    monaco.editor.defineTheme("vibrant-dark", {
-      base: "vs-dark",
+    monaco.editor.defineTheme('vibrant-dark', {
+      base: 'vs-dark',
       inherit: true,
       rules: [
-        { token: "comment", foreground: "6A9955", fontStyle: "italic" },
-        { token: "keyword", foreground: "569CD6", fontStyle: "bold" },
-        { token: "string", foreground: "CE9178" },
-        { token: "number", foreground: "B5CEA8" },
-        { token: "type", foreground: "4EC9B0" },
-        { token: "function", foreground: "DCDCAA" },
+        { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
+        { token: 'keyword', foreground: '569CD6', fontStyle: 'bold' },
+        { token: 'string', foreground: 'CE9178' },
+        { token: 'number', foreground: 'B5CEA8' },
+        { token: 'type', foreground: '4EC9B0' },
+        { token: 'function', foreground: 'DCDCAA' },
       ],
       colors: {
-        "editor.background": "#0d1117",
-        "editor.foreground": "#c9d1d9",
-        "editorLineNumber.foreground": "#7d8590",
-        "editor.selectionBackground": "#264f78",
-        "editor.inactiveSelectionBackground": "#264f78",
+        'editor.background': '#0d1117',
+        'editor.foreground': '#c9d1d9',
+        'editorLineNumber.foreground': '#7d8590',
+        'editor.selectionBackground': '#264f78',
+        'editor.inactiveSelectionBackground': '#264f78',
       },
     });
 
@@ -345,12 +345,12 @@ export default function MonacoSubmitEditor({
     editorInstance.updateOptions({
       minimap: { enabled: true },
       scrollBeyondLastLine: false,
-      wordWrap: "on",
-      lineNumbers: "on",
+      wordWrap: 'on',
+      lineNumbers: 'on',
       folding: true,
       bracketPairColorization: { enabled: true },
-      renderWhitespace: "boundary",
-      cursorBlinking: "smooth",
+      renderWhitespace: 'boundary',
+      cursorBlinking: 'smooth',
       smoothScrolling: true,
       fontFamily:
         "'Fira Code', 'Cascadia Code', 'SF Mono', Consolas, monospace",
@@ -365,7 +365,7 @@ export default function MonacoSubmitEditor({
         comments: false,
         strings: false,
       },
-      tabCompletion: "on",
+      tabCompletion: 'on',
       formatOnPaste: true,
       formatOnType: true,
     });
@@ -374,7 +374,7 @@ export default function MonacoSubmitEditor({
   const getCurrentLanguage = () => {
     return (
       languages.find((lang) => lang.value === currentLanguage)?.monacoLang ||
-      "python"
+      'python'
     );
   };
 
@@ -409,17 +409,17 @@ export default function MonacoSubmitEditor({
                   <div className="flex items-center gap-2">
                     <span
                       className={`w-2 h-2 rounded-full ${
-                        lang.value === "python"
-                          ? "bg-blue-500"
-                          : lang.value === "cpp"
-                            ? "bg-red-500"
-                            : lang.value === "java"
-                              ? "bg-orange-500"
-                              : lang.value === "javascript"
-                                ? "bg-yellow-500"
-                                : lang.value === "csharp"
-                                  ? "bg-purple-500"
-                                  : "bg-cyan-500"
+                        lang.value === 'python'
+                          ? 'bg-blue-500'
+                          : lang.value === 'cpp'
+                            ? 'bg-red-500'
+                            : lang.value === 'java'
+                              ? 'bg-orange-500'
+                              : lang.value === 'javascript'
+                                ? 'bg-yellow-500'
+                                : lang.value === 'csharp'
+                                  ? 'bg-purple-500'
+                                  : 'bg-cyan-500'
                       }`}
                     />
                     {lang.label}
@@ -489,12 +489,12 @@ export default function MonacoSubmitEditor({
               key={tab.id}
               className={`group relative flex items-center gap-2 px-3 py-2 cursor-pointer transition-all duration-200 border-r border-slate-200 dark:border-slate-700 min-w-0 border-0 bg-transparent ${
                 activeTabId === tab.id
-                  ? "bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm"
-                  : "hover:bg-white/70 dark:hover:bg-slate-800/70 text-slate-600 dark:text-slate-400"
+                  ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm'
+                  : 'hover:bg-white/70 dark:hover:bg-slate-800/70 text-slate-600 dark:text-slate-400'
               }`}
               onClick={() => switchTab(tab.id)}
               onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
+                if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   switchTab(tab.id);
                 }
@@ -504,8 +504,8 @@ export default function MonacoSubmitEditor({
               <div
                 className={`absolute top-0 left-0 right-0 h-0.5 transition-all duration-200 ${
                   activeTabId === tab.id
-                    ? "bg-gradient-to-r from-blue-500 to-purple-600"
-                    : "bg-transparent"
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-600'
+                    : 'bg-transparent'
                 }`}
               />
 
@@ -554,7 +554,7 @@ export default function MonacoSubmitEditor({
           height="100%"
           language={getCurrentLanguage()}
           value={currentCode}
-          onChange={(value) => updateTabCode(activeTabId, value || "")}
+          onChange={(value) => updateTabCode(activeTabId, value || '')}
           theme={theme}
           onMount={handleEditorDidMount}
           options={{
@@ -564,12 +564,12 @@ export default function MonacoSubmitEditor({
             fontLigatures: true,
             minimap: { enabled: true },
             scrollBeyondLastLine: false,
-            wordWrap: "on",
-            lineNumbers: "on",
+            wordWrap: 'on',
+            lineNumbers: 'on',
             folding: true,
             bracketPairColorization: { enabled: true },
-            renderWhitespace: "boundary",
-            cursorBlinking: "smooth",
+            renderWhitespace: 'boundary',
+            cursorBlinking: 'smooth',
             smoothScrolling: true,
             padding: { top: 16, bottom: 16 },
             suggest: {
@@ -581,7 +581,7 @@ export default function MonacoSubmitEditor({
               comments: false,
               strings: false,
             },
-            tabCompletion: "on",
+            tabCompletion: 'on',
             formatOnPaste: true,
             formatOnType: true,
             automaticLayout: true,
@@ -593,7 +593,7 @@ export default function MonacoSubmitEditor({
       <div className="p-2 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
         <div className="flex items-center justify-between">
           <div className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-4">
-            <span>Lines: {currentCode.split("\n").length}</span>
+            <span>Lines: {currentCode.split('\n').length}</span>
             <span>Chars: {currentCode.length}</span>
             <span>Theme: {getSelectedTheme()?.label}</span>
             <span>Tab: {activeTab?.name}</span>

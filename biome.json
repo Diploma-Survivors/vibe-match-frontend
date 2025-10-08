@@ -10,7 +10,9 @@
       "a11y": {
         "noLabelWithoutControl": "off",
         "useValidAnchor": "off",
-        "useSemanticElements": "warn"
+        "useSemanticElements": "warn",
+        "useKeyWithClickEvents": "warn",
+        "useButtonType": "warn"
       },
       "complexity": {
         "noStaticOnlyClass": "warn"

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -9,13 +9,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from '@/components/ui/table';
 import {
   CONTEST_STATUS_COLORS,
   CONTEST_STATUS_LABELS,
   type Contest,
-} from "@/types/contest";
-import Link from "next/link";
+} from '@/types/contest';
 import {
   Calendar,
   ChevronLeft,
@@ -23,8 +22,9 @@ import {
   Clock,
   Trophy,
   Users,
-} from "lucide-react";
-import React from "react";
+} from 'lucide-react';
+import Link from 'next/link';
+import React from 'react';
 
 interface ContestTableProps {
   contests: Contest[];
@@ -36,7 +36,7 @@ interface ContestTableProps {
 
 const getActionButton = (contest: Contest) => {
   switch (contest.status) {
-    case "upcoming":
+    case 'upcoming':
       return contest.registrationOpen ? (
         <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
           Đăng ký
@@ -46,7 +46,7 @@ const getActionButton = (contest: Contest) => {
           Chưa mở
         </Button>
       );
-    case "ongoing":
+    case 'ongoing':
       return (
         <Button
           size="sm"
@@ -55,7 +55,7 @@ const getActionButton = (contest: Contest) => {
           Tham gia
         </Button>
       );
-    case "finished":
+    case 'finished':
       return (
         <Button variant="outline" size="sm">
           Kết quả
@@ -68,18 +68,18 @@ const getActionButton = (contest: Contest) => {
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
+  return date.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
   });
 };
 
 const formatTime = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleTimeString("vi-VN", {
-    hour: "2-digit",
-    minute: "2-digit",
+  return date.toLocaleTimeString('vi-VN', {
+    hour: '2-digit',
+    minute: '2-digit',
   });
 };
 
@@ -268,13 +268,13 @@ export default function ContestTable({
                 (pageNum) => (
                   <Button
                     key={pageNum}
-                    variant={pageNum === currentPage ? "default" : "outline"}
+                    variant={pageNum === currentPage ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => onPageChange(pageNum)}
                     className={`h-8 w-8 p-0 transition-all duration-300 ${
                       pageNum === currentPage
-                        ? "shadow-lg shadow-blue-500/25 bg-gradient-to-r from-blue-500 to-purple-600"
-                        : "shadow-md hover:shadow-lg border-white/50 dark:border-slate-600/50 backdrop-blur-sm"
+                        ? 'shadow-lg shadow-blue-500/25 bg-gradient-to-r from-blue-500 to-purple-600'
+                        : 'shadow-md hover:shadow-lg border-white/50 dark:border-slate-600/50 backdrop-blur-sm'
                     }`}
                   >
                     {pageNum}

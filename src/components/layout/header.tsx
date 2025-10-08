@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Wallet } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Button } from '@/components/ui/button';
+import { Wallet } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function Header() {
   const [walletConnected, setWalletConnected] = useState(false);
@@ -19,22 +19,22 @@ export default function Header() {
       setScrolled(window.scrollY > 50);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
   const connectWallet = () => {
     setWalletConnected(!walletConnected);
-    console.log("Connecting to Solana wallet...");
+    console.log('Connecting to Solana wallet...');
   };
 
   const scrollToSection = (id: string) => {
-    if (pathname === "/") {
+    if (pathname === '/') {
       const element = document.getElementById(id);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+        element.scrollIntoView({ behavior: 'smooth' });
       }
     } else {
       // Navigate to home page first, then scroll
@@ -43,9 +43,9 @@ export default function Header() {
   };
 
   const navItems = [
-    { name: "Home", href: "/", onClick: undefined },
-    { name: "Problems", href: "/problems", onClick: undefined },
-    { name: "Contests", href: "/contests", onClick: undefined },
+    { name: 'Home', href: '/', onClick: undefined },
+    { name: 'Problems', href: '/problems', onClick: undefined },
+    { name: 'Contests', href: '/contests', onClick: undefined },
   ];
 
   // Prevent hydration mismatch by not rendering until mounted
@@ -74,7 +74,7 @@ export default function Header() {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white/80 backdrop-blur-md shadow-md" : "bg-transparent"
+        scrolled ? 'bg-white/80 backdrop-blur-md shadow-md' : 'bg-transparent'
       }`}
     >
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
@@ -88,8 +88,8 @@ export default function Header() {
         <div className="hidden md:flex items-center space-x-8">
           {navItems.map((item) => (
             <div key={item.name}>
-              {item.href.startsWith("/#") ? (
-                pathname === "/" ? (
+              {item.href.startsWith('/#') ? (
+                pathname === '/' ? (
                   <button
                     type="button"
                     onClick={item.onClick}
@@ -110,8 +110,8 @@ export default function Header() {
                   href={item.href}
                   className={`transition-colors ${
                     pathname === item.href
-                      ? "text-green-600 font-semibold"
-                      : "text-black hover:text-green-600"
+                      ? 'text-green-600 font-semibold'
+                      : 'text-black hover:text-green-600'
                   }`}
                 >
                   {item.name}

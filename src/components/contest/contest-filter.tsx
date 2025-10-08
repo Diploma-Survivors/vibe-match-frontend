@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { ContestFilters } from "@/types/contest";
-import { CONTEST_STATUS_OPTIONS, PARTICIPATION_OPTIONS } from "@/types/contest";
-import { RotateCcw, Search, Filter } from "lucide-react";
-import React from "react";
+} from '@/components/ui/select';
+import type { ContestFilters } from '@/types/contest';
+import { CONTEST_STATUS_OPTIONS, PARTICIPATION_OPTIONS } from '@/types/contest';
+import { Filter, RotateCcw, Search } from 'lucide-react';
+import React from 'react';
 
 interface ContestFilterProps {
   filters: ContestFilters;
@@ -70,8 +70,8 @@ export default function ContestFilter({
             <Input
               id="contest-id"
               placeholder="Nhập mã contest..."
-              value={filters.id || ""}
-              onChange={(e) => handleFilterChange("id", e.target.value)}
+              value={filters.id || ''}
+              onChange={(e) => handleFilterChange('id', e.target.value)}
               className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
             />
           </div>
@@ -87,8 +87,8 @@ export default function ContestFilter({
             <Input
               id="contest-name"
               placeholder="Nhập tên contest..."
-              value={filters.name || ""}
-              onChange={(e) => handleFilterChange("name", e.target.value)}
+              value={filters.name || ''}
+              onChange={(e) => handleFilterChange('name', e.target.value)}
               className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
             />
           </div>
@@ -99,9 +99,9 @@ export default function ContestFilter({
               Trạng thái:
             </label>
             <Select
-              value={filters.status || "all"}
+              value={filters.status || 'all'}
               onValueChange={(value) =>
-                handleFilterChange("status", value === "all" ? "" : value)
+                handleFilterChange('status', value === 'all' ? '' : value)
               }
             >
               <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200">
@@ -127,9 +127,9 @@ export default function ContestFilter({
               Tình trạng tham gia:
             </label>
             <Select
-              value={filters.participated || "all"}
+              value={filters.participated || 'all'}
               onValueChange={(value) =>
-                handleFilterChange("participated", value === "all" ? "" : value)
+                handleFilterChange('participated', value === 'all' ? '' : value)
               }
             >
               <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200">

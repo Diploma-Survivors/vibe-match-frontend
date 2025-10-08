@@ -2,7 +2,7 @@ export interface Problem {
   id: string;
   title: string;
   topic: string; // Replaced group and category with single topic field
-  difficulty: "Dễ" | "Trung bình" | "Khó";
+  difficulty: 'Dễ' | 'Trung bình' | 'Khó';
   points: number;
   acceptanceRate: number;
   submissionCount: number;
@@ -44,34 +44,34 @@ export interface ProblemFilters {
 }
 
 export const DIFFICULTY_OPTIONS = [
-  { value: "all", label: "Tất cả" },
-  { value: "Dễ", label: "Dễ" },
-  { value: "Trung bình", label: "Trung bình" },
-  { value: "Khó", label: "Khó" },
+  { value: 'all', label: 'Tất cả' },
+  { value: 'Dễ', label: 'Dễ' },
+  { value: 'Trung bình', label: 'Trung bình' },
+  { value: 'Khó', label: 'Khó' },
 ];
 
 export const TOPIC_OPTIONS = [
-  { value: "all", label: "Tất cả" },
-  { value: "Mảng 1 Chiều Cơ Bản", label: "Mảng 1 Chiều Cơ Bản" },
-  { value: "Lý Thuyết Số - Toán Học", label: "Lý Thuyết Số - Toán Học" },
-  { value: "Thuật toán tham lam", label: "Thuật toán tham lam" },
-  { value: "Cấu trúc dữ liệu", label: "Cấu trúc dữ liệu" },
+  { value: 'all', label: 'Tất cả' },
+  { value: 'Mảng 1 Chiều Cơ Bản', label: 'Mảng 1 Chiều Cơ Bản' },
+  { value: 'Lý Thuyết Số - Toán Học', label: 'Lý Thuyết Số - Toán Học' },
+  { value: 'Thuật toán tham lam', label: 'Thuật toán tham lam' },
+  { value: 'Cấu trúc dữ liệu', label: 'Cấu trúc dữ liệu' },
 ];
 
 export const SUBJECT_OPTIONS = [
-  { value: "all", label: "Lập trình cơ bản" },
-  { value: "Cấu trúc dữ liệu", label: "Cấu trúc dữ liệu" },
-  { value: "Thuật toán", label: "Thuật toán" },
+  { value: 'all', label: 'Lập trình cơ bản' },
+  { value: 'Cấu trúc dữ liệu', label: 'Cấu trúc dữ liệu' },
+  { value: 'Thuật toán', label: 'Thuật toán' },
 ];
 
 export const CHAPTER_OPTIONS = [
-  { value: "all", label: "2. Lệnh rẽ nhánh" },
-  { value: "1. Kiểu dữ liệu cơ bản", label: "1. Kiểu dữ liệu cơ bản" },
-  { value: "3. Vòng lặp", label: "3. Vòng lặp" },
+  { value: 'all', label: '2. Lệnh rẽ nhánh' },
+  { value: '1. Kiểu dữ liệu cơ bản', label: '1. Kiểu dữ liệu cơ bản' },
+  { value: '3. Vòng lặp', label: '3. Vòng lặp' },
 ];
 
 export const PROBLEM_TYPE_OPTIONS = [
-  { value: "all", label: "Tất cả" },
-  { value: "Cơ bản", label: "Cơ bản" },
-  { value: "Nâng cao", label: "Nâng cao" },
+  { value: 'all', label: 'Tất cả' },
+  { value: 'Cơ bản', label: 'Cơ bản' },
+  { value: 'Nâng cao', label: 'Nâng cao' },
 ];

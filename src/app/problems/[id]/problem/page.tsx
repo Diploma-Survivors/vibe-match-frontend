@@ -1,22 +1,17 @@
+import ProblemDetail from '@/components/problem/problem-detail-tab';
+import { mockProblems } from '@/lib/data/mock-problems';
 
-import { mockProblems } from "@/lib/data/mock-problems";
-import ProblemDetail from "@/components/problem/problem-detail-tab";
-
-export default async function ProblemDescriptionPage({ params }: {params: Promise<{id: string}>; }) {
+export default async function ProblemDescriptionPage({
+  params,
+}: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
   const problemId = resolvedParams.id;
   const problem = mockProblems.find((p) => p.id === problemId);
 
   if (!problem) return null;
 
-  return (
-    <ProblemDetail 
-      problem={problem}
-      showContestInfo={false}
-    />
-  );
+  return <ProblemDetail problem={problem} showContestInfo={false} />;
 }
-
 
 // "use client";
 
@@ -298,13 +293,13 @@ export default async function ProblemDescriptionPage({ params }: {params: Promis
 //   ];
 
 //   return (
-//     <div 
+//     <div
 //       ref={containerRef}
 //       className="flex h-full gap-0 relative"
 //       style={{ height: "calc(100vh - 60px)" }}
 //     >
 //       {/* Left Panel - Problem Description */}
-//       <div 
+//       <div
 //         className="overflow-y-auto pb-4"
 //         style={{ width: `${leftWidth}%` }}
 //       >
@@ -487,15 +482,15 @@ export default async function ProblemDescriptionPage({ params }: {params: Promis
 //       </div>
 
 //       {/* Right Panel - Editor and Test Cases */}
-//       <div 
+//       <div
 //         ref={rightPanelRef}
 //         className="flex flex-col overflow-hidden pb-4"
 //         style={{ width: `${100 - leftWidth}%` }}
 //       >
 //         <div className="pl-3 flex flex-col h-full gap-0">
-          
+
 //           {/* Editor Section */}
-//           <div 
+//           <div
 //             className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden"
 //             style={{ height: `${editorHeight}%` }}
 //           >
@@ -543,7 +538,7 @@ export default async function ProblemDescriptionPage({ params }: {params: Promis
 //           </div>
 
 //           {/* Test Cases Section */}
-//           <div 
+//           <div
 //             className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden flex flex-col"
 //             style={{ height: `${100 - editorHeight}%` }}
 //           >

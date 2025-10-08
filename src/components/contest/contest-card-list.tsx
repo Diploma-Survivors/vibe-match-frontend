@@ -1,32 +1,32 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   CONTEST_STATUS_COLORS,
   CONTEST_STATUS_LABELS,
   type Contest,
-} from "@/types/contest";
-import Link from "next/link";
+} from '@/types/contest';
+import { motion } from 'framer-motion';
 import {
   Calendar,
+  CheckCircle,
   ChevronLeft,
   ChevronRight,
   Clock,
-  Trophy,
-  Users,
+  Medal,
   Star,
   Timer,
-  Medal,
+  Trophy,
   User,
-  CheckCircle,
-  XCircle,
   UserCheck,
   UserX,
-} from "lucide-react";
-import React from "react";
-import { motion } from "framer-motion";
+  Users,
+  XCircle,
+} from 'lucide-react';
+import Link from 'next/link';
+import React from 'react';
 
 interface ContestCardListProps {
   contests: Contest[];
@@ -38,7 +38,7 @@ interface ContestCardListProps {
 
 const getActionButton = (contest: Contest) => {
   switch (contest.status) {
-    case "upcoming":
+    case 'upcoming':
       return contest.registrationOpen ? (
         <Button
           size="sm"
@@ -51,7 +51,7 @@ const getActionButton = (contest: Contest) => {
           Chưa mở
         </Button>
       );
-    case "ongoing":
+    case 'ongoing':
       return (
         <Button
           size="sm"
@@ -60,7 +60,7 @@ const getActionButton = (contest: Contest) => {
           Tham gia
         </Button>
       );
-    case "finished":
+    case 'finished':
       return (
         <Button variant="outline" size="sm" className="min-w-[100px]">
           Tham gia đấu
@@ -73,39 +73,39 @@ const getActionButton = (contest: Contest) => {
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
+  return date.toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
   });
 };
 
 const formatTime = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleTimeString("vi-VN", {
-    hour: "2-digit",
-    minute: "2-digit",
+  return date.toLocaleTimeString('vi-VN', {
+    hour: '2-digit',
+    minute: '2-digit',
   });
 };
 
 const formatDateTime = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleString("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+  return date.toLocaleString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 };
 
 const getStatusIcon = (status: string) => {
   switch (status) {
-    case "upcoming":
+    case 'upcoming':
       return <Clock className="w-4 h-4" />;
-    case "ongoing":
+    case 'ongoing':
       return <Timer className="w-4 h-4" />;
-    case "finished":
+    case 'finished':
       return <Medal className="w-4 h-4" />;
     default:
       return <Trophy className="w-4 h-4" />;
@@ -175,8 +175,8 @@ export default function ContestCardList({
                         <Badge
                           className={`flex items-center gap-1 text-sm ${
                             contest.userParticipated
-                              ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
-                              : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+                              : 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
                           }`}
                         >
                           {contest.userParticipated ? (
@@ -198,8 +198,8 @@ export default function ContestCardList({
                         <Badge
                           className={`flex items-center gap-1 text-sm ${
                             contest.userCompleted
-                              ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
-                              : "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+                              : 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200'
                           }`}
                         >
                           {contest.userCompleted ? (
@@ -223,7 +223,7 @@ export default function ContestCardList({
                       <div className="flex items-center gap-2">
                         <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                         <span>
-                          {formatDate(contest.startTime)} •{" "}
+                          {formatDate(contest.startTime)} •{' '}
                           {formatTime(contest.startTime)}
                         </span>
                       </div>
@@ -275,13 +275,13 @@ export default function ContestCardList({
                 (pageNum) => (
                   <Button
                     key={pageNum}
-                    variant={pageNum === currentPage ? "default" : "outline"}
+                    variant={pageNum === currentPage ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => onPageChange(pageNum)}
                     className={`h-8 w-8 p-0 transition-all duration-300 ${
                       pageNum === currentPage
-                        ? "shadow-lg shadow-blue-500/25 bg-gradient-to-r from-blue-500 to-purple-600"
-                        : "shadow-md hover:shadow-lg border-white/50 dark:border-slate-600/50 backdrop-blur-sm"
+                        ? 'shadow-lg shadow-blue-500/25 bg-gradient-to-r from-blue-500 to-purple-600'
+                        : 'shadow-md hover:shadow-lg border-white/50 dark:border-slate-600/50 backdrop-blur-sm'
                     }`}
                   >
                     {pageNum}

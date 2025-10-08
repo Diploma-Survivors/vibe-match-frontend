@@ -1,20 +1,20 @@
-"use client";
-import { useParams } from "next/navigation";
+'use client';
+import { useParams } from 'next/navigation';
 
 export default function ContestJoinPage() {
   const params = useParams();
 
   // Mock data cho lịch sử làm bài của người dùng hiện tại
   const userHistory = {
-    username: "vu_the_vy_810[2]",
-    displayName: "Vũ Thế Vỹ",
+    username: 'vu_the_vy_810[2]',
+    displayName: 'Vũ Thế Vỹ',
     rank: 2,
     score: 0,
-    time: "00:00:00",
-    language: "python",
+    time: '00:00:00',
+    language: 'python',
     problems: [
       { points: 0, time: null, attempts: null, maxPoints: 100 },
-      { points: 0, time: "00:00:06", attempts: 1, maxPoints: 100 },
+      { points: 0, time: '00:00:06', attempts: 1, maxPoints: 100 },
       { points: 0, time: null, attempts: null, maxPoints: 100 },
       { points: 0, time: null, attempts: null, maxPoints: 100 },
       { points: 0, time: null, attempts: null, maxPoints: 100 },
@@ -34,7 +34,7 @@ export default function ContestJoinPage() {
           )}
         </div>
       );
-    } 
+    }
     if (problem.points > 0) {
       return (
         <div className="text-center">
@@ -64,7 +64,10 @@ export default function ContestJoinPage() {
       {/* Header section */}
       <div className="mb-6">
         <div className="flex items-center gap-4 mb-4">
-          <button className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg border">
+          <button
+            type="button"
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg border"
+          >
             Xem thành viên tham gia
           </button>
           <div className="flex items-center gap-2">
@@ -140,7 +143,10 @@ export default function ContestJoinPage() {
                   </div>
                 </td>
                 {userHistory.problems.map((problem, problemIndex) => (
-                  <td key={problemIndex} className="px-2 py-3 text-center">
+                  <td
+                    key={`problem-${problemIndex}`}
+                    className="px-2 py-3 text-center"
+                  >
                     {getScoreDisplay(problem)}
                   </td>
                 ))}
@@ -162,7 +168,7 @@ export default function ContestJoinPage() {
                 </td>
                 {userHistory.problems.map((problem, index) => (
                   <td
-                    key={index}
+                    key={`total-${index}`}
                     className="px-2 py-2 text-center font-bold w-20"
                   >
                     {problem.points > 0 ? 1 : 0}

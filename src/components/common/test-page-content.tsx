@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { CodeEditorNew } from "@/components/editor";
-import { Button } from "@/components/ui/button";
+import { CodeEditorNew } from '@/components/editor';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Code2,
   Copy,
@@ -21,15 +21,15 @@ import {
   Settings,
   Sun,
   Upload,
-} from "lucide-react";
-import { useTheme } from "next-themes";
-import { useRef, useState } from "react";
+} from 'lucide-react';
+import { useTheme } from 'next-themes';
+import { useRef, useState } from 'react';
 
 const PROGRAMMING_LANGUAGES = [
   {
-    value: "python",
-    label: "Python 3",
-    extension: ".py",
+    value: 'python',
+    label: 'Python 3',
+    extension: '.py',
     defaultCode: `# Your Python code here
 def solution():
     # Read input
@@ -43,9 +43,9 @@ if __name__ == "__main__":
     solution()`,
   },
   {
-    value: "cpp",
-    label: "C++17",
-    extension: ".cpp",
+    value: 'cpp',
+    label: 'C++17',
+    extension: '.cpp',
     defaultCode: `#include <iostream>
 using namespace std;
 
@@ -60,9 +60,9 @@ int main() {
 }`,
   },
   {
-    value: "java",
-    label: "Java 17",
-    extension: ".java",
+    value: 'java',
+    label: 'Java 17',
+    extension: '.java',
     defaultCode: `import java.util.Scanner;
 
 public class Main {
@@ -78,9 +78,9 @@ public class Main {
 }`,
   },
   {
-    value: "javascript",
-    label: "JavaScript",
-    extension: ".js",
+    value: 'javascript',
+    label: 'JavaScript',
+    extension: '.js',
     defaultCode: `// Your JavaScript code here
 const readline = require('readline');
 
@@ -102,28 +102,28 @@ rl.question('', (input) => {
 
 const themes = [
   {
-    value: "light",
-    label: "Light",
+    value: 'light',
+    label: 'Light',
     icon: Sun,
   },
   {
-    value: "dark",
-    label: "Dark",
+    value: 'dark',
+    label: 'Dark',
     icon: Moon,
   },
   {
-    value: "system",
-    label: "System",
+    value: 'system',
+    label: 'System',
     icon: Monitor,
   },
 ];
 
 export default function TestPageContent() {
   const { theme, setTheme } = useTheme();
-  const [selectedLanguage, setSelectedLanguage] = useState("python");
+  const [selectedLanguage, setSelectedLanguage] = useState('python');
   const [code, setCode] = useState(PROGRAMMING_LANGUAGES[0].defaultCode);
-  const [input, setInput] = useState("");
-  const [output, setOutput] = useState("");
+  const [input, setInput] = useState('');
+  const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -135,7 +135,7 @@ export default function TestPageContent() {
     if (langConfig) {
       setCode(langConfig.defaultCode);
     }
-    setOutput(""); // Clear output when changing language
+    setOutput(''); // Clear output when changing language
   };
 
   const resetCode = () => {
@@ -145,8 +145,8 @@ export default function TestPageContent() {
     if (langConfig) {
       setCode(langConfig.defaultCode);
     }
-    setOutput("");
-    setInput("");
+    setOutput('');
+    setInput('');
   };
 
   const copyCode = () => {
@@ -158,7 +158,7 @@ export default function TestPageContent() {
     if (file) {
       // Check file size (256KB = 262144 bytes)
       if (file.size > 262144) {
-        alert("File size must be less than 256KB");
+        alert('File size must be less than 256KB');
         return;
       }
 
@@ -173,42 +173,42 @@ export default function TestPageContent() {
 
   const runCode = async () => {
     if (!code.trim()) {
-      setOutput("Error: No code to run");
+      setOutput('Error: No code to run');
       return;
     }
 
     setIsRunning(true);
-    setOutput("Running...");
+    setOutput('Running...');
 
     // Simulate code execution
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       // Mock output based on language and input
-      let mockOutput = "";
+      let mockOutput = '';
       if (input.trim()) {
         mockOutput = `Input received: ${input.trim()}\n`;
       }
 
       switch (selectedLanguage) {
-        case "python":
+        case 'python':
           mockOutput +=
-            "Python code executed successfully!\nOutput: Hello from Python";
+            'Python code executed successfully!\nOutput: Hello from Python';
           break;
-        case "cpp":
+        case 'cpp':
           mockOutput +=
-            "C++ code compiled and executed!\nOutput: Hello from C++";
+            'C++ code compiled and executed!\nOutput: Hello from C++';
           break;
-        case "java":
+        case 'java':
           mockOutput +=
-            "Java code compiled and executed!\nOutput: Hello from Java";
+            'Java code compiled and executed!\nOutput: Hello from Java';
           break;
-        case "javascript":
+        case 'javascript':
           mockOutput +=
-            "JavaScript code executed!\nOutput: Hello from JavaScript";
+            'JavaScript code executed!\nOutput: Hello from JavaScript';
           break;
         default:
-          mockOutput += "Code executed successfully!";
+          mockOutput += 'Code executed successfully!';
       }
 
       mockOutput += `\nExecution time: ${Math.floor(Math.random() * 1000)}ms`;
@@ -255,15 +255,15 @@ export default function TestPageContent() {
                     <div className="flex items-center gap-2">
                       <span
                         className={`w-2 h-2 rounded-full ${
-                          lang.value === "python"
-                            ? "bg-blue-500"
-                            : lang.value === "cpp"
-                              ? "bg-red-500"
-                              : lang.value === "java"
-                                ? "bg-orange-500"
-                                : lang.value === "javascript"
-                                  ? "bg-yellow-500"
-                                  : "bg-purple-500"
+                          lang.value === 'python'
+                            ? 'bg-blue-500'
+                            : lang.value === 'cpp'
+                              ? 'bg-red-500'
+                              : lang.value === 'java'
+                                ? 'bg-orange-500'
+                                : lang.value === 'javascript'
+                                  ? 'bg-yellow-500'
+                                  : 'bg-purple-500'
                         }`}
                       />
                       {lang.label}
@@ -326,15 +326,15 @@ export default function TestPageContent() {
 
               {/* Tab Icon */}
               <span className="text-sm flex-shrink-0">
-                {selectedLanguage === "python"
-                  ? "🐍"
-                  : selectedLanguage === "cpp"
-                    ? "⚡"
-                    : selectedLanguage === "java"
-                      ? "☕"
-                      : selectedLanguage === "javascript"
-                        ? "🟡"
-                        : "📄"}
+                {selectedLanguage === 'python'
+                  ? '🐍'
+                  : selectedLanguage === 'cpp'
+                    ? '⚡'
+                    : selectedLanguage === 'java'
+                      ? '☕'
+                      : selectedLanguage === 'javascript'
+                        ? '🟡'
+                        : '📄'}
               </span>
 
               {/* Tab Name */}
@@ -342,7 +342,7 @@ export default function TestPageContent() {
                 Solution
                 {PROGRAMMING_LANGUAGES.find(
                   (lang) => lang.value === selectedLanguage
-                )?.extension || ".py"}
+                )?.extension || '.py'}
               </span>
             </button>
           </div>
@@ -363,10 +363,10 @@ export default function TestPageContent() {
         <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
           <div className="flex items-center justify-between">
             <div className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-4">
-              <span>Lines: {code.split("\n").length}</span>
+              <span>Lines: {code.split('\n').length}</span>
               <span>Chars: {code.length}</span>
               <span>
-                Language:{" "}
+                Language:{' '}
                 {
                   PROGRAMMING_LANGUAGES.find(
                     (lang) => lang.value === selectedLanguage
@@ -444,7 +444,7 @@ export default function TestPageContent() {
           <div className="flex-1 p-4">
             <div className="w-full h-full p-3 bg-slate-900 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg overflow-auto">
               <pre className="text-sm font-mono text-green-400 whitespace-pre-wrap">
-                {output || "Output will appear here after running your code..."}
+                {output || 'Output will appear here after running your code...'}
               </pre>
             </div>
           </div>
@@ -458,15 +458,15 @@ export default function TestPageContent() {
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
             </div>
             <div className="text-xs text-slate-500">
-              {selectedLanguage === "python"
-                ? "🐍"
-                : selectedLanguage === "cpp"
-                  ? "⚡"
-                  : selectedLanguage === "java"
-                    ? "☕"
-                    : selectedLanguage === "javascript"
-                      ? "🟡"
-                      : "📄"}
+              {selectedLanguage === 'python'
+                ? '🐍'
+                : selectedLanguage === 'cpp'
+                  ? '⚡'
+                  : selectedLanguage === 'java'
+                    ? '☕'
+                    : selectedLanguage === 'javascript'
+                      ? '🟡'
+                      : '📄'}
               {
                 PROGRAMMING_LANGUAGES.find(
                   (lang) => lang.value === selectedLanguage

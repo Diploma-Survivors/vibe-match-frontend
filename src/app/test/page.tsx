@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { CodeEditorNew } from "@/components/editor";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import { CodeEditorNew } from '@/components/editor';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AnimatePresence, motion } from "framer-motion";
+} from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertTriangle,
   CheckCircle,
@@ -29,15 +29,15 @@ import {
   TrendingUp,
   XCircle,
   Zap,
-} from "lucide-react";
-import { useEffect, useState } from "react";
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface TestCase {
   id: string;
   input: string;
   expectedOutput: string;
   userOutput?: string;
-  status?: "passed" | "failed" | "running" | "pending";
+  status?: 'passed' | 'failed' | 'running' | 'pending';
   executionTime?: number;
   memoryUsage?: number;
   isHidden?: boolean;
@@ -51,11 +51,11 @@ interface ExecutionResult {
 }
 
 const LANGUAGES = [
-  { value: "python", label: "Python", extension: "py" },
-  { value: "javascript", label: "JavaScript", extension: "js" },
-  { value: "cpp", label: "C++", extension: "cpp" },
-  { value: "java", label: "Java", extension: "java" },
-  { value: "typescript", label: "TypeScript", extension: "ts" },
+  { value: 'python', label: 'Python', extension: 'py' },
+  { value: 'javascript', label: 'JavaScript', extension: 'js' },
+  { value: 'cpp', label: 'C++', extension: 'cpp' },
+  { value: 'java', label: 'Java', extension: 'java' },
+  { value: 'typescript', label: 'TypeScript', extension: 'ts' },
 ];
 
 const DEFAULT_CODE = {
@@ -128,41 +128,41 @@ console.log(result);`,
 
 const DEFAULT_TEST_CASES: TestCase[] = [
   {
-    id: "1",
-    input: "[1, 2, 3, 4, 5]",
-    expectedOutput: "15",
+    id: '1',
+    input: '[1, 2, 3, 4, 5]',
+    expectedOutput: '15',
   },
   {
-    id: "2",
-    input: "[10, -5, 3]",
-    expectedOutput: "8",
+    id: '2',
+    input: '[10, -5, 3]',
+    expectedOutput: '8',
   },
   {
-    id: "3",
-    input: "[]",
-    expectedOutput: "0",
+    id: '3',
+    input: '[]',
+    expectedOutput: '0',
   },
   {
-    id: "hidden1",
-    input: "[1, 1, 1, 1]",
-    expectedOutput: "4",
+    id: 'hidden1',
+    input: '[1, 1, 1, 1]',
+    expectedOutput: '4',
     isHidden: true,
   },
   {
-    id: "hidden2",
-    input: "[-1, -2, -3]",
-    expectedOutput: "-6",
+    id: 'hidden2',
+    input: '[-1, -2, -3]',
+    expectedOutput: '-6',
     isHidden: true,
   },
 ];
 
 export default function TestPage() {
-  const [selectedLanguage, setSelectedLanguage] = useState("python");
+  const [selectedLanguage, setSelectedLanguage] = useState('python');
   const [code, setCode] = useState(DEFAULT_CODE.python);
-  const [customInput, setCustomInput] = useState("");
+  const [customInput, setCustomInput] = useState('');
   const [testCases, setTestCases] = useState<TestCase[]>(DEFAULT_TEST_CASES);
   const [isRunning, setIsRunning] = useState(false);
-  const [activeTab, setActiveTab] = useState("editor");
+  const [activeTab, setActiveTab] = useState('editor');
   const [autoSaved, setAutoSaved] = useState(false);
 
   // Auto-save functionality
@@ -213,25 +213,25 @@ export default function TestPage() {
       }
     } catch (error) {
       return {
-        output: "",
+        output: '',
         executionTime,
         memoryUsage,
-        error: "Invalid input format",
+        error: 'Invalid input format',
       };
     }
 
     return {
-      output: "Error: Could not parse input",
+      output: 'Error: Could not parse input',
       executionTime,
       memoryUsage,
-      error: "Parse error",
+      error: 'Parse error',
     };
   };
 
   const runSingleTest = async (testCase: TestCase) => {
     setTestCases((prev) =>
       prev.map((tc) =>
-        tc.id === testCase.id ? { ...tc, status: "running" } : tc
+        tc.id === testCase.id ? { ...tc, status: 'running' } : tc
       )
     );
 
@@ -239,10 +239,10 @@ export default function TestPage() {
       const result = await simulateCodeExecution(testCase.input);
 
       const status = result.error
-        ? "failed"
+        ? 'failed'
         : result.output.trim() === testCase.expectedOutput.trim()
-          ? "passed"
-          : "failed";
+          ? 'passed'
+          : 'failed';
 
       setTestCases((prev) =>
         prev.map((tc) =>
@@ -263,8 +263,8 @@ export default function TestPage() {
           tc.id === testCase.id
             ? {
                 ...tc,
-                status: "failed",
-                userOutput: "Runtime Error",
+                status: 'failed',
+                userOutput: 'Runtime Error',
                 executionTime: 0,
                 memoryUsage: 0,
               }
@@ -279,7 +279,7 @@ export default function TestPage() {
 
     // Reset all test cases
     setTestCases((prev) =>
-      prev.map((tc) => ({ ...tc, status: "pending" as const }))
+      prev.map((tc) => ({ ...tc, status: 'pending' as const }))
     );
 
     // Run tests sequentially
@@ -295,9 +295,9 @@ export default function TestPage() {
 
     try {
       const result = await simulateCodeExecution(customInput);
-      console.log("Custom input result:", result);
+      console.log('Custom input result:', result);
     } catch (error) {
-      console.error("Error running custom input:", error);
+      console.error('Error running custom input:', error);
     }
   };
 
@@ -308,11 +308,11 @@ export default function TestPage() {
 
   const getStatusIcon = (status?: string) => {
     switch (status) {
-      case "passed":
+      case 'passed':
         return <CheckCircle className="w-4 h-4 text-green-500" />;
-      case "failed":
+      case 'failed':
         return <XCircle className="w-4 h-4 text-red-500" />;
-      case "running":
+      case 'running':
         return (
           <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
         );
@@ -325,18 +325,18 @@ export default function TestPage() {
 
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case "passed":
-        return "bg-green-50 border-green-200";
-      case "failed":
-        return "bg-red-50 border-red-200";
-      case "running":
-        return "bg-blue-50 border-blue-200";
+      case 'passed':
+        return 'bg-green-50 border-green-200';
+      case 'failed':
+        return 'bg-red-50 border-red-200';
+      case 'running':
+        return 'bg-blue-50 border-blue-200';
       default:
-        return "bg-gray-50 border-gray-200";
+        return 'bg-gray-50 border-gray-200';
     }
   };
 
-  const passedTests = testCases.filter((tc) => tc.status === "passed").length;
+  const passedTests = testCases.filter((tc) => tc.status === 'passed').length;
   const totalTests = testCases.length;
 
   return (
@@ -469,7 +469,7 @@ export default function TestPage() {
                         className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
                       >
                         <Play className="w-4 h-4 mr-2" />
-                        {isRunning ? "Running..." : "Run All Tests"}
+                        {isRunning ? 'Running...' : 'Run All Tests'}
                       </Button>
                     </motion.div>
                   </div>
@@ -569,7 +569,7 @@ export default function TestPage() {
                       className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
                     >
                       <Play className="w-4 h-4 mr-2" />
-                      {isRunning ? "Running..." : "Run All"}
+                      {isRunning ? 'Running...' : 'Run All'}
                     </Button>
                   </motion.div>
                 </div>
@@ -591,14 +591,14 @@ export default function TestPage() {
                             <div className="flex items-center gap-3">
                               <motion.div
                                 animate={
-                                  testCase.status === "running"
+                                  testCase.status === 'running'
                                     ? { rotate: 360 }
                                     : { rotate: 0 }
                                 }
                                 transition={{
                                   duration: 2,
                                   repeat:
-                                    testCase.status === "running"
+                                    testCase.status === 'running'
                                       ? Number.POSITIVE_INFINITY
                                       : 0,
                                 }}
@@ -627,7 +627,7 @@ export default function TestPage() {
                                 size="sm"
                                 variant="outline"
                                 onClick={() => runSingleTest(testCase)}
-                                disabled={testCase.status === "running"}
+                                disabled={testCase.status === 'running'}
                                 className="bg-white/90"
                               >
                                 <PlayCircle className="w-4 h-4 mr-1" />
@@ -651,9 +651,9 @@ export default function TestPage() {
                               </div>
                               <div className="bg-white p-2 rounded border font-mono text-green-600">
                                 {testCase.isHidden &&
-                                testCase.status !== "passed" &&
-                                testCase.status !== "failed"
-                                  ? "***"
+                                testCase.status !== 'passed' &&
+                                testCase.status !== 'failed'
+                                  ? '***'
                                   : testCase.expectedOutput}
                               </div>
                             </div>
@@ -663,14 +663,14 @@ export default function TestPage() {
                               </div>
                               <div
                                 className={`bg-white p-2 rounded border font-mono ${
-                                  testCase.status === "passed"
-                                    ? "text-green-600"
-                                    : testCase.status === "failed"
-                                      ? "text-red-600"
-                                      : ""
+                                  testCase.status === 'passed'
+                                    ? 'text-green-600'
+                                    : testCase.status === 'failed'
+                                      ? 'text-red-600'
+                                      : ''
                                 }`}
                               >
-                                {testCase.userOutput || "-"}
+                                {testCase.userOutput || '-'}
                               </div>
                             </div>
                           </div>
@@ -695,10 +695,10 @@ export default function TestPage() {
                           )}
 
                           <AnimatePresence>
-                            {testCase.status === "failed" && (
+                            {testCase.status === 'failed' && (
                               <motion.div
                                 initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
+                                animate={{ opacity: 1, height: 'auto' }}
                                 exit={{ opacity: 0, height: 0 }}
                                 className="mt-3 p-3 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg"
                               >
@@ -747,7 +747,7 @@ export default function TestPage() {
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{
-                          type: "spring",
+                          type: 'spring',
                           stiffness: 300,
                           delay: 0.2,
                         }}
@@ -761,8 +761,8 @@ export default function TestPage() {
                   </div>
                   <div className="text-xs text-green-600">
                     {passedTests === totalTests
-                      ? "🎉 Perfect Score!"
-                      : "Keep going!"}
+                      ? '🎉 Perfect Score!'
+                      : 'Keep going!'}
                   </div>
                 </Card>
               </motion.div>
@@ -782,7 +782,7 @@ export default function TestPage() {
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{
-                          type: "spring",
+                          type: 'spring',
                           stiffness: 300,
                           delay: 0.3,
                         }}
@@ -796,8 +796,8 @@ export default function TestPage() {
                   </div>
                   <div className="text-xs text-red-600">
                     {totalTests - passedTests === 0
-                      ? "No failures!"
-                      : "Review & improve"}
+                      ? 'No failures!'
+                      : 'Review & improve'}
                   </div>
                 </Card>
               </motion.div>
@@ -817,7 +817,7 @@ export default function TestPage() {
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{
-                          type: "spring",
+                          type: 'spring',
                           stiffness: 300,
                           delay: 0.4,
                         }}
@@ -828,7 +828,7 @@ export default function TestPage() {
                                 .filter((tc) => tc.executionTime)
                                 .map((tc) => tc.executionTime || 0)
                             ).toFixed(0)
-                          : "0"}
+                          : '0'}
                         ms
                       </motion.div>
                       <div className="text-sm text-blue-700 font-medium">
@@ -840,8 +840,8 @@ export default function TestPage() {
                     {testCases.some(
                       (tc) => tc.executionTime && tc.executionTime > 50
                     )
-                      ? "⚠️ Consider optimization"
-                      : "🚀 Fast execution"}
+                      ? '⚠️ Consider optimization'
+                      : '🚀 Fast execution'}
                   </div>
                 </Card>
               </motion.div>
@@ -868,7 +868,7 @@ export default function TestPage() {
                     ) && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
+                        animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
                         className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-lg"
                       >
@@ -911,7 +911,7 @@ export default function TestPage() {
                     <motion.div
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      transition={{ type: "spring", stiffness: 300 }}
+                      transition={{ type: 'spring', stiffness: 300 }}
                       className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg text-center"
                     >
                       <div className="text-2xl mb-2">🎉</div>

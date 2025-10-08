@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 import {
   CONTEST_STATUS_COLORS,
   CONTEST_STATUS_LABELS,
   type Contest,
-} from "@/types/contest";
-import { Calendar, Clock, Trophy, Users } from "lucide-react";
-import { motion } from "framer-motion";
+} from '@/types/contest';
+import { motion } from 'framer-motion';
+import { Calendar, Clock, Trophy, Users } from 'lucide-react';
 
 interface ContestCardProps {
   contest: Contest;
@@ -24,24 +24,24 @@ interface ContestCardProps {
 export default function ContestCard({ contest, index }: ContestCardProps) {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
+    return date.toLocaleDateString('vi-VN', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
     });
   };
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString("vi-VN", {
-      hour: "2-digit",
-      minute: "2-digit",
+    return date.toLocaleTimeString('vi-VN', {
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
   const getActionButton = () => {
     switch (contest.status) {
-      case "upcoming":
+      case 'upcoming':
         return contest.registrationOpen ? (
           <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
             Đăng ký
@@ -51,13 +51,13 @@ export default function ContestCard({ contest, index }: ContestCardProps) {
             Chưa mở đăng ký
           </Button>
         );
-      case "ongoing":
+      case 'ongoing':
         return (
           <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
             Tham gia ngay
           </Button>
         );
-      case "finished":
+      case 'finished':
         return (
           <Button variant="outline" className="w-full">
             Xem bảng xếp hạng

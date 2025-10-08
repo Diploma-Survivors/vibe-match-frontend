@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { ArrowDown, ArrowUp, ArrowUpDown } from "lucide-react";
-import React from "react";
+} from '@/components/ui/select';
+import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
+import React from 'react';
 
 export type SortField =
-  | "id"
-  | "title"
-  | "difficulty"
-  | "points"
-  | "acceptanceRate"
-  | "submissionCount";
-export type SortOrder = "asc" | "desc";
+  | 'id'
+  | 'title'
+  | 'difficulty'
+  | 'points'
+  | 'acceptanceRate'
+  | 'submissionCount';
+export type SortOrder = 'asc' | 'desc';
 
 interface SortControlsProps {
   sortField: SortField;
@@ -27,12 +27,12 @@ interface SortControlsProps {
 }
 
 const SORT_OPTIONS = [
-  { value: "id", label: "Mã bài" },
-  { value: "title", label: "Tên bài" },
-  { value: "difficulty", label: "Độ khó" },
-  { value: "points", label: "Điểm" },
-  { value: "acceptanceRate", label: "Tỷ lệ AC" },
-  { value: "submissionCount", label: "Số lượt nộp" },
+  { value: 'id', label: 'Mã bài' },
+  { value: 'title', label: 'Tên bài' },
+  { value: 'difficulty', label: 'Độ khó' },
+  { value: 'points', label: 'Điểm' },
+  { value: 'acceptanceRate', label: 'Tỷ lệ AC' },
+  { value: 'submissionCount', label: 'Số lượt nộp' },
 ];
 
 export default function SortControls({
@@ -45,11 +45,11 @@ export default function SortControls({
   };
 
   const handleOrderToggle = () => {
-    onSortChange(sortField, sortOrder === "asc" ? "desc" : "asc");
+    onSortChange(sortField, sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
   const getSortIcon = () => {
-    if (sortOrder === "asc") {
+    if (sortOrder === 'asc') {
       return <ArrowUp className="w-4 h-4" />;
     }
     return <ArrowDown className="w-4 h-4" />;
@@ -89,7 +89,7 @@ export default function SortControls({
       >
         {getSortIcon()}
         <span className="font-medium">
-          {sortOrder === "asc" ? "Tăng dần" : "Giảm dần"}
+          {sortOrder === 'asc' ? 'Tăng dần' : 'Giảm dần'}
         </span>
       </Button>
     </div>

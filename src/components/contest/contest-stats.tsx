@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import type { Contest } from "@/types/contest";
-import { Calendar, Trophy, Users } from "lucide-react";
-import React, { useMemo } from "react";
+import type { Contest } from '@/types/contest';
+import { Calendar, Trophy, Users } from 'lucide-react';
+import React, { useMemo } from 'react';
 
 interface ContestStatsProps {
   contests: Contest[];
@@ -11,9 +11,9 @@ interface ContestStatsProps {
 export default function ContestStats({ contests }: ContestStatsProps) {
   const stats = useMemo(() => {
     const total = contests.length;
-    const upcoming = contests.filter((c) => c.status === "upcoming").length;
-    const ongoing = contests.filter((c) => c.status === "ongoing").length;
-    const finished = contests.filter((c) => c.status === "finished").length;
+    const upcoming = contests.filter((c) => c.status === 'upcoming').length;
+    const ongoing = contests.filter((c) => c.status === 'ongoing').length;
+    const finished = contests.filter((c) => c.status === 'finished').length;
     const totalParticipants = contests.reduce(
       (acc, c) => acc + c.participantCount,
       0
@@ -31,24 +31,24 @@ export default function ContestStats({ contests }: ContestStatsProps) {
   const statItems = [
     {
       icon: Trophy,
-      label: "Tổng cuộc thi",
+      label: 'Tổng cuộc thi',
       value: stats.total.toLocaleString(),
-      bgColor: "bg-blue-50 dark:bg-blue-900/20",
-      iconColor: "text-emerald-600 dark:text-emerald-400",
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+      iconColor: 'text-emerald-600 dark:text-emerald-400',
     },
     {
       icon: Calendar,
-      label: "Sắp diễn ra",
+      label: 'Sắp diễn ra',
       value: stats.upcoming.toLocaleString(),
-      bgColor: "bg-green-50 dark:bg-green-900/20",
-      iconColor: "text-blue-600 dark:text-blue-400",
+      bgColor: 'bg-green-50 dark:bg-green-900/20',
+      iconColor: 'text-blue-600 dark:text-blue-400',
     },
     {
       icon: Users,
-      label: "Tổng thí sinh",
+      label: 'Tổng thí sinh',
       value: stats.totalParticipants.toLocaleString(),
-      bgColor: "bg-green-50 dark:bg-green-900/20",
-      iconColor: "text-purple-600 dark:text-purple-400",
+      bgColor: 'bg-green-50 dark:bg-green-900/20',
+      iconColor: 'text-purple-600 dark:text-purple-400',
     },
   ];
 

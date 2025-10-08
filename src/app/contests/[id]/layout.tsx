@@ -1,9 +1,9 @@
-"use client";
-import { ContestNavbar } from "@/components/contest";
-import { mockContests } from "@/lib/data/mock-contests";
-import type { Contest } from "@/types/contest";
-import { useParams, usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+'use client';
+import { ContestNavbar } from '@/components/contest';
+import { mockContests } from '@/lib/data/mock-contests';
+import type { Contest } from '@/types/contest';
+import { useParams, usePathname, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function ContestLayout({
   children,
@@ -13,7 +13,7 @@ export default function ContestLayout({
   const router = useRouter();
   const contestId = params.id as string;
   const [contest, setContest] = useState<Contest | null>(null);
-  const activeTab = pathname.split("/").pop() || "info";
+  const activeTab = pathname.split('/').pop() || 'info';
 
   useEffect(() => {
     const found = mockContests.find((c) => c.id === contestId);

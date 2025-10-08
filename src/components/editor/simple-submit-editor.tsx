@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 import {
   Code2,
   Copy,
@@ -16,15 +16,15 @@ import {
   RotateCcw,
   Send,
   Settings,
-} from "lucide-react";
-import { useRef, useState } from "react";
+} from 'lucide-react';
+import { useRef, useState } from 'react';
 
 const languages = [
-  { value: "python", label: "Python 3", extension: ".py" },
-  { value: "cpp", label: "C++17", extension: ".cpp" },
-  { value: "java", label: "Java 17", extension: ".java" },
-  { value: "javascript", label: "JavaScript", extension: ".js" },
-  { value: "csharp", label: "C# 10", extension: ".cs" },
+  { value: 'python', label: 'Python 3', extension: '.py' },
+  { value: 'cpp', label: 'C++17', extension: '.cpp' },
+  { value: 'java', label: 'Java 17', extension: '.java' },
+  { value: 'javascript', label: 'JavaScript', extension: '.js' },
+  { value: 'csharp', label: 'C# 10', extension: '.cs' },
 ];
 
 const defaultCode = {
@@ -107,7 +107,7 @@ export default function SimpleSubmitEditor({
   isRunning = false,
   isSubmitting = false,
 }: SimpleSubmitEditorProps) {
-  const [selectedLanguage, setSelectedLanguage] = useState("python");
+  const [selectedLanguage, setSelectedLanguage] = useState('python');
   const [code, setCode] = useState(defaultCode.python);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -148,15 +148,15 @@ export default function SimpleSubmitEditor({
                   <div className="flex items-center gap-2">
                     <span
                       className={`w-2 h-2 rounded-full ${
-                        lang.value === "python"
-                          ? "bg-blue-500"
-                          : lang.value === "cpp"
-                            ? "bg-red-500"
-                            : lang.value === "java"
-                              ? "bg-orange-500"
-                              : lang.value === "javascript"
-                                ? "bg-yellow-500"
-                                : "bg-purple-500"
+                        lang.value === 'python'
+                          ? 'bg-blue-500'
+                          : lang.value === 'cpp'
+                            ? 'bg-red-500'
+                            : lang.value === 'java'
+                              ? 'bg-orange-500'
+                              : lang.value === 'javascript'
+                                ? 'bg-yellow-500'
+                                : 'bg-purple-500'
                       }`}
                     />
                     {lang.label}
@@ -213,7 +213,7 @@ export default function SimpleSubmitEditor({
           style={{
             fontFamily:
               "'Fira Code', 'Cascadia Code', 'SF Mono', Consolas, monospace",
-            lineHeight: "1.5",
+            lineHeight: '1.5',
             tabSize: 4,
           }}
         />
@@ -223,7 +223,7 @@ export default function SimpleSubmitEditor({
       <div className="p-4 border-t border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-800/50">
         <div className="flex items-center justify-between">
           <div className="text-sm text-slate-600 dark:text-slate-400">
-            Lines: {code.split("\n").length} | Chars: {code.length}
+            Lines: {code.split('\n').length} | Chars: {code.length}
           </div>
           <div className="flex items-center gap-2">
             <Button

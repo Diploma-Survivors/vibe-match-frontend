@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -8,11 +8,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import type { Problem } from "@/types/problem";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import Link from "next/link";
-import React from "react";
+} from '@/components/ui/table';
+import type { Problem } from '@/types/problem';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import React from 'react';
 
 interface ProblemTableProps {
   problems: Problem[];
@@ -23,21 +23,21 @@ interface ProblemTableProps {
 
 const getDifficultyColor = (difficulty: string) => {
   switch (difficulty) {
-    case "Dễ":
-      return "bg-green-100 text-green-800 hover:bg-green-200";
-    case "Trung bình":
-      return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200";
-    case "Khó":
-      return "bg-red-100 text-red-800 hover:bg-red-200";
+    case 'Dễ':
+      return 'bg-green-100 text-green-800 hover:bg-green-200';
+    case 'Trung bình':
+      return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200';
+    case 'Khó':
+      return 'bg-red-100 text-red-800 hover:bg-red-200';
     default:
-      return "bg-gray-100 text-gray-800 hover:bg-gray-200";
+      return 'bg-gray-100 text-gray-800 hover:bg-gray-200';
   }
 };
 
 const getAcceptanceRateColor = (rate: number) => {
-  if (rate >= 70) return "text-green-600";
-  if (rate >= 40) return "text-yellow-600";
-  return "text-red-600";
+  if (rate >= 70) return 'text-green-600';
+  if (rate >= 40) return 'text-yellow-600';
+  return 'text-red-600';
 };
 
 export default function ProblemTable({
@@ -151,10 +151,10 @@ export default function ProblemTable({
                     <div
                       className={`inline-flex items-center justify-center w-16 h-8 rounded-full text-xs font-bold ${
                         problem.acceptanceRate >= 70
-                          ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700"
+                          ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-200 dark:border-green-700'
                           : problem.acceptanceRate >= 40
-                            ? "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700"
-                            : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700"
+                            ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700'
+                            : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-700'
                       }`}
                     >
                       {problem.acceptanceRate.toFixed(1)}%
@@ -202,13 +202,13 @@ export default function ProblemTable({
                 return (
                   <Button
                     key={pageNum}
-                    variant={currentPage === pageNum ? "default" : "outline"}
+                    variant={currentPage === pageNum ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => onPageChange(pageNum)}
                     className={`w-10 h-10 p-0 rounded-xl transition-all duration-200 ${
                       currentPage === pageNum
-                        ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg"
-                        : "border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600"
+                        ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
+                        : 'border-0 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
                     }`}
                   >
                     {pageNum}
@@ -229,11 +229,11 @@ export default function ProblemTable({
           </div>
 
           <div className="text-sm font-medium text-slate-600 dark:text-slate-400">
-            Trang{" "}
+            Trang{' '}
             <span className="font-bold text-slate-900 dark:text-slate-100">
               {currentPage}
-            </span>{" "}
-            /{" "}
+            </span>{' '}
+            /{' '}
             <span className="font-bold text-slate-900 dark:text-slate-100">
               {totalPages}
             </span>

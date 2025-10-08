@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { ParticleBackground } from "@/components/common";
-import { Button } from "@/components/ui/button";
-import { motion } from "framer-motion";
+import { ParticleBackground } from '@/components/common';
+import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
 import {
   Award,
   ChevronDown,
@@ -13,9 +13,9 @@ import {
   Users,
   Wallet,
   Zap,
-} from "lucide-react";
-import { useState } from "react";
-import { useInView } from "react-intersection-observer";
+} from 'lucide-react';
+import { useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 
 export default function HomePage() {
   const [walletConnected, setWalletConnected] = useState(false);
@@ -45,13 +45,13 @@ export default function HomePage() {
   const connectWallet = () => {
     // This would be replaced with actual Solana wallet connection logic
     setWalletConnected(!walletConnected);
-    console.log("Connecting to Solana wallet...");
+    console.log('Connecting to Solana wallet...');
   };
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
+      element.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -69,7 +69,7 @@ export default function HomePage() {
                 ref={heroRef}
                 initial={{ opacity: 0, x: -50 }}
                 animate={heroInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.8, ease: "easeOut" }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
                 className="max-w-xl"
               >
                 <h1 className="text-5xl md:text-6xl font-bold text-black mb-4">
@@ -94,7 +94,7 @@ export default function HomePage() {
                     variant="outline"
                     className="text-black border-black hover:bg-black/10 px-8 py-6"
                     onClick={() => {
-                      window.location.href = "/problems";
+                      window.location.href = '/problems';
                     }}
                   >
                     Browse Problems
@@ -119,7 +119,7 @@ export default function HomePage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1.5 }}
           className="absolute bottom-10 left-1/2 transform -translate-x-1/2 cursor-pointer"
-          onClick={() => scrollToSection("problems")}
+          onClick={() => scrollToSection('problems')}
         >
           <ChevronDown className="animate-bounce" size={32} />
         </motion.div>
@@ -146,27 +146,27 @@ export default function HomePage() {
             {[
               {
                 icon: <Lock className="h-12 w-12 text-green-600" />,
-                title: "Content Censorship",
+                title: 'Content Censorship',
                 description:
-                  "Content removed or restricted by central authorities.",
+                  'Content removed or restricted by central authorities.',
               },
               {
                 icon: <Shield className="h-12 w-12 text-green-600" />,
-                title: "Data Privacy",
+                title: 'Data Privacy',
                 description:
-                  "User data stored centrally, vulnerable to exploitation.",
+                  'User data stored centrally, vulnerable to exploitation.',
               },
               {
                 icon: <DollarSign className="h-12 w-12 text-green-600" />,
-                title: "Unfair Profit Distribution",
+                title: 'Unfair Profit Distribution',
                 description:
-                  "Creators receive little to no deserved compensation.",
+                  'Creators receive little to no deserved compensation.',
               },
               {
                 icon: <Award className="h-12 w-12 text-green-600" />,
-                title: "Copyright Violations",
+                title: 'Copyright Violations',
                 description:
-                  "Content easily misused without clear ownership proof.",
+                  'Content easily misused without clear ownership proof.',
               },
             ].map((problem, index) => (
               <motion.div
@@ -214,27 +214,27 @@ export default function HomePage() {
                   {[
                     {
                       icon: <Zap className="h-8 w-8 text-green-600" />,
-                      title: "High Transaction Speed",
+                      title: 'High Transaction Speed',
                       description:
-                        "Thousands of transactions per second (TPS), ideal for social media interactions.",
+                        'Thousands of transactions per second (TPS), ideal for social media interactions.',
                     },
                     {
                       icon: <DollarSign className="h-8 w-8 text-green-600" />,
-                      title: "Low Cost",
+                      title: 'Low Cost',
                       description:
-                        "Average transaction fee of ~$0.00025, perfect for NFT minting and microtransactions.",
+                        'Average transaction fee of ~$0.00025, perfect for NFT minting and microtransactions.',
                     },
                     {
                       icon: <Database className="h-8 w-8 text-green-600" />,
-                      title: "Strong Ecosystem",
+                      title: 'Strong Ecosystem',
                       description:
-                        "Tools like Anchor, Metaplex, and Solana Wallet Adapter support efficient development.",
+                        'Tools like Anchor, Metaplex, and Solana Wallet Adapter support efficient development.',
                     },
                     {
                       icon: <Users className="h-8 w-8 text-green-600" />,
-                      title: "Scalability",
+                      title: 'Scalability',
                       description:
-                        "Accommodates user growth without performance impact.",
+                        'Accommodates user growth without performance impact.',
                     },
                   ].map((feature, index) => (
                     <div key={feature.title} className="flex items-start">
@@ -271,7 +271,7 @@ export default function HomePage() {
               <div className="relative h-12 w-full max-w-md bg-gray-200 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
-                  animate={solanaInView ? { width: "95%" } : {}}
+                  animate={solanaInView ? { width: '95%' } : {}}
                   transition={{ duration: 1.5, delay: 0.6 }}
                   className="absolute top-0 left-0 h-full bg-gradient-to-r from-green-600 to-emerald-600 rounded-full"
                 />
@@ -304,39 +304,39 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                title: "Decentralized Storage",
+                title: 'Decentralized Storage',
                 description:
-                  "Content stored on Arweave with metadata and hash on Solana for authenticity verification.",
+                  'Content stored on Arweave with metadata and hash on Solana for authenticity verification.',
                 delay: 0.1,
               },
               {
-                title: "Content NFT",
+                title: 'Content NFT',
                 description:
-                  "Each content piece linked to a unique NFT, proving ownership and enabling automatic royalties.",
+                  'Each content piece linked to a unique NFT, proving ownership and enabling automatic royalties.',
                 delay: 0.2,
               },
               {
-                title: "SolVibe Token (SOLV)",
+                title: 'SolVibe Token (SOLV)',
                 description:
-                  "Rewards for users creating content, engaging, and participating in curation.",
+                  'Rewards for users creating content, engaging, and participating in curation.',
                 delay: 0.3,
               },
               {
-                title: "NFT Badges",
+                title: 'NFT Badges',
                 description:
-                  "Special NFTs for outstanding creators, providing benefits like increased visibility or exclusive feature access.",
+                  'Special NFTs for outstanding creators, providing benefits like increased visibility or exclusive feature access.',
                 delay: 0.4,
               },
               {
-                title: "Community Curation",
+                title: 'Community Curation',
                 description:
-                  "On-chain voting with quadratic voting and user reputation to rank quality content.",
+                  'On-chain voting with quadratic voting and user reputation to rank quality content.',
                 delay: 0.5,
               },
               {
-                title: "Decentralized Identity",
+                title: 'Decentralized Identity',
                 description:
-                  "Users manage profiles via Solana wallets, fully owning their data.",
+                  'Users manage profiles via Solana wallets, fully owning their data.',
                 delay: 0.6,
               },
             ].map((feature, index) => (
@@ -363,27 +363,27 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row justify-center items-center md:items-start gap-8 max-w-4xl mx-auto">
               {[
                 {
-                  step: "01",
-                  title: "Connect Wallet",
+                  step: '01',
+                  title: 'Connect Wallet',
                   description:
-                    "Register using your Solana wallet (like Phantom).",
+                    'Register using your Solana wallet (like Phantom).',
                 },
                 {
-                  step: "02",
-                  title: "Create Content",
+                  step: '02',
+                  title: 'Create Content',
                   description:
                     "Post content that's stored on Arweave with an on-chain NFT.",
                 },
                 {
-                  step: "03",
-                  title: "Engage & Earn",
-                  description: "Like, comment, share, and earn SOLV tokens.",
+                  step: '03',
+                  title: 'Engage & Earn',
+                  description: 'Like, comment, share, and earn SOLV tokens.',
                 },
                 {
-                  step: "04",
-                  title: "Community Curation",
+                  step: '04',
+                  title: 'Community Curation',
                   description:
-                    "Vote on content to increase visibility based on user reputation.",
+                    'Vote on content to increase visibility based on user reputation.',
                 },
               ].map((step, index) => (
                 <div
@@ -427,33 +427,33 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                title: "Content Creators",
+                title: 'Content Creators',
                 description:
-                  "Those seeking fair compensation, copyright protection, and recognition.",
+                  'Those seeking fair compensation, copyright protection, and recognition.',
                 delay: 0.1,
               },
               {
-                title: "Privacy-Focused Users",
+                title: 'Privacy-Focused Users',
                 description:
-                  "Individuals who prioritize control over their personal data.",
+                  'Individuals who prioritize control over their personal data.',
                 delay: 0.2,
               },
               {
-                title: "Web3 Enthusiasts",
+                title: 'Web3 Enthusiasts',
                 description:
-                  "Supporters of decentralized applications and blockchain technology.",
+                  'Supporters of decentralized applications and blockchain technology.',
                 delay: 0.3,
               },
               {
-                title: "Communities",
+                title: 'Communities',
                 description:
-                  "Groups looking to build social spaces free from centralized control.",
+                  'Groups looking to build social spaces free from centralized control.',
                 delay: 0.4,
               },
               {
-                title: "Businesses",
+                title: 'Businesses',
                 description:
-                  "Organizations needing blockchain solutions for content rights management.",
+                  'Organizations needing blockchain solutions for content rights management.',
                 delay: 0.5,
               },
             ].map((audience, index) => (

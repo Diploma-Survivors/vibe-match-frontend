@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import ContestCardList from "./contest-card-list";
-import { getContestsByStatus } from "@/lib/data/mock-contests";
-import type { Contest } from "@/types/contest";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { getContestsByStatus } from '@/lib/data/mock-contests';
+import type { Contest } from '@/types/contest';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import ContestCardList from './contest-card-list';
 
 const ITEMS_PER_PAGE = 10;
 

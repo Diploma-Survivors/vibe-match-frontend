@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import Editor from "@monaco-editor/react";
+} from '@/components/ui/select';
+import Editor from '@monaco-editor/react';
 import {
   Brain,
   Clock,
@@ -25,31 +25,31 @@ import {
   Settings,
   TestTube,
   Upload,
-} from "lucide-react";
-import type { editor } from "monaco-editor";
-import { useEffect, useRef, useState } from "react";
+} from 'lucide-react';
+import type { editor } from 'monaco-editor';
+import { useEffect, useRef, useState } from 'react';
 
 const languages = [
   {
-    value: "python",
-    label: "Python 3",
-    extension: ".py",
-    monacoLang: "python",
+    value: 'python',
+    label: 'Python 3',
+    extension: '.py',
+    monacoLang: 'python',
   },
-  { value: "cpp", label: "C++17", extension: ".cpp", monacoLang: "cpp" },
-  { value: "java", label: "Java 17", extension: ".java", monacoLang: "java" },
+  { value: 'cpp', label: 'C++17', extension: '.cpp', monacoLang: 'cpp' },
+  { value: 'java', label: 'Java 17', extension: '.java', monacoLang: 'java' },
   {
-    value: "javascript",
-    label: "JavaScript",
-    extension: ".js",
-    monacoLang: "javascript",
+    value: 'javascript',
+    label: 'JavaScript',
+    extension: '.js',
+    monacoLang: 'javascript',
   },
-  { value: "csharp", label: "C# 10", extension: ".cs", monacoLang: "csharp" },
+  { value: 'csharp', label: 'C# 10', extension: '.cs', monacoLang: 'csharp' },
   {
-    value: "typescript",
-    label: "TypeScript",
-    extension: ".ts",
-    monacoLang: "typescript",
+    value: 'typescript',
+    label: 'TypeScript',
+    extension: '.ts',
+    monacoLang: 'typescript',
   },
 ];
 
@@ -128,12 +128,12 @@ for (let i = 1; i <= n; i++) {
 };
 
 export default function CodeEditor() {
-  const [selectedLanguage, setSelectedLanguage] = useState("python");
+  const [selectedLanguage, setSelectedLanguage] = useState('python');
   const [code, setCode] = useState(defaultCode.python);
-  const [theme, setTheme] = useState("vs-dark");
+  const [theme, setTheme] = useState('vs-dark');
   const [fontSize, setFontSize] = useState(14);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [output, setOutput] = useState("");
+  const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -149,7 +149,7 @@ export default function CodeEditor() {
 
   const handleEditorDidMount = (
     editorInstance: editor.IStandaloneCodeEditor,
-    monaco: typeof import("monaco-editor")
+    monaco: typeof import('monaco-editor')
   ) => {
     editorRef.current = editorInstance;
 
@@ -157,77 +157,77 @@ export default function CodeEditor() {
     editorInstance.updateOptions({
       minimap: { enabled: true },
       scrollBeyondLastLine: false,
-      wordWrap: "on",
-      lineNumbers: "on",
+      wordWrap: 'on',
+      lineNumbers: 'on',
       folding: true,
       bracketPairColorization: { enabled: true },
-      renderWhitespace: "boundary",
-      cursorBlinking: "smooth",
+      renderWhitespace: 'boundary',
+      cursorBlinking: 'smooth',
       smoothScrolling: true,
     });
 
     // Add custom themes
-    monaco.editor.defineTheme("vibrant-dark", {
-      base: "vs-dark",
+    monaco.editor.defineTheme('vibrant-dark', {
+      base: 'vs-dark',
       inherit: true,
       rules: [
-        { token: "comment", foreground: "6A9955", fontStyle: "italic" },
-        { token: "keyword", foreground: "569CD6", fontStyle: "bold" },
-        { token: "string", foreground: "CE9178" },
-        { token: "number", foreground: "B5CEA8" },
-        { token: "type", foreground: "4EC9B0" },
-        { token: "function", foreground: "DCDCAA" },
+        { token: 'comment', foreground: '6A9955', fontStyle: 'italic' },
+        { token: 'keyword', foreground: '569CD6', fontStyle: 'bold' },
+        { token: 'string', foreground: 'CE9178' },
+        { token: 'number', foreground: 'B5CEA8' },
+        { token: 'type', foreground: '4EC9B0' },
+        { token: 'function', foreground: 'DCDCAA' },
       ],
       colors: {
-        "editor.background": "#0f172a",
-        "editor.foreground": "#e2e8f0",
-        "editorLineNumber.foreground": "#64748b",
-        "editorLineNumber.activeForeground": "#f1f5f9",
-        "editor.selectionBackground": "#1e40af40",
-        "editor.lineHighlightBackground": "#1e293b40",
+        'editor.background': '#0f172a',
+        'editor.foreground': '#e2e8f0',
+        'editorLineNumber.foreground': '#64748b',
+        'editorLineNumber.activeForeground': '#f1f5f9',
+        'editor.selectionBackground': '#1e40af40',
+        'editor.lineHighlightBackground': '#1e293b40',
       },
     });
 
-    monaco.editor.defineTheme("vibrant-light", {
-      base: "vs",
+    monaco.editor.defineTheme('vibrant-light', {
+      base: 'vs',
       inherit: true,
       rules: [
-        { token: "comment", foreground: "008000", fontStyle: "italic" },
-        { token: "keyword", foreground: "0000ff", fontStyle: "bold" },
-        { token: "string", foreground: "a31515" },
-        { token: "number", foreground: "098658" },
-        { token: "type", foreground: "267f99" },
-        { token: "function", foreground: "795e26" },
+        { token: 'comment', foreground: '008000', fontStyle: 'italic' },
+        { token: 'keyword', foreground: '0000ff', fontStyle: 'bold' },
+        { token: 'string', foreground: 'a31515' },
+        { token: 'number', foreground: '098658' },
+        { token: 'type', foreground: '267f99' },
+        { token: 'function', foreground: '795e26' },
       ],
       colors: {
-        "editor.background": "#ffffff",
-        "editor.foreground": "#000000",
-        "editorLineNumber.foreground": "#237893",
-        "editor.selectionBackground": "#add6ff",
-        "editor.lineHighlightBackground": "#f0f0f0",
+        'editor.background': '#ffffff',
+        'editor.foreground': '#000000',
+        'editorLineNumber.foreground': '#237893',
+        'editor.selectionBackground': '#add6ff',
+        'editor.lineHighlightBackground': '#f0f0f0',
       },
     });
   };
 
   const handleRun = () => {
     setIsRunning(true);
-    setOutput("Running code...\n");
+    setOutput('Running code...\n');
 
     // Simulate code execution
     setTimeout(() => {
-      setOutput("1 2 3 4 5 \n\n✅ Execution completed successfully");
+      setOutput('1 2 3 4 5 \n\n✅ Execution completed successfully');
       setIsRunning(false);
     }, 2000);
   };
 
   const handleSubmit = () => {
     setIsSubmitting(true);
-    setOutput("Submitting code...\n");
+    setOutput('Submitting code...\n');
 
     // Simulate code submission
     setTimeout(() => {
       setOutput(
-        "✅ Code submitted successfully!\n\nResult: Accepted\nTime: 142ms\nMemory: 2.1MB"
+        '✅ Code submitted successfully!\n\nResult: Accepted\nTime: 142ms\nMemory: 2.1MB'
       );
       setIsSubmitting(false);
     }, 3000);
@@ -239,11 +239,11 @@ export default function CodeEditor() {
 
   const downloadCode = () => {
     const lang = languages.find((l) => l.value === selectedLanguage);
-    const blob = new Blob([code], { type: "text/plain" });
+    const blob = new Blob([code], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = `solution${lang?.extension || ".txt"}`;
+    a.download = `solution${lang?.extension || '.txt'}`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -251,7 +251,7 @@ export default function CodeEditor() {
   const getCurrentLanguage = () => {
     return (
       languages.find((lang) => lang.value === selectedLanguage)?.monacoLang ||
-      "python"
+      'python'
     );
   };
   return (
@@ -306,17 +306,17 @@ export default function CodeEditor() {
                     <div className="flex items-center gap-2">
                       <span
                         className={`w-2 h-2 rounded-full ${
-                          lang.value === "python"
-                            ? "bg-blue-500"
-                            : lang.value === "cpp"
-                              ? "bg-red-500"
-                              : lang.value === "java"
-                                ? "bg-orange-500"
-                                : lang.value === "javascript"
-                                  ? "bg-yellow-500"
-                                  : lang.value === "csharp"
-                                    ? "bg-purple-500"
-                                    : "bg-cyan-500"
+                          lang.value === 'python'
+                            ? 'bg-blue-500'
+                            : lang.value === 'cpp'
+                              ? 'bg-red-500'
+                              : lang.value === 'java'
+                                ? 'bg-orange-500'
+                                : lang.value === 'javascript'
+                                  ? 'bg-yellow-500'
+                                  : lang.value === 'csharp'
+                                    ? 'bg-purple-500'
+                                    : 'bg-cyan-500'
                         }`}
                       />
                       {lang.label}
@@ -399,7 +399,7 @@ export default function CodeEditor() {
               height="100%"
               language={getCurrentLanguage()}
               value={code}
-              onChange={(value) => setCode(value || "")}
+              onChange={(value) => setCode(value || '')}
               onMount={handleEditorDidMount}
               theme={theme}
               options={{
@@ -409,12 +409,12 @@ export default function CodeEditor() {
                 fontLigatures: true,
                 minimap: { enabled: true },
                 scrollBeyondLastLine: false,
-                wordWrap: "on",
-                lineNumbers: "on",
+                wordWrap: 'on',
+                lineNumbers: 'on',
                 folding: true,
                 bracketPairColorization: { enabled: true },
-                renderWhitespace: "boundary",
-                cursorBlinking: "smooth",
+                renderWhitespace: 'boundary',
+                cursorBlinking: 'smooth',
                 smoothScrolling: true,
                 padding: { top: 16, bottom: 16 },
                 suggest: {
@@ -426,7 +426,7 @@ export default function CodeEditor() {
                   comments: false,
                   strings: false,
                 },
-                tabCompletion: "on",
+                tabCompletion: 'on',
                 formatOnPaste: true,
                 formatOnType: true,
               }}
@@ -582,7 +582,7 @@ export default function CodeEditor() {
               className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white border-0 px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-200"
             >
               <Play className="w-4 h-4 mr-2" />
-              {isRunning ? "Running..." : "Run Code"}
+              {isRunning ? 'Running...' : 'Run Code'}
             </Button>
 
             <Button
@@ -591,7 +591,7 @@ export default function CodeEditor() {
               className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-0 px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-200"
             >
               <Send className="w-4 h-4 mr-2" />
-              {isSubmitting ? "Submitting..." : "Submit Code"}
+              {isSubmitting ? 'Submitting...' : 'Submit Code'}
             </Button>
           </div>
 
@@ -601,7 +601,7 @@ export default function CodeEditor() {
               <span>Live</span>
             </div>
             <span>•</span>
-            <span>{code.split("\n").length} lines</span>
+            <span>{code.split('\n').length} lines</span>
             <span>•</span>
             <span>{code.length} chars</span>
           </div>

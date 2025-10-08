@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import Editor from "@monaco-editor/react";
-import { useState } from "react";
+import Editor from '@monaco-editor/react';
+import { useState } from 'react';
 
 interface CodeEditorProps {
   language: string;
@@ -16,14 +16,14 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   language,
   value,
   onChange,
-  height = "400px",
-  theme = "vs-dark",
+  height = '400px',
+  theme = 'vs-dark',
   readOnly = false,
 }) => {
   const [isEditorReady, setIsEditorReady] = useState(false);
 
   const handleEditorChange = (value: string | undefined) => {
-    onChange(value || "");
+    onChange(value || '');
   };
 
   const handleEditorDidMount = () => {
@@ -36,14 +36,14 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
     fontSize: 14,
     minimap: { enabled: false },
     scrollBeyondLastLine: false,
-    wordWrap: "on" as const,
-    lineNumbers: "on" as const,
+    wordWrap: 'on' as const,
+    lineNumbers: 'on' as const,
     folding: true,
     selectOnLineNumbers: true,
-    matchBrackets: "always" as const,
-    autoClosingBrackets: "always" as const,
-    autoClosingQuotes: "always" as const,
-    autoIndent: "full" as const,
+    matchBrackets: 'always' as const,
+    autoClosingBrackets: 'always' as const,
+    autoClosingQuotes: 'always' as const,
+    autoIndent: 'full' as const,
     formatOnPaste: true,
     formatOnType: true,
     tabSize: 4,
@@ -63,7 +63,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
       )}
       <Editor
         height={height}
-        language={language === "cpp" ? "cpp" : language}
+        language={language === 'cpp' ? 'cpp' : language}
         value={value}
         onChange={handleEditorChange}
         onMount={handleEditorDidMount}

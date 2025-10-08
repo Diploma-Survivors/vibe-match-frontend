@@ -1,17 +1,20 @@
 // src/app/problems/[id]/submissions/page.tsx
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ProblemSidebar } from "@/components/problem";
+// import SimpleSubmitEditor from "./simple-submit-editor"; // Ensure the file exists or correct the path
+import { TestPageContent } from '@/components/common';
+import { CodeEditor, MonacoSubmitEditor } from '@/components/editor';
+import { ProblemSidebar } from '@/components/problem';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { Problem } from "@/types/problem";
+} from '@/components/ui/select';
+import type { Problem } from '@/types/problem';
 import {
   AlertCircle,
   BarChart3,
@@ -37,14 +40,11 @@ import {
   Timer,
   X,
   XCircle,
-} from "lucide-react";
-import { CodeEditor, MonacoSubmitEditor } from "@/components/editor";
-// import SimpleSubmitEditor from "./simple-submit-editor"; // Ensure the file exists or correct the path
-import { TestPageContent } from "@/components/common";
+} from 'lucide-react';
 
-import { mockProblems } from "@/lib/data/mock-problems";
-import { useParams } from "next/navigation";
-import { useState } from "react";
+import { mockProblems } from '@/lib/data/mock-problems';
+import { useParams } from 'next/navigation';
+import { useState } from 'react';
 
 export default function StatusPage() {
   const params = useParams();
@@ -55,7 +55,7 @@ export default function StatusPage() {
   if (!problem) return null;
 
   // Status tab state
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedSubmissionId, setSelectedSubmissionId] = useState<
     number | null
   >(null);
@@ -65,28 +65,28 @@ export default function StatusPage() {
 
   // Publish Solution Modal state
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-  const [publishTitle, setPublishTitle] = useState("");
-  const [publishDescription, setPublishDescription] = useState("");
+  const [publishTitle, setPublishTitle] = useState('');
+  const [publishDescription, setPublishDescription] = useState('');
   const [isPublishing, setIsPublishing] = useState(false);
 
   // Sample Test Cases state
   const [testCases, setTestCases] = useState([
     {
       id: 1,
-      input: "5",
-      output: "1 1 2 1 4",
+      input: '5',
+      output: '1 1 2 1 4',
       isEditing: false,
     },
     {
       id: 2,
-      input: "10",
-      output: "1 1 2 1 4 2 6 1 6 2",
+      input: '10',
+      output: '1 1 2 1 4 2 6 1 6 2',
       isEditing: false,
     },
     {
       id: 3,
-      input: "3",
-      output: "1 1 2",
+      input: '3',
+      output: '1 1 2',
       isEditing: false,
     },
   ]);
@@ -94,13 +94,13 @@ export default function StatusPage() {
 
   // AI Assistant state
   const [aiMessages, setAiMessages] = useState<
-    Array<{ role: "user" | "ai"; content: string; timestamp: string }>
+    Array<{ role: 'user' | 'ai'; content: string; timestamp: string }>
   >([]);
-  const [aiInput, setAiInput] = useState("");
+  const [aiInput, setAiInput] = useState('');
   const [isAiThinking, setIsAiThinking] = useState(false);
-  const [verdictFilter, setVerdictFilter] = useState("all");
-  const [languageFilter, setLanguageFilter] = useState("all");
-  const [sortOrder, setSortOrder] = useState("newest");
+  const [verdictFilter, setVerdictFilter] = useState('all');
+  const [languageFilter, setLanguageFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('newest');
   const [currentPage, setCurrentPage] = useState(1);
   const submissionsPerPage = 20;
 
@@ -109,10 +109,10 @@ export default function StatusPage() {
       id: number;
       timestamp: string;
       status:
-        | "Accepted"
-        | "Wrong Answer"
-        | "Time Limit Exceeded"
-        | "Runtime Error";
+        | 'Accepted'
+        | 'Wrong Answer'
+        | 'Time Limit Exceeded'
+        | 'Runtime Error';
       runtime: string;
       memory: string;
       score: number;
@@ -123,12 +123,12 @@ export default function StatusPage() {
   const mockUserSubmissions = [
     {
       id: 1001,
-      when: "2025-08-09 14:30:25",
-      verdict: "Accepted",
-      time: "124ms",
-      memory: "2.1MB",
+      when: '2025-08-09 14:30:25',
+      verdict: 'Accepted',
+      time: '124ms',
+      memory: '2.1MB',
       testCase: null,
-      lang: "Python 3.11",
+      lang: 'Python 3.11',
       code: `def euler_phi(n):
       result = n
       p = 2
@@ -145,31 +145,31 @@ export default function StatusPage() {
   n = int(input())
   for i in range(1, n + 1):
       print(euler_phi(i), end=" ")`,
-      result: "All test cases passed successfully",
+      result: 'All test cases passed successfully',
     },
     {
       id: 1002,
-      when: "2025-08-09 14:25:15",
-      verdict: "Wrong Answer",
-      time: "89ms",
-      memory: "1.8MB",
-      testCase: "Failed on test 5",
-      lang: "Python 3.11",
+      when: '2025-08-09 14:25:15',
+      verdict: 'Wrong Answer',
+      time: '89ms',
+      memory: '1.8MB',
+      testCase: 'Failed on test 5',
+      lang: 'Python 3.11',
       code: `n = int(input())
   for i in range(1, n + 1):
       # Wrong implementation
       print(i, end=" ")`,
       result:
-        "Expected output: 1 1 2 1 4 2 6 1 6 2\nActual output: 1 2 3 4 5 6 7 8 9 10",
+        'Expected output: 1 1 2 1 4 2 6 1 6 2\nActual output: 1 2 3 4 5 6 7 8 9 10',
     },
     {
       id: 1003,
-      when: "2025-08-09 14:20:10",
-      verdict: "Time Limit Exceeded",
-      time: "2000ms",
-      memory: "3.2MB",
-      testCase: "Failed on test 12",
-      lang: "Python 3.11",
+      when: '2025-08-09 14:20:10',
+      verdict: 'Time Limit Exceeded',
+      time: '2000ms',
+      memory: '3.2MB',
+      testCase: 'Failed on test 12',
+      lang: 'Python 3.11',
       code: `def euler_phi(n):
       # Inefficient implementation
       count = 0
@@ -186,16 +186,16 @@ export default function StatusPage() {
   n = int(input())
   for i in range(1, n + 1):
       print(euler_phi(i), end=" ")`,
-      result: "Time limit exceeded on test case with large input",
+      result: 'Time limit exceeded on test case with large input',
     },
     {
       id: 1004,
-      when: "2025-08-09 14:15:05",
-      verdict: "Compilation Error",
-      time: "-",
-      memory: "-",
-      testCase: "Syntax error at line 15",
-      lang: "Python 3.11",
+      when: '2025-08-09 14:15:05',
+      verdict: 'Compilation Error',
+      time: '-',
+      memory: '-',
+      testCase: 'Syntax error at line 15',
+      lang: 'Python 3.11',
       code: `def euler_phi(n):
       result = n
       p = 2
@@ -216,12 +216,12 @@ export default function StatusPage() {
     },
     {
       id: 1005,
-      when: "2025-08-09 14:10:00",
-      verdict: "Runtime Error",
-      time: "67ms",
-      memory: "1.8MB",
-      testCase: "Runtime error on test 4",
-      lang: "Python 3.11",
+      when: '2025-08-09 14:10:00',
+      verdict: 'Runtime Error',
+      time: '67ms',
+      memory: '1.8MB',
+      testCase: 'Runtime error on test 4',
+      lang: 'Python 3.11',
       code: `def euler_phi(n):
       result = n
       p = 2
@@ -238,7 +238,7 @@ export default function StatusPage() {
   n = int(input())
   for i in range(1, n + 1):
       print(euler_phi(i), end=" ")`,
-      result: "ZeroDivisionError: integer division or modulo by zero",
+      result: 'ZeroDivisionError: integer division or modulo by zero',
     },
   ];
 
@@ -254,57 +254,57 @@ export default function StatusPage() {
 
   const getRankColor = (rank: string) => {
     switch (rank) {
-      case "newbie":
-        return "text-gray-600";
-      case "pupil":
-        return "text-green-600";
-      case "specialist":
-        return "text-cyan-600";
-      case "expert":
-        return "text-blue-600";
-      case "candidate master":
-        return "text-purple-600";
-      case "master":
-        return "text-orange-600";
-      case "international master":
-        return "text-orange-500";
-      case "grandmaster":
-        return "text-red-600";
+      case 'newbie':
+        return 'text-gray-600';
+      case 'pupil':
+        return 'text-green-600';
+      case 'specialist':
+        return 'text-cyan-600';
+      case 'expert':
+        return 'text-blue-600';
+      case 'candidate master':
+        return 'text-purple-600';
+      case 'master':
+        return 'text-orange-600';
+      case 'international master':
+        return 'text-orange-500';
+      case 'grandmaster':
+        return 'text-red-600';
       default:
-        return "text-gray-600";
+        return 'text-gray-600';
     }
   };
 
   const getVerdictColor = (verdict: string) => {
     switch (verdict) {
-      case "Accepted":
-        return "text-green-600 bg-green-50 dark:bg-green-900/20";
-      case "Wrong Answer":
-        return "text-red-600 bg-red-50 dark:bg-red-900/20";
-      case "Time Limit Exceeded":
-        return "text-orange-600 bg-orange-50 dark:bg-orange-900/20";
-      case "Compilation Error":
-        return "text-gray-600 bg-gray-50 dark:bg-gray-900/20";
-      case "Runtime Error":
-        return "text-purple-600 bg-purple-50 dark:bg-purple-900/20";
-      case "Memory Limit Exceeded":
-        return "text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20";
+      case 'Accepted':
+        return 'text-green-600 bg-green-50 dark:bg-green-900/20';
+      case 'Wrong Answer':
+        return 'text-red-600 bg-red-50 dark:bg-red-900/20';
+      case 'Time Limit Exceeded':
+        return 'text-orange-600 bg-orange-50 dark:bg-orange-900/20';
+      case 'Compilation Error':
+        return 'text-gray-600 bg-gray-50 dark:bg-gray-900/20';
+      case 'Runtime Error':
+        return 'text-purple-600 bg-purple-50 dark:bg-purple-900/20';
+      case 'Memory Limit Exceeded':
+        return 'text-yellow-600 bg-yellow-50 dark:bg-yellow-900/20';
       default:
-        return "text-slate-600 bg-slate-50 dark:bg-slate-900/20";
+        return 'text-slate-600 bg-slate-50 dark:bg-slate-900/20';
     }
   };
 
   const getVerdictIcon = (verdict: string) => {
     switch (verdict) {
-      case "Accepted":
+      case 'Accepted':
         return <CheckCircle className="w-4 h-4" />;
-      case "Wrong Answer":
+      case 'Wrong Answer':
         return <XCircle className="w-4 h-4" />;
-      case "Time Limit Exceeded":
+      case 'Time Limit Exceeded':
         return <Timer className="w-4 h-4" />;
-      case "Compilation Error":
+      case 'Compilation Error':
         return <AlertCircle className="w-4 h-4" />;
-      case "Runtime Error":
+      case 'Runtime Error':
         return <AlertCircle className="w-4 h-4" />;
       default:
         return <AlertCircle className="w-4 h-4" />;
@@ -314,21 +314,21 @@ export default function StatusPage() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [output, setOutput] = useState("");
+  const [output, setOutput] = useState('');
 
   // Filter and sort submissions
   const filteredSubmissions = mockUserSubmissions
     .filter((submission) => {
       const matchesSearch = submission.id.toString().includes(searchTerm);
       const matchesVerdict =
-        verdictFilter === "all" || submission.verdict === verdictFilter;
+        verdictFilter === 'all' || submission.verdict === verdictFilter;
       const matchesLanguage =
-        languageFilter === "all" || submission.lang.includes(languageFilter);
+        languageFilter === 'all' || submission.lang.includes(languageFilter);
 
       return matchesSearch && matchesVerdict && matchesLanguage;
     })
     .sort((a, b) => {
-      if (sortOrder === "newest") {
+      if (sortOrder === 'newest') {
         return new Date(b.when).getTime() - new Date(a.when).getTime();
       }
       return new Date(a.when).getTime() - new Date(b.when).getTime();
@@ -368,12 +368,12 @@ export default function StatusPage() {
 
   const handleRun = async () => {
     setIsRunning(true);
-    setOutput("Running...");
+    setOutput('Running...');
 
     // Simulate code execution
     setTimeout(() => {
       setOutput(
-        "Sample Input: 5\nSample Output: 1 1 2 3 5\n\nExecution time: 0.12s\nMemory used: 2.4 MB\n\n✅ Test passed!"
+        'Sample Input: 5\nSample Output: 1 1 2 3 5\n\nExecution time: 0.12s\nMemory used: 2.4 MB\n\n✅ Test passed!'
       );
       setIsRunning(false);
     }, 2000);
@@ -381,20 +381,20 @@ export default function StatusPage() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    setOutput("Submitting...");
+    setOutput('Submitting...');
 
     // Simulate submission
     setTimeout(() => {
       const statusOptions: Array<
-        "Accepted" | "Wrong Answer" | "Time Limit Exceeded" | "Runtime Error"
-      > = ["Accepted", "Wrong Answer", "Time Limit Exceeded", "Runtime Error"];
+        'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Runtime Error'
+      > = ['Accepted', 'Wrong Answer', 'Time Limit Exceeded', 'Runtime Error'];
       const randomStatus =
         statusOptions[Math.floor(Math.random() * statusOptions.length)];
 
       const newSubmission = {
         id: submissions.length + 1,
         timestamp: new Date().toLocaleString(),
-        status: Math.random() > 0.3 ? ("Accepted" as const) : randomStatus,
+        status: Math.random() > 0.3 ? ('Accepted' as const) : randomStatus,
         runtime: `${(Math.random() * 2).toFixed(2)}s`,
         memory: `${(Math.random() * 50 + 10).toFixed(1)}MB`,
         score: Math.random() > 0.3 ? 100 : Math.floor(Math.random() * 60 + 20),
@@ -409,7 +409,7 @@ export default function StatusPage() {
         }\nScore: ${
           newSubmission.score
         }/100\n\nTest case 1: Passed (0.08s)\nTest case 2: Passed (0.12s)\nTest case 3: ${
-          newSubmission.status === "Accepted" ? "Passed" : "Failed"
+          newSubmission.status === 'Accepted' ? 'Passed' : 'Failed'
         } (0.15s)`
       );
       setIsSubmitting(false);
@@ -419,8 +419,8 @@ export default function StatusPage() {
   // AI Assistant Functions
   const getAiResponse = (question: string): string => {
     if (
-      question.toLowerCase().includes("giải thích") ||
-      question.toLowerCase().includes("thuật toán")
+      question.toLowerCase().includes('giải thích') ||
+      question.toLowerCase().includes('thuật toán')
     ) {
       return `Đây là bài toán về dãy con chẵn lẻ. Thuật toán giải quyết:
   
@@ -435,8 +435,8 @@ export default function StatusPage() {
     }
 
     if (
-      question.toLowerCase().includes("gợi ý") ||
-      question.toLowerCase().includes("code")
+      question.toLowerCase().includes('gợi ý') ||
+      question.toLowerCase().includes('code')
     ) {
       return `Đây là gợi ý code cho bài này:
   
@@ -465,8 +465,8 @@ export default function StatusPage() {
     }
 
     if (
-      question.toLowerCase().includes("tối ưu") ||
-      question.toLowerCase().includes("optimize")
+      question.toLowerCase().includes('tối ưu') ||
+      question.toLowerCase().includes('optimize')
     ) {
       return `Các cách tối ưu hóa solution:
   
@@ -491,8 +491,8 @@ export default function StatusPage() {
     }
 
     if (
-      question.toLowerCase().includes("debug") ||
-      question.toLowerCase().includes("lỗi")
+      question.toLowerCase().includes('debug') ||
+      question.toLowerCase().includes('lỗi')
     ) {
       return `Các lỗi thường gặp và cách debug:
   
@@ -524,19 +524,19 @@ export default function StatusPage() {
     if (!message.trim()) return;
 
     const userMessage = {
-      role: "user" as const,
+      role: 'user' as const,
       content: message,
       timestamp: new Date().toLocaleTimeString(),
     };
 
     setAiMessages((prev) => [...prev, userMessage]);
-    setAiInput("");
+    setAiInput('');
     setIsAiThinking(true);
 
     // Simulate AI thinking time
     setTimeout(() => {
       const aiResponse = {
-        role: "ai" as const,
+        role: 'ai' as const,
         content: getAiResponse(message),
         timestamp: new Date().toLocaleTimeString(),
       };
@@ -548,9 +548,9 @@ export default function StatusPage() {
 
   const handleQuickAction = (action: string) => {
     const messages = {
-      explain: "Hãy giải thích thuật toán cho bài này",
-      hint: "Cho tôi gợi ý code để giải bài này",
-      optimize: "Làm thế nào để tối ưu hóa solution này?",
+      explain: 'Hãy giải thích thuật toán cho bài này',
+      hint: 'Cho tôi gợi ý code để giải bài này',
+      optimize: 'Làm thế nào để tối ưu hóa solution này?',
     };
 
     handleAiMessage(messages[action as keyof typeof messages] || action);
@@ -561,7 +561,7 @@ export default function StatusPage() {
     if (selectedSubmission) {
       setPublishTitle(`Optimal Solution for ${problem.title}`);
       setPublishDescription(
-        "This is my efficient solution that passes all test cases with good performance."
+        'This is my efficient solution that passes all test cases with good performance.'
       );
       setIsPublishModalOpen(true);
     }
@@ -578,23 +578,23 @@ export default function StatusPage() {
     setTimeout(() => {
       setIsPublishing(false);
       setIsPublishModalOpen(false);
-      setPublishTitle("");
-      setPublishDescription("");
+      setPublishTitle('');
+      setPublishDescription('');
       // You could show a success notification here
-      alert("Solution published successfully!");
+      alert('Solution published successfully!');
     }, 2000);
   };
 
   const handlePublishCancel = () => {
     setIsPublishModalOpen(false);
-    setPublishTitle("");
-    setPublishDescription("");
+    setPublishTitle('');
+    setPublishDescription('');
   };
 
   // Test Cases Functions
   const handleTestCaseChange = (
     id: number,
-    field: "input" | "output",
+    field: 'input' | 'output',
     value: string
   ) => {
     setTestCases((prev) =>
@@ -625,8 +625,8 @@ export default function StatusPage() {
   const handleTestCaseAdd = () => {
     const newTestCase = {
       id: Date.now(),
-      input: "",
-      output: "",
+      input: '',
+      output: '',
       isEditing: true,
     };
     setTestCases((prev) => [...prev, newTestCase]);
@@ -741,8 +741,8 @@ export default function StatusPage() {
                         onClick={() => setSelectedSubmissionId(submission.id)}
                         className={`cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors ${
                           selectedSubmissionId === submission.id
-                            ? "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500"
-                            : ""
+                            ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500'
+                            : ''
                         }`}
                       >
                         {/* Status */}
@@ -783,7 +783,7 @@ export default function StatusPage() {
                         {/* Notes */}
                         <td className="px-4 py-4">
                           <div className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[100px]">
-                            {submissionNotes[submission.id] || "No notes"}
+                            {submissionNotes[submission.id] || 'No notes'}
                           </div>
                         </td>
                       </tr>
@@ -831,7 +831,7 @@ export default function StatusPage() {
                     </div>
 
                     {/* Publish Solution Button - Only for Accepted submissions */}
-                    {selectedSubmission.verdict === "Accepted" && (
+                    {selectedSubmission.verdict === 'Accepted' && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -937,7 +937,7 @@ export default function StatusPage() {
                       Notes
                     </h4>
                     <textarea
-                      value={submissionNotes[selectedSubmission.id] || ""}
+                      value={submissionNotes[selectedSubmission.id] || ''}
                       onChange={(e) =>
                         setSubmissionNotes((prev) => ({
                           ...prev,

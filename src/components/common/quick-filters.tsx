@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import type { ProblemFilters } from "@/types/problem";
-import { Filter, X } from "lucide-react";
-import React from "react";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import type { ProblemFilters } from '@/types/problem';
+import { Filter, X } from 'lucide-react';
+import React from 'react';
 
 interface QuickFiltersProps {
   activeFilters: ProblemFilters;
@@ -13,13 +13,13 @@ interface QuickFiltersProps {
 }
 
 const POPULAR_TAGS = [
-  { key: "difficulty", value: "Dễ", label: "Dễ" },
-  { key: "difficulty", value: "Trung bình", label: "Trung bình" },
-  { key: "difficulty", value: "Khó", label: "Khó" },
-  { key: "category", value: "Mảng 1 Chiều Cơ Bản", label: "Mảng cơ bản" },
-  { key: "category", value: "Lý Thuyết Số - Toán Học", label: "Toán học" },
-  { key: "problemType", value: "Cơ bản", label: "Cơ bản" },
-  { key: "problemType", value: "Nâng cao", label: "Nâng cao" },
+  { key: 'difficulty', value: 'Dễ', label: 'Dễ' },
+  { key: 'difficulty', value: 'Trung bình', label: 'Trung bình' },
+  { key: 'difficulty', value: 'Khó', label: 'Khó' },
+  { key: 'category', value: 'Mảng 1 Chiều Cơ Bản', label: 'Mảng cơ bản' },
+  { key: 'category', value: 'Lý Thuyết Số - Toán Học', label: 'Toán học' },
+  { key: 'problemType', value: 'Cơ bản', label: 'Cơ bản' },
+  { key: 'problemType', value: 'Nâng cao', label: 'Nâng cao' },
 ];
 
 export default function QuickFilters({
@@ -33,17 +33,17 @@ export default function QuickFilters({
 
   const getFilterLabel = (key: keyof ProblemFilters, value: string) => {
     switch (key) {
-      case "id":
+      case 'id':
         return `ID: ${value}`;
-      case "title":
+      case 'title':
         return `Tên: ${value}`;
-      case "difficulty":
+      case 'difficulty':
         return `Độ khó: ${value}`;
-      case "subject":
+      case 'subject':
         return `Môn: ${value}`;
-      case "chapter":
+      case 'chapter':
         return `Chương: ${value}`;
-      case "problemType":
+      case 'problemType':
         return `Loại: ${value}`;
       default:
         return value;
@@ -64,7 +64,7 @@ export default function QuickFilters({
       <div className="flex flex-wrap gap-3 items-center">
         {/* Active Filters */}
         {Object.entries(activeFilters).map(([key, value]) => {
-          if (!value || value.trim() === "") return null;
+          if (!value || value.trim() === '') return null;
           return (
             <div
               key={key}

@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   ArrowLeft,
   CheckCircle,
   Code,
   FileText,
+  Lightbulb,
   TestTube,
   Trophy,
-  Lightbulb,
-} from "lucide-react";
-import Link from "next/link";
+} from 'lucide-react';
+import Link from 'next/link';
 
 interface ProblemNavbarProps {
   activeTab: string;
@@ -19,12 +19,12 @@ interface ProblemNavbarProps {
 }
 
 const navItems = [
-  { id: "problem", label: "Problem", icon: FileText },
-  { id: "submit", label: "Submit", icon: Code },
-  { id: "submissions", label: "Submissions", icon: CheckCircle },
-  { id: "solutions", label: "Solutions", icon: Lightbulb },
-  { id: "standing", label: "Standing", icon: Trophy },
-  { id: "test", label: "Test", icon: TestTube },
+  { id: 'problem', label: 'Problem', icon: FileText },
+  { id: 'submit', label: 'Submit', icon: Code },
+  { id: 'submissions', label: 'Submissions', icon: CheckCircle },
+  { id: 'solutions', label: 'Solutions', icon: Lightbulb },
+  { id: 'standing', label: 'Standing', icon: Trophy },
+  { id: 'test', label: 'Test', icon: TestTube },
 ];
 
 export default function ProblemNavbar({
@@ -49,7 +49,7 @@ export default function ProblemNavbar({
               </Button>
             </Link>
           )}
-          
+
           {/* If hideNavigation is true, render an empty div to maintain layout */}
           {hideNavigation && <div className="w-20" />}
 
@@ -62,13 +62,13 @@ export default function ProblemNavbar({
               return (
                 <Button
                   key={item.id}
-                  variant={isActive ? "default" : "ghost"}
+                  variant={isActive ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => onTabChange(item.id)}
                   className={`gap-2 transition-all duration-200 ${
                     isActive
-                      ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg"
-                      : "text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400"
+                      ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
+                      : 'text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400'
                   }`}
                 >
                   <IconComponent className="w-4 h-4" />

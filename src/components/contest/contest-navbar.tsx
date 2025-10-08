@@ -1,14 +1,14 @@
-"use client";
-import { Button } from "@/components/ui/button";
+'use client';
+import { Button } from '@/components/ui/button';
+import type { Contest } from '@/types/contest';
 import {
   ArrowLeft,
-  Info,
   BarChart2,
+  Info,
   ListOrdered,
   UserPlus,
-} from "lucide-react";
-import Link from "next/link";
-import type { Contest } from "@/types/contest";
+} from 'lucide-react';
+import Link from 'next/link';
 
 interface ContestNavbarProps {
   contest: Contest;
@@ -17,10 +17,10 @@ interface ContestNavbarProps {
 }
 
 const navItems = [
-  { id: "info", label: "Thông tin", icon: Info },
-  { id: "stats", label: "Thống kê", icon: BarChart2 },
-  { id: "ranking", label: "Bảng xếp hạng", icon: ListOrdered },
-  { id: "join", label: "Tham gia", icon: UserPlus },
+  { id: 'info', label: 'Thông tin', icon: Info },
+  { id: 'stats', label: 'Thống kê', icon: BarChart2 },
+  { id: 'ranking', label: 'Bảng xếp hạng', icon: ListOrdered },
+  { id: 'join', label: 'Tham gia', icon: UserPlus },
 ];
 
 export default function ContestNavbar({
@@ -49,10 +49,10 @@ export default function ContestNavbar({
               return (
                 <Button
                   key={item.id}
-                  variant={isActive ? "default" : "ghost"}
+                  variant={isActive ? 'default' : 'ghost'}
                   size="sm"
                   onClick={() => onTabChange(item.id)}
-                  className={`gap-2 transition-all ${isActive ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg" : "text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400"}`}
+                  className={`gap-2 transition-all ${isActive ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg' : 'text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400'}`}
                 >
                   <Icon className="w-4 h-4" />
                   {item.label}

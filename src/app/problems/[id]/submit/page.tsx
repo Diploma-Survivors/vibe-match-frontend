@@ -1,12 +1,10 @@
 // src/app/problems/[id]/submit/page.tsx
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { MonacoSubmitEditor } from "@/components/editor";
-import { mockProblems } from "@/lib/data/mock-problems";
-import { useParams } from "next/navigation";
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
+import { MonacoSubmitEditor } from '@/components/editor';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { mockProblems } from '@/lib/data/mock-problems';
 import {
   AlertCircle,
   BarChart3,
@@ -32,14 +30,16 @@ import {
   Timer,
   X,
   XCircle,
-} from "lucide-react";
+} from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { useState } from 'react';
 
 export default function SubmitPage() {
   const params = useParams();
   const problemId = params.id as string;
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [output, setOutput] = useState("");
+  const [output, setOutput] = useState('');
 
   const problem = mockProblems.find((p) => p.id === problemId);
   const [activeTestCase, setActiveTestCase] = useState(0);
@@ -49,10 +49,10 @@ export default function SubmitPage() {
       id: number;
       timestamp: string;
       status:
-        | "Accepted"
-        | "Wrong Answer"
-        | "Time Limit Exceeded"
-        | "Runtime Error";
+        | 'Accepted'
+        | 'Wrong Answer'
+        | 'Time Limit Exceeded'
+        | 'Runtime Error';
       runtime: string;
       memory: string;
       score: number;
@@ -62,8 +62,8 @@ export default function SubmitPage() {
   // AI Assistant Functions
   const getAiResponse = (question: string): string => {
     if (
-      question.toLowerCase().includes("giải thích") ||
-      question.toLowerCase().includes("thuật toán")
+      question.toLowerCase().includes('giải thích') ||
+      question.toLowerCase().includes('thuật toán')
     ) {
       return `Đây là bài toán về dãy con chẵn lẻ. Thuật toán giải quyết:
     
@@ -78,8 +78,8 @@ export default function SubmitPage() {
     }
 
     if (
-      question.toLowerCase().includes("gợi ý") ||
-      question.toLowerCase().includes("code")
+      question.toLowerCase().includes('gợi ý') ||
+      question.toLowerCase().includes('code')
     ) {
       return `Đây là gợi ý code cho bài này:
     
@@ -108,8 +108,8 @@ export default function SubmitPage() {
     }
 
     if (
-      question.toLowerCase().includes("tối ưu") ||
-      question.toLowerCase().includes("optimize")
+      question.toLowerCase().includes('tối ưu') ||
+      question.toLowerCase().includes('optimize')
     ) {
       return `Các cách tối ưu hóa solution:
     
@@ -134,8 +134,8 @@ export default function SubmitPage() {
     }
 
     if (
-      question.toLowerCase().includes("debug") ||
-      question.toLowerCase().includes("lỗi")
+      question.toLowerCase().includes('debug') ||
+      question.toLowerCase().includes('lỗi')
     ) {
       return `Các lỗi thường gặp và cách debug:
     
@@ -165,9 +165,9 @@ export default function SubmitPage() {
 
   const handleQuickAction = (action: string) => {
     const messages = {
-      explain: "Hãy giải thích thuật toán cho bài này",
-      hint: "Cho tôi gợi ý code để giải bài này",
-      optimize: "Làm thế nào để tối ưu hóa solution này?",
+      explain: 'Hãy giải thích thuật toán cho bài này',
+      hint: 'Cho tôi gợi ý code để giải bài này',
+      optimize: 'Làm thế nào để tối ưu hóa solution này?',
     };
 
     handleAiMessage(messages[action as keyof typeof messages] || action);
@@ -175,21 +175,21 @@ export default function SubmitPage() {
 
   // AI Assistant state
   const [aiMessages, setAiMessages] = useState<
-    Array<{ role: "user" | "ai"; content: string; timestamp: string }>
+    Array<{ role: 'user' | 'ai'; content: string; timestamp: string }>
   >([]);
-  const [aiInput, setAiInput] = useState("");
+  const [aiInput, setAiInput] = useState('');
   const [isAiThinking, setIsAiThinking] = useState(false);
-  const [verdictFilter, setVerdictFilter] = useState("all");
-  const [languageFilter, setLanguageFilter] = useState("all");
-  const [sortOrder, setSortOrder] = useState("newest");
+  const [verdictFilter, setVerdictFilter] = useState('all');
+  const [languageFilter, setLanguageFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('newest');
   const [currentPage, setCurrentPage] = useState(1);
   const submissionsPerPage = 20;
 
   const handleTestCaseAdd = () => {
     const newTestCase = {
       id: Date.now(),
-      input: "",
-      output: "",
+      input: '',
+      output: '',
       isEditing: true,
     };
     setTestCases((prev) => [...prev, newTestCase]);
@@ -200,19 +200,19 @@ export default function SubmitPage() {
     if (!message.trim()) return;
 
     const userMessage = {
-      role: "user" as const,
+      role: 'user' as const,
       content: message,
       timestamp: new Date().toLocaleTimeString(),
     };
 
     setAiMessages((prev) => [...prev, userMessage]);
-    setAiInput("");
+    setAiInput('');
     setIsAiThinking(true);
 
     // Simulate AI thinking time
     setTimeout(() => {
       const aiResponse = {
-        role: "ai" as const,
+        role: 'ai' as const,
         content: getAiResponse(message),
         timestamp: new Date().toLocaleTimeString(),
       };
@@ -230,7 +230,7 @@ export default function SubmitPage() {
   // Test Cases Functions
   const handleTestCaseChange = (
     id: number,
-    field: "input" | "output",
+    field: 'input' | 'output',
     value: string
   ) => {
     setTestCases((prev) =>
@@ -262,20 +262,20 @@ export default function SubmitPage() {
   const [testCases, setTestCases] = useState([
     {
       id: 1,
-      input: "5",
-      output: "1 1 2 1 4",
+      input: '5',
+      output: '1 1 2 1 4',
       isEditing: false,
     },
     {
       id: 2,
-      input: "10",
-      output: "1 1 2 1 4 2 6 1 6 2",
+      input: '10',
+      output: '1 1 2 1 4 2 6 1 6 2',
       isEditing: false,
     },
     {
       id: 3,
-      input: "3",
-      output: "1 1 2",
+      input: '3',
+      output: '1 1 2',
       isEditing: false,
     },
   ]);
@@ -284,11 +284,11 @@ export default function SubmitPage() {
 
   const handleRun = async () => {
     setIsRunning(true);
-    setOutput("Running...");
+    setOutput('Running...');
 
     setTimeout(() => {
       setOutput(
-        "Sample Input: 5\\nSample Output: 1 1 2 3 5\\n\\nExecution time: 0.12s\\nMemory used: 2.4 MB\\n\\n✅ Test passed!"
+        'Sample Input: 5\\nSample Output: 1 1 2 3 5\\n\\nExecution time: 0.12s\\nMemory used: 2.4 MB\\n\\n✅ Test passed!'
       );
       setIsRunning(false);
     }, 2000);
@@ -296,20 +296,20 @@ export default function SubmitPage() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    setOutput("Submitting...");
+    setOutput('Submitting...');
 
     // Simulate submission
     setTimeout(() => {
       const statusOptions: Array<
-        "Accepted" | "Wrong Answer" | "Time Limit Exceeded" | "Runtime Error"
-      > = ["Accepted", "Wrong Answer", "Time Limit Exceeded", "Runtime Error"];
+        'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Runtime Error'
+      > = ['Accepted', 'Wrong Answer', 'Time Limit Exceeded', 'Runtime Error'];
       const randomStatus =
         statusOptions[Math.floor(Math.random() * statusOptions.length)];
 
       const newSubmission = {
         id: submissions.length + 1,
         timestamp: new Date().toLocaleString(),
-        status: Math.random() > 0.3 ? ("Accepted" as const) : randomStatus,
+        status: Math.random() > 0.3 ? ('Accepted' as const) : randomStatus,
         runtime: `${(Math.random() * 2).toFixed(2)}s`,
         memory: `${(Math.random() * 50 + 10).toFixed(1)}MB`,
         score: Math.random() > 0.3 ? 100 : Math.floor(Math.random() * 60 + 20),
@@ -324,7 +324,7 @@ export default function SubmitPage() {
         }\nScore: ${
           newSubmission.score
         }/100\n\nTest case 1: Passed (0.08s)\nTest case 2: Passed (0.12s)\nTest case 3: ${
-          newSubmission.status === "Accepted" ? "Passed" : "Failed"
+          newSubmission.status === 'Accepted' ? 'Passed' : 'Failed'
         } (0.15s)`
       );
       setIsSubmitting(false);
@@ -416,8 +416,8 @@ export default function SubmitPage() {
                       onClick={() => setActiveTestCase(index)}
                       className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                         activeTestCase === index
-                          ? "bg-blue-500 text-white shadow-md"
-                          : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
+                          ? 'bg-blue-500 text-white shadow-md'
+                          : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
                       }`}
                     >
                       Case {index + 1}
@@ -462,7 +462,7 @@ export default function SubmitPage() {
                             onChange={(e) =>
                               handleTestCaseChange(
                                 testCases[activeTestCase].id,
-                                "input",
+                                'input',
                                 e.target.value
                               )
                             }
@@ -506,7 +506,7 @@ export default function SubmitPage() {
                           </div>
                           <pre className="text-sm font-mono text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
                             {testCases[activeTestCase].input ||
-                              "Enter input..."}
+                              'Enter input...'}
                           </pre>
                         </div>
                       )}
@@ -524,7 +524,7 @@ export default function SubmitPage() {
                           onChange={(e) =>
                             handleTestCaseChange(
                               testCases[activeTestCase].id,
-                              "output",
+                              'output',
                               e.target.value
                             )
                           }
@@ -546,7 +546,7 @@ export default function SubmitPage() {
                           </div>
                           <pre className="text-sm font-mono text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
                             {testCases[activeTestCase].output ||
-                              "Enter expected output..."}
+                              'Enter expected output...'}
                           </pre>
                         </div>
                       )}
@@ -642,17 +642,17 @@ export default function SubmitPage() {
                       <div
                         key={message.timestamp}
                         className={`flex items-start gap-3 ${
-                          message.role === "user" ? "flex-row-reverse" : ""
+                          message.role === 'user' ? 'flex-row-reverse' : ''
                         }`}
                       >
                         <div
                           className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                            message.role === "user"
-                              ? "bg-gradient-to-br from-blue-500 to-blue-600"
-                              : "bg-gradient-to-br from-purple-500 to-pink-600"
+                            message.role === 'user'
+                              ? 'bg-gradient-to-br from-blue-500 to-blue-600'
+                              : 'bg-gradient-to-br from-purple-500 to-pink-600'
                           }`}
                         >
-                          {message.role === "user" ? (
+                          {message.role === 'user' ? (
                             <div className="w-3 h-3 bg-white rounded-full" />
                           ) : (
                             <Bot className="w-3 h-3 text-white" />
@@ -660,9 +660,9 @@ export default function SubmitPage() {
                         </div>
                         <div
                           className={`bg-white/80 dark:bg-slate-800/80 rounded-lg p-4 shadow-sm max-w-[90%] ${
-                            message.role === "user"
-                              ? "bg-blue-50 dark:bg-blue-900/20"
-                              : ""
+                            message.role === 'user'
+                              ? 'bg-blue-50 dark:bg-blue-900/20'
+                              : ''
                           }`}
                         >
                           <div className="text-sm text-slate-700 dark:text-slate-300 whitespace-pre-wrap leading-relaxed">
@@ -686,11 +686,11 @@ export default function SubmitPage() {
                             <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" />
                             <div
                               className="w-2 h-2 bg-purple-500 rounded-full animate-bounce"
-                              style={{ animationDelay: "0.1s" }}
+                              style={{ animationDelay: '0.1s' }}
                             />
                             <div
                               className="w-2 h-2 bg-purple-500 rounded-full animate-bounce"
-                              style={{ animationDelay: "0.2s" }}
+                              style={{ animationDelay: '0.2s' }}
                             />
                             <span className="text-xs text-slate-600 dark:text-slate-400 ml-2">
                               AI đang suy nghĩ...
@@ -709,7 +709,7 @@ export default function SubmitPage() {
                       value={aiInput}
                       onChange={(e) => setAiInput(e.target.value)}
                       onKeyPress={(e) => {
-                        if (e.key === "Enter") {
+                        if (e.key === 'Enter') {
                           handleAiMessage(aiInput);
                         }
                       }}
@@ -732,7 +732,7 @@ export default function SubmitPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleQuickAction("explain")}
+                      onClick={() => handleQuickAction('explain')}
                       disabled={isAiThinking}
                       className="text-xs bg-white/60 dark:bg-slate-800/60 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 disabled:opacity-50"
                     >
@@ -742,7 +742,7 @@ export default function SubmitPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleQuickAction("hint")}
+                      onClick={() => handleQuickAction('hint')}
                       disabled={isAiThinking}
                       className="text-xs bg-white/60 dark:bg-slate-800/60 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 disabled:opacity-50"
                     >
@@ -752,7 +752,7 @@ export default function SubmitPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => handleQuickAction("optimize")}
+                      onClick={() => handleQuickAction('optimize')}
                       disabled={isAiThinking}
                       className="text-xs bg-white/60 dark:bg-slate-800/60 border-purple-200 dark:border-purple-700 text-purple-700 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/20 disabled:opacity-50"
                     >
@@ -798,20 +798,20 @@ export default function SubmitPage() {
                           </span>
                           <div
                             className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                              submission.status === "Accepted"
-                                ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                                : submission.status === "Wrong Answer"
-                                  ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
-                                  : submission.status === "Time Limit Exceeded"
-                                    ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-                                    : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
+                              submission.status === 'Accepted'
+                                ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                : submission.status === 'Wrong Answer'
+                                  ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                  : submission.status === 'Time Limit Exceeded'
+                                    ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
                             }`}
                           >
-                            {submission.status === "Accepted" ? (
+                            {submission.status === 'Accepted' ? (
                               <CheckCircle className="w-3 h-3" />
-                            ) : submission.status === "Wrong Answer" ? (
+                            ) : submission.status === 'Wrong Answer' ? (
                               <XCircle className="w-3 h-3" />
-                            ) : submission.status === "Time Limit Exceeded" ? (
+                            ) : submission.status === 'Time Limit Exceeded' ? (
                               <Clock className="w-3 h-3" />
                             ) : (
                               <AlertCircle className="w-3 h-3" />

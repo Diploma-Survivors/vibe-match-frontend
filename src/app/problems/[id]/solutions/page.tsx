@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import type { Problem, Solution } from "@/types/problem";
+} from '@/components/ui/select';
+import type { Problem, Solution } from '@/types/problem';
 import {
   AlertCircle,
   BarChart3,
@@ -41,23 +41,23 @@ import {
   User,
   X,
   XCircle,
-} from "lucide-react";
-import { useState } from "react";
+} from 'lucide-react';
+import { useState } from 'react';
 
 export default function ProblemSolutionsPage() {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [output, setOutput] = useState("");
+  const [output, setOutput] = useState('');
   const [submissions, setSubmissions] = useState<
     Array<{
       id: number;
       timestamp: string;
       status:
-        | "Accepted"
-        | "Wrong Answer"
-        | "Time Limit Exceeded"
-        | "Runtime Error";
+        | 'Accepted'
+        | 'Wrong Answer'
+        | 'Time Limit Exceeded'
+        | 'Runtime Error';
       runtime: string;
       memory: string;
       score: number;
@@ -68,21 +68,21 @@ export default function ProblemSolutionsPage() {
   const [selectedSolution, setSelectedSolution] = useState<Solution | null>(
     null
   );
-  const [solutionSearchTerm, setSolutionSearchTerm] = useState("");
-  const [solutionLanguageFilter, setSolutionLanguageFilter] = useState("all");
-  const [solutionSortOrder, setSolutionSortOrder] = useState("popular");
+  const [solutionSearchTerm, setSolutionSearchTerm] = useState('');
+  const [solutionLanguageFilter, setSolutionLanguageFilter] = useState('all');
+  const [solutionSortOrder, setSolutionSortOrder] = useState('popular');
 
   // Mock solutions data
   const mockSolutions: Solution[] = [
     {
-      id: "sol-1",
+      id: 'sol-1',
       title: "Efficient Euler's Totient Function using Sieve",
       description:
         "This solution uses the sieve approach to calculate Euler's totient function for all numbers from 1 to N efficiently. Time complexity: O(N log log N), which is much better than the naive O(N√N) approach.",
       author: {
-        name: "AlgorithmMaster",
-        level: "Expert",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=expert1",
+        name: 'AlgorithmMaster',
+        level: 'Expert',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=expert1',
       },
       code: `def sieve_euler_phi(n):
       phi = list(range(n + 1))
@@ -97,24 +97,24 @@ export default function ProblemSolutionsPage() {
   for i in range(1, n + 1):
       print(phi[i], end=" " if i < n else "")
   print()`,
-      language: "Python 3.11",
-      runtime: "124ms",
-      memory: "2.1MB",
+      language: 'Python 3.11',
+      runtime: '124ms',
+      memory: '2.1MB',
       views: 1247,
       supports: 89,
       comments: 23,
-      createdAt: "2025-01-15T10:30:00Z",
-      tags: ["sieve", "number-theory", "optimization"],
+      createdAt: '2025-01-15T10:30:00Z',
+      tags: ['sieve', 'number-theory', 'optimization'],
     },
     {
-      id: "sol-2",
-      title: "Clean Mathematical Approach",
+      id: 'sol-2',
+      title: 'Clean Mathematical Approach',
       description:
         "A straightforward implementation using the mathematical definition of Euler's totient function. Easy to understand and implement, perfect for learning the concept.",
       author: {
-        name: "MathGenius",
-        level: "Advanced",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=math1",
+        name: 'MathGenius',
+        level: 'Advanced',
+        avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=math1',
       },
       code: `def euler_phi(n):
       result = n
@@ -133,14 +133,14 @@ export default function ProblemSolutionsPage() {
   for i in range(1, n + 1):
       print(euler_phi(i), end=" " if i < n else "")
   print()`,
-      language: "Python 3.11",
-      runtime: "298ms",
-      memory: "1.8MB",
+      language: 'Python 3.11',
+      runtime: '298ms',
+      memory: '1.8MB',
       views: 892,
       supports: 67,
       comments: 15,
-      createdAt: "2025-01-14T15:45:00Z",
-      tags: ["math", "basic", "educational"],
+      createdAt: '2025-01-14T15:45:00Z',
+      tags: ['math', 'basic', 'educational'],
     },
   ];
 
@@ -159,7 +159,7 @@ export default function ProblemSolutionsPage() {
           .includes(solutionSearchTerm.toLowerCase());
 
       const matchesLanguage =
-        solutionLanguageFilter === "all" ||
+        solutionLanguageFilter === 'all' ||
         solution.language
           .toLowerCase()
           .includes(solutionLanguageFilter.toLowerCase());
@@ -168,15 +168,15 @@ export default function ProblemSolutionsPage() {
     })
     .sort((a, b) => {
       switch (solutionSortOrder) {
-        case "popular":
+        case 'popular':
           return b.supports + b.views * 0.1 - (a.supports + a.views * 0.1);
-        case "newest":
+        case 'newest':
           return (
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           );
-        case "views":
+        case 'views':
           return b.views - a.views;
-        case "supports":
+        case 'supports':
           return b.supports - a.supports;
         default:
           return 0;
@@ -190,16 +190,16 @@ export default function ProblemSolutionsPage() {
 
   const getAuthorLevelColor = (level: string) => {
     switch (level.toLowerCase()) {
-      case "expert":
-        return "text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30";
-      case "advanced":
-        return "text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30";
-      case "intermediate":
-        return "text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30";
-      case "beginner":
-        return "text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30";
+      case 'expert':
+        return 'text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30';
+      case 'advanced':
+        return 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30';
+      case 'intermediate':
+        return 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30';
+      case 'beginner':
+        return 'text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30';
       default:
-        return "text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-900/30";
+        return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-900/30';
     }
   };
 
@@ -209,8 +209,8 @@ export default function ProblemSolutionsPage() {
     const diffInMs = now.getTime() - date.getTime();
     const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
-    if (diffInDays === 0) return "Today";
-    if (diffInDays === 1) return "Yesterday";
+    if (diffInDays === 0) return 'Today';
+    if (diffInDays === 1) return 'Yesterday';
     if (diffInDays < 7) return `${diffInDays} days ago`;
     if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
     return `${Math.floor(diffInDays / 30)} months ago`;
@@ -224,11 +224,11 @@ export default function ProblemSolutionsPage() {
 
   const handleRun = async () => {
     setIsRunning(true);
-    setOutput("Running...");
+    setOutput('Running...');
 
     setTimeout(() => {
       setOutput(
-        "Sample Input: 5\nSample Output: 1 1 2 1 4\n\nExecution time: 0.12s\nMemory used: 2.4 MB\n\n✅ Test passed!"
+        'Sample Input: 5\nSample Output: 1 1 2 1 4\n\nExecution time: 0.12s\nMemory used: 2.4 MB\n\n✅ Test passed!'
       );
       setIsRunning(false);
     }, 2000);
@@ -236,19 +236,19 @@ export default function ProblemSolutionsPage() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    setOutput("Submitting...");
+    setOutput('Submitting...');
 
     setTimeout(() => {
       const statusOptions: Array<
-        "Accepted" | "Wrong Answer" | "Time Limit Exceeded" | "Runtime Error"
-      > = ["Accepted", "Wrong Answer", "Time Limit Exceeded", "Runtime Error"];
+        'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Runtime Error'
+      > = ['Accepted', 'Wrong Answer', 'Time Limit Exceeded', 'Runtime Error'];
       const randomStatus =
         statusOptions[Math.floor(Math.random() * statusOptions.length)];
 
       const newSubmission = {
         id: submissions.length + 1,
         timestamp: new Date().toLocaleString(),
-        status: Math.random() > 0.3 ? ("Accepted" as const) : randomStatus,
+        status: Math.random() > 0.3 ? ('Accepted' as const) : randomStatus,
         runtime: `${(Math.random() * 2).toFixed(2)}s`,
         memory: `${(Math.random() * 50 + 10).toFixed(1)}MB`,
         score: Math.random() > 0.3 ? 100 : Math.floor(Math.random() * 60 + 20),
@@ -362,8 +362,8 @@ export default function ProblemSolutionsPage() {
                         onClick={() => setSelectedSolution(solution)}
                         className={`p-4 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors ${
                           selectedSolution?.id === solution.id
-                            ? "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500"
-                            : ""
+                            ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500'
+                            : ''
                         }`}
                       >
                         <div className="flex items-center gap-3 mb-3">
@@ -615,7 +615,7 @@ export default function ProblemSolutionsPage() {
                       >
                         <Copy className="w-3 h-3 mr-1" />
 
-                        {copiedIndex === -2 ? "Copied!" : "Copy Code"}
+                        {copiedIndex === -2 ? 'Copied!' : 'Copy Code'}
                       </Button>
                     </div>
 

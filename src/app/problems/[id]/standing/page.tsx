@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ProblemSidebar } from "@/components/problem";
+import { ProblemSidebar } from '@/components/problem';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { Problem } from "@/types/problem";
+} from '@/components/ui/select';
+import type { Problem } from '@/types/problem';
 import {
   AlertCircle,
   BarChart3,
@@ -36,8 +36,8 @@ import {
   Timer,
   X,
   XCircle,
-} from "lucide-react";
-import { useState } from "react";
+} from 'lucide-react';
+import { useState } from 'react';
 
 export default function ProblemStandingPage() {
   return (
@@ -211,91 +211,91 @@ export default function ProblemStandingPage() {
                     {[
                       {
                         rank: 1,
-                        user: "CodeMaster2024",
-                        level: "Expert",
-                        avatar: "champion1",
-                        lang: "C++17",
-                        runtime: "47ms",
-                        memory: "1.2MB",
-                        time: "2 hours ago",
-                        badge: "🥇",
+                        user: 'CodeMaster2024',
+                        level: 'Expert',
+                        avatar: 'champion1',
+                        lang: 'C++17',
+                        runtime: '47ms',
+                        memory: '1.2MB',
+                        time: '2 hours ago',
+                        badge: '🥇',
                       },
                       {
                         rank: 2,
-                        user: "AlgoNinja",
-                        level: "Advanced",
-                        avatar: "runner1",
-                        lang: "Python 3",
-                        runtime: "52ms",
-                        memory: "1.3MB",
-                        time: "3 hours ago",
-                        badge: "🥈",
+                        user: 'AlgoNinja',
+                        level: 'Advanced',
+                        avatar: 'runner1',
+                        lang: 'Python 3',
+                        runtime: '52ms',
+                        memory: '1.3MB',
+                        time: '3 hours ago',
+                        badge: '🥈',
                       },
                       {
                         rank: 3,
-                        user: "PyThonista",
-                        level: "Advanced",
-                        avatar: "runner2",
-                        lang: "Java 17",
-                        runtime: "61ms",
-                        memory: "1.4MB",
-                        time: "5 hours ago",
-                        badge: "🥉",
+                        user: 'PyThonista',
+                        level: 'Advanced',
+                        avatar: 'runner2',
+                        lang: 'Java 17',
+                        runtime: '61ms',
+                        memory: '1.4MB',
+                        time: '5 hours ago',
+                        badge: '🥉',
                       },
                       {
                         rank: 4,
-                        user: "DevGuru",
-                        level: "Intermediate",
-                        avatar: "user4",
-                        lang: "TypeScript",
-                        runtime: "73ms",
-                        memory: "1.5MB",
-                        time: "6 hours ago",
-                        badge: "🔥",
+                        user: 'DevGuru',
+                        level: 'Intermediate',
+                        avatar: 'user4',
+                        lang: 'TypeScript',
+                        runtime: '73ms',
+                        memory: '1.5MB',
+                        time: '6 hours ago',
+                        badge: '🔥',
                       },
                       {
                         rank: 5,
-                        user: "CodeNinja99",
-                        level: "Intermediate",
-                        avatar: "user5",
-                        lang: "C++17",
-                        runtime: "89ms",
-                        memory: "1.6MB",
-                        time: "8 hours ago",
-                        badge: "⚡",
+                        user: 'CodeNinja99',
+                        level: 'Intermediate',
+                        avatar: 'user5',
+                        lang: 'C++17',
+                        runtime: '89ms',
+                        memory: '1.6MB',
+                        time: '8 hours ago',
+                        badge: '⚡',
                       },
                       {
                         rank: 6,
-                        user: "FastCoder",
-                        level: "Beginner",
-                        avatar: "user6",
-                        lang: "Python 3",
-                        runtime: "94ms",
-                        memory: "1.7MB",
-                        time: "1 day ago",
-                        badge: "💪",
+                        user: 'FastCoder',
+                        level: 'Beginner',
+                        avatar: 'user6',
+                        lang: 'Python 3',
+                        runtime: '94ms',
+                        memory: '1.7MB',
+                        time: '1 day ago',
+                        badge: '💪',
                       },
                       {
                         rank: 7,
-                        user: "QuickSolver",
-                        level: "Beginner",
-                        avatar: "user7",
-                        lang: "JavaScript",
-                        runtime: "108ms",
-                        memory: "1.8MB",
-                        time: "1 day ago",
-                        badge: "🚀",
+                        user: 'QuickSolver',
+                        level: 'Beginner',
+                        avatar: 'user7',
+                        lang: 'JavaScript',
+                        runtime: '108ms',
+                        memory: '1.8MB',
+                        time: '1 day ago',
+                        badge: '🚀',
                       },
                       {
                         rank: 8,
-                        user: "BugHunter",
-                        level: "Intermediate",
-                        avatar: "user8",
-                        lang: "C# 10",
-                        runtime: "115ms",
-                        memory: "1.9MB",
-                        time: "2 days ago",
-                        badge: "🎯",
+                        user: 'BugHunter',
+                        level: 'Intermediate',
+                        avatar: 'user8',
+                        lang: 'C# 10',
+                        runtime: '115ms',
+                        memory: '1.9MB',
+                        time: '2 days ago',
+                        badge: '🎯',
                       },
                     ].map((entry) => (
                       <tr
@@ -323,13 +323,13 @@ export default function ProblemStandingPage() {
                               </div>
                               <div
                                 className={`text-xs ${
-                                  entry.level === "Expert"
-                                    ? "text-purple-600 dark:text-purple-400"
-                                    : entry.level === "Advanced"
-                                      ? "text-blue-600 dark:text-blue-400"
-                                      : entry.level === "Intermediate"
-                                        ? "text-green-600 dark:text-green-400"
-                                        : "text-yellow-600 dark:text-yellow-400"
+                                  entry.level === 'Expert'
+                                    ? 'text-purple-600 dark:text-purple-400'
+                                    : entry.level === 'Advanced'
+                                      ? 'text-blue-600 dark:text-blue-400'
+                                      : entry.level === 'Intermediate'
+                                        ? 'text-green-600 dark:text-green-400'
+                                        : 'text-yellow-600 dark:text-yellow-400'
                                 }`}
                               >
                                 {entry.level}
@@ -340,16 +340,16 @@ export default function ProblemStandingPage() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              entry.lang.includes("C++")
-                                ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300"
-                                : entry.lang.includes("Python")
-                                  ? "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300"
-                                  : entry.lang.includes("Java")
-                                    ? "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300"
-                                    : entry.lang.includes("JavaScript") ||
-                                        entry.lang.includes("TypeScript")
-                                      ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
-                                      : "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
+                              entry.lang.includes('C++')
+                                ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                                : entry.lang.includes('Python')
+                                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                                  : entry.lang.includes('Java')
+                                    ? 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300'
+                                    : entry.lang.includes('JavaScript') ||
+                                        entry.lang.includes('TypeScript')
+                                      ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
+                                      : 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
                             }`}
                           >
                             {entry.lang}

@@ -1,13 +1,13 @@
-"use client";
-import { useParams } from "next/navigation";
+'use client';
 import {
+  Award,
   BarChart3,
+  Clock,
   PieChart,
   TrendingUp,
   Users,
-  Clock,
-  Award,
-} from "lucide-react";
+} from 'lucide-react';
+import { useParams } from 'next/navigation';
 
 export default function ContestStatsPage() {
   const params = useParams();
@@ -16,78 +16,78 @@ export default function ContestStatsPage() {
   const stats = {
     submissions: 15426,
     solvedProblems: 8432,
-    averageTime: "45:32",
+    averageTime: '45:32',
     topScore: 4850,
     languages: [
-      { name: "C++", count: 8942, percentage: 58, color: "bg-blue-500" },
-      { name: "Python", count: 4231, percentage: 27, color: "bg-green-500" },
-      { name: "Java", count: 1876, percentage: 12, color: "bg-orange-500" },
-      { name: "C", count: 377, percentage: 3, color: "bg-purple-500" },
+      { name: 'C++', count: 8942, percentage: 58, color: 'bg-blue-500' },
+      { name: 'Python', count: 4231, percentage: 27, color: 'bg-green-500' },
+      { name: 'Java', count: 1876, percentage: 12, color: 'bg-orange-500' },
+      { name: 'C', count: 377, percentage: 3, color: 'bg-purple-500' },
     ],
     problemStats: [
       {
-        problem: "A",
-        title: "Tìm số lớn nhất",
+        problem: 'A',
+        title: 'Tìm số lớn nhất',
         solved: 2847,
         attempted: 3241,
-        difficulty: "Dễ",
-        color: "bg-green-500",
+        difficulty: 'Dễ',
+        color: 'bg-green-500',
       },
       {
-        problem: "B",
-        title: "Đếm số cặp",
+        problem: 'B',
+        title: 'Đếm số cặp',
         solved: 1932,
         attempted: 2876,
-        difficulty: "Dễ",
-        color: "bg-green-500",
+        difficulty: 'Dễ',
+        color: 'bg-green-500',
       },
       {
-        problem: "C",
-        title: "Dãy con tăng dài nhất",
+        problem: 'C',
+        title: 'Dãy con tăng dài nhất',
         solved: 876,
         attempted: 2156,
-        difficulty: "Trung bình",
-        color: "bg-yellow-500",
+        difficulty: 'Trung bình',
+        color: 'bg-yellow-500',
       },
       {
-        problem: "D",
-        title: "Cây khung nhỏ nhất",
+        problem: 'D',
+        title: 'Cây khung nhỏ nhất',
         solved: 543,
         attempted: 1892,
-        difficulty: "Trung bình",
-        color: "bg-yellow-500",
+        difficulty: 'Trung bình',
+        color: 'bg-yellow-500',
       },
       {
-        problem: "E",
-        title: "Đường đi ngắn nhất",
+        problem: 'E',
+        title: 'Đường đi ngắn nhất',
         solved: 234,
         attempted: 1456,
-        difficulty: "Khó",
-        color: "bg-red-500",
+        difficulty: 'Khó',
+        color: 'bg-red-500',
       },
       {
-        problem: "F",
-        title: "Thuật toán động",
+        problem: 'F',
+        title: 'Thuật toán động',
         solved: 123,
         attempted: 987,
-        difficulty: "Khó",
-        color: "bg-red-500",
+        difficulty: 'Khó',
+        color: 'bg-red-500',
       },
       {
-        problem: "G",
-        title: "Cấu trúc dữ liệu",
+        problem: 'G',
+        title: 'Cấu trúc dữ liệu',
         solved: 67,
         attempted: 543,
-        difficulty: "Rất khó",
-        color: "bg-gray-800",
+        difficulty: 'Rất khó',
+        color: 'bg-gray-800',
       },
       {
-        problem: "H",
-        title: "Lý thuyết số",
+        problem: 'H',
+        title: 'Lý thuyết số',
         solved: 23,
         attempted: 234,
-        difficulty: "Rất khó",
-        color: "bg-gray-800",
+        difficulty: 'Rất khó',
+        color: 'bg-gray-800',
       },
     ],
   };
@@ -200,7 +200,7 @@ export default function ContestStatsPage() {
                     <div
                       className={`${lang.color} h-3 rounded-full transition-all duration-1000 ease-out`}
                       style={{ width: `${lang.percentage}%` }}
-                    ></div>
+                    />
                   </div>
                 </div>
               ))}
@@ -256,7 +256,7 @@ export default function ContestStatsPage() {
                       <div
                         className="bg-gradient-to-r from-emerald-500 to-teal-600 h-2 rounded-full transition-all duration-1000 ease-out"
                         style={{ width: `${solveRate}%` }}
-                      ></div>
+                      />
                     </div>
                   </div>
                 );

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import type { Problem } from "@/types/problem";
+} from '@/components/ui/select';
+import type { Problem } from '@/types/problem';
 import {
   AlertCircle,
   CheckCircle,
@@ -21,8 +21,8 @@ import {
   Trophy,
   X,
   XCircle,
-} from "lucide-react";
-import { useState } from "react";
+} from 'lucide-react';
+import { useState } from 'react';
 
 interface ProblemSubmissionsProps {
   problem: Problem;
@@ -31,23 +31,27 @@ interface ProblemSubmissionsProps {
   contestTimeRemaining?: string;
 }
 
-export default function ProblemSubmissions({ 
-  problem, 
+export default function ProblemSubmissions({
+  problem,
   showContestInfo = false,
   contestName,
-  contestTimeRemaining 
+  contestTimeRemaining,
 }: ProblemSubmissionsProps) {
   // State management
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSubmissionId, setSelectedSubmissionId] = useState<number | null>(null);
-  const [submissionNotes, setSubmissionNotes] = useState<Record<number, string>>({});
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedSubmissionId, setSelectedSubmissionId] = useState<
+    number | null
+  >(null);
+  const [submissionNotes, setSubmissionNotes] = useState<
+    Record<number, string>
+  >({});
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false);
-  const [publishTitle, setPublishTitle] = useState("");
-  const [publishDescription, setPublishDescription] = useState("");
+  const [publishTitle, setPublishTitle] = useState('');
+  const [publishDescription, setPublishDescription] = useState('');
   const [isPublishing, setIsPublishing] = useState(false);
-  const [verdictFilter, setVerdictFilter] = useState("all");
-  const [languageFilter, setLanguageFilter] = useState("all");
-  const [sortOrder, setSortOrder] = useState("newest");
+  const [verdictFilter, setVerdictFilter] = useState('all');
+  const [languageFilter, setLanguageFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('newest');
   const [currentPage, setCurrentPage] = useState(1);
   const submissionsPerPage = 20;
 
@@ -55,12 +59,12 @@ export default function ProblemSubmissions({
   const mockUserSubmissions = [
     {
       id: 1001,
-      when: "2025-08-09 14:30:25",
-      verdict: "Accepted",
-      time: "124ms",
-      memory: "2.1MB",
+      when: '2025-08-09 14:30:25',
+      verdict: 'Accepted',
+      time: '124ms',
+      memory: '2.1MB',
       testCase: null,
-      lang: "Python 3.11",
+      lang: 'Python 3.11',
       code: `def euler_phi(n):
     result = n
     p = 2
@@ -77,30 +81,31 @@ export default function ProblemSubmissions({
 n = int(input())
 for i in range(1, n + 1):
     print(euler_phi(i), end=" ")`,
-      result: "All test cases passed successfully",
+      result: 'All test cases passed successfully',
     },
     {
       id: 1002,
-      when: "2025-08-09 14:25:15",
-      verdict: "Wrong Answer",
-      time: "89ms",
-      memory: "1.8MB",
-      testCase: "Failed on test 5",
-      lang: "Python 3.11",
+      when: '2025-08-09 14:25:15',
+      verdict: 'Wrong Answer',
+      time: '89ms',
+      memory: '1.8MB',
+      testCase: 'Failed on test 5',
+      lang: 'Python 3.11',
       code: `n = int(input())
 for i in range(1, n + 1):
     # Wrong implementation
     print(i, end=" ")`,
-      result: "Expected output: 1 1 2 1 4 2 6 1 6 2\nActual output: 1 2 3 4 5 6 7 8 9 10",
+      result:
+        'Expected output: 1 1 2 1 4 2 6 1 6 2\nActual output: 1 2 3 4 5 6 7 8 9 10',
     },
     {
       id: 1003,
-      when: "2025-08-09 14:20:10",
-      verdict: "Time Limit Exceeded",
-      time: "2000ms",
-      memory: "3.2MB",
-      testCase: "Failed on test 12",
-      lang: "Python 3.11",
+      when: '2025-08-09 14:20:10',
+      verdict: 'Time Limit Exceeded',
+      time: '2000ms',
+      memory: '3.2MB',
+      testCase: 'Failed on test 12',
+      lang: 'Python 3.11',
       code: `def euler_phi(n):
     # Inefficient implementation
     count = 0
@@ -117,7 +122,7 @@ def gcd(a, b):
 n = int(input())
 for i in range(1, n + 1):
     print(euler_phi(i), end=" ")`,
-      result: "Time limit exceeded on test case with large input",
+      result: 'Time limit exceeded on test case with large input',
     },
   ];
 
@@ -134,32 +139,32 @@ for i in range(1, n + 1):
   // Utility functions
   const getVerdictColor = (verdict: string) => {
     switch (verdict) {
-      case "Accepted":
-        return "text-green-600 bg-green-50 dark:bg-green-900/20";
-      case "Wrong Answer":
-        return "text-red-600 bg-red-50 dark:bg-red-900/20";
-      case "Time Limit Exceeded":
-        return "text-orange-600 bg-orange-50 dark:bg-orange-900/20";
-      case "Compilation Error":
-        return "text-gray-600 bg-gray-50 dark:bg-gray-900/20";
-      case "Runtime Error":
-        return "text-purple-600 bg-purple-50 dark:bg-purple-900/20";
+      case 'Accepted':
+        return 'text-green-600 bg-green-50 dark:bg-green-900/20';
+      case 'Wrong Answer':
+        return 'text-red-600 bg-red-50 dark:bg-red-900/20';
+      case 'Time Limit Exceeded':
+        return 'text-orange-600 bg-orange-50 dark:bg-orange-900/20';
+      case 'Compilation Error':
+        return 'text-gray-600 bg-gray-50 dark:bg-gray-900/20';
+      case 'Runtime Error':
+        return 'text-purple-600 bg-purple-50 dark:bg-purple-900/20';
       default:
-        return "text-slate-600 bg-slate-50 dark:bg-slate-900/20";
+        return 'text-slate-600 bg-slate-50 dark:bg-slate-900/20';
     }
   };
 
   const getVerdictIcon = (verdict: string) => {
     switch (verdict) {
-      case "Accepted":
+      case 'Accepted':
         return <CheckCircle className="w-4 h-4" />;
-      case "Wrong Answer":
+      case 'Wrong Answer':
         return <XCircle className="w-4 h-4" />;
-      case "Time Limit Exceeded":
+      case 'Time Limit Exceeded':
         return <Timer className="w-4 h-4" />;
-      case "Compilation Error":
+      case 'Compilation Error':
         return <AlertCircle className="w-4 h-4" />;
-      case "Runtime Error":
+      case 'Runtime Error':
         return <AlertCircle className="w-4 h-4" />;
       default:
         return <AlertCircle className="w-4 h-4" />;
@@ -170,12 +175,14 @@ for i in range(1, n + 1):
   const filteredSubmissions = mockUserSubmissions
     .filter((submission) => {
       const matchesSearch = submission.id.toString().includes(searchTerm);
-      const matchesVerdict = verdictFilter === "all" || submission.verdict === verdictFilter;
-      const matchesLanguage = languageFilter === "all" || submission.lang.includes(languageFilter);
+      const matchesVerdict =
+        verdictFilter === 'all' || submission.verdict === verdictFilter;
+      const matchesLanguage =
+        languageFilter === 'all' || submission.lang.includes(languageFilter);
       return matchesSearch && matchesVerdict && matchesLanguage;
     })
     .sort((a, b) => {
-      if (sortOrder === "newest") {
+      if (sortOrder === 'newest') {
         return new Date(b.when).getTime() - new Date(a.when).getTime();
       }
       return new Date(a.when).getTime() - new Date(b.when).getTime();
@@ -196,28 +203,30 @@ for i in range(1, n + 1):
   const handlePublishSolution = () => {
     if (selectedSubmission) {
       setPublishTitle(`Optimal Solution for ${problem.title}`);
-      setPublishDescription("This is my efficient solution that passes all test cases with good performance.");
+      setPublishDescription(
+        'This is my efficient solution that passes all test cases with good performance.'
+      );
       setIsPublishModalOpen(true);
     }
   };
 
   const handlePublishSubmit = async () => {
     if (!publishTitle.trim() || !publishDescription.trim()) return;
-    
+
     setIsPublishing(true);
     setTimeout(() => {
       setIsPublishing(false);
       setIsPublishModalOpen(false);
-      setPublishTitle("");
-      setPublishDescription("");
-      alert("Solution published successfully!");
+      setPublishTitle('');
+      setPublishDescription('');
+      alert('Solution published successfully!');
     }, 2000);
   };
 
   const handlePublishCancel = () => {
     setIsPublishModalOpen(false);
-    setPublishTitle("");
-    setPublishDescription("");
+    setPublishTitle('');
+    setPublishDescription('');
   };
 
   return (
@@ -251,7 +260,14 @@ for i in range(1, n + 1):
         </div>
       )}
 
-      <div className="p-8" style={{ height: showContestInfo ? "calc(100vh - 180px)" : "calc(100vh - 120px)" }}>
+      <div
+        className="p-8"
+        style={{
+          height: showContestInfo
+            ? 'calc(100vh - 180px)'
+            : 'calc(100vh - 120px)',
+        }}
+      >
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 h-full">
           {/* Left Column - User Submissions List */}
           <div className="xl:col-span-1">
@@ -270,7 +286,10 @@ for i in range(1, n + 1):
               <div className="p-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/50 flex-shrink-0">
                 <div className="flex flex-wrap items-center gap-3">
                   {/* Verdict Filter */}
-                  <Select value={verdictFilter} onValueChange={setVerdictFilter}>
+                  <Select
+                    value={verdictFilter}
+                    onValueChange={setVerdictFilter}
+                  >
                     <SelectTrigger className="w-40 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                       <SelectValue placeholder="All verdicts" />
                     </SelectTrigger>
@@ -278,14 +297,23 @@ for i in range(1, n + 1):
                       <SelectItem value="all">All verdicts</SelectItem>
                       <SelectItem value="Accepted">Accepted</SelectItem>
                       <SelectItem value="Wrong Answer">Wrong Answer</SelectItem>
-                      <SelectItem value="Time Limit Exceeded">Time Limit Exceeded</SelectItem>
-                      <SelectItem value="Compilation Error">Compilation Error</SelectItem>
-                      <SelectItem value="Runtime Error">Runtime Error</SelectItem>
+                      <SelectItem value="Time Limit Exceeded">
+                        Time Limit Exceeded
+                      </SelectItem>
+                      <SelectItem value="Compilation Error">
+                        Compilation Error
+                      </SelectItem>
+                      <SelectItem value="Runtime Error">
+                        Runtime Error
+                      </SelectItem>
                     </SelectContent>
                   </Select>
 
                   {/* Language Filter */}
-                  <Select value={languageFilter} onValueChange={setLanguageFilter}>
+                  <Select
+                    value={languageFilter}
+                    onValueChange={setLanguageFilter}
+                  >
                     <SelectTrigger className="w-32 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
                       <SelectValue placeholder="Language" />
                     </SelectTrigger>
@@ -338,8 +366,8 @@ for i in range(1, n + 1):
                           onClick={() => setSelectedSubmissionId(submission.id)}
                           className={`cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors ${
                             selectedSubmissionId === submission.id
-                              ? "bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500"
-                              : ""
+                              ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500'
+                              : ''
                           }`}
                         >
                           {/* Status */}
@@ -422,7 +450,7 @@ for i in range(1, n + 1):
                     </div>
 
                     {/* Publish Solution Button - Only for Accepted submissions */}
-                    {selectedSubmission.verdict === "Accepted" && (
+                    {selectedSubmission.verdict === 'Accepted' && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -526,7 +554,7 @@ for i in range(1, n + 1):
                       Notes
                     </h4>
                     <textarea
-                      value={submissionNotes[selectedSubmission.id] || ""}
+                      value={submissionNotes[selectedSubmission.id] || ''}
                       onChange={(e) =>
                         setSubmissionNotes((prev) => ({
                           ...prev,
@@ -674,7 +702,8 @@ for i in range(1, n + 1):
             <div className="p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-slate-600 dark:text-slate-400">
-                  Your solution will be visible to other users in the community solutions section.
+                  Your solution will be visible to other users in the community
+                  solutions section.
                 </div>
                 <div className="flex items-center gap-3">
                   <Button
