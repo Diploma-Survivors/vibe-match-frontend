@@ -1,4 +1,4 @@
-import type { ProblemData } from './problems';
+import type { ProblemDetail } from './problems';
 
 export interface Contest {
   id?: string;
@@ -7,7 +7,7 @@ export interface Contest {
   startTime: string;
   endTime: string;
   durationMinutes: number;
-  problems: ProblemData[];
+  problems: ProblemDetail[];
   status?: ContestStatus;
   createdBy?: string;
   createdAt?: string;

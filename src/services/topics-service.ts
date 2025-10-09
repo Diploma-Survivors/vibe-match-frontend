@@ -6,7 +6,7 @@ import type {
 } from '@/types/topics';
 
 // create topic
-export async function createTopic(topic: CreateTopicRequest): Promise<Topic> {
+async function createTopic(topic: CreateTopicRequest): Promise<Topic> {
   try {
     const response = await clientApi.post('/topics', topic);
     return response.data.data;
@@ -17,9 +17,7 @@ export async function createTopic(topic: CreateTopicRequest): Promise<Topic> {
 }
 
 // create multiple topics
-export async function createTopics(
-  topics: CreateTopicRequest[]
-): Promise<Topic[]> {
+async function createTopics(topics: CreateTopicRequest[]): Promise<Topic[]> {
   try {
     const response = await clientApi.post('/topics/bulk', { topics });
     return response.data.data;
@@ -30,7 +28,7 @@ export async function createTopics(
 }
 
 // Fetch all available topics
-export async function getTopics(): Promise<Topic[]> {
+async function getAllTopics(): Promise<Topic[]> {
   try {
     const response = await clientApi.get('/topics');
     return response.data.data;
@@ -41,7 +39,7 @@ export async function getTopics(): Promise<Topic[]> {
 }
 
 // Fetch topic by ID
-export async function getTopicById(id: string): Promise<Topic> {
+async function getTopicById(id: string): Promise<Topic> {
   try {
     const response = await clientApi.get(`/topics/${id}`);
     return response.data.data;
@@ -52,7 +50,7 @@ export async function getTopicById(id: string): Promise<Topic> {
 }
 
 // Update topic
-export async function updateTopic(
+async function updateTopic(
   topic: UpdateTopicRequest,
   id: string
 ): Promise<Topic> {
@@ -66,7 +64,7 @@ export async function updateTopic(
 }
 
 // Delete topic
-export async function deleteTopic(id: string): Promise<void> {
+async function deleteTopic(id: string): Promise<void> {
   try {
     await clientApi.delete(`/topics/${id}`);
   } catch (error) {
@@ -74,3 +72,12 @@ export async function deleteTopic(id: string): Promise<void> {
     throw error;
   }
 }
+
+export const TopicsService = {
+  createTopic,
+  createTopics,
+  getAllTopics,
+  getTopicById,
+  updateTopic,
+  deleteTopic,
+};

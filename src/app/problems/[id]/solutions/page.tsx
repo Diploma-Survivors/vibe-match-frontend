@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { Problem, Solution } from '@/types/problem';
+import type { Problem, Solution } from '@/types/problem-test';
 import {
   AlertCircle,
   BarChart3,

@@ -3,7 +3,7 @@ import type { ApiResponse } from '@/types/api';
 import {
   type CreateProblemRequest,
   type GetProblemListRequest,
-  ProblemData,
+  ProblemDetail,
   type ProblemEndpointType,
   type ProblemListResponse,
 } from '@/types/problems';
@@ -23,6 +23,9 @@ async function getProblemList(
   const endpoint = `/problems/${endpointType}`;
   const queryString = params.toString();
   const url = queryString ? `${endpoint}?${queryString}` : endpoint;
+
+  console.log('Fetching problems from URL:', url);
+
   return await clientApi.get(url);
 }
 

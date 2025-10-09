@@ -6,7 +6,7 @@ import type {
 } from '@/types/testcases';
 
 // Create test cases from array (returns testcase ID)
-export async function createTestcase(
+async function createTestcase(
   testcases: TestcaseSample[]
 ): Promise<CreateTestcaseResponse> {
   try {
@@ -19,7 +19,7 @@ export async function createTestcase(
 }
 
 // Create testcase by uploading file
-export async function createTestcaseFile(
+async function createTestcaseFile(
   file: File
 ): Promise<CreateTestcaseFileResponse> {
   try {
@@ -42,7 +42,7 @@ export async function createTestcaseFile(
 // Cache management for testcase responses
 const testcaseStorage = new Map<string, CreateTestcaseFileResponse>();
 
-export function saveTestcaseToCache(
+function saveTestcaseToCache(
   key: string,
   response: CreateTestcaseFileResponse
 ): void {
@@ -56,23 +56,21 @@ export function saveTestcaseToCache(
   ); // 1 hour expiration
 }
 
-export function getTestcaseFromCache(
-  key: string
-): CreateTestcaseFileResponse | null {
+function getTestcaseFromCache(key: string): CreateTestcaseFileResponse | null {
   return testcaseStorage.get(key) || null;
 }
 
-export function clearTestcaseCache(): void {
+function clearTestcaseCache(): void {
   testcaseStorage.clear();
 }
 
 // Helper method to generate cache key for file
-export function generateCacheKey(file: File): string {
+function generateCacheKey(file: File): string {
   return `testcase_${file.name}_${file.size}_${file.lastModified}`;
 }
 
 // Complete testcase creation workflow with caching
-export async function createTestcaseComplete(file: File): Promise<string> {
+async function createTestcaseComplete(file: File): Promise<string> {
   try {
     // Check if we have a cached testcase response for this file
     const cacheKey = generateCacheKey(file);
@@ -92,3 +90,12 @@ export async function createTestcaseComplete(file: File): Promise<string> {
     throw error;
   }
 }
+
+export const TestcasesService = {
+  createTestcase,
+  createTestcaseFile,
+  createTestcaseComplete,
+  saveTestcaseToCache,
+  getTestcaseFromCache,
+  clearTestcaseCache,
+};

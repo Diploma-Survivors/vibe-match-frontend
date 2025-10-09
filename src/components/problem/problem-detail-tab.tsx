@@ -2,7 +2,7 @@
 
 import { MonacoSubmitEditor } from '@/components/editor';
 import { Button } from '@/components/ui/button';
-import type { Problem } from '@/types/problem';
+import type { Problem } from '@/types/problem-test';
 import { Copy, FileText, MemoryStick, Timer } from 'lucide-react';
 import {
   CheckCircle,

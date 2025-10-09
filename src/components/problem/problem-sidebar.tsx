@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { Problem } from '@/types/problem';
+import type { Problem } from '@/types/problem-test';
 import {
   Calendar,
   CheckCircle,

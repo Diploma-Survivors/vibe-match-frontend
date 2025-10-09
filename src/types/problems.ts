@@ -1,4 +1,6 @@
+import type { Tag } from './tags';
 import type { TestcaseSample } from './testcases';
+import type { Topic } from './topics';
 
 export enum ProblemDifficulty {
   EASY = 'easy',
@@ -45,7 +47,7 @@ export interface CreateProblemRequest {
   testcaseSamples: TestcaseSample[];
 }
 
-export interface ProblemData {
+export interface ProblemDetail {
   id: string;
   title: string;
   description: string;
@@ -67,6 +69,7 @@ export interface ProblemData {
 
 export interface ProblemFilters {
   difficulty?: ProblemDifficulty;
+  type?: ProblemType;
   topic?: string;
   tags?: string[];
 }
@@ -83,8 +86,17 @@ export interface GetProblemListRequest {
   filters?: ProblemFilters;
 }
 
+export interface ProblemItemList {
+  id: string;
+  title: string;
+  difficulty: ProblemDifficulty;
+  createAt: string;
+  tags: Tag[];
+  topics: Topic[];
+}
+
 export interface ProblemEdge {
-  node: ProblemData;
+  node: ProblemItemList;
   cursor: string;
 }
 

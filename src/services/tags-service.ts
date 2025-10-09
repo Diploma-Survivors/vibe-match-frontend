@@ -2,7 +2,7 @@ import clientApi from '@/lib/apis/axios-client';
 import type { CreateTagRequest, Tag } from '@/types/tags';
 
 // create a new tag
-export async function createTag(tag: CreateTagRequest): Promise<Tag> {
+async function createTag(tag: CreateTagRequest): Promise<Tag> {
   try {
     const response = await clientApi.post('/tags', tag);
     return response.data.data;
@@ -13,7 +13,7 @@ export async function createTag(tag: CreateTagRequest): Promise<Tag> {
 }
 
 // create multiple tags
-export async function createTags(tags: CreateTagRequest[]): Promise<Tag[]> {
+async function createTags(tags: CreateTagRequest[]): Promise<Tag[]> {
   try {
     const response = await clientApi.post('/tags/bulk', { tags });
     return response.data.data;
@@ -24,7 +24,7 @@ export async function createTags(tags: CreateTagRequest[]): Promise<Tag[]> {
 }
 
 // Fetch all available tags
-export async function getTags(): Promise<Tag[]> {
+async function getAllTags(): Promise<Tag[]> {
   try {
     const response = await clientApi.get('/tags');
     return response.data.data;
@@ -35,7 +35,7 @@ export async function getTags(): Promise<Tag[]> {
 }
 
 // Fetch tag by ID
-export async function getTagById(id: string): Promise<Tag> {
+async function getTagById(id: string): Promise<Tag> {
   try {
     const response = await clientApi.get(`/tags/${id}`);
     return response.data.data;
@@ -46,10 +46,7 @@ export async function getTagById(id: string): Promise<Tag> {
 }
 
 // Update tag by ID
-export async function updateTag(
-  tag: CreateTagRequest,
-  id: string
-): Promise<Tag> {
+async function updateTag(tag: CreateTagRequest, id: string): Promise<Tag> {
   try {
     const response = await clientApi.patch(`/tags/${id}`, tag);
     return response.data.data;
@@ -60,7 +57,7 @@ export async function updateTag(
 }
 
 // Delete tag by ID
-export async function deleteTag(id: string): Promise<void> {
+async function deleteTag(id: string): Promise<void> {
   try {
     await clientApi.delete(`/tags/${id}`);
   } catch (error) {
@@ -68,3 +65,12 @@ export async function deleteTag(id: string): Promise<void> {
     throw error;
   }
 }
+
+export const TagsService = {
+  createTag,
+  createTags,
+  getAllTags,
+  getTagById,
+  updateTag,
+  deleteTag,
+};

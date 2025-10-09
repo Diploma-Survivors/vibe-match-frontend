@@ -10,15 +10,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { getTags } from '@/services/tags-service';
-import { getTopics } from '@/services/topics-service';
-import type { ProblemFilters } from '@/types/problem';
+import { TagsService } from '@/services/tags-service';
+import { TopicsService } from '@/services/topics-service';
+import type { ProblemFilters } from '@/types/problem-test';
 import {
   CHAPTER_OPTIONS,
   DIFFICULTY_OPTIONS,
   PROBLEM_TYPE_OPTIONS,
   SUBJECT_OPTIONS,
-} from '@/types/problem';
+} from '@/types/problem-test';
 import type { Tag } from '@/types/tags';
 import type { Topic } from '@/types/topics';
 import { RotateCcw, Search } from 'lucide-react';
@@ -47,7 +47,7 @@ export default function ProblemFilter({
     const fetchTags = async () => {
       try {
         setIsLoadingTags(true);
-        const data = await getTags();
+        const data = await TagsService.getAllTags();
         setTags(data);
       } catch (error) {
         console.error('Error fetching tags:', error);
@@ -64,7 +64,7 @@ export default function ProblemFilter({
     const fetchTopics = async () => {
       try {
         setIsLoadingTopics(true);
-        const data = await getTopics();
+        const data = await TopicsService.getAllTopics();
         setTopics(data);
       } catch (error) {
         console.error('Error fetching topics:', error);
@@ -145,7 +145,7 @@ export default function ProblemFilter({
             />
           </div>
 
-          {/* Mức độ */}
+          {/* Difficulty */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Mức độ:
@@ -173,7 +173,7 @@ export default function ProblemFilter({
             </Select>
           </div>
 
-          {/* Topic (replaced Dạng bài) */}
+          {/* Topic */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Topic:
@@ -207,7 +207,7 @@ export default function ProblemFilter({
             </Select>
           </div>
 
-          {/* Lựa chọn tag */}
+          {/* tag */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Lựa chọn tag:

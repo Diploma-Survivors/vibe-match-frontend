@@ -1,119 +1,128 @@
 'use client';
 
-import { QuickFilters, SortControls } from '@/components/common';
+import { SortControls } from '@/components/common';
 import type { SortField, SortOrder } from '@/components/common/sort-controls';
+import { ProblemFilter, ProblemTable } from '@/components/problem';
+import { ProblemsService } from '@/services/problems-service';
+import type { ProblemFilters } from '@/types/problem-test';
 import {
-  ProblemFilter,
-  ProblemStats,
-  ProblemTable,
-} from '@/components/problem';
-import { mockProblems } from '@/lib/data/mock-problems';
-import type { Problem, ProblemFilters } from '@/types/problem';
-import React, { useState, useMemo } from 'react';
+  type GetProblemListRequest,
+  type PageInfo,
+  ProblemEndpointType,
+  type ProblemItemList,
+  type ProblemListResponse,
+} from '@/types/problems';
+import { BookOpen } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 2;
 
 export default function ProblemsPage() {
-  const [filters, setFilters] = useState<ProblemFilters>({});
+  const [error, setError] = useState<string | null>(null);
+  const [problems, setProblems] = useState<ProblemItemList[]>([]);
+  const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [filters, setFilters] = useState<ProblemFilters>({});
   const [sortField, setSortField] = useState<SortField>('id');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
-  // Filter and sort problems
-  const filteredAndSortedProblems = useMemo(() => {
-    // First filter
-    const filtered = mockProblems.filter((problem) => {
-      if (
-        filters.id &&
-        !problem.id.toLowerCase().includes(filters.id.toLowerCase())
-      ) {
-        return false;
-      }
-      if (
-        filters.title &&
-        !problem.title.toLowerCase().includes(filters.title.toLowerCase())
-      ) {
-        return false;
-      }
-      if (filters.difficulty && problem.difficulty !== filters.difficulty) {
-        return false;
-      }
-
-      if (filters.subject && problem.subject !== filters.subject) {
-        return false;
-      }
-      if (filters.chapter && problem.chapter !== filters.chapter) {
-        return false;
-      }
-      if (filters.problemType && problem.problemType !== filters.problemType) {
-        return false;
-      }
-      return true;
+  const [getProblemsRequest, setGetProblemsRequest] =
+    useState<GetProblemListRequest>({
+      first: ITEMS_PER_PAGE,
     });
 
-    // Then sort
-    filtered.sort((a, b) => {
-      let aValue: string | number = a[sortField];
-      let bValue: string | number = b[sortField];
+  useEffect(() => {
+    const fetchProblems = async () => {
+      try {
+        setIsLoading(true);
 
-      // Handle special sorting for difficulty
-      if (sortField === 'difficulty') {
-        const difficultyOrder = { Dễ: 1, 'Trung bình': 2, Khó: 3 };
-        aValue =
-          difficultyOrder[a.difficulty as keyof typeof difficultyOrder] || 0;
-        bValue =
-          difficultyOrder[b.difficulty as keyof typeof difficultyOrder] || 0;
+        const axiosResponse = await ProblemsService.getProblemList(
+          getProblemsRequest,
+          ProblemEndpointType.TRAINING
+        );
+        const response: ProblemListResponse = axiosResponse?.data?.data;
+
+        // Extract problems from edges
+        const problemsData = response?.edges?.map((edge) => ({
+          ...edge.node,
+        }));
+
+        setProblems(problemsData);
+        setPageInfo(response?.pageInfos);
+        setTotalCount(response?.totalCount);
+      } catch (err) {
+        console.error('Error fetching problems:', err);
+        setError("Can't load the problems.");
+        setProblems([]);
+        setPageInfo(null);
+        setTotalCount(0);
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      // Handle string sorting
-      if (typeof aValue === 'string' && typeof bValue === 'string') {
-        aValue = aValue.toLowerCase();
-        bValue = bValue.toLowerCase();
-      }
+    fetchProblems();
+  }, [getProblemsRequest]);
 
-      if (sortOrder === 'asc') {
-        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
-      }
-      return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
-    });
+  // Tính toán tổng số trang dựa trên totalCount từ API
+  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
-    return filtered;
-  }, [filters, sortField, sortOrder]);
+  const handlePageChange = (page: number) => {
+    if (isLoading) return;
 
-  // Paginate filtered and sorted problems
-  const paginatedProblems = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
-    return filteredAndSortedProblems.slice(startIndex, endIndex);
-  }, [filteredAndSortedProblems, currentPage]);
-
-  const totalPages = Math.ceil(
-    filteredAndSortedProblems.length / ITEMS_PER_PAGE
-  );
+    // Nếu đi tới trang tiếp theo
+    if (page > currentPage && pageInfo?.hasNextPage) {
+      setGetProblemsRequest((prev) => ({
+        ...prev,
+        after: pageInfo.endCursor,
+        before: undefined,
+        first: ITEMS_PER_PAGE,
+        last: undefined,
+      }));
+      setCurrentPage(page);
+    }
+    // Nếu quay lại trang trước
+    else if (page < currentPage && pageInfo?.hasPreviousPage) {
+      setGetProblemsRequest((prev) => ({
+        ...prev,
+        before: pageInfo.startCursor,
+        after: undefined,
+        first: undefined,
+        last: ITEMS_PER_PAGE,
+      }));
+      setCurrentPage(page);
+    }
+  };
 
   const handleFiltersChange = (newFilters: ProblemFilters) => {
     setFilters(newFilters);
-    setCurrentPage(1); // Reset to first page when filters change
+    setCurrentPage(1);
+    // Reset về trang đầu tiên khi thay đổi filter
+    setGetProblemsRequest({
+      first: ITEMS_PER_PAGE,
+    });
   };
 
   const handleSearch = () => {
-    // Search is handled automatically through filtering
     setCurrentPage(1);
+    // TODO: Implement search with API
   };
 
   const handleReset = () => {
     setFilters({});
     setCurrentPage(1);
-  };
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
+    setGetProblemsRequest({
+      first: ITEMS_PER_PAGE,
+    });
   };
 
   const handleSortChange = (field: SortField, order: SortOrder) => {
     setSortField(field);
     setSortOrder(order);
-    setCurrentPage(1); // Reset to first page when sorting changes
+    setCurrentPage(1);
+    // TODO: Implement sorting with API
   };
 
   const handleRemoveFilter = (key: keyof ProblemFilters) => {
@@ -143,7 +152,20 @@ export default function ProblemsPage() {
                 Khám phá và chinh phục hàng ngàn bài tập lập trình
               </p>
             </div>
-            <ProblemStats problems={filteredAndSortedProblems} />
+            {/* <ProblemStats problems={problems} /> */}
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 rounded-xl border border-green-200 dark:border-green-700">
+                <BookOpen className="w-5 h-5 text-green-600 dark:text-green-400" />
+                <div>
+                  <div className="text-xs text-slate-600 dark:text-slate-400">
+                    Tổng bài
+                  </div>
+                  <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                    {totalCount}
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -161,12 +183,6 @@ export default function ProblemsPage() {
                   onSearch={handleSearch}
                   onReset={handleReset}
                 />
-
-                {/* <QuickFilters
-                  activeFilters={filters}
-                  onRemoveFilter={handleRemoveFilter}
-                  onClearAll={handleClearAllFilters}
-                /> */}
               </div>
             </div>
           </div>
@@ -186,19 +202,43 @@ export default function ProblemsPage() {
                 <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">
                   <span className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full">
                     <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
-                    {paginatedProblems.length} /{' '}
-                    {filteredAndSortedProblems.length} bài tập
+                    {isLoading
+                      ? 'Đang tải...'
+                      : `${problems.length} / ${totalCount} bài tập`}
                   </span>
                 </div>
               </div>
 
+              {/* Loading State */}
+              {isLoading && (
+                <div className="flex items-center justify-center py-12">
+                  <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-slate-600 dark:text-slate-400">
+                      Đang tải dữ liệu...
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Error State */}
+              {error && !isLoading && (
+                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-6 text-center">
+                  <p className="text-red-600 dark:text-red-400">{error}</p>
+                </div>
+              )}
+
               {/* Problem Table */}
-              <ProblemTable
-                problems={paginatedProblems}
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-              />
+              {!isLoading && !error && (
+                <ProblemTable
+                  problems={problems}
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  isLoading={isLoading}
+                  pageInfo={pageInfo}
+                />
+              )}
             </div>
           </div>
         </div>

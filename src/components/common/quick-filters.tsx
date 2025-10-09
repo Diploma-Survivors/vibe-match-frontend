@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import type { ProblemFilters } from '@/types/problem';
+import type { ProblemFilters } from '@/types/problem-test';
 import { Filter, X } from 'lucide-react';
 import React from 'react';
 
