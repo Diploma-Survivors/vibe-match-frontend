@@ -19,7 +19,7 @@ interface ProblemNavbarProps {
 }
 
 const navItems = [
-  { id: 'problem', label: 'Problem', icon: FileText },
+  { id: 'description', label: 'Problem', icon: FileText },
   { id: 'submissions', label: 'Submissions', icon: CheckCircle },
   { id: 'solutions', label: 'Solutions', icon: Lightbulb },
   { id: 'standing', label: 'Standing', icon: Trophy },

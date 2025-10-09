@@ -9,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { Problem } from '@/types/problem-test';
 import {
   AlertCircle,
   CheckCircle,

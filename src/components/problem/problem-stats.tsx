@@ -1,6 +1,5 @@
 'use client';
 
-import type { Problem } from '@/types/problem-test';
 import type { ProblemItemList } from '@/types/problems';
 import { BookOpen, TrendingUp, Users } from 'lucide-react';
 import React, { useMemo } from 'react';
