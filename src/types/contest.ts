@@ -8,7 +8,7 @@ export interface Contest {
   endTime: string;
   durationMinutes: number;
   problems: ProblemDetail[];
-  status?: ContestStatus;
+  status?: ContestStatus | 'upcoming' | 'ongoing' | 'finished';
   createdBy?: string;
   createdAt?: string;
 }
@@ -21,7 +21,7 @@ export interface ContestDTO {
   endTime: string;
   durationMinutes: number;
   problems: ContestProblemDTO[];
-  status?: ContestStatus;
+  status?: ContestStatus | 'upcoming' | 'ongoing' | 'finished';
   createdBy?: string;
   createdAt?: string;
 }
