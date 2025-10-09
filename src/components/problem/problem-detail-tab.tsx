@@ -2,7 +2,10 @@
 
 import { MonacoSubmitEditor } from '@/components/editor';
 import { Button } from '@/components/ui/button';
-import type { ProblemDetail as ProblemDetailType } from '@/types/problems';
+import {
+  type ProblemDetail as ProblemDetailType,
+  ProblemDifficulty,
+} from '@/types/problems';
 import { Copy, FileText, MemoryStick, Timer } from 'lucide-react';
 import {
   CheckCircle,
@@ -53,11 +56,11 @@ export default function ProblemDetail({
   // Map difficulty from API to Vietnamese
   const getDifficultyLabel = (difficulty: string) => {
     switch (difficulty) {
-      case 'easy':
+      case ProblemDifficulty.EASY:
         return 'Dễ';
-      case 'medium':
+      case ProblemDifficulty.MEDIUM:
         return 'Trung bình';
-      case 'hard':
+      case ProblemDifficulty.HARD:
         return 'Khó';
       default:
         return difficulty;

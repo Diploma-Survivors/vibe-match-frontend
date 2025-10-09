@@ -2,7 +2,6 @@
 
 import { ProblemNavbar } from '@/components/problem';
 import { useApp } from '@/contexts/app-context';
-import { mockProblems } from '@/lib/data/mock-problems';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 
 export default function ProblemLayout({
