@@ -6,182 +6,30 @@ import {
   ProblemStats,
   ProblemTable,
 } from '@/components/problem';
-import { ProblemsService } from '@/services/problems-service';
-import type { ProblemFilters } from '@/types/problem-test';
-import {
-  type GetProblemListRequest,
-  type PageInfo,
-  ProblemEndpointType,
-  type ProblemItemList,
-  type ProblemListResponse,
-  SortBy,
-  SortOrder,
-} from '@/types/problems';
-import { BookOpen } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
-
-const ITEMS_PER_PAGE = 20;
+import { useProblems } from '@/hooks/use-problems';
+import React from 'react';
 
 export default function ProblemsPage() {
-  const [error, setError] = useState<string | null>(null);
-  const [problems, setProblems] = useState<ProblemItemList[]>([]);
-  const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
-  const [totalCount, setTotalCount] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const {
+    // State
+    problems,
+    pageInfo,
+    totalCount,
+    isLoading,
+    error,
+    filters,
+    keyword,
+    sortBy,
+    sortOrder,
 
-  // state for filters
-  const [filters, setFilters] = useState<ProblemFilters>({});
-
-  // state for sorting
-  const [sortBy, setSortBy] = useState<SortBy>(SortBy.TITLE);
-  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
-
-  const [getProblemsRequest, setGetProblemsRequest] =
-    useState<GetProblemListRequest>({
-      first: ITEMS_PER_PAGE,
-    });
-
-  useEffect(() => {
-    const fetchProblems = async () => {
-      try {
-        setIsLoading(true);
-        setError(null); // Clear previous errors
-
-        console.log('Fetching problems with request:', getProblemsRequest);
-        const startTime = performance.now();
-
-        const axiosResponse = await ProblemsService.getProblemList(
-          getProblemsRequest,
-          ProblemEndpointType.TRAINING
-        );
-
-        const endTime = performance.now();
-        console.log(`API call took ${(endTime - startTime).toFixed(2)}ms`);
-
-        const response: ProblemListResponse = axiosResponse?.data?.data;
-
-        // Extract problems from edges
-        const problemsData =
-          response?.edges?.map((edge) => ({
-            ...edge.node,
-          })) || [];
-
-        console.log(`Fetched ${problemsData.length} problems`);
-
-        // Append new problems to existing ones for infinite scroll
-        setProblems((prev) => {
-          // If using 'before' (going backward), prepend
-          if (getProblemsRequest.before) {
-            return [...problemsData, ...prev];
-          }
-          // If using 'after' or initial load, append
-          return getProblemsRequest.after
-            ? [...prev, ...problemsData]
-            : problemsData;
-        });
-
-        setPageInfo(response?.pageInfos);
-        setTotalCount(response?.totalCount);
-      } catch (err) {
-        console.error('Error fetching problems:', err);
-        setError("Can't load the problems.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProblems();
-  }, [getProblemsRequest]);
-
-  const handleLoadMore = () => {
-    console.log('handleLoadMore called', {
-      isLoading,
-      hasNextPage: pageInfo?.hasNextPage,
-      endCursor: pageInfo?.endCursor,
-    });
-
-    if (isLoading || !pageInfo?.hasNextPage) {
-      console.log('Skipping load more - already loading or no more data');
-      return;
-    }
-
-    console.log('Loading more problems...');
-    setGetProblemsRequest((prev) => ({
-      ...prev,
-      after: pageInfo.endCursor,
-      before: undefined,
-      first: ITEMS_PER_PAGE,
-      last: undefined,
-      sortBy,
-      sortOrder,
-    }));
-  };
-
-  const handleFiltersChange = (newFilters: ProblemFilters) => {
-    setFilters(newFilters);
-    // Reset về trang đầu tiên khi thay đổi filter, nhưng giữ nguyên sort
-    setProblems([]);
-    setGetProblemsRequest({
-      first: ITEMS_PER_PAGE,
-      sortBy,
-      sortOrder,
-    });
-  };
-
-  const handleSearch = () => {
-    // TODO: Implement search with API
-    setProblems([]);
-    setGetProblemsRequest({
-      first: ITEMS_PER_PAGE,
-      sortBy,
-      sortOrder,
-    });
-  };
-
-  const handleReset = () => {
-    setFilters({});
-    setProblems([]);
-    setGetProblemsRequest({
-      first: ITEMS_PER_PAGE,
-      sortBy,
-      sortOrder,
-    });
-  };
-
-  const handleSortChange = (field: SortBy, order: SortOrder) => {
-    setSortBy(field);
-    setSortOrder(order);
-    // Reset về trang đầu tiên và áp dụng sort mới
-    setProblems([]);
-    setGetProblemsRequest({
-      first: ITEMS_PER_PAGE,
-      sortBy: field,
-      sortOrder: order,
-    });
-  };
-
-  const handleRemoveFilter = (key: keyof ProblemFilters) => {
-    setFilters((prev) => ({
-      ...prev,
-      [key]: '',
-    }));
-    setProblems([]);
-    setGetProblemsRequest({
-      first: ITEMS_PER_PAGE,
-      sortBy,
-      sortOrder,
-    });
-  };
-
-  const handleClearAllFilters = () => {
-    setFilters({});
-    setProblems([]);
-    setGetProblemsRequest({
-      first: ITEMS_PER_PAGE,
-      sortBy,
-      sortOrder,
-    });
-  };
+    // Actions
+    handleFiltersChange,
+    handleKeywordChange,
+    handleSearch,
+    handleReset,
+    handleSortChange,
+    handleLoadMore,
+  } = useProblems();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pt-4">
@@ -210,6 +58,8 @@ export default function ProblemsPage() {
             <div className="xl:sticky xl:top-32 xl:max-h-[calc(100vh-8rem)] xl:overflow-y-auto xl:custom-scrollbar xl:pr-2">
               <div className="space-y-6">
                 <ProblemFilter
+                  keyWord={keyword}
+                  setKeyWord={handleKeywordChange}
                   filters={filters}
                   onFiltersChange={handleFiltersChange}
                   onSearch={handleSearch}
