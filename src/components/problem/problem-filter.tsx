@@ -124,7 +124,7 @@ export default function ProblemFilter({
               placeholder="Nhập mã bài..."
               value={filters.id || ''}
               onChange={(e) => handleFilterChange('id', e.target.value)}
-              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200"
+              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500"
             />
           </div>
 
@@ -141,7 +141,7 @@ export default function ProblemFilter({
               placeholder="Nhập tên bài..."
               value={filters.title || ''}
               onChange={(e) => handleFilterChange('title', e.target.value)}
-              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200"
+              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500"
             />
           </div>
 
@@ -156,7 +156,7 @@ export default function ProblemFilter({
                 handleFilterChange('difficulty', value === 'all' ? '' : value)
               }
             >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
+              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500">
                 <SelectValue placeholder="Tất cả" />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
@@ -164,7 +164,7 @@ export default function ProblemFilter({
                   <SelectItem
                     key={option.value}
                     value={option.value}
-                    className="rounded-lg"
+                    className="rounded-lg focus:bg-slate-100 dark:focus:bg-slate-700"
                   >
                     {option.label}
                   </SelectItem>
@@ -185,20 +185,23 @@ export default function ProblemFilter({
               }
               disabled={isLoadingTopics}
             >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
+              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500">
                 <SelectValue
                   placeholder={isLoadingTopics ? 'Đang tải...' : 'Tất cả'}
                 />
               </SelectTrigger>
               <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-                <SelectItem value="all" className="rounded-lg">
+                <SelectItem
+                  value="all"
+                  className="rounded-lg focus:bg-slate-100 dark:focus:bg-slate-700"
+                >
                   Tất cả
                 </SelectItem>
                 {topics.map((topic) => (
                   <SelectItem
                     key={topic.id}
                     value={topic.id}
-                    className="rounded-lg"
+                    className="rounded-lg focus:bg-slate-100 dark:focus:bg-slate-700"
                   >
                     {topic.name}
                   </SelectItem>
@@ -213,7 +216,7 @@ export default function ProblemFilter({
               Lựa chọn tag:
             </label>
             <Select disabled={isLoadingTags}>
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
+              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500">
                 <SelectValue
                   placeholder={
                     isLoadingTags
@@ -228,7 +231,7 @@ export default function ProblemFilter({
                 {tags.map((tag) => (
                   <div
                     key={tag.id}
-                    className="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg cursor-pointer"
+                    className="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg cursor-pointer transition-colors"
                     onClick={(e) => {
                       e.preventDefault();
                       const currentTags = filters.tags || [];
@@ -269,7 +272,7 @@ export default function ProblemFilter({
                       type="checkbox"
                       checked={filters.tags?.includes(tag.id) || false}
                       onChange={() => {}} // Handled by parent div onClick
-                      className="w-4 h-4 text-green-600 bg-gray-100 border-gray-300 rounded focus:ring-green-500 focus:ring-2"
+                      className="w-4 h-4 text-slate-600 bg-gray-100 border-gray-300 rounded focus:ring-slate-500 focus:ring-2"
                     />
                     <span className="text-sm">{tag.name}</span>
                   </div>

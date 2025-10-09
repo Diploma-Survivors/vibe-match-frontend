@@ -1,7 +1,6 @@
 'use client';
 
 import { SortControls } from '@/components/common';
-import type { SortField, SortOrder } from '@/components/common/sort-controls';
 import {
   ProblemFilter,
   ProblemStats,
@@ -15,11 +14,13 @@ import {
   ProblemEndpointType,
   type ProblemItemList,
   type ProblemListResponse,
+  SortBy,
+  SortOrder,
 } from '@/types/problems';
 import { BookOpen } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
-const ITEMS_PER_PAGE = 2;
+const ITEMS_PER_PAGE = 20;
 
 export default function ProblemsPage() {
   const [error, setError] = useState<string | null>(null);
@@ -27,9 +28,13 @@ export default function ProblemsPage() {
   const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // state for filters
   const [filters, setFilters] = useState<ProblemFilters>({});
-  const [sortField, setSortField] = useState<SortField>('id');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+
+  // state for sorting
+  const [sortBy, setSortBy] = useState<SortBy>(SortBy.TITLE);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
 
   const [getProblemsRequest, setGetProblemsRequest] =
     useState<GetProblemListRequest>({
@@ -107,15 +112,19 @@ export default function ProblemsPage() {
       before: undefined,
       first: ITEMS_PER_PAGE,
       last: undefined,
+      sortBy,
+      sortOrder,
     }));
   };
 
   const handleFiltersChange = (newFilters: ProblemFilters) => {
     setFilters(newFilters);
-    // Reset về trang đầu tiên khi thay đổi filter
+    // Reset về trang đầu tiên khi thay đổi filter, nhưng giữ nguyên sort
     setProblems([]);
     setGetProblemsRequest({
       first: ITEMS_PER_PAGE,
+      sortBy,
+      sortOrder,
     });
   };
 
@@ -124,6 +133,8 @@ export default function ProblemsPage() {
     setProblems([]);
     setGetProblemsRequest({
       first: ITEMS_PER_PAGE,
+      sortBy,
+      sortOrder,
     });
   };
 
@@ -132,16 +143,20 @@ export default function ProblemsPage() {
     setProblems([]);
     setGetProblemsRequest({
       first: ITEMS_PER_PAGE,
+      sortBy,
+      sortOrder,
     });
   };
 
-  const handleSortChange = (field: SortField, order: SortOrder) => {
-    setSortField(field);
+  const handleSortChange = (field: SortBy, order: SortOrder) => {
+    setSortBy(field);
     setSortOrder(order);
-    // TODO: Implement sorting with API
+    // Reset về trang đầu tiên và áp dụng sort mới
     setProblems([]);
     setGetProblemsRequest({
       first: ITEMS_PER_PAGE,
+      sortBy: field,
+      sortOrder: order,
     });
   };
 
@@ -153,6 +168,8 @@ export default function ProblemsPage() {
     setProblems([]);
     setGetProblemsRequest({
       first: ITEMS_PER_PAGE,
+      sortBy,
+      sortOrder,
     });
   };
 
@@ -161,6 +178,8 @@ export default function ProblemsPage() {
     setProblems([]);
     setGetProblemsRequest({
       first: ITEMS_PER_PAGE,
+      sortBy,
+      sortOrder,
     });
   };
 
@@ -207,7 +226,7 @@ export default function ProblemsPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-6 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl">
                 <div className="flex items-center gap-4">
                   <SortControls
-                    sortField={sortField}
+                    sortBy={sortBy}
                     sortOrder={sortOrder}
                     onSortChange={handleSortChange}
                   />

@@ -82,7 +82,7 @@ export interface GetProblemListRequest {
   last?: number;
   sortOrder?: SortOrder;
   matchMode?: MatchMode;
-  sortBy?: MatchMode;
+  sortBy?: SortBy;
   filters?: ProblemFilters;
 }
 

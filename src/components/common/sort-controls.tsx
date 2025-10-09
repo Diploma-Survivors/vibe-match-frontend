@@ -8,48 +8,40 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { SortBy, SortOrder } from '@/types/problems';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import React from 'react';
 
-export type SortField =
-  | 'id'
-  | 'title'
-  | 'difficulty'
-  | 'points'
-  | 'acceptanceRate'
-  | 'submissionCount';
-export type SortOrder = 'asc' | 'desc';
-
 interface SortControlsProps {
-  sortField: SortField;
+  sortBy: SortBy;
   sortOrder: SortOrder;
-  onSortChange: (field: SortField, order: SortOrder) => void;
+  onSortChange: (field: SortBy, order: SortOrder) => void;
 }
 
 const SORT_OPTIONS = [
-  { value: 'id', label: 'Mã bài' },
-  { value: 'title', label: 'Tên bài' },
-  { value: 'difficulty', label: 'Độ khó' },
-  { value: 'points', label: 'Điểm' },
-  { value: 'acceptanceRate', label: 'Tỷ lệ AC' },
-  { value: 'submissionCount', label: 'Số lượt nộp' },
+  { value: SortBy.TITLE, label: 'Tên bài' },
+  { value: SortBy.DIFFICULTY, label: 'Độ khó' },
+  { value: SortBy.CREATED_AT, label: 'Ngày tạo' },
+  { value: SortBy.MAX_SCORE, label: 'Điểm tối đa' },
 ];
 
 export default function SortControls({
-  sortField,
+  sortBy,
   sortOrder,
   onSortChange,
 }: SortControlsProps) {
-  const handleFieldChange = (field: string) => {
-    onSortChange(field as SortField, sortOrder);
+  const handleFieldChange = (newSortBy: SortBy) => {
+    onSortChange(newSortBy, sortOrder);
   };
 
   const handleOrderToggle = () => {
-    onSortChange(sortField, sortOrder === 'asc' ? 'desc' : 'asc');
+    const newOrder =
+      sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
+    onSortChange(sortBy, newOrder);
   };
 
   const getSortIcon = () => {
-    if (sortOrder === 'asc') {
+    if (sortOrder === SortOrder.ASC) {
       return <ArrowUp className="w-4 h-4" />;
     }
     return <ArrowDown className="w-4 h-4" />;
@@ -64,7 +56,7 @@ export default function SortControls({
         </span>
       </div>
 
-      <Select value={sortField} onValueChange={handleFieldChange}>
+      <Select value={sortBy} onValueChange={handleFieldChange}>
         <SelectTrigger className="w-48 h-10 rounded-xl border-0 bg-slate-100 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
           <SelectValue />
         </SelectTrigger>
@@ -89,7 +81,7 @@ export default function SortControls({
       >
         {getSortIcon()}
         <span className="font-medium">
-          {sortOrder === 'asc' ? 'Tăng dần' : 'Giảm dần'}
+          {sortOrder === SortOrder.ASC ? 'Tăng dần' : 'Giảm dần'}
         </span>
       </Button>
     </div>
