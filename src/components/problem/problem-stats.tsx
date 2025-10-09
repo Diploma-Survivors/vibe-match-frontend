@@ -1,27 +1,28 @@
 'use client';
 
 import type { Problem } from '@/types/problem-test';
+import type { ProblemItemList } from '@/types/problems';
 import { BookOpen, TrendingUp, Users } from 'lucide-react';
 import React, { useMemo } from 'react';
 
 interface ProblemStatsProps {
-  problems: Problem[];
+  problems: ProblemItemList[];
 }
 
 export default function ProblemStats({ problems }: ProblemStatsProps) {
   const stats = useMemo(() => {
     const total = problems.length;
-    const avgAcceptance =
-      problems.reduce((acc, p) => acc + p.acceptanceRate, 0) / total || 0;
-    const totalSubmissions = problems.reduce(
-      (acc, p) => acc + p.submissionCount,
-      0
-    );
+    // const avgAcceptance =
+    //   problems.reduce((acc, p) => acc + p.acceptanceRate, 0) / total || 0;
+    // const totalSubmissions = problems.reduce(
+    //   (acc, p) => acc + p.submissionCount,
+    //   0
+    // );
 
     return {
       total,
-      avgAcceptance,
-      totalSubmissions,
+      // avgAcceptance,
+      // totalSubmissions,
     };
   }, [problems]);
 
@@ -36,14 +37,16 @@ export default function ProblemStats({ problems }: ProblemStatsProps) {
     {
       icon: TrendingUp,
       label: 'Tỷ lệ AC',
-      value: `${stats.avgAcceptance.toFixed(1)}%`,
+      // value: `${stats.avgAcceptance.toFixed(1)}%`,
+      value: '100%',
       bgColor: 'bg-green-50 dark:bg-green-900/20',
       iconColor: 'text-green-600 dark:text-green-400',
     },
     {
       icon: Users,
       label: 'Lượt nộp',
-      value: stats.totalSubmissions.toLocaleString(),
+      // value: stats.totalSubmissions.toLocaleString(),
+      value: '9999',
       bgColor: 'bg-green-50 dark:bg-green-900/20',
       iconColor: 'text-green-600 dark:text-green-400',
     },

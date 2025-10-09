@@ -174,3 +174,24 @@
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(75, 85, 99, 0.8);
 }
+
+/* Dots Loader Animation */
+.dots-loader {
+  width: 120px;
+  height: 20px;
+  -webkit-mask: radial-gradient(circle closest-side, #000 94%, #0000) left / 20%
+    100%;
+  mask: radial-gradient(circle closest-side, #000 94%, #0000) left / 20% 100%;
+  background: linear-gradient(#000000 0 0) left / 0% 100% no-repeat #e5e7eb;
+  animation: dotsLoader 2s infinite steps(6);
+}
+
+@keyframes dotsLoader {
+  100% {
+    background-size: 120% 100%;
+  }
+}
+
+.dark .dots-loader {
+  background: linear-gradient(#000000 0 0) left / 0% 100% no-repeat #374151;
+}

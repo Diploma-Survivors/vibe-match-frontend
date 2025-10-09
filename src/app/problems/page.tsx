@@ -2,7 +2,11 @@
 
 import { SortControls } from '@/components/common';
 import type { SortField, SortOrder } from '@/components/common/sort-controls';
-import { ProblemFilter, ProblemTable } from '@/components/problem';
+import {
+  ProblemFilter,
+  ProblemStats,
+  ProblemTable,
+} from '@/components/problem';
 import { ProblemsService } from '@/services/problems-service';
 import type { ProblemFilters } from '@/types/problem-test';
 import {
@@ -23,7 +27,6 @@ export default function ProblemsPage() {
   const [pageInfo, setPageInfo] = useState<PageInfo | null>(null);
   const [totalCount, setTotalCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const [filters, setFilters] = useState<ProblemFilters>({});
   const [sortField, setSortField] = useState<SortField>('id');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -37,27 +40,46 @@ export default function ProblemsPage() {
     const fetchProblems = async () => {
       try {
         setIsLoading(true);
+        setError(null); // Clear previous errors
+
+        console.log('Fetching problems with request:', getProblemsRequest);
+        const startTime = performance.now();
 
         const axiosResponse = await ProblemsService.getProblemList(
           getProblemsRequest,
           ProblemEndpointType.TRAINING
         );
+
+        const endTime = performance.now();
+        console.log(`API call took ${(endTime - startTime).toFixed(2)}ms`);
+
         const response: ProblemListResponse = axiosResponse?.data?.data;
 
         // Extract problems from edges
-        const problemsData = response?.edges?.map((edge) => ({
-          ...edge.node,
-        }));
+        const problemsData =
+          response?.edges?.map((edge) => ({
+            ...edge.node,
+          })) || [];
 
-        setProblems(problemsData);
+        console.log(`Fetched ${problemsData.length} problems`);
+
+        // Append new problems to existing ones for infinite scroll
+        setProblems((prev) => {
+          // If using 'before' (going backward), prepend
+          if (getProblemsRequest.before) {
+            return [...problemsData, ...prev];
+          }
+          // If using 'after' or initial load, append
+          return getProblemsRequest.after
+            ? [...prev, ...problemsData]
+            : problemsData;
+        });
+
         setPageInfo(response?.pageInfos);
         setTotalCount(response?.totalCount);
       } catch (err) {
         console.error('Error fetching problems:', err);
         setError("Can't load the problems.");
-        setProblems([]);
-        setPageInfo(null);
-        setTotalCount(0);
       } finally {
         setIsLoading(false);
       }
@@ -66,53 +88,48 @@ export default function ProblemsPage() {
     fetchProblems();
   }, [getProblemsRequest]);
 
-  // Tính toán tổng số trang dựa trên totalCount từ API
-  const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
+  const handleLoadMore = () => {
+    console.log('handleLoadMore called', {
+      isLoading,
+      hasNextPage: pageInfo?.hasNextPage,
+      endCursor: pageInfo?.endCursor,
+    });
 
-  const handlePageChange = (page: number) => {
-    if (isLoading) return;
+    if (isLoading || !pageInfo?.hasNextPage) {
+      console.log('Skipping load more - already loading or no more data');
+      return;
+    }
 
-    // Nếu đi tới trang tiếp theo
-    if (page > currentPage && pageInfo?.hasNextPage) {
-      setGetProblemsRequest((prev) => ({
-        ...prev,
-        after: pageInfo.endCursor,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      }));
-      setCurrentPage(page);
-    }
-    // Nếu quay lại trang trước
-    else if (page < currentPage && pageInfo?.hasPreviousPage) {
-      setGetProblemsRequest((prev) => ({
-        ...prev,
-        before: pageInfo.startCursor,
-        after: undefined,
-        first: undefined,
-        last: ITEMS_PER_PAGE,
-      }));
-      setCurrentPage(page);
-    }
+    console.log('Loading more problems...');
+    setGetProblemsRequest((prev) => ({
+      ...prev,
+      after: pageInfo.endCursor,
+      before: undefined,
+      first: ITEMS_PER_PAGE,
+      last: undefined,
+    }));
   };
 
   const handleFiltersChange = (newFilters: ProblemFilters) => {
     setFilters(newFilters);
-    setCurrentPage(1);
     // Reset về trang đầu tiên khi thay đổi filter
+    setProblems([]);
     setGetProblemsRequest({
       first: ITEMS_PER_PAGE,
     });
   };
 
   const handleSearch = () => {
-    setCurrentPage(1);
     // TODO: Implement search with API
+    setProblems([]);
+    setGetProblemsRequest({
+      first: ITEMS_PER_PAGE,
+    });
   };
 
   const handleReset = () => {
     setFilters({});
-    setCurrentPage(1);
+    setProblems([]);
     setGetProblemsRequest({
       first: ITEMS_PER_PAGE,
     });
@@ -121,8 +138,11 @@ export default function ProblemsPage() {
   const handleSortChange = (field: SortField, order: SortOrder) => {
     setSortField(field);
     setSortOrder(order);
-    setCurrentPage(1);
     // TODO: Implement sorting with API
+    setProblems([]);
+    setGetProblemsRequest({
+      first: ITEMS_PER_PAGE,
+    });
   };
 
   const handleRemoveFilter = (key: keyof ProblemFilters) => {
@@ -130,42 +150,35 @@ export default function ProblemsPage() {
       ...prev,
       [key]: '',
     }));
-    setCurrentPage(1);
+    setProblems([]);
+    setGetProblemsRequest({
+      first: ITEMS_PER_PAGE,
+    });
   };
 
   const handleClearAllFilters = () => {
     setFilters({});
-    setCurrentPage(1);
+    setProblems([]);
+    setGetProblemsRequest({
+      first: ITEMS_PER_PAGE,
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-green-50 to-emerald-100 dark:from-slate-900 dark:via-green-900 dark:to-emerald-900 pt-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pt-4">
       {/* Header */}
       <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-white/20 dark:border-slate-700/50">
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent mb-2">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent mb-2">
                 Vibe Match Problems
               </h1>
               <p className="text-slate-600 dark:text-slate-400 text-lg">
                 Khám phá và chinh phục hàng ngàn bài tập lập trình
               </p>
             </div>
-            {/* <ProblemStats problems={problems} /> */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 rounded-xl border border-green-200 dark:border-green-700">
-                <BookOpen className="w-5 h-5 text-green-600 dark:text-green-400" />
-                <div>
-                  <div className="text-xs text-slate-600 dark:text-slate-400">
-                    Tổng bài
-                  </div>
-                  <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                    {totalCount}
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ProblemStats problems={problems} />
           </div>
         </div>
       </div>
@@ -210,7 +223,7 @@ export default function ProblemsPage() {
               </div>
 
               {/* Loading State */}
-              {isLoading && (
+              {isLoading && problems.length === 0 && (
                 <div className="flex items-center justify-center py-12">
                   <div className="text-center">
                     <div className="w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4" />
@@ -229,14 +242,13 @@ export default function ProblemsPage() {
               )}
 
               {/* Problem Table */}
-              {!isLoading && !error && (
+              {!error && problems.length > 0 && (
                 <ProblemTable
                   problems={problems}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
+                  hasMore={pageInfo?.hasNextPage ?? false}
+                  onLoadMore={handleLoadMore}
                   isLoading={isLoading}
-                  pageInfo={pageInfo}
+                  totalCount={totalCount}
                 />
               )}
             </div>
