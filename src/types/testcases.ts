@@ -8,6 +8,7 @@ export interface TestCase {
 export interface TestcaseSample {
   input: string;
   output: string;
+  explanation?: string;
 }
 
 export interface CreateTestcaseRequest {

@@ -2,7 +2,7 @@
 
 import { MonacoSubmitEditor } from '@/components/editor';
 import { Button } from '@/components/ui/button';
-import type { Problem } from '@/types/problem-test';
+import type { ProblemDetail as ProblemDetailType } from '@/types/problems';
 import { Copy, FileText, MemoryStick, Timer } from 'lucide-react';
 import {
   CheckCircle,
@@ -18,7 +18,7 @@ import {
 import React, { useState, useRef, useCallback } from 'react';
 
 interface ProblemDetailProps {
-  problem: Problem;
+  problem: ProblemDetailType;
   showContestInfo?: boolean;
   contestName?: string;
   contestTimeRemaining?: string;
@@ -50,8 +50,28 @@ export default function ProblemDetail({
     }>
   >([]);
 
+  // Map difficulty from API to Vietnamese
+  const getDifficultyLabel = (difficulty: string) => {
+    switch (difficulty) {
+      case 'easy':
+        return 'Dễ';
+      case 'medium':
+        return 'Trung bình';
+      case 'hard':
+        return 'Khó';
+      default:
+        return difficulty;
+    }
+  };
+
+  // Convert time limit from ms to seconds
+  const timeLimitSeconds = (problem.timeLimitMs / 1000).toFixed(1);
+
+  // Convert memory limit from KB to MB
+  const memoryLimitMB = (problem.memoryLimitKb / 1024).toFixed(0);
+
   // Resizable panel state for horizontal (left/right)
-  const [leftWidth, setLeftWidth] = useState(40);
+  const [leftWidth, setLeftWidth] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -264,18 +284,8 @@ export default function ProblemDetail({
     setTimeout(() => setCopiedIndex(null), 2000);
   };
 
-  const sampleCases = [
-    {
-      input: '5',
-      output: '1 1 2 3 5',
-      explanation: 'First 5 Fibonacci numbers',
-    },
-    {
-      input: '8',
-      output: '1 1 2 3 5 8 13 21',
-      explanation: 'First 8 Fibonacci numbers',
-    },
-  ];
+  // Get sample test cases from problem data
+  const sampleCases = problem.testcaseSamples || [];
 
   return (
     <div className="h-full">
@@ -334,26 +344,26 @@ export default function ProblemDetail({
                   <div className="flex items-center gap-4 flex-wrap">
                     <div
                       className={`px-3 py-1 rounded-full text-sm font-semibold shadow-md ${
-                        problem.difficulty === 'Dễ'
+                        problem.difficulty === 'easy'
                           ? 'bg-gradient-to-r from-green-400 to-green-500 text-white'
-                          : problem.difficulty === 'Trung bình'
+                          : problem.difficulty === 'medium'
                             ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white'
                             : 'bg-gradient-to-r from-red-400 to-red-500 text-white'
                       }`}
                     >
-                      {problem.difficulty}
+                      {getDifficultyLabel(problem.difficulty)}
                     </div>
                     <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
                       <Timer className="w-4 h-4" />
-                      2.0s time limit
+                      {timeLimitSeconds}s time limit
                     </div>
                     <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
                       <MemoryStick className="w-4 h-4" />
-                      256MB memory
+                      {memoryLimitMB}MB memory
                     </div>
                     <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
                       <FileText className="w-4 h-4" />
-                      {problem.points} điểm
+                      {problem.maxScore} điểm
                     </div>
                   </div>
                 </div>
@@ -364,14 +374,8 @@ export default function ProblemDetail({
                     Mô tả bài toán
                   </h2>
                   <div className="prose prose-slate dark:prose-invert max-w-none">
-                    <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
-                      Cho số nguyên dương <strong>N</strong>, liệt kê phi hàm
-                      euler của các số từ 1 tới N và in ra màn hình.
-                    </p>
-                    <p className="text-slate-700 dark:text-slate-300 leading-relaxed mt-4">
-                      Phi hàm euler của số <strong>X</strong> hiển số lượng số
-                      nguyên tố cùng nhau với <strong>X</strong> nằm trong
-                      khoảng từ [1, X].
+                    <p className="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
+                      {problem.description}
                     </p>
                   </div>
                 </section>
@@ -382,23 +386,28 @@ export default function ProblemDetail({
                     Đầu vào
                   </h2>
                   <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                    <p className="text-slate-700 dark:text-slate-300">
-                      • Số nguyên N
+                    <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+                      {problem.inputDescription}
                     </p>
                   </div>
                 </section>
 
                 {/* Constraints */}
-                <section>
-                  <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-                    Giới hạn
-                  </h2>
-                  <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                    <p className="text-slate-700 dark:text-slate-300">
-                      • 1≤N≤10^6
-                    </p>
-                  </div>
-                </section>
+                {problem.timeLimitMs && problem.memoryLimitKb && (
+                  <section>
+                    <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
+                      Giới hạn
+                    </h2>
+                    <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                      <p className="text-slate-700 dark:text-slate-300">
+                        • Thời gian: {timeLimitSeconds}s
+                      </p>
+                      <p className="text-slate-700 dark:text-slate-300">
+                        • Bộ nhớ: {memoryLimitMB}MB
+                      </p>
+                    </div>
+                  </section>
+                )}
 
                 {/* Output Format */}
                 <section>
@@ -406,85 +415,92 @@ export default function ProblemDetail({
                     Đầu ra
                   </h2>
                   <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                    <p className="text-slate-700 dark:text-slate-300">
-                      • In ra phi hàm euler của các số từ 1 tới N
+                    <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
+                      {problem.outputDescription}
                     </p>
                   </div>
                 </section>
 
                 {/* Sample Cases */}
-                <section>
-                  <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-                    Ví dụ
-                  </h2>
-                  {sampleCases.map((testCase, index) => (
-                    <div
-                      key={`testcase-${index}-${testCase.input.slice(0, 10)}`}
-                      className="mb-6 last:mb-0"
-                    >
-                      <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-3">
-                        Test case {index + 1}
-                      </h3>
+                {sampleCases.length > 0 && (
+                  <section>
+                    <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
+                      Ví dụ
+                    </h2>
+                    {sampleCases.map((testCase, index) => (
+                      <div
+                        key={`testcase-${index}-${testCase.input?.slice(0, 10) || index}`}
+                        className="mb-6 last:mb-0"
+                      >
+                        <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-3">
+                          Test case {index + 1}
+                        </h3>
 
-                      {/* Input */}
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                            Input
-                          </h4>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              copyToClipboard(testCase.input, index * 2)
-                            }
-                            className="h-6 px-2 text-xs"
-                          >
-                            <Copy className="w-3 h-3 mr-1" />
-                            {copiedIndex === index * 2 ? 'Copied!' : 'Copy'}
-                          </Button>
+                        {/* Input */}
+                        <div className="mb-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                              Input
+                            </h4>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                copyToClipboard(testCase.input || '', index * 2)
+                              }
+                              className="h-6 px-2 text-xs"
+                            >
+                              <Copy className="w-3 h-3 mr-1" />
+                              {copiedIndex === index * 2 ? 'Copied!' : 'Copy'}
+                            </Button>
+                          </div>
+                          <div className="bg-slate-100 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                            <code className="text-slate-800 dark:text-slate-200 font-mono text-sm whitespace-pre-wrap">
+                              {testCase.input}
+                            </code>
+                          </div>
                         </div>
-                        <div className="bg-slate-100 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                          <code className="text-slate-800 dark:text-slate-200 font-mono text-sm">
-                            {testCase.input}
-                          </code>
+
+                        {/* Output */}
+                        <div className="mb-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <h4 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                              Output
+                            </h4>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() =>
+                                copyToClipboard(
+                                  testCase.output || '',
+                                  index * 2 + 1
+                                )
+                              }
+                              className="h-6 px-2 text-xs"
+                            >
+                              <Copy className="w-3 h-3 mr-1" />
+                              {copiedIndex === index * 2 + 1
+                                ? 'Copied!'
+                                : 'Copy'}
+                            </Button>
+                          </div>
+                          <div className="bg-slate-100 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                            <code className="text-slate-800 dark:text-slate-200 font-mono text-sm whitespace-pre-wrap">
+                              {testCase.output}
+                            </code>
+                          </div>
                         </div>
+
+                        {/* Explanation */}
+                        {testCase.explanation && (
+                          <div className="text-sm text-slate-600 dark:text-slate-400 italic">
+                            {testCase.explanation}
+                          </div>
+                        )}
                       </div>
-
-                      {/* Output */}
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h4 className="text-sm font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                            Output
-                          </h4>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              copyToClipboard(testCase.output, index * 2 + 1)
-                            }
-                            className="h-6 px-2 text-xs"
-                          >
-                            <Copy className="w-3 h-3 mr-1" />
-                            {copiedIndex === index * 2 + 1 ? 'Copied!' : 'Copy'}
-                          </Button>
-                        </div>
-                        <div className="bg-slate-100 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                          <code className="text-slate-800 dark:text-slate-200 font-mono text-sm">
-                            {testCase.output}
-                          </code>
-                        </div>
-                      </div>
-
-                      {/* Explanation */}
-                      {testCase.explanation && (
-                        <div className="text-sm text-slate-600 dark:text-slate-400 italic">
-                          {testCase.explanation}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </section>
+                    ))}
+                  </section>
+                )}
               </div>
             </div>
           </div>

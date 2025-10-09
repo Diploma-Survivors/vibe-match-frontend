@@ -1,11 +1,11 @@
 import clientApi from '@/lib/apis/axios-client';
 import type { ApiResponse } from '@/types/api';
-import {
-  type CreateProblemRequest,
-  type GetProblemListRequest,
+import type {
+  CreateProblemRequest,
+  GetProblemListRequest,
   ProblemDetail,
-  type ProblemEndpointType,
-  type ProblemListResponse,
+  ProblemEndpointType,
+  ProblemListResponse,
 } from '@/types/problems';
 import { Tag } from '@/types/tags';
 import { TestcaseSample } from '@/types/testcases';
@@ -70,6 +70,16 @@ async function createProblemComplete(
   }
 }
 
+async function getProblemById(problemId: string): Promise<ProblemDetail> {
+  const response = await clientApi.get<ApiResponse<ProblemDetail>>(
+    `/problems/${problemId}`
+  );
+
+  const problem = response.data.data;
+  return problem;
+}
+
+// Helper function to convert GetProblemListRequest to URLSearchParams
 function convertToQueryParams(request: GetProblemListRequest): URLSearchParams {
   const params = new URLSearchParams();
 
@@ -115,5 +125,6 @@ function convertToQueryParams(request: GetProblemListRequest): URLSearchParams {
 
 export const ProblemsService = {
   getProblemList,
+  getProblemById,
   createProblemComplete,
 };

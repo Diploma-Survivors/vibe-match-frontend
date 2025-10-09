@@ -150,7 +150,7 @@ export default function ProblemTable({
                     {/* Title and Tags */}
                     <TableCell className="px-4 py-4">
                       <div className="space-y-3">
-                        <Link href={`/problems/${problem.id}`}>
+                        <Link href={`/problems/${problem.id}/description`}>
                           <button
                             type="button"
                             className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-bold text-base text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"

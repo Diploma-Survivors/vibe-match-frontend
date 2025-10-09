@@ -56,14 +56,14 @@ export interface ProblemDetail {
   maxScore: number;
   timeLimitMs: number;
   memoryLimitKb: number;
-  difficulty: ProblemDifficulty;
+  difficulty: ProblemDifficulty | string;
   type?: string;
   createdAt?: string;
   updatedAt?: string;
-  tags: string[];
-  topic: string;
-  testcase: string;
-  testcaseSamples: TestcaseSample[];
+  tags?: string[];
+  topics?: string[];
+  testcase?: string;
+  testcaseSamples?: TestcaseSample[];
   score?: number; // For use in contests or assignments
 }
 
