@@ -115,3 +115,11 @@ export const PARTICIPATION_OPTIONS = [
   { value: 'yes', label: 'Đã tham gia' },
   { value: 'no', label: 'Chưa tham gia' },
 ];
+
+// Filter types for UI
+export interface ContestFilters {
+  startTime?: string;
+  endTime?: string;
+  minDurationMinutes?: number;
+  maxDurationMinutes?: number;
+}

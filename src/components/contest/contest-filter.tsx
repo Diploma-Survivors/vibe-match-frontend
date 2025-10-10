@@ -10,14 +10,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { ContestFilters } from '@/types/contests';
-import {
-  CONTEST_STATUS_OPTIONS,
-  PARTICIPATION_OPTIONS,
-} from '@/types/contests';
 import { Filter, RotateCcw, Search } from 'lucide-react';
 import React from 'react';
 
 interface ContestFilterProps {
+  keyword: string;
+  setKeyword: (keyword: string) => void;
   filters: ContestFilters;
   onFiltersChange: (filters: ContestFilters) => void;
   onSearch: () => void;
@@ -25,12 +23,17 @@ interface ContestFilterProps {
 }
 
 export default function ContestFilter({
+  keyword,
+  setKeyword,
   filters,
   onFiltersChange,
   onSearch,
   onReset,
 }: ContestFilterProps) {
-  const handleFilterChange = (key: keyof ContestFilters, value: string) => {
+  const handleFilterChange = (
+    key: keyof ContestFilters,
+    value: string | number | undefined
+  ) => {
     onFiltersChange({
       ...filters,
       [key]: value,
@@ -62,94 +65,101 @@ export default function ContestFilter({
         </div>
 
         <div className="space-y-4">
-          {/* Mã contest */}
+          {/* Keyword Search */}
           <div className="space-y-2">
             <label
-              htmlFor="contest-id"
+              htmlFor="contest-keyword"
               className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
             >
-              Mã contest:
+              Tìm kiếm:
             </label>
             <Input
-              id="contest-id"
-              placeholder="Nhập mã contest..."
-              value={filters.id || ''}
-              onChange={(e) => handleFilterChange('id', e.target.value)}
-              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
-            />
-          </div>
-
-          {/* Tên contest */}
-          <div className="space-y-2">
-            <label
-              htmlFor="contest-name"
-              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
-            >
-              Tên contest:
-            </label>
-            <Input
-              id="contest-name"
+              id="contest-keyword"
               placeholder="Nhập tên contest..."
-              value={filters.name || ''}
-              onChange={(e) => handleFilterChange('name', e.target.value)}
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
               className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
             />
           </div>
 
-          {/* Trạng thái contest */}
+          {/* Start Time */}
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Trạng thái:
-            </label>
-            <Select
-              value={filters.status || 'all'}
-              onValueChange={(value) =>
-                handleFilterChange('status', value === 'all' ? '' : value)
-              }
+            <label
+              htmlFor="start-time"
+              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
             >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200">
-                <SelectValue placeholder="Tất cả trạng thái" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-                {CONTEST_STATUS_OPTIONS.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="rounded-lg"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              Thời gian bắt đầu:
+            </label>
+            <Input
+              id="start-time"
+              type="datetime-local"
+              value={filters.startTime || ''}
+              onChange={(e) => handleFilterChange('startTime', e.target.value)}
+              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
+            />
           </div>
 
-          {/* Tình trạng tham gia */}
+          {/* End Time */}
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Tình trạng tham gia:
-            </label>
-            <Select
-              value={filters.participated || 'all'}
-              onValueChange={(value) =>
-                handleFilterChange('participated', value === 'all' ? '' : value)
-              }
+            <label
+              htmlFor="end-time"
+              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
             >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200">
-                <SelectValue placeholder="Tất cả" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-                {PARTICIPATION_OPTIONS.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="rounded-lg"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              Thời gian kết thúc:
+            </label>
+            <Input
+              id="end-time"
+              type="datetime-local"
+              value={filters.endTime || ''}
+              onChange={(e) => handleFilterChange('endTime', e.target.value)}
+              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
+            />
+          </div>
+
+          {/* Min Duration */}
+          <div className="space-y-2">
+            <label
+              htmlFor="min-duration"
+              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
+            >
+              Thời lượng tối thiểu (phút):
+            </label>
+            <Input
+              id="min-duration"
+              type="number"
+              placeholder="Nhập thời lượng..."
+              value={filters.minDurationMinutes || ''}
+              onChange={(e) =>
+                handleFilterChange(
+                  'minDurationMinutes',
+                  e.target.value ? Number(e.target.value) : undefined
+                )
+              }
+              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
+            />
+          </div>
+
+          {/* Max Duration */}
+          <div className="space-y-2">
+            <label
+              htmlFor="max-duration"
+              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
+            >
+              Thời lượng tối đa (phút):
+            </label>
+            <Input
+              id="max-duration"
+              type="number"
+              placeholder="Nhập thời lượng..."
+              value={filters.maxDurationMinutes || ''}
+              onChange={(e) =>
+                handleFilterChange(
+                  'maxDurationMinutes',
+                  e.target.value ? Number(e.target.value) : undefined
+                )
+              }
+              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
+            />
           </div>
         </div>
 

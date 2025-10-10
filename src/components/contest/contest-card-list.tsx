@@ -29,11 +29,10 @@ import Link from 'next/link';
 import React from 'react';
 
 interface ContestCardListProps {
-  contests: Contest[];
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-  title: string;
+  contests: any[];
+  hasMore: boolean;
+  onLoadMore: () => void;
+  isLoading: boolean;
 }
 
 const getActionButton = (contest: Contest) => {
@@ -114,10 +113,9 @@ const getStatusIcon = (status: string) => {
 
 export default function ContestCardList({
   contests,
-  currentPage,
-  totalPages,
-  onPageChange,
-  title,
+  hasMore,
+  onLoadMore,
+  isLoading,
 }: ContestCardListProps) {
   return (
     <div className="space-y-4">
@@ -127,7 +125,7 @@ export default function ContestCardList({
           <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg shadow-lg shadow-emerald-500/25">
             <Trophy className="w-5 h-5 text-white" />
           </div>
-          {title}
+          🏆 Danh sách cuộc thi
         </h3>
       </div>
 
@@ -256,50 +254,26 @@ export default function ContestCardList({
         ))}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-6">
-          <div className="flex items-center justify-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage <= 1}
-              className="h-8 px-3 shadow-md hover:shadow-lg transition-all duration-300 border-white/50 dark:border-slate-600/50 backdrop-blur-sm"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-
-            <div className="flex items-center gap-1">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (pageNum) => (
-                  <Button
-                    key={pageNum}
-                    variant={pageNum === currentPage ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => onPageChange(pageNum)}
-                    className={`h-8 w-8 p-0 transition-all duration-300 ${
-                      pageNum === currentPage
-                        ? 'shadow-lg shadow-blue-500/25 bg-gradient-to-r from-blue-500 to-purple-600'
-                        : 'shadow-md hover:shadow-lg border-white/50 dark:border-slate-600/50 backdrop-blur-sm'
-                    }`}
-                  >
-                    {pageNum}
-                  </Button>
-                )
-              )}
-            </div>
-
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage >= totalPages}
-              className="h-8 px-3 shadow-md hover:shadow-lg transition-all duration-300 border-white/50 dark:border-slate-600/50 backdrop-blur-sm"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
-          </div>
+      {/* Load More Button */}
+      {hasMore && (
+        <div className="flex justify-center pt-4">
+          <Button
+            onClick={onLoadMore}
+            disabled={isLoading}
+            className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 py-6 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            {isLoading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                Đang tải...
+              </>
+            ) : (
+              <>
+                <ChevronRight className="w-5 h-5 mr-2" />
+                Xem thêm
+              </>
+            )}
+          </Button>
         </div>
       )}
     </div>

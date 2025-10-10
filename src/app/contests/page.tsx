@@ -1,10 +1,31 @@
 'use client';
 
-import { ContestList } from '@/components/contest';
-import { RankingList } from '@/components/ranking';
+import { ContestFilter, ContestList } from '@/components/contest';
+import { useContests } from '@/hooks';
 import { motion } from 'framer-motion';
 
 export default function ContestsPage() {
+  const {
+    // State
+    contests,
+    pageInfo,
+    totalCount,
+    isLoading,
+    error,
+    filters,
+    keyword,
+    sortBy,
+    sortOrder,
+
+    // Actions
+    handleFiltersChange,
+    handleKeywordChange,
+    handleSearch,
+    handleReset,
+    handleSortChange,
+    handleLoadMore,
+  } = useContests();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <div className="container mx-auto px-6 py-8">
@@ -31,17 +52,30 @@ export default function ContestsPage() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="flex-1 xl:w-[70%]"
           >
-            <ContestList />
+            <ContestList
+              contests={contests}
+              isLoading={isLoading}
+              error={error}
+              pageInfo={pageInfo}
+              onLoadMore={handleLoadMore}
+            />
           </motion.div>
 
-          {/* Right Panel - Global Ranking (30%) */}
+          {/* Right Panel - Filter (30%) */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
             className="xl:w-[30%] xl:min-w-[400px] xl:sticky xl:top-24 xl:self-start"
           >
-            <RankingList />
+            <ContestFilter
+              keyword={keyword}
+              setKeyword={handleKeywordChange}
+              filters={filters}
+              onFiltersChange={handleFiltersChange}
+              onSearch={handleSearch}
+              onReset={handleReset}
+            />
           </motion.div>
         </div>
       </div>
