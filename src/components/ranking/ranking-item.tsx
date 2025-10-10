@@ -1,6 +1,6 @@
 'use client';
 
-import type { User } from '@/types/contest';
+import type { User } from '@/types/contests';
 import { motion } from 'framer-motion';
 import { Crown, Medal, Trophy } from 'lucide-react';
 

@@ -9,8 +9,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import type { ContestFilters } from '@/types/contest';
-import { CONTEST_STATUS_OPTIONS, PARTICIPATION_OPTIONS } from '@/types/contest';
+import type { ContestFilters } from '@/types/contests';
+import {
+  CONTEST_STATUS_OPTIONS,
+  PARTICIPATION_OPTIONS,
+} from '@/types/contests';
 import { Filter, RotateCcw, Search } from 'lucide-react';
 import React from 'react';
 

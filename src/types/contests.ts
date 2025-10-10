@@ -1,41 +1,73 @@
 import type { ProblemDetail } from './problems';
 
-export interface Contest {
-  id?: string;
-  name: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  durationMinutes: number;
-  problems: ProblemDetail[];
-  status?: ContestStatus | 'upcoming' | 'ongoing' | 'finished';
-  createdBy?: string;
-  createdAt?: string;
-}
-
-export interface ContestDTO {
-  id?: string;
-  name: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  durationMinutes: number;
-  problems: ContestProblemDTO[];
-  status?: ContestStatus | 'upcoming' | 'ongoing' | 'finished';
-  createdBy?: string;
-  createdAt?: string;
-}
-
+// Enums for contest list
 export enum ContestStatus {
-  PRIVATE = 'private',
   PUBLIC = 'public',
+  PRIVATE = 'private',
+  UPCOMING = 'upcoming',
+  ONGOING = 'ongoing',
+  FINISHED = 'finished',
 }
 
-export interface ContestFilters {
-  id?: string;
-  name?: string;
-  status?: string;
-  accessRange?: string;
+export enum SortBy {
+  NAME = 'name',
+  START_TIME = 'startTime',
+  END_TIME = 'endTime',
+  DURATION_MINUTES = 'durationMinutes',
+}
+
+export enum SortOrder {
+  ASC = 'asc',
+  DESC = 'desc',
+}
+
+export enum MatchMode {
+  ANY = 'any',
+  ALL = 'all',
+}
+
+// Request types
+export interface GetContestListRequest {
+  keyword?: string;
+  after?: string;
+  before?: string;
+  first?: number;
+  last?: number;
+  sortOrder?: SortOrder;
+  matchMode?: MatchMode;
+  sortBy?: SortBy;
+  startTime?: string; // ISO 8601 format
+  endTime?: string; // ISO 8601 format
+  minDurationMinutes?: number;
+  maxDurationMinutes?: number;
+}
+
+// Response types
+export interface ContestItemList {
+  id: string;
+  name: string;
+  startTime: string; // ISO 8601 format
+  endTime: string; // ISO 8601 format
+  durationMinutes: number;
+  status: string;
+}
+
+export interface ContestEdge {
+  cursor: string;
+  node: ContestItemList;
+}
+
+export interface PageInfo {
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+  startCursor: string;
+  endCursor: string;
+}
+
+export interface ContestListResponse {
+  edges: ContestEdge[];
+  pageInfos: PageInfo;
+  totalCount: number;
 }
 
 export const CONTEST_STATUS_OPTIONS = [
@@ -66,12 +98,6 @@ export interface User {
   rank: number;
 }
 
-// export interface ContestStatus {
-//   upcoming: Contest[];
-//   ongoing: Contest[];
-//   finished: Contest[];
-// }
-
 export const CONTEST_STATUS_COLORS = {
   upcoming: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
   ongoing: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
@@ -83,20 +109,6 @@ export const CONTEST_STATUS_LABELS = {
   ongoing: 'Đang diễn ra',
   finished: 'Đã kết thúc',
 };
-
-// export interface ContestFilters {
-//   id?: string;
-//   name?: string;
-//   status?: "upcoming" | "ongoing" | "finished" | "";
-//   participated?: "yes" | "no" | "";
-// }
-
-// export const CONTEST_STATUS_OPTIONS = [
-//   { value: "all", label: "Tất cả trạng thái" },
-//   { value: "upcoming", label: "Sắp diễn ra" },
-//   { value: "ongoing", label: "Đang diễn ra" },
-//   { value: "finished", label: "Đã kết thúc" },
-// ];
 
 export const PARTICIPATION_OPTIONS = [
   { value: 'all', label: 'Tất cả' },

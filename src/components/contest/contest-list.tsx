@@ -1,7 +1,7 @@
 'use client';
 
 import { getContestsByStatus } from '@/lib/data/mock-contests';
-import type { Contest } from '@/types/contest';
+import type { Contest } from '@/types/contests';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import ContestCardList from './contest-card-list';

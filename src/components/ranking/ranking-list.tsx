@@ -1,7 +1,7 @@
 'use client';
 
 import ContestFilter from '@/components/contest/contest-filter';
-import type { ContestFilters } from '@/types/contest';
+import type { ContestFilters } from '@/types/contests';
 import { useState } from 'react';
 
 export default function RankingList() {

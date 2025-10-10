@@ -1,6 +1,6 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import type { Contest } from '@/types/contest';
+import type { Contest } from '@/types/contests';
 import {
   ArrowLeft,
   BarChart2,

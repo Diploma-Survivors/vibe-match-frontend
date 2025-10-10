@@ -1,7 +1,7 @@
 'use client';
 import { ContestNavbar } from '@/components/contest';
 import { mockContests } from '@/lib/data/mock-contests';
-import type { Contest } from '@/types/contest';
+import type { Contest } from '@/types/contests';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 

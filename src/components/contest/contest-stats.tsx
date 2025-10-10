@@ -1,6 +1,6 @@
 'use client';
 
-import type { Contest } from '@/types/contest';
+import type { Contest } from '@/types/contests';
 import { Calendar, Trophy, Users } from 'lucide-react';
 import React, { useMemo } from 'react';
 

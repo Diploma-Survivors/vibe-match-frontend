@@ -7,7 +7,7 @@ import {
   CONTEST_STATUS_COLORS,
   CONTEST_STATUS_LABELS,
   type Contest,
-} from '@/types/contest';
+} from '@/types/contests';
 import { motion } from 'framer-motion';
 import {
   Calendar,

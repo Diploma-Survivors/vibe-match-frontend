@@ -1,4 +1,4 @@
-import type { Contest, User } from '@/types/contest';
+import type { Contest, User } from '@/types/contests';
 
 export const mockContests: Contest[] = [
   {

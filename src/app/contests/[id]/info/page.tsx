@@ -2,7 +2,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { mockContests } from '@/lib/data/mock-contests';
-import { CONTEST_STATUS_COLORS, CONTEST_STATUS_LABELS } from '@/types/contest';
+import { CONTEST_STATUS_COLORS, CONTEST_STATUS_LABELS } from '@/types/contests';
 import {
   Award,
   BookOpen,
