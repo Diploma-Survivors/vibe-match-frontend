@@ -31,8 +31,6 @@ export default function ProblemDescriptionPage({
       try {
         const axiosResponse = await ProblemsService.getProblemById(id);
 
-        console.log('Fetched problem:', axiosResponse);
-
         setProblem(axiosResponse);
       } catch (error) {
         console.error('Error fetching problem:', error);

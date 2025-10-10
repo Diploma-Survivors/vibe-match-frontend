@@ -6,9 +6,12 @@ export interface TestCase {
 }
 
 export interface TestcaseSample {
+  id?: string;
   input: string;
   output: string;
   explanation?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreateTestcaseRequest {

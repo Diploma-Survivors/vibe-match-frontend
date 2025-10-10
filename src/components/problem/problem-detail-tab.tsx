@@ -33,6 +33,8 @@ export default function ProblemDetail({
   contestName,
   contestTimeRemaining,
 }: ProblemDetailProps) {
+  console.log('aassacas', problem);
+
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [output, setOutput] = useState('');
@@ -83,27 +85,27 @@ export default function ProblemDetail({
   const [isVerticalDragging, setIsVerticalDragging] = useState(false);
   const rightPanelRef = useRef<HTMLDivElement>(null);
 
-  // Test cases state
-  const [testCases, setTestCases] = useState([
-    {
-      id: 1,
-      input: '5',
-      output: '1 1 2 1 4',
-      isEditing: false,
-    },
-    {
-      id: 2,
-      input: '10',
-      output: '1 1 2 1 4 2 6 1 6 2',
-      isEditing: false,
-    },
-    {
-      id: 3,
-      input: '3',
-      output: '1 1 2',
-      isEditing: false,
-    },
-  ]);
+  // Test cases state - Initialize from problem data
+  const [testCases, setTestCases] = useState(() => {
+    // Convert API test cases to local format
+    if (problem.testcaseSamples && problem.testcaseSamples.length > 0) {
+      return problem.testcaseSamples.map((tc, index) => ({
+        id: tc.id || `testcase-${index}`,
+        input: tc.input || '',
+        output: tc.output || '',
+        isEditing: false,
+      }));
+    }
+    // Fallback to one empty test case if no samples
+    return [
+      {
+        id: 'default-1',
+        input: '',
+        output: '',
+        isEditing: true,
+      },
+    ];
+  });
 
   // Horizontal resizer handlers
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -189,11 +191,11 @@ export default function ProblemDetail({
   ]);
 
   // Test case handlers
-  const handleTestCaseSave = (id: number) => {
+  const handleTestCaseSave = (id: string) => {
     handleTestCaseEdit(id);
   };
 
-  const handleTestCaseEdit = (id: number) => {
+  const handleTestCaseEdit = (id: string) => {
     setTestCases((prev) =>
       prev.map((testCase) =>
         testCase.id === id
@@ -204,7 +206,7 @@ export default function ProblemDetail({
   };
 
   const handleTestCaseChange = (
-    id: number,
+    id: string,
     field: 'input' | 'output',
     value: string
   ) => {
@@ -217,7 +219,7 @@ export default function ProblemDetail({
 
   const handleTestCaseAdd = () => {
     const newTestCase = {
-      id: Date.now(),
+      id: `testcase-${Date.now()}`,
       input: '',
       output: '',
       isEditing: true,
@@ -226,7 +228,7 @@ export default function ProblemDetail({
     setActiveTestCase(testCases.length);
   };
 
-  const handleTestCaseDelete = (id: number) => {
+  const handleTestCaseDelete = (id: string) => {
     setTestCases((prev) => prev.filter((testCase) => testCase.id !== id));
     if (activeTestCase >= testCases.length - 1) {
       setActiveTestCase(Math.max(0, testCases.length - 2));
