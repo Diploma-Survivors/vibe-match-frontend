@@ -3,6 +3,7 @@
 import { ContestFilter, ContestList } from '@/components/contest';
 import { useContests } from '@/hooks';
 import { motion } from 'framer-motion';
+import { NotebookPen } from 'lucide-react';
 
 export default function ContestsPage() {
   const {
@@ -35,8 +36,9 @@ export default function ContestsPage() {
           transition={{ duration: 0.5 }}
           className="mb-8"
         >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent mb-3">
-            🏆 Contests
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent mb-3 flex items-center gap-3">
+            <NotebookPen className="w-10 h-10 text-slate-700 dark:text-slate-200" />
+            Contests
           </h1>
           <p className="text-slate-600 dark:text-slate-400 text-lg">
             Tham gia các cuộc thi lập trình để thử thách bản thân và nâng cao kỹ

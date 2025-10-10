@@ -3,30 +3,21 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  CONTEST_STATUS_COLORS,
-  CONTEST_STATUS_LABELS,
-  type Contest,
-} from '@/types/contests';
+import { CONTEST_STATUS_COLORS, CONTEST_STATUS_LABELS } from '@/types/contests';
 import { motion } from 'framer-motion';
 import {
   Calendar,
   CheckCircle,
-  ChevronLeft,
   ChevronRight,
   Clock,
-  Medal,
   Star,
   Timer,
   Trophy,
-  User,
   UserCheck,
   UserX,
-  Users,
   XCircle,
 } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
 
 interface ContestCardListProps {
   contests: any[];
@@ -35,42 +26,8 @@ interface ContestCardListProps {
   isLoading: boolean;
 }
 
-const getActionButton = (contest: Contest) => {
-  switch (contest.status) {
-    case 'upcoming':
-      return contest.registrationOpen ? (
-        <Button
-          size="sm"
-          className="bg-blue-600 hover:bg-blue-700 text-white min-w-[100px]"
-        >
-          Tham gia đấu
-        </Button>
-      ) : (
-        <Button variant="outline" size="sm" disabled className="min-w-[100px]">
-          Chưa mở
-        </Button>
-      );
-    case 'ongoing':
-      return (
-        <Button
-          size="sm"
-          className="bg-green-600 hover:bg-green-700 text-white min-w-[100px]"
-        >
-          Tham gia
-        </Button>
-      );
-    case 'finished':
-      return (
-        <Button variant="outline" size="sm" className="min-w-[100px]">
-          Tham gia đấu
-        </Button>
-      );
-    default:
-      return null;
-  }
-};
-
 const formatDate = (dateString: string) => {
+  if (!dateString) return 'N/A';
   const date = new Date(dateString);
   return date.toLocaleDateString('vi-VN', {
     day: '2-digit',
@@ -80,6 +37,7 @@ const formatDate = (dateString: string) => {
 };
 
 const formatTime = (dateString: string) => {
+  if (!dateString) return 'N/A';
   const date = new Date(dateString);
   return date.toLocaleTimeString('vi-VN', {
     hour: '2-digit',
@@ -87,15 +45,17 @@ const formatTime = (dateString: string) => {
   });
 };
 
-const formatDateTime = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString('vi-VN', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+const formatDuration = (minutes: number) => {
+  if (!minutes) return 'N/A';
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  if (hours > 0 && mins > 0) {
+    return `${hours}h ${mins}m`;
+  }
+  if (hours > 0) {
+    return `${hours}h`;
+  }
+  return `${mins}m`;
 };
 
 const getStatusIcon = (status: string) => {
@@ -105,10 +65,27 @@ const getStatusIcon = (status: string) => {
     case 'ongoing':
       return <Timer className="w-4 h-4" />;
     case 'finished':
-      return <Medal className="w-4 h-4" />;
+      return <Trophy className="w-4 h-4" />;
+    case 'public':
+      return <Trophy className="w-4 h-4" />;
+    case 'private':
+      return <Trophy className="w-4 h-4" />;
     default:
       return <Trophy className="w-4 h-4" />;
   }
+};
+
+const getStatusColor = (status: string) => {
+  const statusKey = status as keyof typeof CONTEST_STATUS_COLORS;
+  return (
+    CONTEST_STATUS_COLORS[statusKey] ||
+    'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+  );
+};
+
+const getStatusLabel = (status: string) => {
+  const statusKey = status as keyof typeof CONTEST_STATUS_LABELS;
+  return CONTEST_STATUS_LABELS[statusKey] || status;
 };
 
 export default function ContestCardList({
@@ -162,10 +139,10 @@ export default function ContestCardList({
 
                       {/* Status Badge */}
                       <Badge
-                        className={`${CONTEST_STATUS_COLORS[contest.status]} flex items-center gap-1 text-sm`}
+                        className={`${getStatusColor(contest.status)} flex items-center gap-1 text-sm`}
                       >
                         {getStatusIcon(contest.status)}
-                        {CONTEST_STATUS_LABELS[contest.status]}
+                        {getStatusLabel(contest.status)}
                       </Badge>
 
                       {/* User Participation Status */}
@@ -216,22 +193,46 @@ export default function ContestCardList({
                     </div>
 
                     {/* Contest Details - Inline */}
-                    <div className="flex items-center gap-6 text-base text-slate-600 dark:text-slate-400">
-                      {/* Date & Time */}
+                    <div className="flex flex-wrap items-center gap-4 text-sm text-slate-600 dark:text-slate-400">
+                      {/* Start Time */}
                       <div className="flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-                        <span>
-                          {formatDate(contest.startTime)} •{' '}
-                          {formatTime(contest.startTime)}
-                        </span>
+                        <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        <div className="flex flex-col">
+                          <span className="text-xs text-slate-500 dark:text-slate-500">
+                            Bắt đầu
+                          </span>
+                          <span className="font-medium">
+                            {formatDate(contest.starttime)} •{' '}
+                            {formatTime(contest.starttime)}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* End Time */}
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                        <div className="flex flex-col">
+                          <span className="text-xs text-slate-500 dark:text-slate-500">
+                            Kết thúc
+                          </span>
+                          <span className="font-medium">
+                            {formatDate(contest.endtime)} •{' '}
+                            {formatTime(contest.endtime)}
+                          </span>
+                        </div>
                       </div>
 
                       {/* Duration */}
                       <div className="flex items-center gap-2">
-                        <Clock className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                        <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-                          {contest.duration}
-                        </span>
+                        <Clock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                        <div className="flex flex-col">
+                          <span className="text-xs text-slate-500 dark:text-slate-500">
+                            Thời lượng
+                          </span>
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                            {formatDuration(contest.durationminutes)}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>

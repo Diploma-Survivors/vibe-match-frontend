@@ -52,6 +52,17 @@ export interface ContestItemList {
   status: string;
 }
 
+// API Response (lowercase fields from backend)
+export interface ContestItemApiResponse {
+  id: string;
+  name: string;
+  starttime: string; // ISO 8601 format (lowercase from API)
+  endtime: string; // ISO 8601 format (lowercase from API)
+  durationminutes: number; // lowercase from API
+  status: string;
+  sortby?: string;
+}
+
 export interface ContestEdge {
   cursor: string;
   node: ContestItemList;
@@ -102,13 +113,19 @@ export const CONTEST_STATUS_COLORS = {
   upcoming: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
   ongoing: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
   finished: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
-};
+  public:
+    'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
+  private:
+    'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+} as const;
 
 export const CONTEST_STATUS_LABELS = {
   upcoming: 'Sắp diễn ra',
   ongoing: 'Đang diễn ra',
   finished: 'Đã kết thúc',
-};
+  public: 'Công khai',
+  private: 'Riêng tư',
+} as const;
 
 export const PARTICIPATION_OPTIONS = [
   { value: 'all', label: 'Tất cả' },
