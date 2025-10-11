@@ -32,9 +32,7 @@ export default function ContestLayout({
       />
 
       {/* Main Content - Full Width for all tabs */}
-      <div className="container mx-auto px-4 bg-white dark:bg-slate-900">
-        {children}
-      </div>
+      <div className="container mx-auto px-4 dark:bg-slate-900">{children}</div>
     </div>
   );
 }

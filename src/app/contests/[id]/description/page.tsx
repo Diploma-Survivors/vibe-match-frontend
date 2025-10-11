@@ -24,7 +24,6 @@ export default function ContestInfoPage() {
       setLoading(true);
       const response = await ContestsService.getContestById(contestId);
       setContest(response?.data?.data);
-      console.log('Fetched contest data:', response?.data?.data);
     } catch (error) {
       console.error('Error fetching contest:', error);
     } finally {
@@ -38,7 +37,7 @@ export default function ContestInfoPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4" />
           <p className="text-slate-600 dark:text-slate-400">
@@ -51,7 +50,7 @@ export default function ContestInfoPage() {
 
   if (!contest) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-8 max-w-md">
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-2">
             Không tìm thấy cuộc thi
@@ -89,7 +88,7 @@ export default function ContestInfoPage() {
   const totalScore = contest.problems.reduce((sum, p) => sum + p.score, 0);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+    <div className="min-h-screen">
       <div className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8 xl:col-span-9 space-y-6">
