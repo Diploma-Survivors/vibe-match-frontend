@@ -4,7 +4,7 @@ import {
   type PageInfo,
   ProblemEndpointType,
   type ProblemFilters,
-  type ProblemItemList,
+  type ProblemListItem,
   type ProblemListResponse,
   SortBy,
   SortOrder,
@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from 'react';
 const ITEMS_PER_PAGE = 20;
 
 interface UseProblemsState {
-  problems: ProblemItemList[];
+  problems: ProblemListItem[];
   pageInfo: PageInfo | null;
   totalCount: number;
   isLoading: boolean;

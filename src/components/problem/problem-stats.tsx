@@ -1,11 +1,11 @@
 'use client';
 
-import type { ProblemItemList } from '@/types/problems';
+import type { ProblemListItem } from '@/types/problems';
 import { BookOpen, TrendingUp, Users } from 'lucide-react';
 import React, { useMemo } from 'react';
 
 interface ProblemStatsProps {
-  problems: ProblemItemList[];
+  problems: ProblemListItem[];
 }
 
 export default function ProblemStats({ problems }: ProblemStatsProps) {

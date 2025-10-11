@@ -8,14 +8,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ProblemDifficulty, type ProblemItemList } from '@/types/problems';
+import { ProblemDifficulty, type ProblemListItem } from '@/types/problems';
 import Link from 'next/link';
 import React from 'react';
 import { FaList } from 'react-icons/fa6';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 interface ProblemTableProps {
-  problems: ProblemItemList[];
+  problems: ProblemListItem[];
   hasMore: boolean;
   onLoadMore: () => void;
   isLoading?: boolean;

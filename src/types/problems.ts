@@ -70,8 +70,8 @@ export interface ProblemDetail {
 export interface ProblemFilters {
   difficulty?: ProblemDifficulty;
   type?: ProblemType;
-  topic?: string;
-  tags?: string[];
+  topicIds?: string[];
+  tagIds?: string[];
 }
 
 export interface GetProblemListRequest {
@@ -86,7 +86,7 @@ export interface GetProblemListRequest {
   filters?: ProblemFilters;
 }
 
-export interface ProblemItemList {
+export interface ProblemListItem {
   id: string;
   title: string;
   difficulty: ProblemDifficulty;
@@ -96,7 +96,7 @@ export interface ProblemItemList {
 }
 
 export interface ProblemEdge {
-  node: ProblemItemList;
+  node: ProblemListItem;
   cursor: string;
 }
 
