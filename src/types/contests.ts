@@ -15,6 +15,26 @@ export enum MatchMode {
   ALL = 'all',
 }
 
+// Contest Detail types
+export interface ContestProblem {
+  id: string;
+  title: string;
+  score: number;
+  difficulty: 'easy' | 'medium' | 'hard';
+  memoryLimitKb: number;
+  timeLimitMs: number;
+}
+
+export interface ContestDetail {
+  id: string;
+  name: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  durationMinutes: number;
+  problems: ContestProblem[];
+}
+
 // Filter types
 export interface ContestFilters {
   startTime?: string;

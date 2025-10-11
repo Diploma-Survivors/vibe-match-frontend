@@ -34,7 +34,7 @@ interface UseContestsReturn extends UseContestsState, UseContestsActions {
   filters: ContestFilters;
 }
 
-export function useContests(): UseContestsReturn {
+export default function useContests(): UseContestsReturn {
   // Main state to manage contests and loading/error states
   const [state, setState] = useState<UseContestsState>({
     contests: [],

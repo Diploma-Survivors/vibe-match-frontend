@@ -16,6 +16,11 @@ async function getContestList(
   return await clientApi.get(url);
 }
 
+async function getContestById(id: string) {
+  return await clientApi.get(`/contests/${id}`);
+}
+
 export const ContestsService = {
   getContestList,
+  getContestById,
 };

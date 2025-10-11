@@ -1,10 +1,10 @@
 'use client';
 
-import { SortControls } from '@/components/common';
+import SortControls from '@/components/common/sort-controls';
 import ProblemFilter from '@/components/problem/problem-filter';
 import ProblemStats from '@/components/problem/problem-stats';
 import ProblemTable from '@/components/problem/problem-table';
-import { useProblems } from '@/hooks/use-problems';
+import useProblems from '@/hooks/use-problems';
 import React from 'react';
 
 export default function ProblemsPage() {

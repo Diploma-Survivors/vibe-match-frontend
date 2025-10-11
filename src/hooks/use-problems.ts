@@ -40,7 +40,7 @@ interface UseProblemsReturn extends UseProblemsState, UseProblemsActions {
   sortOrder: SortOrder;
 }
 
-export function useProblems(): UseProblemsReturn {
+export default function useProblems(): UseProblemsReturn {
   const [state, setState] = useState<UseProblemsState>({
     problems: [],
     pageInfo: null,

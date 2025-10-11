@@ -2,7 +2,7 @@
 
 import ContestFilter from '@/components/contest/contest-filter';
 import ContestList from '@/components/contest/contest-list';
-import { useContests } from '@/hooks';
+import useContests from '@/hooks/use-contests';
 import { motion } from 'framer-motion';
 import { NotebookPen } from 'lucide-react';
 

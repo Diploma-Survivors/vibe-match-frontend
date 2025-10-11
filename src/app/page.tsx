@@ -1,6 +1,6 @@
 'use client';
 
-import { ParticleBackground } from '@/components/common';
+import { ParticleBackground } from '@/components/common/particle-background';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import {

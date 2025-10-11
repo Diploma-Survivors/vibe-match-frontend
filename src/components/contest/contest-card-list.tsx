@@ -98,7 +98,7 @@ export default function ContestCard({ contest, index }: ContestCardProps) {
               {/* Contest Header */}
               <div className="flex items-center gap-2 mb-4">
                 <Link
-                  href={`/contests/${contest.id}`}
+                  href={`/contests/${contest.id}/description`}
                   className="text-2xl font-bold text-slate-900 dark:text-slate-100 hover:text-green-600 dark:hover:text-blue-400 transition-colors line-clamp-1 flex-1"
                 >
                   {contest.name}
