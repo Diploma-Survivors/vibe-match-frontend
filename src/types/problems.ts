@@ -127,27 +127,6 @@ export const TYPE_OPTIONS = [
   { value: 'hybrid', label: 'Linh hoạt' },
 ];
 
-export const TAG_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'easy', label: 'Dễ' },
-  { value: 'medium', label: 'Trung bình' },
-  { value: 'hard', label: 'Khó' },
-];
-
-// Remove TOPIC_OPTIONS and TAG_OPTIONS as they will be fetched from backend
-// Keep ACCESS_RANGE_OPTIONS for potential future use
-export const ACCESS_RANGE_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'public', label: 'Public' },
-  { value: 'private', label: 'Private' },
-];
-
-export enum ProblemEndpointType {
-  SELECTABLE_FOR_CONTEST = 'selectable-for-contest',
-  SELECTABLE_FOR_ASSIGNMENT = 'selectable-for-assignment',
-  TRAINING = 'training',
-}
-
 export const DIFFICULTY_LABELS = new Map([
   [ProblemDifficulty.EASY, 'Dễ'],
   [ProblemDifficulty.MEDIUM, 'Trung bình'],

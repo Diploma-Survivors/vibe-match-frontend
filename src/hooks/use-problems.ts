@@ -3,8 +3,6 @@ import {
   type GetProblemListRequest,
   MatchMode,
   type PageInfo,
-  ProblemDifficulty,
-  ProblemEndpointType,
   type ProblemFilters,
   type ProblemListItem,
   type ProblemListResponse,

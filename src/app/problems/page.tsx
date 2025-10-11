@@ -56,18 +56,16 @@ export default function ProblemsPage() {
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
           {/* Left Sidebar - Filters */}
           <div className="xl:col-span-1">
-            <div className="xl:sticky xl:top-32 xl:max-h-[calc(100vh-8rem)] xl:overflow-y-auto xl:custom-scrollbar xl:pr-2">
-              <div className="space-y-6">
-                <ProblemFilter
-                  keyWord={keyword}
-                  filters={filters}
-                  onKeywordChange={handleKeywordChange}
-                  onFiltersChange={handleFiltersChange}
-                  onSearch={handleSearch}
-                  onReset={handleReset}
-                  isLoading={isLoading}
-                />
-              </div>
+            <div className="xl:sticky xl:top-32">
+              <ProblemFilter
+                keyWord={keyword}
+                filters={filters}
+                onKeywordChange={handleKeywordChange}
+                onFiltersChange={handleFiltersChange}
+                onSearch={handleSearch}
+                onReset={handleReset}
+                isLoading={isLoading}
+              />
             </div>
           </div>
 
