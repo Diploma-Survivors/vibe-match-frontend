@@ -75,149 +75,6 @@ export default function ProblemFilter({
     fetchTagsAndTopics();
   }, [fetchTagsAndTopics]);
 
-  // Tạo màu sắc dựa trên tên tag (hash-based color)
-  const getTagColor = (tagName: string) => {
-    const colors = [
-      {
-        bg: 'bg-blue-50',
-        text: 'text-blue-700',
-        border: 'border-blue-400',
-        darkBg: 'dark:bg-blue-900/20',
-        darkText: 'dark:text-blue-300',
-        darkBorder: 'dark:border-blue-500',
-      },
-      {
-        bg: 'bg-purple-50',
-        text: 'text-purple-700',
-        border: 'border-purple-400',
-        darkBg: 'dark:bg-purple-900/20',
-        darkText: 'dark:text-purple-300',
-        darkBorder: 'dark:border-purple-500',
-      },
-      {
-        bg: 'bg-pink-50',
-        text: 'text-pink-700',
-        border: 'border-pink-400',
-        darkBg: 'dark:bg-pink-900/20',
-        darkText: 'dark:text-pink-300',
-        darkBorder: 'dark:border-pink-500',
-      },
-      {
-        bg: 'bg-rose-50',
-        text: 'text-rose-700',
-        border: 'border-rose-400',
-        darkBg: 'dark:bg-rose-900/20',
-        darkText: 'dark:text-rose-300',
-        darkBorder: 'dark:border-rose-500',
-      },
-      {
-        bg: 'bg-orange-50',
-        text: 'text-orange-700',
-        border: 'border-orange-400',
-        darkBg: 'dark:bg-orange-900/20',
-        darkText: 'dark:text-orange-300',
-        darkBorder: 'dark:border-orange-500',
-      },
-      {
-        bg: 'bg-amber-50',
-        text: 'text-amber-700',
-        border: 'border-amber-400',
-        darkBg: 'dark:bg-amber-900/20',
-        darkText: 'dark:text-amber-300',
-        darkBorder: 'dark:border-amber-500',
-      },
-      {
-        bg: 'bg-yellow-50',
-        text: 'text-yellow-700',
-        border: 'border-yellow-400',
-        darkBg: 'dark:bg-yellow-900/20',
-        darkText: 'dark:text-yellow-300',
-        darkBorder: 'dark:border-yellow-500',
-      },
-      {
-        bg: 'bg-lime-50',
-        text: 'text-lime-700',
-        border: 'border-lime-400',
-        darkBg: 'dark:bg-lime-900/20',
-        darkText: 'dark:text-lime-300',
-        darkBorder: 'dark:border-lime-500',
-      },
-      {
-        bg: 'bg-green-50',
-        text: 'text-green-700',
-        border: 'border-green-400',
-        darkBg: 'dark:bg-green-900/20',
-        darkText: 'dark:text-green-300',
-        darkBorder: 'dark:border-green-500',
-      },
-      {
-        bg: 'bg-emerald-50',
-        text: 'text-emerald-700',
-        border: 'border-emerald-400',
-        darkBg: 'dark:bg-emerald-900/20',
-        darkText: 'dark:text-emerald-300',
-        darkBorder: 'dark:border-emerald-500',
-      },
-      {
-        bg: 'bg-teal-50',
-        text: 'text-teal-700',
-        border: 'border-teal-400',
-        darkBg: 'dark:bg-teal-900/20',
-        darkText: 'dark:text-teal-300',
-        darkBorder: 'dark:border-teal-500',
-      },
-      {
-        bg: 'bg-cyan-50',
-        text: 'text-cyan-700',
-        border: 'border-cyan-400',
-        darkBg: 'dark:bg-cyan-900/20',
-        darkText: 'dark:text-cyan-300',
-        darkBorder: 'dark:border-cyan-500',
-      },
-      {
-        bg: 'bg-sky-50',
-        text: 'text-sky-700',
-        border: 'border-sky-400',
-        darkBg: 'dark:bg-sky-900/20',
-        darkText: 'dark:text-sky-300',
-        darkBorder: 'dark:border-sky-500',
-      },
-      {
-        bg: 'bg-indigo-50',
-        text: 'text-indigo-700',
-        border: 'border-indigo-400',
-        darkBg: 'dark:bg-indigo-900/20',
-        darkText: 'dark:text-indigo-300',
-        darkBorder: 'dark:border-indigo-500',
-      },
-      {
-        bg: 'bg-violet-50',
-        text: 'text-violet-700',
-        border: 'border-violet-400',
-        darkBg: 'dark:bg-violet-900/20',
-        darkText: 'dark:text-violet-300',
-        darkBorder: 'dark:border-violet-500',
-      },
-      {
-        bg: 'bg-fuchsia-50',
-        text: 'text-fuchsia-700',
-        border: 'border-fuchsia-400',
-        darkBg: 'dark:bg-fuchsia-900/20',
-        darkText: 'dark:text-fuchsia-300',
-        darkBorder: 'dark:border-fuchsia-500',
-      },
-    ];
-
-    // Hash function to consistently assign a color based on tag name
-    let hash = 0;
-    for (let i = 0; i < tagName.length; i++) {
-      hash = tagName.charCodeAt(i) + ((hash << 5) - hash);
-    }
-
-    const index = Math.abs(hash) % colors.length;
-    return colors[index];
-  };
-
   return (
     <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
       <div className="flex items-center justify-between mb-6">
@@ -259,66 +116,66 @@ export default function ProblemFilter({
         </div>
 
         {/* Difficulty */}
-        <div className="space-y-2">
-          <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-            Mức độ:
-          </label>
-          <Select
-            value={filters.difficulty || 'all'}
-            onValueChange={(value) =>
-              onFiltersChange({
-                ...filters,
-                difficulty:
-                  value === 'all' ? undefined : (value as ProblemDifficulty),
-              })
-            }
-          >
-            <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500">
-              <SelectValue placeholder="Tất cả" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-              {DIFFICULTY_OPTIONS.map((option) => (
-                <SelectItem
-                  key={option.value}
-                  value={option.value}
-                  className="rounded-lg focus:bg-slate-100 dark:focus:bg-slate-700"
-                >
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Mức độ:
+            </label>
+            {filters.difficulty && (
+              <button
+                type="button"
+                onClick={() =>
+                  onFiltersChange({ ...filters, difficulty: undefined })
+                }
+                className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
+              >
+                Xóa
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {['easy', 'medium', 'hard'].map((level) => {
+              const isSelected = filters.difficulty === level;
+              const labels = {
+                easy: 'Dễ',
+                medium: 'Trung bình',
+                hard: 'Khó',
+              };
+              const colors = {
+                easy: isSelected
+                  ? 'bg-green-50 text-green-700 border-2 border-green-400 dark:bg-green-900/20 dark:text-green-300 dark:border-green-500'
+                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-green-300 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600',
+                medium: isSelected
+                  ? 'bg-yellow-50 text-yellow-700 border-2 border-yellow-400 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-500'
+                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-yellow-300 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600',
+                hard: isSelected
+                  ? 'bg-red-50 text-red-700 border-2 border-red-400 dark:bg-red-900/20 dark:text-red-300 dark:border-red-500'
+                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-red-300 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600',
+              };
 
-        {/* Type */}
-        <div className="space-y-2">
-          <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-            Loại bài:
-          </label>
-          <Select
-            value={filters.type || 'all'}
-            onValueChange={(value) =>
-              onFiltersChange({
-                ...filters,
-                type: value === 'all' ? undefined : (value as ProblemType),
-              })
-            }
-          >
-            <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500">
-              <SelectValue placeholder="Tất cả" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-              {TYPE_OPTIONS.map((option) => (
-                <SelectItem
-                  key={option.value}
-                  value={option.value}
-                  className="rounded-lg focus:bg-slate-100 dark:focus:bg-slate-700"
+              return (
+                <button
+                  key={level}
+                  type="button"
+                  onClick={() =>
+                    onFiltersChange({
+                      ...filters,
+                      difficulty: isSelected
+                        ? undefined
+                        : (level as ProblemDifficulty),
+                    })
+                  }
+                  className={`
+                    px-3 py-2 rounded-lg border text-xs font-medium
+                    transition-all duration-200 hover:scale-105
+                    ${colors[level as keyof typeof colors]}
+                  `}
                 >
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                  {labels[level as keyof typeof labels]}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Topic */}
@@ -366,11 +223,8 @@ export default function ProblemFilter({
                     className={`
                       flex items-center gap-3 px-4 py-2.5 rounded-lg border text-sm
                       transition-all duration-200 hover:scale-[1.02]
-                      ${
-                        isSelected
-                          ? 'bg-green-50 text-green-700 border-2 border-green-400 dark:bg-green-900/20 dark:text-green-300 dark:border-green-500 shadow-sm'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 dark:bg-slate-700/50 dark:text-slate-300 dark:border-slate-600 dark:hover:border-slate-500'
-                      }
+                      bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 
+                      dark:bg-slate-700/50 dark:text-slate-300 dark:border-slate-600 dark:hover:border-slate-500
                     `}
                   >
                     <div
@@ -436,7 +290,6 @@ export default function ProblemFilter({
                   (tag) => {
                     const isSelected =
                       filters.tagIds?.includes(tag.id) || false;
-                    const colorScheme = getTagColor(tag.name);
 
                     return (
                       <button
@@ -459,7 +312,7 @@ export default function ProblemFilter({
                             transition-all duration-200 hover:scale-105 hover:shadow-md
                             ${
                               isSelected
-                                ? `${colorScheme.bg} ${colorScheme.text} border-2 ${colorScheme.border} ${colorScheme.darkBg} ${colorScheme.darkText} ${colorScheme.darkBorder} shadow-sm`
+                                ? 'bg-slate-200 text-slate-700 border-2 border-slate-400 dark:bg-slate-600 dark:text-slate-200 dark:border-slate-500 shadow-sm'
                                 : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600 dark:hover:border-slate-500'
                             }
                           `}
