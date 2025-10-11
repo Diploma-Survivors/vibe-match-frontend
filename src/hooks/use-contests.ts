@@ -30,6 +30,7 @@ interface UseContestsActions {
 }
 
 interface UseContestsReturn extends UseContestsState, UseContestsActions {
+  // Request params (exposed for UI)
   keyword: string;
   filters: ContestFilters;
 }
@@ -71,7 +72,7 @@ export default function useContests(): UseContestsReturn {
         const response: ContestListResponse = axiosResponse?.data?.data;
 
         // Extract contests from edges
-        const contestsData =
+        const contestsData: ContestListItem[] =
           response?.edges?.map((edge) => ({
             ...edge.node,
           })) || [];

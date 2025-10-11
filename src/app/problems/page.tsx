@@ -15,17 +15,20 @@ export default function ProblemsPage() {
     totalCount,
     isLoading,
     error,
+
+    // Request params (exposed for UI)
     filters,
     keyword,
     sortBy,
     sortOrder,
 
-    // Actions
+    // Handlers
     handleFiltersChange,
     handleKeywordChange,
+    handleSortByChange,
+    handleSortOrderChange,
     handleSearch,
     handleReset,
-    handleSortChange,
     handleLoadMore,
   } = useProblems();
 
@@ -57,11 +60,12 @@ export default function ProblemsPage() {
               <div className="space-y-6">
                 <ProblemFilter
                   keyWord={keyword}
-                  setKeyWord={handleKeywordChange}
                   filters={filters}
+                  onKeywordChange={handleKeywordChange}
                   onFiltersChange={handleFiltersChange}
                   onSearch={handleSearch}
                   onReset={handleReset}
+                  isLoading={isLoading}
                 />
               </div>
             </div>
@@ -76,7 +80,8 @@ export default function ProblemsPage() {
                   <SortControls
                     sortBy={sortBy}
                     sortOrder={sortOrder}
-                    onSortChange={handleSortChange}
+                    onSortByChange={handleSortByChange}
+                    onSortOrderChange={handleSortOrderChange}
                   />
                 </div>
                 <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">

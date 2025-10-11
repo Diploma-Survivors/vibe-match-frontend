@@ -15,7 +15,8 @@ import React from 'react';
 interface SortControlsProps {
   sortBy: SortBy;
   sortOrder: SortOrder;
-  onSortChange: (field: SortBy, order: SortOrder) => void;
+  onSortByChange: (newSortBy: SortBy) => void;
+  onSortOrderChange: (newSortOrder: SortOrder) => void;
 }
 
 const SORT_OPTIONS = [
@@ -28,18 +29,9 @@ const SORT_OPTIONS = [
 export default function SortControls({
   sortBy,
   sortOrder,
-  onSortChange,
+  onSortByChange,
+  onSortOrderChange,
 }: SortControlsProps) {
-  const handleFieldChange = (newSortBy: SortBy) => {
-    onSortChange(newSortBy, sortOrder);
-  };
-
-  const handleOrderToggle = () => {
-    const newOrder =
-      sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC;
-    onSortChange(sortBy, newOrder);
-  };
-
   const getSortIcon = () => {
     if (sortOrder === SortOrder.ASC) {
       return <ArrowUp className="w-4 h-4" />;
@@ -56,7 +48,7 @@ export default function SortControls({
         </span>
       </div>
 
-      <Select value={sortBy} onValueChange={handleFieldChange}>
+      <Select value={sortBy} onValueChange={onSortByChange}>
         <SelectTrigger className="w-48 h-10 rounded-xl border-0 bg-slate-100 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
           <SelectValue />
         </SelectTrigger>
@@ -76,7 +68,11 @@ export default function SortControls({
       <Button
         variant="outline"
         size="sm"
-        onClick={handleOrderToggle}
+        onClick={() =>
+          onSortOrderChange(
+            sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC
+          )
+        }
         className="flex items-center gap-2 h-10 px-4 border-0 bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition-all duration-200 hover:scale-105"
       >
         {getSortIcon()}

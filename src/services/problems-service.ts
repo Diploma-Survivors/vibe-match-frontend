@@ -8,7 +8,7 @@ import type {
 import type { AxiosResponse } from 'axios';
 import qs from 'qs';
 
-async function getProblemList(
+async function getProblemListForTraining(
   getProblemListRequest: GetProblemListRequest
 ): Promise<AxiosResponse<ApiResponse<ProblemListResponse>>> {
   const queryString = qs.stringify(getProblemListRequest, {
@@ -16,7 +16,9 @@ async function getProblemList(
     skipNulls: true,
   });
 
-  const url = queryString ? `/problems?${queryString}` : '/problems';
+  const url = queryString
+    ? `/problems/training?${queryString}`
+    : '/problems/training';
   return await clientApi.get(url);
 }
 
@@ -30,6 +32,6 @@ async function getProblemById(problemId: string): Promise<ProblemDetail> {
 }
 
 export const ProblemsService = {
-  getProblemList,
+  getProblemListForTraining,
   getProblemById,
 };

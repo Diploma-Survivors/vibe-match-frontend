@@ -14,31 +14,36 @@ import { TagsService } from '@/services/tags-service';
 import { TopicsService } from '@/services/topics-service';
 import {
   DIFFICULTY_OPTIONS,
-  ProblemDifficulty,
+  type ProblemDifficulty,
   type ProblemFilters,
+  type ProblemType,
+  TYPE_OPTIONS,
 } from '@/types/problems';
 import type { Tag } from '@/types/tags';
 import type { Topic } from '@/types/topics';
 import { RotateCcw, Search } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface ProblemFilterProps {
   keyWord: string;
-  setKeyWord: (keyWord: string) => void;
   filters: ProblemFilters;
-  onFiltersChange: (filters: ProblemFilters) => void;
+  onKeywordChange: (newKeyword: string) => void;
+  onFiltersChange: (newFilters: ProblemFilters) => void;
   onSearch: () => void;
   onReset: () => void;
+  isLoading: boolean;
 }
 
 export default function ProblemFilter({
   keyWord,
-  setKeyWord,
   filters,
+  onKeywordChange,
   onFiltersChange,
   onSearch,
   onReset,
+  isLoading,
 }: ProblemFilterProps) {
+  // state for tags and topics to display in filter options
   const [tags, setTags] = useState<Tag[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
   const [isLoadingTags, setIsLoadingTags] = useState(true);
@@ -47,43 +52,28 @@ export default function ProblemFilter({
   const TAG_DISPLAY_LIMIT = 3;
 
   // Fetch tags and topics from backend
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch both tags and topics in parallel
-        const [tagsData, topicsData] = await Promise.all([
-          TagsService.getAllTags(),
-          TopicsService.getAllTopics(),
-        ]);
+  const fetchTagsAndTopics = useCallback(async () => {
+    setIsLoadingTags(true);
+    setIsLoadingTopics(true);
 
-        setTags(tagsData);
-        setTopics(topicsData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setIsLoadingTags(false);
-        setIsLoadingTopics(false);
-      }
-    };
-
-    fetchData();
+    try {
+      const [tagsData, topicsData] = await Promise.all([
+        TagsService.getAllTags(),
+        TopicsService.getAllTopics(),
+      ]);
+      setTags(tagsData);
+      setTopics(topicsData);
+    } catch (error) {
+      console.error('Error fetching tags or topics:', error);
+    } finally {
+      setIsLoadingTags(false);
+      setIsLoadingTopics(false);
+    }
   }, []);
 
-  const handleFilterChange = (
-    key: keyof ProblemFilters,
-    value: string | string[]
-  ) => {
-    const newFilters = { ...filters };
-
-    // If value is empty/undefined, remove the key from filters
-    if (!value || (Array.isArray(value) && value.length === 0)) {
-      delete newFilters[key];
-    } else {
-      newFilters[key] = value as any;
-    }
-
-    onFiltersChange(newFilters);
-  };
+  useEffect(() => {
+    fetchTagsAndTopics();
+  }, [fetchTagsAndTopics]);
 
   // Tạo màu sắc dựa trên tên tag (hash-based color)
   const getTagColor = (tagName: string) => {
@@ -218,7 +208,7 @@ export default function ProblemFilter({
       },
     ];
 
-    // Tạo hash từ tên tag
+    // Hash function to consistently assign a color based on tag name
     let hash = 0;
     for (let i = 0; i < tagName.length; i++) {
       hash = tagName.charCodeAt(i) + ((hash << 5) - hash);
@@ -265,7 +255,7 @@ export default function ProblemFilter({
               id="problem-keyword"
               placeholder="Nhập từ khóa..."
               value={keyWord || ''}
-              onChange={(e) => setKeyWord(e.target.value)}
+              onChange={(e) => onKeywordChange(e.target.value)}
               className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500"
             />
           </div>
@@ -278,7 +268,11 @@ export default function ProblemFilter({
             <Select
               value={filters.difficulty || 'all'}
               onValueChange={(value) =>
-                handleFilterChange('difficulty', value === 'all' ? '' : value)
+                onFiltersChange({
+                  ...filters,
+                  difficulty:
+                    value === 'all' ? undefined : (value as ProblemDifficulty),
+                })
               }
             >
               <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500">
@@ -298,15 +292,53 @@ export default function ProblemFilter({
             </Select>
           </div>
 
+          {/* Type */}
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Loại bài:
+            </label>
+            <Select
+              value={filters.type || 'all'}
+              onValueChange={(value) =>
+                onFiltersChange({
+                  ...filters,
+                  type: value === 'all' ? undefined : (value as ProblemType),
+                })
+              }
+            >
+              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500">
+                <SelectValue placeholder="Tất cả" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
+                {TYPE_OPTIONS.map((option) => (
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                    className="rounded-lg focus:bg-slate-100 dark:focus:bg-slate-700"
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
           {/* Topic */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Topic:
             </label>
             <Select
-              value={filters.topic || 'all'}
+              value={
+                filters.topicIds && filters.topicIds.length > 0
+                  ? filters.topicIds[0]
+                  : 'all'
+              }
               onValueChange={(value) =>
-                handleFilterChange('topic', value === 'all' ? '' : value)
+                onFiltersChange({
+                  ...filters,
+                  topicIds: value === 'all' ? [] : [value],
+                })
               }
               disabled={isLoadingTopics}
             >
@@ -341,13 +373,13 @@ export default function ProblemFilter({
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Lựa chọn tag:
               </label>
-              {filters.tags && filters.tags.length > 0 && (
+              {filters.tagIds && filters.tagIds.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => handleFilterChange('tags', [])}
+                  onClick={() => onFiltersChange({ ...filters, tagIds: [] })}
                   className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
                 >
-                  Xóa tất cả ({filters.tags.length})
+                  Xóa tất cả ({filters.tagIds.length})
                 </button>
               )}
             </div>
@@ -361,7 +393,7 @@ export default function ProblemFilter({
                   {(showAllTags ? tags : tags.slice(0, TAG_DISPLAY_LIMIT)).map(
                     (tag) => {
                       const isSelected =
-                        filters.tags?.includes(tag.id) || false;
+                        filters.tagIds?.includes(tag.id) || false;
                       const colorScheme = getTagColor(tag.name);
 
                       return (
@@ -369,15 +401,15 @@ export default function ProblemFilter({
                           key={tag.id}
                           type="button"
                           onClick={() => {
-                            const currentTags = filters.tags || [];
+                            const currentTags = filters.tagIds || [];
                             if (isSelected) {
                               const newTags = currentTags.filter(
-                                (t) => t !== tag.id
+                                (t: string) => t !== tag.id
                               );
-                              handleFilterChange('tags', newTags);
+                              onFiltersChange({ ...filters, tagIds: newTags });
                             } else {
                               const newTags = [...currentTags, tag.id];
-                              handleFilterChange('tags', newTags);
+                              onFiltersChange({ ...filters, tagIds: newTags });
                             }
                           }}
                           className={`

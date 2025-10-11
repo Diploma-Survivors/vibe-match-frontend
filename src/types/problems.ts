@@ -120,6 +120,13 @@ export const DIFFICULTY_OPTIONS = [
   { value: 'hard', label: 'Khó' },
 ];
 
+export const TYPE_OPTIONS = [
+  { value: 'all', label: 'Tất cả' },
+  { value: 'standalone', label: 'Độc lập' },
+  { value: 'contest', label: 'Thi đấu' },
+  { value: 'hybrid', label: 'Linh hoạt' },
+];
+
 export const TAG_OPTIONS = [
   { value: 'all', label: 'Tất cả' },
   { value: 'easy', label: 'Dễ' },

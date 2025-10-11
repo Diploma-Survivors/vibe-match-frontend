@@ -1,7 +1,9 @@
 import { ProblemsService } from '@/services/problems-service';
 import {
   type GetProblemListRequest,
+  MatchMode,
   type PageInfo,
+  ProblemDifficulty,
   ProblemEndpointType,
   type ProblemFilters,
   type ProblemListItem,
@@ -24,16 +26,15 @@ interface UseProblemsState {
 interface UseProblemsActions {
   handleFiltersChange: (newFilters: ProblemFilters) => void;
   handleKeywordChange: (newKeyword: string) => void;
+  handleSortByChange: (newSortBy: SortBy) => void;
+  handleSortOrderChange: (newSortOrder: SortOrder) => void;
   handleSearch: () => void;
   handleReset: () => void;
-  handleSortChange: (field: SortBy, order: SortOrder) => void;
   handleLoadMore: () => void;
-  handleRemoveFilter: (key: keyof ProblemFilters) => void;
-  handleClearAllFilters: () => void;
 }
 
 interface UseProblemsReturn extends UseProblemsState, UseProblemsActions {
-  // Expose request state for UI
+  // Request params (exposed for UI)
   filters: ProblemFilters;
   keyword: string;
   sortBy: SortBy;
@@ -41,6 +42,7 @@ interface UseProblemsReturn extends UseProblemsState, UseProblemsActions {
 }
 
 export default function useProblems(): UseProblemsReturn {
+  // Main state to manage problems and loading/error states
   const [state, setState] = useState<UseProblemsState>({
     problems: [],
     pageInfo: null,
@@ -49,11 +51,23 @@ export default function useProblems(): UseProblemsReturn {
     error: null,
   });
 
+  // states for filters and keyword to manage input values
+  const [filters, setFilters] = useState<ProblemFilters>({});
+  const [keyword, setKeyword] = useState<string>('');
+
+  // state for sorting
+  const [sortBy, setSortBy] = useState<SortBy>(SortBy.TITLE);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
+
+  // Request state to manage API request parameters
   const [request, setRequest] = useState<GetProblemListRequest>({
     first: ITEMS_PER_PAGE,
-    sortBy: SortBy.TITLE,
-    sortOrder: SortOrder.ASC,
-    filters: {},
+    sortBy: sortBy || SortBy.TITLE,
+    sortOrder: sortOrder || SortOrder.ASC,
+    matchMode: MatchMode.ANY,
+    filters: {
+      ...filters,
+    },
   });
 
   // Fetch problems function
@@ -61,29 +75,21 @@ export default function useProblems(): UseProblemsReturn {
     async (requestParams: GetProblemListRequest) => {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-        console.log('Fetching problems with request:', requestParams);
-
-        const axiosResponse = await ProblemsService.getProblemList(
-          requestParams,
-          ProblemEndpointType.TRAINING
-        );
-
+        const axiosResponse =
+          await ProblemsService.getProblemListForTraining(requestParams);
         const response: ProblemListResponse = axiosResponse?.data?.data;
 
         // Extract problems from edges
-        const problemsData =
+        const problemsData: ProblemListItem[] =
           response?.edges?.map((edge) => ({
             ...edge.node,
           })) || [];
 
-        console.log(`Fetched ${problemsData.length} problems`);
-
         setState((prev) => ({
           ...prev,
           problems: requestParams.after
-            ? [...prev.problems, ...problemsData] // Append for pagination
-            : problemsData, // Replace for new search/sort
+            ? [...prev.problems, ...problemsData]
+            : problemsData,
           pageInfo: response?.pageInfos,
           totalCount: response?.totalCount,
           isLoading: false,
@@ -105,32 +111,6 @@ export default function useProblems(): UseProblemsReturn {
     fetchProblems(request);
   }, [request, fetchProblems]);
 
-  // Helper function to clean filters (remove empty/undefined values)
-  const cleanFilters = useCallback(
-    (filters: ProblemFilters): ProblemFilters => {
-      const cleaned: ProblemFilters = {};
-
-      if (filters.difficulty) {
-        cleaned.difficulty = filters.difficulty;
-      }
-
-      if (filters.topic) {
-        cleaned.topic = filters.topic;
-      }
-
-      if (filters.tags && filters.tags.length > 0) {
-        cleaned.tags = filters.tags;
-      }
-
-      if (filters.type) {
-        cleaned.type = filters.type;
-      }
-
-      return cleaned;
-    },
-    []
-  );
-
   // Helper function to update request
   const updateRequest = useCallback(
     (updates: Partial<GetProblemListRequest>, clearProblems = false) => {
@@ -138,104 +118,45 @@ export default function useProblems(): UseProblemsReturn {
         setState((prev) => ({ ...prev, problems: [] }));
       }
 
-      setRequest((prev) => {
-        const newRequest: GetProblemListRequest = {
-          ...prev,
-          ...updates,
-        };
-
-        // Clean filters if provided
-        if (updates.filters !== undefined) {
-          const cleanedFilters = cleanFilters(updates.filters);
-          newRequest.filters =
-            Object.keys(cleanedFilters).length > 0 ? cleanedFilters : undefined;
-        }
-
-        // Clean keyword
-        if (updates.keyword !== undefined) {
-          newRequest.keyword = updates.keyword.trim() || undefined;
-        }
-
-        return newRequest;
-      });
+      setRequest((prev) => ({
+        ...prev,
+        ...updates,
+      }));
     },
-    [cleanFilters]
+    []
   );
 
-  // Actions
-  const handleFiltersChange = useCallback(
-    (newFilters: ProblemFilters) => {
-      updateRequest({ filters: newFilters }, false);
-      console.log('Filters changed:', newFilters);
+  // handle filter, keyword changes
+  const handleFiltersChange = useCallback((newFilters: ProblemFilters) => {
+    setFilters(newFilters);
+  }, []);
+
+  const handleKeywordChange = useCallback((newKeyword: string) => {
+    setKeyword(newKeyword);
+  }, []);
+
+  // handle sorting changes
+  const handleSortByChange = useCallback(
+    (newSortBy: SortBy) => {
+      setSortBy(newSortBy);
+      updateRequest({ sortBy: newSortBy }, false);
     },
     [updateRequest]
   );
 
-  const handleKeywordChange = useCallback(
-    (newKeyword: string) => {
-      updateRequest({ keyword: newKeyword }, false);
+  const handleSortOrderChange = useCallback(
+    (newSortOrder: SortOrder) => {
+      setSortOrder(newSortOrder);
+      updateRequest({ sortOrder: newSortOrder }, false);
     },
     [updateRequest]
   );
 
-  const handleSearch = useCallback(() => {
-    // Reset to first page with current filters/keyword
-    updateRequest(
-      {
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      true
-    );
-  }, [updateRequest]);
-
-  const handleReset = useCallback(() => {
-    updateRequest(
-      {
-        keyword: undefined,
-        filters: {},
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      true
-    );
-  }, [updateRequest]);
-
-  const handleSortChange = useCallback(
-    (field: SortBy, order: SortOrder) => {
-      updateRequest(
-        {
-          sortBy: field,
-          sortOrder: order,
-          after: undefined,
-          before: undefined,
-          first: ITEMS_PER_PAGE,
-          last: undefined,
-        },
-        true
-      );
-    },
-    [updateRequest]
-  );
-
+  // handle load more for pagination
   const handleLoadMore = useCallback(() => {
-    console.log('handleLoadMore called', {
-      isLoading: state.isLoading,
-      hasNextPage: state.pageInfo?.hasNextPage,
-      endCursor: state.pageInfo?.endCursor,
-    });
-
     if (state.isLoading || !state.pageInfo?.hasNextPage) {
-      console.log('Skipping load more - already loading or no more data');
       return;
     }
-
-    console.log('Loading more problems...');
-
     updateRequest(
       {
         after: state.pageInfo.endCursor,
@@ -247,26 +168,30 @@ export default function useProblems(): UseProblemsReturn {
     );
   }, [state.isLoading, state.pageInfo, updateRequest]);
 
-  const handleRemoveFilter = useCallback(
-    (key: keyof ProblemFilters) => {
-      const newFilters = { ...(request.filters || {}) };
-      delete newFilters[key];
+  // handle search
+  const handleSearch = useCallback(() => {
+    const trimmedKeyword = keyword.trim();
 
-      updateRequest(
-        {
-          filters: newFilters,
-          after: undefined,
-          before: undefined,
-          first: ITEMS_PER_PAGE,
-          last: undefined,
+    updateRequest(
+      {
+        keyword: trimmedKeyword || undefined,
+        filters: {
+          ...filters,
         },
-        true
-      );
-    },
-    [request.filters, updateRequest]
-  );
+        after: undefined,
+        before: undefined,
+        first: ITEMS_PER_PAGE,
+        last: undefined,
+      },
+      true
+    );
+  }, [keyword, filters, updateRequest]);
 
-  const handleClearAllFilters = useCallback(() => {
+  // handle reset
+  const handleReset = useCallback(() => {
+    setFilters({});
+    setKeyword('');
+
     updateRequest(
       {
         keyword: undefined,
@@ -289,19 +214,18 @@ export default function useProblems(): UseProblemsReturn {
     error: state.error,
 
     // Request params (exposed for UI)
-    filters: request.filters || {},
-    keyword: request.keyword || '',
-    sortBy: request.sortBy || SortBy.TITLE,
-    sortOrder: request.sortOrder || SortOrder.ASC,
+    filters,
+    keyword,
+    sortBy,
+    sortOrder,
 
-    // Actions
+    // Handlers
     handleFiltersChange,
     handleKeywordChange,
+    handleSortByChange,
+    handleSortOrderChange,
     handleSearch,
     handleReset,
-    handleSortChange,
     handleLoadMore,
-    handleRemoveFilter,
-    handleClearAllFilters,
   };
 }
