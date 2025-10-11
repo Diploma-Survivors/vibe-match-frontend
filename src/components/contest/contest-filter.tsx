@@ -14,8 +14,6 @@ import { Filter, RotateCcw, Search } from 'lucide-react';
 import React from 'react';
 
 interface ContestFilterProps {
-  keyword: string;
-  setKeyword: (keyword: string) => void;
   filters: ContestFilters;
   onFiltersChange: (filters: ContestFilters) => void;
   onSearch: () => void;
@@ -23,8 +21,6 @@ interface ContestFilterProps {
 }
 
 export default function ContestFilter({
-  keyword,
-  setKeyword,
   filters,
   onFiltersChange,
   onSearch,
@@ -76,8 +72,8 @@ export default function ContestFilter({
             <Input
               id="contest-keyword"
               placeholder="Nhập tên contest..."
-              value={keyword}
-              onChange={(e) => setKeyword(e.target.value)}
+              value={filters.keyword || ''}
+              onChange={(e) => handleFilterChange('keyword', e.target.value)}
               className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
             />
           </div>

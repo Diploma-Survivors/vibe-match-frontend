@@ -1,3 +1,4 @@
+import { Filter } from 'lucide-react';
 import type { ProblemDetail } from './problems';
 
 // Enums for contest list
@@ -26,9 +27,16 @@ export enum MatchMode {
   ALL = 'all',
 }
 
+export interface ContestFilters {
+  keyword?: string;
+  startTime?: string;
+  endTime?: string;
+  minDurationMinutes?: number;
+  maxDurationMinutes?: number;
+}
+
 // Request types
 export interface GetContestListRequest {
-  keyword?: string;
   after?: string;
   before?: string;
   first?: number;
@@ -36,8 +44,9 @@ export interface GetContestListRequest {
   sortOrder?: SortOrder;
   matchMode?: MatchMode;
   sortBy?: SortBy;
-  startTime?: string; // ISO 8601 format
-  endTime?: string; // ISO 8601 format
+  keyword?: string;
+  startTime?: string;
+  endTime?: string;
   minDurationMinutes?: number;
   maxDurationMinutes?: number;
 }
@@ -46,8 +55,8 @@ export interface GetContestListRequest {
 export interface ContestItemList {
   id: string;
   name: string;
-  startTime: string; // ISO 8601 format
-  endTime: string; // ISO 8601 format
+  startTime: string;
+  endTime: string;
   durationMinutes: number;
   status: string;
 }
@@ -56,9 +65,9 @@ export interface ContestItemList {
 export interface ContestItemApiResponse {
   id: string;
   name: string;
-  starttime: string; // ISO 8601 format (lowercase from API)
-  endtime: string; // ISO 8601 format (lowercase from API)
-  durationminutes: number; // lowercase from API
+  starttime: string;
+  endtime: string;
+  durationminutes: number;
   status: string;
   sortby?: string;
 }
@@ -132,11 +141,3 @@ export const PARTICIPATION_OPTIONS = [
   { value: 'yes', label: 'Đã tham gia' },
   { value: 'no', label: 'Chưa tham gia' },
 ];
-
-// Filter types for UI
-export interface ContestFilters {
-  startTime?: string;
-  endTime?: string;
-  minDurationMinutes?: number;
-  maxDurationMinutes?: number;
-}

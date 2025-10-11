@@ -1,6 +1,7 @@
 'use client';
 
-import { ContestFilter, ContestList } from '@/components/contest';
+import ContestFilter from '@/components/contest/contest-filter';
+import ContestList from '@/components/contest/contest-list';
 import { useContests } from '@/hooks';
 import { motion } from 'framer-motion';
 import { NotebookPen } from 'lucide-react';
@@ -14,13 +15,11 @@ export default function ContestsPage() {
     isLoading,
     error,
     filters,
-    keyword,
     sortBy,
     sortOrder,
 
     // Actions
     handleFiltersChange,
-    handleKeywordChange,
     handleSearch,
     handleReset,
     handleSortChange,
@@ -71,8 +70,6 @@ export default function ContestsPage() {
             className="xl:w-[30%] xl:min-w-[400px] xl:sticky xl:top-24 xl:self-start"
           >
             <ContestFilter
-              keyword={keyword}
-              setKeyword={handleKeywordChange}
               filters={filters}
               onFiltersChange={handleFiltersChange}
               onSearch={handleSearch}

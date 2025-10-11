@@ -1,5 +1,6 @@
 import { ContestsService } from '@/services/contests-service';
 import {
+  type ContestFilters,
   type ContestItemList,
   type ContestListResponse,
   type GetContestListRequest,
@@ -10,14 +11,7 @@ import {
 } from '@/types/contests';
 import { useCallback, useEffect, useState } from 'react';
 
-const ITEMS_PER_PAGE = 20;
-
-interface ContestFilters {
-  startTime?: string;
-  endTime?: string;
-  minDurationMinutes?: number;
-  maxDurationMinutes?: number;
-}
+const ITEMS_PER_PAGE = 3;
 
 interface UseContestsState {
   contests: ContestItemList[];
@@ -29,7 +23,6 @@ interface UseContestsState {
 
 interface UseContestsActions {
   handleFiltersChange: (newFilters: ContestFilters) => void;
-  handleKeywordChange: (newKeyword: string) => void;
   handleSearch: () => void;
   handleReset: () => void;
   handleSortChange: (field: SortBy, order: SortOrder) => void;
@@ -41,7 +34,6 @@ interface UseContestsActions {
 interface UseContestsReturn extends UseContestsState, UseContestsActions {
   // Expose request state for UI
   filters: ContestFilters;
-  keyword: string;
   sortBy: SortBy;
   sortOrder: SortOrder;
   matchMode: MatchMode;
@@ -56,6 +48,9 @@ export function useContests(): UseContestsReturn {
     error: null,
   });
 
+  // UI filters - for user input (not applied until Search is clicked)
+  const [uiFilters, setUiFilters] = useState<ContestFilters>({});
+
   const [request, setRequest] = useState<GetContestListRequest>({
     first: ITEMS_PER_PAGE,
     sortBy: SortBy.START_TIME,
@@ -68,8 +63,6 @@ export function useContests(): UseContestsReturn {
     async (requestParams: GetContestListRequest) => {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
-
-        console.log('Fetching contests with request:', requestParams);
 
         const axiosResponse =
           await ContestsService.getContestList(requestParams);
@@ -178,33 +171,23 @@ export function useContests(): UseContestsReturn {
   );
 
   // Actions
-  const handleFiltersChange = useCallback(
-    (newFilters: ContestFilters) => {
-      updateRequest(
-        {
-          startTime: newFilters.startTime,
-          endTime: newFilters.endTime,
-          minDurationMinutes: newFilters.minDurationMinutes,
-          maxDurationMinutes: newFilters.maxDurationMinutes,
-        },
-        false
-      );
-      console.log('Filters changed:', newFilters);
-    },
-    [updateRequest]
-  );
-
-  const handleKeywordChange = useCallback(
-    (newKeyword: string) => {
-      updateRequest({ keyword: newKeyword }, false);
-    },
-    [updateRequest]
-  );
+  const handleFiltersChange = useCallback((newFilters: ContestFilters) => {
+    // Just update UI filters, don't trigger fetch
+    setUiFilters(newFilters);
+    console.log('UI Filters changed:', newFilters);
+  }, []);
 
   const handleSearch = useCallback(() => {
-    // Reset to first page with current filters/keyword
+    // Apply UI filters to request and trigger fetch
+    const trimmedKeyword = uiFilters.keyword?.trim();
+
     updateRequest(
       {
+        keyword: trimmedKeyword || undefined,
+        startTime: uiFilters.startTime,
+        endTime: uiFilters.endTime,
+        minDurationMinutes: uiFilters.minDurationMinutes,
+        maxDurationMinutes: uiFilters.maxDurationMinutes,
         after: undefined,
         before: undefined,
         first: ITEMS_PER_PAGE,
@@ -212,9 +195,12 @@ export function useContests(): UseContestsReturn {
       },
       true
     );
-  }, [updateRequest]);
+    console.log('Search triggered with filters:', uiFilters);
+  }, [uiFilters, updateRequest]);
 
   const handleReset = useCallback(() => {
+    // Reset both UI filters and request
+    setUiFilters({});
     updateRequest(
       {
         keyword: undefined,
@@ -275,6 +261,14 @@ export function useContests(): UseContestsReturn {
 
   const handleRemoveFilter = useCallback(
     (key: keyof ContestFilters) => {
+      // Remove from UI filters
+      setUiFilters((prev) => {
+        const newFilters = { ...prev };
+        delete newFilters[key];
+        return newFilters;
+      });
+
+      // Also remove from request and trigger search
       updateRequest(
         {
           [key]: undefined,
@@ -290,6 +284,8 @@ export function useContests(): UseContestsReturn {
   );
 
   const handleClearAllFilters = useCallback(() => {
+    // Clear both UI filters and request
+    setUiFilters({});
     updateRequest(
       {
         keyword: undefined,
@@ -306,14 +302,6 @@ export function useContests(): UseContestsReturn {
     );
   }, [updateRequest]);
 
-  // Extract current filters from request
-  const filters: ContestFilters = {
-    startTime: request.startTime,
-    endTime: request.endTime,
-    minDurationMinutes: request.minDurationMinutes,
-    maxDurationMinutes: request.maxDurationMinutes,
-  };
-
   return {
     // State
     contests: state.contests,
@@ -322,16 +310,14 @@ export function useContests(): UseContestsReturn {
     isLoading: state.isLoading,
     error: state.error,
 
-    // Request params (exposed for UI)
-    filters,
-    keyword: request.keyword || '',
+    // Request params (exposed for UI) - use uiFilters for display
+    filters: uiFilters,
     sortBy: request.sortBy || SortBy.START_TIME,
     sortOrder: request.sortOrder || SortOrder.DESC,
     matchMode: request.matchMode || MatchMode.ANY,
 
     // Actions
     handleFiltersChange,
-    handleKeywordChange,
     handleSearch,
     handleReset,
     handleSortChange,
