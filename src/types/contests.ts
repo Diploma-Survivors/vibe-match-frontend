@@ -1,20 +1,8 @@
-import { Filter } from 'lucide-react';
-import type { ProblemDetail } from './problems';
-
-// Enums for contest list
-export enum ContestStatus {
-  PUBLIC = 'public',
-  PRIVATE = 'private',
-  UPCOMING = 'upcoming',
-  ONGOING = 'ongoing',
-  FINISHED = 'finished',
-}
-
 export enum SortBy {
   NAME = 'name',
   START_TIME = 'startTime',
   END_TIME = 'endTime',
-  DURATION_MINUTES = 'durationMinutes',
+  CREATED_AT = 'createdAt',
 }
 
 export enum SortOrder {
@@ -27,8 +15,8 @@ export enum MatchMode {
   ALL = 'all',
 }
 
+// Filter types
 export interface ContestFilters {
-  keyword?: string;
   startTime?: string;
   endTime?: string;
   minDurationMinutes?: number;
@@ -36,7 +24,8 @@ export interface ContestFilters {
 }
 
 // Request types
-export interface GetContestListRequest {
+export interface ContestListRequest {
+  keyword?: string;
   after?: string;
   before?: string;
   first?: number;
@@ -44,15 +33,11 @@ export interface GetContestListRequest {
   sortOrder?: SortOrder;
   matchMode?: MatchMode;
   sortBy?: SortBy;
-  keyword?: string;
-  startTime?: string;
-  endTime?: string;
-  minDurationMinutes?: number;
-  maxDurationMinutes?: number;
+  filters?: ContestFilters;
 }
 
 // Response types
-export interface ContestItemList {
+export interface ContestListItem {
   id: string;
   name: string;
   startTime: string;
@@ -61,20 +46,9 @@ export interface ContestItemList {
   status: string;
 }
 
-// API Response (lowercase fields from backend)
-export interface ContestItemApiResponse {
-  id: string;
-  name: string;
-  starttime: string;
-  endtime: string;
-  durationminutes: number;
-  status: string;
-  sortby?: string;
-}
-
 export interface ContestEdge {
   cursor: string;
-  node: ContestItemList;
+  node: ContestListItem;
 }
 
 export interface PageInfo {
@@ -88,6 +62,15 @@ export interface ContestListResponse {
   edges: ContestEdge[];
   pageInfos: PageInfo;
   totalCount: number;
+}
+
+// -------- Mock Data & Constants, It will be deleted, replaced or edit in the future --------
+export enum ContestStatus {
+  PUBLIC = 'public',
+  PRIVATE = 'private',
+  UPCOMING = 'upcoming',
+  ONGOING = 'ongoing',
+  FINISHED = 'finished',
 }
 
 export const CONTEST_STATUS_OPTIONS = [

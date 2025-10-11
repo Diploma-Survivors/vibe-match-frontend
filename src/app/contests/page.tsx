@@ -14,15 +14,16 @@ export default function ContestsPage() {
     totalCount,
     isLoading,
     error,
+
+    // state for controlled inputs
+    keyword,
     filters,
-    sortBy,
-    sortOrder,
 
     // Actions
+    handleKeywordChange,
     handleFiltersChange,
     handleSearch,
     handleReset,
-    handleSortChange,
     handleLoadMore,
   } = useContests();
 
@@ -70,7 +71,9 @@ export default function ContestsPage() {
             className="xl:w-[30%] xl:min-w-[400px] xl:sticky xl:top-24 xl:self-start"
           >
             <ContestFilter
+              keyword={keyword}
               filters={filters}
+              onKeywordChange={handleKeywordChange}
               onFiltersChange={handleFiltersChange}
               onSearch={handleSearch}
               onReset={handleReset}

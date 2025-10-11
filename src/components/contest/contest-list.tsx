@@ -19,7 +19,6 @@ export default function ContestList({
   pageInfo,
   onLoadMore,
 }: ContestListProps) {
-  console.log('Rendering ContestList with contests:', contests);
   return (
     <div className="space-y-6">
       {/* Loading State */}
@@ -88,13 +87,9 @@ export default function ContestList({
       {/* Empty State */}
       {!isLoading && !error && contests.length === 0 && (
         <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-12 text-center">
-          <div className="text-6xl mb-4">🎯</div>
           <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
             Không tìm thấy cuộc thi nào
           </h3>
-          <p className="text-slate-500 dark:text-slate-400">
-            Hãy thử thay đổi bộ lọc để tìm kiếm cuộc thi phù hợp
-          </p>
         </div>
       )}
     </div>

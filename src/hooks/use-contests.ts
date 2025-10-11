@@ -1,9 +1,9 @@
 import { ContestsService } from '@/services/contests-service';
 import {
   type ContestFilters,
-  type ContestItemList,
+  type ContestListItem,
+  type ContestListRequest,
   type ContestListResponse,
-  type GetContestListRequest,
   MatchMode,
   type PageInfo,
   SortBy,
@@ -14,7 +14,7 @@ import { useCallback, useEffect, useState } from 'react';
 const ITEMS_PER_PAGE = 3;
 
 interface UseContestsState {
-  contests: ContestItemList[];
+  contests: ContestListItem[];
   pageInfo: PageInfo | null;
   totalCount: number;
   isLoading: boolean;
@@ -23,23 +23,19 @@ interface UseContestsState {
 
 interface UseContestsActions {
   handleFiltersChange: (newFilters: ContestFilters) => void;
+  handleKeywordChange: (newKeyword: string) => void;
   handleSearch: () => void;
   handleReset: () => void;
-  handleSortChange: (field: SortBy, order: SortOrder) => void;
   handleLoadMore: () => void;
-  handleRemoveFilter: (key: keyof ContestFilters) => void;
-  handleClearAllFilters: () => void;
 }
 
 interface UseContestsReturn extends UseContestsState, UseContestsActions {
-  // Expose request state for UI
+  keyword: string;
   filters: ContestFilters;
-  sortBy: SortBy;
-  sortOrder: SortOrder;
-  matchMode: MatchMode;
 }
 
 export function useContests(): UseContestsReturn {
+  // Main state to manage contests and loading/error states
   const [state, setState] = useState<UseContestsState>({
     contests: [],
     pageInfo: null,
@@ -48,19 +44,24 @@ export function useContests(): UseContestsReturn {
     error: null,
   });
 
-  // UI filters - for user input (not applied until Search is clicked)
-  const [uiFilters, setUiFilters] = useState<ContestFilters>({});
+  // states for filters and keyword to manage input values
+  const [filters, setFilters] = useState<ContestFilters>({});
+  const [keyword, setKeyword] = useState<string>('');
 
-  const [request, setRequest] = useState<GetContestListRequest>({
+  // Request state to manage API request parameters
+  const [request, setRequest] = useState<ContestListRequest>({
     first: ITEMS_PER_PAGE,
     sortBy: SortBy.START_TIME,
     sortOrder: SortOrder.DESC,
     matchMode: MatchMode.ANY,
+    filters: {
+      ...filters,
+    },
   });
 
   // Fetch contests function
   const fetchContests = useCallback(
-    async (requestParams: GetContestListRequest) => {
+    async (requestParams: ContestListRequest) => {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
@@ -75,13 +76,11 @@ export function useContests(): UseContestsReturn {
             ...edge.node,
           })) || [];
 
-        console.log(`Fetched ${contestsData.length} contests`);
-
         setState((prev) => ({
           ...prev,
           contests: requestParams.after
-            ? [...prev.contests, ...contestsData] // Append for pagination
-            : contestsData, // Replace for new search/sort
+            ? [...prev.contests, ...contestsData]
+            : contestsData,
           pageInfo: response?.pageInfos,
           totalCount: response?.totalCount,
           isLoading: false,
@@ -103,150 +102,35 @@ export function useContests(): UseContestsReturn {
     fetchContests(request);
   }, [request, fetchContests]);
 
-  // Helper function to clean filters (remove empty/undefined values)
-  const cleanFilters = useCallback(
-    (filters: ContestFilters): ContestFilters => {
-      const cleaned: ContestFilters = {};
-
-      if (filters.startTime) {
-        cleaned.startTime = filters.startTime;
-      }
-
-      if (filters.endTime) {
-        cleaned.endTime = filters.endTime;
-      }
-
-      if (filters.minDurationMinutes !== undefined) {
-        cleaned.minDurationMinutes = filters.minDurationMinutes;
-      }
-
-      if (filters.maxDurationMinutes !== undefined) {
-        cleaned.maxDurationMinutes = filters.maxDurationMinutes;
-      }
-
-      return cleaned;
-    },
-    []
-  );
-
   // Helper function to update request
   const updateRequest = useCallback(
-    (updates: Partial<GetContestListRequest>, clearContests = false) => {
+    (updates: Partial<ContestListRequest>, clearContests = false) => {
       if (clearContests) {
         setState((prev) => ({ ...prev, contests: [] }));
       }
 
-      setRequest((prev) => {
-        const newRequest: GetContestListRequest = {
-          ...prev,
-          ...updates,
-        };
-
-        // Apply filters to request
-        if (updates.startTime !== undefined) {
-          newRequest.startTime = updates.startTime || undefined;
-        }
-
-        if (updates.endTime !== undefined) {
-          newRequest.endTime = updates.endTime || undefined;
-        }
-
-        if (updates.minDurationMinutes !== undefined) {
-          newRequest.minDurationMinutes = updates.minDurationMinutes;
-        }
-
-        if (updates.maxDurationMinutes !== undefined) {
-          newRequest.maxDurationMinutes = updates.maxDurationMinutes;
-        }
-
-        // Clean keyword
-        if (updates.keyword !== undefined) {
-          newRequest.keyword = updates.keyword.trim() || undefined;
-        }
-
-        return newRequest;
-      });
+      setRequest((prev) => ({
+        ...prev,
+        ...updates,
+      }));
     },
     []
   );
 
-  // Actions
+  // handle filter and keyword changes
   const handleFiltersChange = useCallback((newFilters: ContestFilters) => {
-    // Just update UI filters, don't trigger fetch
-    setUiFilters(newFilters);
-    console.log('UI Filters changed:', newFilters);
+    setFilters(newFilters);
   }, []);
 
-  const handleSearch = useCallback(() => {
-    // Apply UI filters to request and trigger fetch
-    const trimmedKeyword = uiFilters.keyword?.trim();
+  const handleKeywordChange = useCallback((newKeyword: string) => {
+    setKeyword(newKeyword);
+  }, []);
 
-    updateRequest(
-      {
-        keyword: trimmedKeyword || undefined,
-        startTime: uiFilters.startTime,
-        endTime: uiFilters.endTime,
-        minDurationMinutes: uiFilters.minDurationMinutes,
-        maxDurationMinutes: uiFilters.maxDurationMinutes,
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      true
-    );
-    console.log('Search triggered with filters:', uiFilters);
-  }, [uiFilters, updateRequest]);
-
-  const handleReset = useCallback(() => {
-    // Reset both UI filters and request
-    setUiFilters({});
-    updateRequest(
-      {
-        keyword: undefined,
-        startTime: undefined,
-        endTime: undefined,
-        minDurationMinutes: undefined,
-        maxDurationMinutes: undefined,
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      true
-    );
-  }, [updateRequest]);
-
-  const handleSortChange = useCallback(
-    (field: SortBy, order: SortOrder) => {
-      updateRequest(
-        {
-          sortBy: field,
-          sortOrder: order,
-          after: undefined,
-          before: undefined,
-          first: ITEMS_PER_PAGE,
-          last: undefined,
-        },
-        true
-      );
-    },
-    [updateRequest]
-  );
-
+  // Load more contests for pagination
   const handleLoadMore = useCallback(() => {
-    console.log('handleLoadMore called', {
-      isLoading: state.isLoading,
-      hasNextPage: state.pageInfo?.hasNextPage,
-      endCursor: state.pageInfo?.endCursor,
-    });
-
     if (state.isLoading || !state.pageInfo?.hasNextPage) {
-      console.log('Skipping load more - already loading or no more data');
       return;
     }
-
-    console.log('Loading more contests...');
 
     updateRequest(
       {
@@ -259,40 +143,38 @@ export function useContests(): UseContestsReturn {
     );
   }, [state.isLoading, state.pageInfo, updateRequest]);
 
-  const handleRemoveFilter = useCallback(
-    (key: keyof ContestFilters) => {
-      // Remove from UI filters
-      setUiFilters((prev) => {
-        const newFilters = { ...prev };
-        delete newFilters[key];
-        return newFilters;
-      });
+  // Search and Reset handlers
+  const handleSearch = useCallback(() => {
+    const trimmedKeyword = keyword.trim();
 
-      // Also remove from request and trigger search
-      updateRequest(
-        {
-          [key]: undefined,
-          after: undefined,
-          before: undefined,
-          first: ITEMS_PER_PAGE,
-          last: undefined,
-        },
-        true
-      );
-    },
-    [updateRequest]
-  );
-
-  const handleClearAllFilters = useCallback(() => {
-    // Clear both UI filters and request
-    setUiFilters({});
     updateRequest(
       {
+        filters: {
+          ...filters,
+        },
+        keyword: trimmedKeyword || undefined,
+        after: undefined,
+        before: undefined,
+        first: ITEMS_PER_PAGE,
+        last: undefined,
+      },
+      true
+    );
+  }, [filters, keyword, updateRequest]);
+
+  const handleReset = useCallback(() => {
+    setKeyword('');
+    setFilters({
+      startTime: undefined,
+      endTime: undefined,
+      minDurationMinutes: undefined,
+      maxDurationMinutes: undefined,
+    });
+
+    updateRequest(
+      {
+        filters: {},
         keyword: undefined,
-        startTime: undefined,
-        endTime: undefined,
-        minDurationMinutes: undefined,
-        maxDurationMinutes: undefined,
         after: undefined,
         before: undefined,
         first: ITEMS_PER_PAGE,
@@ -310,19 +192,15 @@ export function useContests(): UseContestsReturn {
     isLoading: state.isLoading,
     error: state.error,
 
-    // Request params (exposed for UI) - use uiFilters for display
-    filters: uiFilters,
-    sortBy: request.sortBy || SortBy.START_TIME,
-    sortOrder: request.sortOrder || SortOrder.DESC,
-    matchMode: request.matchMode || MatchMode.ANY,
+    // Expose request state for UI
+    keyword: keyword,
+    filters: filters,
 
     // Actions
+    handleKeywordChange,
     handleFiltersChange,
     handleSearch,
     handleReset,
-    handleSortChange,
     handleLoadMore,
-    handleRemoveFilter,
-    handleClearAllFilters,
   };
 }
