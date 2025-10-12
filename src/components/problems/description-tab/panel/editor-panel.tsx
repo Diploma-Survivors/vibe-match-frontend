@@ -1,0 +1,100 @@
+import MonacoSubmitEditor from '@/components/editor/monaco-submit-editor';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, Play, Send } from 'lucide-react';
+
+interface EditorPanelProps {
+  height: number;
+  output: string;
+  isRunning: boolean;
+  isSubmitting: boolean;
+  onRun: () => void;
+  onSubmit: () => void;
+}
+
+export function EditorPanel({
+  height,
+  output,
+  isRunning,
+  isSubmitting,
+  onRun,
+  onSubmit,
+}: EditorPanelProps) {
+  return (
+    <div
+      className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden flex flex-col"
+      style={{ height: `${height}%` }}
+    >
+      <div className="flex-1 min-h-0 flex flex-col">
+        {/* Monaco Editor */}
+        <div className="flex-1 min-h-0">
+          <MonacoSubmitEditor />
+        </div>
+
+        {/* Footer cố định chứa nút Run/Submit */}
+        <div className="flex items-center justify-between px-4 py-2 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex-shrink-0">
+          <div className="text-xs text-slate-500 dark:text-slate-400">
+            {/* Hiện tại không lấy được vị trí con trỏ, có thể bổ sung nếu cần */}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={onRun}
+              disabled={isRunning}
+              variant="outline"
+              size="sm"
+              className="h-8 text-sm"
+            >
+              {isRunning ? (
+                <>
+                  <div className="w-3 h-3 border-2 border-slate-400/20 border-t-slate-400 rounded-full animate-spin mr-1.5" />
+                  Running...
+                </>
+              ) : (
+                <>
+                  <Play className="w-3.5 h-3.5 mr-1.5" />
+                  Run
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={onSubmit}
+              disabled={isSubmitting}
+              className="h-8 text-sm bg-green-600 hover:bg-green-700 text-white"
+              size="sm"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin mr-1.5" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Send className="w-3.5 h-3.5 mr-1.5" />
+                  Submit
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Output Section */}
+        {output && (
+          <div className="border-t border-slate-200/50 dark:border-slate-700/50 p-4 bg-slate-50/50 dark:bg-slate-800/50 flex-shrink-0">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                <CheckCircle className="w-4 h-4 text-white" />
+              </div>
+              <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-100">
+                Execution Result
+              </h4>
+            </div>
+            <div className="bg-slate-900 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 shadow-inner max-h-32 overflow-y-auto">
+              <pre className="text-green-400 dark:text-green-300 font-mono text-sm whitespace-pre-wrap leading-relaxed">
+                {output}
+              </pre>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

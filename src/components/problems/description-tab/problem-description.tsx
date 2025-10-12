@@ -6,10 +6,10 @@ import { useTestCases } from '@/hooks/use-test-cases';
 import type { ProblemDetail as ProblemDetailType } from '@/types/problems';
 import React, { useRef, useEffect } from 'react';
 import { ContestInfoHeader } from './contest-info-header';
-import { EditorPanel } from './editor-panel';
-import { ProblemDescriptionPanel } from './problem-description-panel';
+import { EditorPanel } from './panel/editor-panel';
+import { ProblemDescriptionPanel } from './panel/problem-description-panel';
+import { SampleTestCasesPanel } from './panel/sample-testcases-panel';
 import { ResizableDivider } from './resizable-divider';
-import { TestCasesPanel } from './test-cases-panel';
 
 interface ProblemDescriptionProps {
   problem: ProblemDetailType;
@@ -163,7 +163,7 @@ export default function ProblemDescription({
             />
 
             {/* Test Cases Section */}
-            <TestCasesPanel
+            <SampleTestCasesPanel
               height={100 - editorHeight}
               testCases={testCases}
               activeTestCase={activeTestCase}

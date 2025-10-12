@@ -198,54 +198,6 @@ export default function MonacoSubmitEditor({
           }}
         />
       </div>
-
-      {/* Footer - LeetCode style with Line/Col info and action buttons */}
-      <div className="flex items-center justify-between px-4 py-2 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
-        <div className="text-xs text-slate-500 dark:text-slate-400">
-          Ln {cursorPosition.line}, Col {cursorPosition.column}
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={handleRun}
-            disabled={isRunning || !code.trim()}
-            variant="outline"
-            size="sm"
-            className="h-8 text-sm"
-          >
-            {isRunning ? (
-              <>
-                <div className="w-3 h-3 border-2 border-slate-400/20 border-t-slate-400 rounded-full animate-spin mr-1.5" />
-                Running...
-              </>
-            ) : (
-              <>
-                <Play className="w-3.5 h-3.5 mr-1.5" />
-                Run
-              </>
-            )}
-          </Button>
-
-          <Button
-            onClick={handleSubmit}
-            disabled={isSubmitting || !code.trim()}
-            className="h-8 text-sm bg-green-600 hover:bg-green-700 text-white"
-            size="sm"
-          >
-            {isSubmitting ? (
-              <>
-                <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin mr-1.5" />
-                Submitting...
-              </>
-            ) : (
-              <>
-                <Send className="w-3.5 h-3.5 mr-1.5" />
-                Submit
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
     </div>
   );
 }

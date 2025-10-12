@@ -8,7 +8,7 @@ interface TestCase {
   isEditing: boolean;
 }
 
-interface TestCasesPanelProps {
+interface SampleTestCasesPanelProps {
   height: number;
   testCases: TestCase[];
   activeTestCase: number;
@@ -24,7 +24,7 @@ interface TestCasesPanelProps {
   onActiveTestCaseChange: (index: number) => void;
 }
 
-export function TestCasesPanel({
+export function SampleTestCasesPanel({
   height,
   testCases,
   activeTestCase,
@@ -34,7 +34,7 @@ export function TestCasesPanel({
   onTestCaseSave,
   onTestCaseChange,
   onActiveTestCaseChange,
-}: TestCasesPanelProps) {
+}: SampleTestCasesPanelProps) {
   return (
     <div
       className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden flex flex-col"

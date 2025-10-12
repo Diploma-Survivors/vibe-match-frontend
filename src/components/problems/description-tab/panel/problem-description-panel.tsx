@@ -1,7 +1,7 @@
 import type { ProblemDetail } from '@/types/problems';
 import { ProblemDifficulty } from '@/types/problems';
 import { FileText, MemoryStick, Timer } from 'lucide-react';
-import { SampleTestCase } from './sample-test-case';
+import { SampleTestCase } from '../sample-test-case';
 
 interface ProblemDescriptionPanelProps {
   problem: ProblemDetail;
