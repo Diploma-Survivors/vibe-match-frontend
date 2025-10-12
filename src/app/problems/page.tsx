@@ -1,7 +1,7 @@
 'use client';
 
 import SortControls from '@/components/common/sort-controls';
-import ProblemFilter from '@/components/problem/problem-filter';
+import ProblemFilter from '@/components/problem/filter/problem-filter';
 import ProblemStats from '@/components/problem/problem-stats';
 import ProblemTable from '@/components/problem/problem-table';
 import useProblems from '@/hooks/use-problems';

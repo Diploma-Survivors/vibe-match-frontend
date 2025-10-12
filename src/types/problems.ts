@@ -114,7 +114,6 @@ export interface ProblemListResponse {
 }
 
 export const DIFFICULTY_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
   { value: 'easy', label: 'Dễ' },
   { value: 'medium', label: 'Trung bình' },
   { value: 'hard', label: 'Khó' },
