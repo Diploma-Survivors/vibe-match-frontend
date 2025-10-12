@@ -37,19 +37,6 @@ export default function ProblemFilter({
   const [isLoadingTags, setIsLoadingTags] = useState(true);
   const [isLoadingTopics, setIsLoadingTopics] = useState(true);
 
-  // Helper function to toggle items in array filters
-  const toggleArrayFilter = useCallback(
-    (filterKey: 'topicIds' | 'tagIds', itemId: string, isSelected: boolean) => {
-      const currentItems = filters[filterKey] || [];
-      const newItems = isSelected
-        ? currentItems.filter((id: string) => id !== itemId)
-        : [...currentItems, itemId];
-
-      onFiltersChange({ ...filters, [filterKey]: newItems });
-    },
-    [filters, onFiltersChange]
-  );
-
   // Fetch tags and topics from backend
   const fetchTagsAndTopics = useCallback(async () => {
     setIsLoadingTags(true);
@@ -73,6 +60,19 @@ export default function ProblemFilter({
   useEffect(() => {
     fetchTagsAndTopics();
   }, [fetchTagsAndTopics]);
+
+  // Helper function to toggle items in array filters (topicIds, tagIds)
+  const toggleArrayFilter = useCallback(
+    (filterKey: 'topicIds' | 'tagIds', itemId: string, isSelected: boolean) => {
+      const currentItems = filters[filterKey] || [];
+      const newItems = isSelected
+        ? currentItems.filter((id: string) => id !== itemId)
+        : [...currentItems, itemId];
+
+      onFiltersChange({ ...filters, [filterKey]: newItems });
+    },
+    [filters, onFiltersChange]
+  );
 
   return (
     <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
@@ -98,7 +98,7 @@ export default function ProblemFilter({
       </div>
 
       <div className="space-y-4">
-        {/* Từ khóa */}
+        {/* Keyword */}
         <div className="space-y-2">
           <label
             htmlFor="problem-keyword"

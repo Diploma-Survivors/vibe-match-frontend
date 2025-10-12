@@ -1,6 +1,6 @@
 'use client';
 
-import ProblemDetailComponent from '@/components/problem/problem-detail-tab';
+import ProblemDetailComponent from '@/components/problems/problem-detail-tab';
 import { ProblemsService } from '@/services/problems-service';
 import type { ProblemDetail as ProblemDetailType } from '@/types/problems';
 

@@ -5,7 +5,7 @@ export * from './layout';
 export * from './contest';
 
 // Problem components
-export * from './problem';
+export * from './problems';
 
 // Editor components
 export * from './editor';

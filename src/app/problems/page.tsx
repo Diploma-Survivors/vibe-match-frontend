@@ -1,9 +1,9 @@
 'use client';
 
 import SortControls from '@/components/common/sort-controls';
-import ProblemFilter from '@/components/problem/filter/problem-filter';
-import ProblemStats from '@/components/problem/problem-stats';
-import ProblemTable from '@/components/problem/problem-table';
+import ProblemStats from '@/components/problems/problem-stats';
+import ProblemFilter from '@/components/problems/problems-filter/problems-filter';
+import ProblemTable from '@/components/problems/problems-table/problems-table';
 import useProblems from '@/hooks/use-problems';
 import React from 'react';
 
