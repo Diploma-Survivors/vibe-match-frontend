@@ -1,6 +1,6 @@
 'use client';
 
-import ProblemDetailComponent from '@/components/problems/problem-detail-tab';
+import ProblemDescription from '@/components/problems/description-tab/problem-description';
 import { ProblemsService } from '@/services/problems-service';
 import type { ProblemDetail as ProblemDetailType } from '@/types/problems';
 
@@ -43,8 +43,29 @@ export default function ProblemDescriptionPage({
   }, [problemId]);
 
   if (isLoading || !problem) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <div className="text-center">
+          <div className="relative inline-flex mb-6">
+            <div className="w-16 h-16 border-4 border-blue-200 dark:border-blue-900 border-t-blue-600 dark:border-t-blue-400 rounded-full animate-spin" />
+            <div
+              className="absolute inset-0 w-16 h-16 border-4 border-transparent border-r-purple-600 dark:border-r-purple-400 rounded-full animate-spin"
+              style={{
+                animationDirection: 'reverse',
+                animationDuration: '1.5s',
+              }}
+            />
+          </div>
+          <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-2">
+            Đang tải bài toán...
+          </h2>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Vui lòng đợi trong giây lát
+          </p>
+        </div>
+      </div>
+    );
   }
 
-  return <ProblemDetailComponent problem={problem} showContestInfo={false} />;
+  return <ProblemDescription problem={problem} showContestInfo={false} />;
 }
