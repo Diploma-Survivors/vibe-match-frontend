@@ -1,9 +1,8 @@
 // src/app/problems/[id]/submissions/page.tsx
 'use client';
 
-// import SimpleSubmitEditor from "./simple-submit-editor"; // Ensure the file exists or correct the path
 import { TestPageContent } from '@/components/common';
-import { CodeEditor, MonacoSubmitEditor } from '@/components/editor';
+import { MonacoSubmitEditor } from '@/components/editor';
 import { ProblemSidebar } from '@/components/problem';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

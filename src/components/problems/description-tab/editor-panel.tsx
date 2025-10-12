@@ -1,4 +1,4 @@
-import { MonacoSubmitEditor } from '@/components/editor';
+import MonacoSubmitEditor from '@/components/editor/monaco-submit-editor';
 import { CheckCircle } from 'lucide-react';
 
 interface EditorPanelProps {
