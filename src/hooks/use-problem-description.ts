@@ -1,3 +1,4 @@
+import { SubmissionsService } from '@/services/submissions-service';
 import type { ProblemDetail } from '@/types/problems';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RefObject } from 'react';
@@ -62,6 +63,9 @@ export function useProblemDescription({
     handleRun: executeRun,
     handleSubmit: executeSubmit,
   } = useCodeExecution();
+
+  // Refetch key for consumers to re-query DB-backed testcase results
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Resizable handlers
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -172,6 +176,8 @@ export function useProblemDescription({
         problem.id,
         testCasesForSubmission
       );
+      // trigger refetch consumers (e.g., testcase panel) after completion
+      setRefreshKey((prev) => prev + 1);
     },
     [executeRun, testCases, problem.id]
   );
@@ -189,6 +195,7 @@ export function useProblemDescription({
         problem.id,
         testCasesForSubmission
       );
+      setRefreshKey((prev) => prev + 1);
     },
     [executeSubmit, testCases, problem.id]
   );
@@ -254,6 +261,7 @@ export function useProblemDescription({
     isSubmitting,
     output,
     testResults,
+    refreshKey,
 
     // Handlers
     handleMouseDown,

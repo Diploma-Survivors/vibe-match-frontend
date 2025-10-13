@@ -109,6 +109,7 @@ export default function ProblemDescription({
               testCases={testCases}
               activeTestCase={activeTestCase}
               testResults={testResults}
+              isRunning={isRunning}
               onTestCaseAdd={handleTestCaseAdd}
               onTestCaseDelete={handleTestCaseDelete}
               onTestCaseEdit={handleTestCaseEdit}
