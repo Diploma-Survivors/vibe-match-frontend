@@ -64,7 +64,7 @@ export default function ProblemDescription({
 
       <div
         ref={containerRef}
-        className="flex h-full gap-0 relative"
+        className="flex h-full gap-0 relative bg-slate-50 dark:bg-slate-900"
         style={{
           height: showContestInfo ? 'calc(100vh - 60px)' : 'calc(100vh - 60px)',
         }}
@@ -89,7 +89,6 @@ export default function ProblemDescription({
             {/* Editor Section */}
             <EditorPanel
               height={editorHeight}
-              output={output}
               isRunning={isRunning}
               isSubmitting={isSubmitting}
               onRun={handleRun}

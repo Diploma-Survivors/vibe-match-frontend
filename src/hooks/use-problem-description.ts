@@ -29,7 +29,7 @@ export function useProblemDescription({
 
   // Resizable state
   const [leftWidth, setLeftWidth] = useState(50);
-  const [editorHeight, setEditorHeight] = useState(60);
+  const [editorHeight, setEditorHeight] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const [isVerticalDragging, setIsVerticalDragging] = useState(false);
 

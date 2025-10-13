@@ -152,7 +152,7 @@ export function SampleTestCasesPanel({
 
   return (
     <div
-      className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden flex flex-col"
+      className="flex flex-col overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
       style={{ height: `${height}%` }}
     >
       {/* Header Tabs */}
@@ -183,7 +183,7 @@ export function SampleTestCasesPanel({
         </div>
       </div>
 
-      <div className="p-6 pt-4 flex-1 overflow-y-auto">
+      <div className="p-6 pt-4 flex-1">
         {/* Case Tabs with Add */}
         {!(activeTab === 'result' && !hasResults) && (
           <div className="flex items-center gap-2 mb-6 overflow-x-auto">
