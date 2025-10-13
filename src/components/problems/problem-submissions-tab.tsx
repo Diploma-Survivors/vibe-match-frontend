@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import type { ProblemDetail } from '@/types/problems';
 import {
   AlertCircle,
   CheckCircle,
@@ -24,7 +25,7 @@ import {
 import { useState } from 'react';
 
 interface ProblemSubmissionsProps {
-  problem: Problem;
+  problem: ProblemDetail;
   showContestInfo?: boolean;
   contestName?: string;
   contestTimeRemaining?: string;
@@ -54,76 +55,8 @@ export default function ProblemSubmissions({
   const [currentPage, setCurrentPage] = useState(1);
   const submissionsPerPage = 20;
 
-  // Mock submissions data
-  const mockUserSubmissions = [
-    {
-      id: 1001,
-      when: '2025-08-09 14:30:25',
-      verdict: 'Accepted',
-      time: '124ms',
-      memory: '2.1MB',
-      testCase: null,
-      lang: 'Python 3.11',
-      code: `def euler_phi(n):
-    result = n
-    p = 2
-    while p * p <= n:
-        if n % p == 0:
-            while n % p == 0:
-                n //= p
-            result -= result // p
-        p += 1
-    if n > 1:
-        result -= result // n
-    return result
-
-n = int(input())
-for i in range(1, n + 1):
-    print(euler_phi(i), end=" ")`,
-      result: 'All test cases passed successfully',
-    },
-    {
-      id: 1002,
-      when: '2025-08-09 14:25:15',
-      verdict: 'Wrong Answer',
-      time: '89ms',
-      memory: '1.8MB',
-      testCase: 'Failed on test 5',
-      lang: 'Python 3.11',
-      code: `n = int(input())
-for i in range(1, n + 1):
-    # Wrong implementation
-    print(i, end=" ")`,
-      result:
-        'Expected output: 1 1 2 1 4 2 6 1 6 2\nActual output: 1 2 3 4 5 6 7 8 9 10',
-    },
-    {
-      id: 1003,
-      when: '2025-08-09 14:20:10',
-      verdict: 'Time Limit Exceeded',
-      time: '2000ms',
-      memory: '3.2MB',
-      testCase: 'Failed on test 12',
-      lang: 'Python 3.11',
-      code: `def euler_phi(n):
-    # Inefficient implementation
-    count = 0
-    for i in range(1, n + 1):
-        if gcd(i, n) == 1:
-            count += 1
-    return count
-
-def gcd(a, b):
-    while b:
-        a, b = b, a % b
-    return a
-
-n = int(input())
-for i in range(1, n + 1):
-    print(euler_phi(i), end=" ")`,
-      result: 'Time limit exceeded on test case with large input',
-    },
-  ];
+  // TODO: Fetch submissions from API
+  const mockUserSubmissions: any[] = [];
 
   // Get selected submission
   const selectedSubmission = mockUserSubmissions.find(

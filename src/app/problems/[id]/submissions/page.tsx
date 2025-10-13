@@ -41,7 +41,6 @@ import {
   XCircle,
 } from 'lucide-react';
 
-import { mockProblems } from '@/lib/data/mock-problems';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 
@@ -49,9 +48,11 @@ export default function StatusPage() {
   const params = useParams();
   const problemId = params.id as string;
 
-  const problem = mockProblems.find((p) => p.id === problemId);
-
-  if (!problem) return null;
+  // TODO: Fetch problem data from API
+  const problem = {
+    id: problemId,
+    title: 'Problem Title',
+  };
 
   // Status tab state
   const [searchTerm, setSearchTerm] = useState('');
@@ -118,128 +119,8 @@ export default function StatusPage() {
     }>
   >([]);
 
-  // Mock submissions data for Status tab - Current User Only
-  const mockUserSubmissions = [
-    {
-      id: 1001,
-      when: '2025-08-09 14:30:25',
-      verdict: 'Accepted',
-      time: '124ms',
-      memory: '2.1MB',
-      testCase: null,
-      lang: 'Python 3.11',
-      code: `def euler_phi(n):
-      result = n
-      p = 2
-      while p * p <= n:
-          if n % p == 0:
-              while n % p == 0:
-                  n //= p
-              result -= result // p
-          p += 1
-      if n > 1:
-          result -= result // n
-      return result
-  
-  n = int(input())
-  for i in range(1, n + 1):
-      print(euler_phi(i), end=" ")`,
-      result: 'All test cases passed successfully',
-    },
-    {
-      id: 1002,
-      when: '2025-08-09 14:25:15',
-      verdict: 'Wrong Answer',
-      time: '89ms',
-      memory: '1.8MB',
-      testCase: 'Failed on test 5',
-      lang: 'Python 3.11',
-      code: `n = int(input())
-  for i in range(1, n + 1):
-      # Wrong implementation
-      print(i, end=" ")`,
-      result:
-        'Expected output: 1 1 2 1 4 2 6 1 6 2\nActual output: 1 2 3 4 5 6 7 8 9 10',
-    },
-    {
-      id: 1003,
-      when: '2025-08-09 14:20:10',
-      verdict: 'Time Limit Exceeded',
-      time: '2000ms',
-      memory: '3.2MB',
-      testCase: 'Failed on test 12',
-      lang: 'Python 3.11',
-      code: `def euler_phi(n):
-      # Inefficient implementation
-      count = 0
-      for i in range(1, n + 1):
-          if gcd(i, n) == 1:
-              count += 1
-      return count
-  
-  def gcd(a, b):
-      while b:
-          a, b = b, a % b
-      return a
-  
-  n = int(input())
-  for i in range(1, n + 1):
-      print(euler_phi(i), end=" ")`,
-      result: 'Time limit exceeded on test case with large input',
-    },
-    {
-      id: 1004,
-      when: '2025-08-09 14:15:05',
-      verdict: 'Compilation Error',
-      time: '-',
-      memory: '-',
-      testCase: 'Syntax error at line 15',
-      lang: 'Python 3.11',
-      code: `def euler_phi(n):
-      result = n
-      p = 2
-      while p * p <= n:
-          if n % p == 0:
-              while n % p == 0:
-                  n //= p
-              result -= result // p
-          p += 1
-      if n > 1:
-          result -= result // n
-      return result
-  
-  n = int(input())
-  for i in range(1, n + 1):
-      print(euler_phi(i), end=" "  # Missing closing parenthesis`,
-      result: "SyntaxError: '(' was never closed",
-    },
-    {
-      id: 1005,
-      when: '2025-08-09 14:10:00',
-      verdict: 'Runtime Error',
-      time: '67ms',
-      memory: '1.8MB',
-      testCase: 'Runtime error on test 4',
-      lang: 'Python 3.11',
-      code: `def euler_phi(n):
-      result = n
-      p = 2
-      while p * p <= n:
-          if n % p == 0:
-              while n % p == 0:
-                  n //= p
-              result -= result // p  # Division by zero possible
-          p += 1
-      if n > 1:
-          result -= result // n
-      return result
-  
-  n = int(input())
-  for i in range(1, n + 1):
-      print(euler_phi(i), end=" ")`,
-      result: 'ZeroDivisionError: integer division or modulo by zero',
-    },
-  ];
+  // TODO: Fetch submissions from API
+  const mockUserSubmissions: any[] = [];
 
   // Get selected submission details
   const selectedSubmission = mockUserSubmissions.find(
@@ -366,157 +247,19 @@ export default function StatusPage() {
   };
 
   const handleRun = async () => {
-    setIsRunning(true);
-    setOutput('Running...');
-
-    // Simulate code execution
-    setTimeout(() => {
-      setOutput(
-        'Sample Input: 5\nSample Output: 1 1 2 3 5\n\nExecution time: 0.12s\nMemory used: 2.4 MB\n\n✅ Test passed!'
-      );
-      setIsRunning(false);
-    }, 2000);
+    // TODO: Implement real run functionality
+    console.log('Run button clicked - implement API call');
   };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-    setOutput('Submitting...');
-
-    // Simulate submission
-    setTimeout(() => {
-      const statusOptions: Array<
-        'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Runtime Error'
-      > = ['Accepted', 'Wrong Answer', 'Time Limit Exceeded', 'Runtime Error'];
-      const randomStatus =
-        statusOptions[Math.floor(Math.random() * statusOptions.length)];
-
-      const newSubmission = {
-        id: submissions.length + 1,
-        timestamp: new Date().toLocaleString(),
-        status: Math.random() > 0.3 ? ('Accepted' as const) : randomStatus,
-        runtime: `${(Math.random() * 2).toFixed(2)}s`,
-        memory: `${(Math.random() * 50 + 10).toFixed(1)}MB`,
-        score: Math.random() > 0.3 ? 100 : Math.floor(Math.random() * 60 + 20),
-      };
-
-      setSubmissions([newSubmission, ...submissions]);
-      setOutput(
-        `✅ Submission #${newSubmission.id} completed!\n\nStatus: ${
-          newSubmission.status
-        }\nRuntime: ${newSubmission.runtime}\nMemory: ${
-          newSubmission.memory
-        }\nScore: ${
-          newSubmission.score
-        }/100\n\nTest case 1: Passed (0.08s)\nTest case 2: Passed (0.12s)\nTest case 3: ${
-          newSubmission.status === 'Accepted' ? 'Passed' : 'Failed'
-        } (0.15s)`
-      );
-      setIsSubmitting(false);
-    }, 3000);
+    // TODO: Implement real submit functionality
+    console.log('Submit button clicked - implement API call');
   };
 
   // AI Assistant Functions
   const getAiResponse = (question: string): string => {
-    if (
-      question.toLowerCase().includes('giải thích') ||
-      question.toLowerCase().includes('thuật toán')
-    ) {
-      return `Đây là bài toán về dãy con chẵn lẻ. Thuật toán giải quyết:
-  
-  1. **Phân tích bài toán**: Cần liệt kê phi hàm euler của các số từ 1 tới N
-  2. **Công thức Euler**: φ(n) = n × ∏(1 - 1/p) với p là các số nguyên tố chia hết n
-  3. **Độ phức tạp**: O(N × sqrt(N)) cho việc tính toán
-  
-  **Ý tưởng chính**: 
-  - Duyệt từ 1 đến N
-  - Với mỗi số, tính phi hàm euler
-  - In kết quả ra màn hình`;
-    }
-
-    if (
-      question.toLowerCase().includes('gợi ý') ||
-      question.toLowerCase().includes('code')
-    ) {
-      return `Đây là gợi ý code cho bài này:
-  
-  \`\`\`python
-  def euler_phi(n):
-      result = n
-      p = 2
-      while p * p <= n:
-          if n % p == 0:
-              while n % p == 0:
-                  n //= p
-              result -= result // p
-          p += 1
-      if n > 1:
-          result -= result // n
-      return result
-  
-  n = int(input())
-  for i in range(1, n + 1):
-      print(euler_phi(i), end=" ")
-  \`\`\`
-  
-  **Giải thích**:
-  - Hàm \`euler_phi(n)\` tính phi hàm euler của n
-  - Duyệt từ 1 đến n và in kết quả`;
-    }
-
-    if (
-      question.toLowerCase().includes('tối ưu') ||
-      question.toLowerCase().includes('optimize')
-    ) {
-      return `Các cách tối ưu hóa solution:
-  
-  **1. Sàng Euler Phi (O(N log log N))**:
-  \`\`\`python
-  def sieve_euler_phi(n):
-      phi = list(range(n + 1))
-      for i in range(2, n + 1):
-          if phi[i] == i:  # i is prime
-              for j in range(i, n + 1, i):
-                  phi[j] -= phi[j] // i
-      return phi
-  
-  n = int(input())
-  phi = sieve_euler_phi(n)
-  for i in range(1, n + 1):
-      print(phi[i], end=" ")
-  \`\`\`
-  
-  **2. Tối ưu bộ nhớ**: Chỉ tính khi cần
-  **3. Tối ưu I/O**: Dùng sys.stdout.write thay vì print`;
-    }
-
-    if (
-      question.toLowerCase().includes('debug') ||
-      question.toLowerCase().includes('lỗi')
-    ) {
-      return `Các lỗi thường gặp và cách debug:
-  
-  **1. Time Limit Exceeded**:
-  - Thuật toán O(N²) quá chậm
-  - Dùng sàng thay vì tính từng số
-  
-  **2. Wrong Answer**:
-  - Kiểm tra công thức phi hàm euler
-  - Chú ý trường hợp n = 1 (φ(1) = 1)
-  
-  **3. Runtime Error**:
-  - Kiểm tra chia cho 0
-  - Kiểm tra index mảng
-  
-  **Cách debug**: Thử với test case nhỏ (n=5) để kiểm tra output`;
-    }
-
-    return `Tôi có thể giúp bạn:
-  - Giải thích thuật toán
-  - Đưa ra gợi ý code  
-  - Debug lỗi
-  - Tối ưu hóa solution
-  
-  Hãy hỏi cụ thể hơn nhé!`;
+    // TODO: Implement real AI assistant integration
+    return 'AI assistant not implemented yet.';
   };
 
   const handleAiMessage = async (message: string) => {

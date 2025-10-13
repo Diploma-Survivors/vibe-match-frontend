@@ -2,6 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import type { ProblemDetail } from '@/types/problems';
 import {
   Calendar,
   CheckCircle,
@@ -14,34 +15,19 @@ import {
 } from 'lucide-react';
 
 interface ProblemSidebarProps {
-  problem: Problem;
+  problem: ProblemDetail;
 }
 
 export default function ProblemSidebar({ problem }: ProblemSidebarProps) {
-  // Mock related problems
-  const relatedProblems = [
-    { id: '101', title: 'Fibonacci Sequence', difficulty: 'Dễ', solved: true },
-    {
-      id: '102',
-      title: 'Prime Numbers',
-      difficulty: 'Trung bình',
-      solved: false,
-    },
-    { id: '103', title: 'GCD & LCM', difficulty: 'Khó', solved: false },
-    {
-      id: '104',
-      title: 'Binary Search',
-      difficulty: 'Trung bình',
-      solved: true,
-    },
-  ];
+  // TODO: Fetch related problems from API
+  const relatedProblems: any[] = [];
 
-  // Mock submission stats
+  // TODO: Fetch submission stats from API
   const submissionStats = {
-    totalSubmissions: 1247,
-    successfulSubmissions: 423,
-    averageTime: '2.4s',
-    acceptanceRate: 33.9,
+    totalSubmissions: 0,
+    successfulSubmissions: 0,
+    averageTime: '0s',
+    acceptanceRate: 0,
   };
 
   return (
@@ -118,7 +104,7 @@ export default function ProblemSidebar({ problem }: ProblemSidebarProps) {
               <span className="text-sm">Điểm số</span>
             </div>
             <span className="text-sm font-medium text-purple-600 dark:text-purple-400">
-              {problem.points}
+              {problem.maxScore}
             </span>
           </div>
         </div>

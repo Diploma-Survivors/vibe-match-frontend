@@ -27,5 +27,4 @@ export interface CreateTestcaseFileResponse {
 
 export interface CreateTestcaseResponse {
   id: string;
-  // Add other fields as returned by backend
 }

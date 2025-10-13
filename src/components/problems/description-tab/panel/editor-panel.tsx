@@ -1,14 +1,15 @@
 import MonacoSubmitEditor from '@/components/editor/monaco-submit-editor';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Play, Send } from 'lucide-react';
+import { useState } from 'react';
 
 interface EditorPanelProps {
   height: number;
   output: string;
   isRunning: boolean;
   isSubmitting: boolean;
-  onRun: () => void;
-  onSubmit: () => void;
+  onRun: (sourceCode: string, languageId: string) => void;
+  onSubmit: (sourceCode: string, languageId: string) => void;
 }
 
 export function EditorPanel({
@@ -19,6 +20,51 @@ export function EditorPanel({
   onRun,
   onSubmit,
 }: EditorPanelProps) {
+  const [currentCode, setCurrentCode] = useState('');
+  const [currentLanguage, setCurrentLanguage] = useState('cpp');
+
+  // Map language strings to languageId numbers
+  const getLanguageId = (language: string): number => {
+    const languageMap: Record<string, number> = {
+      python: 71,
+      cpp: 52,
+      java: 62,
+      javascript: 63,
+    };
+    return languageMap[language] || 52; // Default to C++ if not found
+  };
+
+  const handleCodeChange = (code: string, language: string) => {
+    setCurrentCode(code);
+    setCurrentLanguage(language);
+  };
+
+  const handleRunClick = () => {
+    const languageId = getLanguageId(currentLanguage);
+    console.log(
+      'Run clicked - Code:',
+      currentCode,
+      'Language:',
+      currentLanguage,
+      'LanguageId:',
+      languageId
+    );
+    onRun(currentCode, languageId.toString());
+  };
+
+  const handleSubmitClick = () => {
+    const languageId = getLanguageId(currentLanguage);
+    console.log(
+      'Submit clicked - Code:',
+      currentCode,
+      'Language:',
+      currentLanguage,
+      'LanguageId:',
+      languageId
+    );
+    onSubmit(currentCode, languageId.toString());
+  };
+
   return (
     <div
       className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden flex flex-col"
@@ -27,7 +73,13 @@ export function EditorPanel({
       <div className="flex-1 min-h-0 flex flex-col">
         {/* Monaco Editor */}
         <div className="flex-1 min-h-0">
-          <MonacoSubmitEditor />
+          <MonacoSubmitEditor
+            onCodeChange={handleCodeChange}
+            onRun={handleRunClick}
+            onSubmit={handleSubmitClick}
+            isRunning={isRunning}
+            isSubmitting={isSubmitting}
+          />
         </div>
 
         {/* Footer cố định chứa nút Run/Submit */}
@@ -37,7 +89,7 @@ export function EditorPanel({
           </div>
           <div className="flex items-center gap-2">
             <Button
-              onClick={onRun}
+              onClick={handleRunClick}
               disabled={isRunning}
               variant="outline"
               size="sm"
@@ -56,7 +108,7 @@ export function EditorPanel({
               )}
             </Button>
             <Button
-              onClick={onSubmit}
+              onClick={handleSubmitClick}
               disabled={isSubmitting}
               className="h-8 text-sm bg-green-600 hover:bg-green-700 text-white"
               size="sm"

@@ -1,10 +1,8 @@
 'use client';
 
-import { useCodeExecution } from '@/hooks/use-code-execution';
-import { useResizable } from '@/hooks/use-resizable';
-import { useTestCases } from '@/hooks/use-test-cases';
+import { useProblemDescription } from '@/hooks/use-problem-description';
 import type { ProblemDetail as ProblemDetailType } from '@/types/problems';
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { ContestInfoHeader } from './contest-info-header';
 import { EditorPanel } from './panel/editor-panel';
 import { ProblemDescriptionPanel } from './panel/problem-description-panel';
@@ -24,92 +22,35 @@ export default function ProblemDescription({
   contestName,
   contestTimeRemaining,
 }: ProblemDescriptionProps) {
-  console.log('aassacas', problem);
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  const rightPanelRef = useRef<HTMLDivElement>(null);
-
-  // Custom hooks
   const {
-    size: leftWidth,
-    isDragging,
-    handleMouseDown,
-    handleMouseMove: handleHorizontalMouseMove,
-    handleMouseUp,
-  } = useResizable({
     containerRef,
-    initialSize: 50,
-    minSize: 30,
-    maxSize: 80,
-  });
-
-  const {
-    size: editorHeight,
-    isDragging: isVerticalDragging,
-    handleMouseDown: handleVerticalMouseDown,
-    handleMouseMove: handleVerticalMouseMoveRaw,
-    handleMouseUp: handleVerticalMouseUp,
-  } = useResizable({
-    containerRef: rightPanelRef,
-    initialSize: 60,
-    minSize: 30,
-    maxSize: 80,
-  });
-
-  const {
+    rightPanelRef,
+    leftWidth,
+    editorHeight,
+    isDragging,
+    isVerticalDragging,
     testCases,
     activeTestCase,
     setActiveTestCase,
+    isRunning,
+    isSubmitting,
+    output,
+    testResults,
+    handleMouseDown,
+    handleVerticalMouseDown,
+    handleRun,
+    handleSubmit,
     handleTestCaseSave,
     handleTestCaseEdit,
     handleTestCaseChange,
     handleTestCaseAdd,
     handleTestCaseDelete,
-  } = useTestCases(problem);
-
-  const { isRunning, isSubmitting, output, handleRun, handleSubmit } =
-    useCodeExecution();
-
-  // Add global mouse event listeners
-  useEffect(() => {
-    const handleMouseMoveHorizontal = (e: MouseEvent) => {
-      handleHorizontalMouseMove(e, 'horizontal');
-    };
-
-    const handleMouseMoveVertical = (e: MouseEvent) => {
-      handleVerticalMouseMoveRaw(e, 'vertical');
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMoveHorizontal);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-    }
-
-    if (isVerticalDragging) {
-      document.addEventListener('mousemove', handleMouseMoveVertical);
-      document.addEventListener('mouseup', handleVerticalMouseUp);
-      document.body.style.cursor = 'row-resize';
-      document.body.style.userSelect = 'none';
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMoveHorizontal);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('mousemove', handleMouseMoveVertical);
-      document.removeEventListener('mouseup', handleVerticalMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    };
-  }, [
-    isDragging,
-    isVerticalDragging,
-    handleHorizontalMouseMove,
-    handleMouseUp,
-    handleVerticalMouseMoveRaw,
-    handleVerticalMouseUp,
-  ]);
+  } = useProblemDescription({
+    problem,
+    showContestInfo,
+    contestName,
+    contestTimeRemaining,
+  });
 
   return (
     <div className="h-full">
@@ -167,6 +108,7 @@ export default function ProblemDescription({
               height={100 - editorHeight}
               testCases={testCases}
               activeTestCase={activeTestCase}
+              testResults={testResults}
               onTestCaseAdd={handleTestCaseAdd}
               onTestCaseDelete={handleTestCaseDelete}
               onTestCaseEdit={handleTestCaseEdit}

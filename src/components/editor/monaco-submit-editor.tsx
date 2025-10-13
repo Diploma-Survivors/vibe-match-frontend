@@ -11,7 +11,7 @@ import {
 import Editor from '@monaco-editor/react';
 import { Copy, Play, Send } from 'lucide-react';
 import type { editor } from 'monaco-editor';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const languages = [
   {
@@ -37,18 +37,14 @@ for i in range(1, n + 1):
     print(i, end=" ")
 `,
   cpp: `#include <iostream>
-using namespace std;
 
-int main() {
-    int n;
-    cin >> n;
-    
-    // Code của bạn ở đây
-    for (int i = 1; i <= n; i++) {
-        cout << i << " ";
-    }
-    
-    return 0;
+int main() {    
+    int soThuNhat, soThuHai, tong;
+    std::cin >> soThuNhat;
+    std::cin >> soThuHai;  
+    tong = soThuNhat + soThuHai;
+ 
+    std::cout << tong;
 }`,
   java: `import java.util.Scanner;
 
@@ -88,6 +84,7 @@ interface MonacoSubmitEditorProps {
   onSubmit?: (code: string, language: string) => void;
   isRunning?: boolean;
   isSubmitting?: boolean;
+  onCodeChange?: (code: string, language: string) => void;
 }
 
 export default function MonacoSubmitEditor({
@@ -95,15 +92,23 @@ export default function MonacoSubmitEditor({
   onSubmit,
   isRunning = false,
   isSubmitting = false,
+  onCodeChange,
 }: MonacoSubmitEditorProps) {
-  const [selectedLanguage, setSelectedLanguage] = useState('python');
-  const [code, setCode] = useState(defaultCode.python);
+  const [selectedLanguage, setSelectedLanguage] = useState('cpp');
+  const [code, setCode] = useState(defaultCode.cpp);
   const [cursorPosition, setCursorPosition] = useState({ line: 1, column: 1 });
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
+  // Notify parent component of initial code when component mounts
+  useEffect(() => {
+    onCodeChange?.(code, selectedLanguage);
+  }, [code, selectedLanguage, onCodeChange]);
+
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
-    setCode(defaultCode[language as keyof typeof defaultCode]);
+    const newCode = defaultCode[language as keyof typeof defaultCode];
+    setCode(newCode);
+    onCodeChange?.(newCode, language);
   };
 
   const copyCode = () => {
@@ -130,6 +135,9 @@ export default function MonacoSubmitEditor({
         column: e.position.column,
       });
     });
+
+    // Notify parent component of initial code
+    onCodeChange?.(code, selectedLanguage);
   };
 
   const getCurrentLanguage = () => {
@@ -179,7 +187,11 @@ export default function MonacoSubmitEditor({
           height="100%"
           language={getCurrentLanguage()}
           value={code}
-          onChange={(value) => setCode(value || '')}
+          onChange={(value) => {
+            const newCode = value || '';
+            setCode(newCode);
+            onCodeChange?.(newCode, selectedLanguage);
+          }}
           theme="light"
           onMount={handleEditorDidMount}
           options={{
