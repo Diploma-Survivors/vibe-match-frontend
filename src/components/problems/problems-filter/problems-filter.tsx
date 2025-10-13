@@ -75,7 +75,7 @@ export default function ProblemFilter({
   );
 
   return (
-    <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
+    <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
@@ -90,7 +90,7 @@ export default function ProblemFilter({
           variant="ghost"
           size="sm"
           onClick={onReset}
-          className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-all duration-200"
+          className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all duration-200"
         >
           <RotateCcw className="w-4 h-4 mr-2" />
           Đặt lại
@@ -111,7 +111,7 @@ export default function ProblemFilter({
             placeholder="Nhập từ khóa..."
             value={keyWord || ''}
             onChange={(e) => onKeywordChange(e.target.value)}
-            className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500"
+            className="h-12 rounded-lg border-0 bg-slate-50 dark:bg-slate-700/50 focus-visible:ring-2 focus-visible:ring-slate-400 dark:focus-visible:ring-slate-500"
           />
         </div>
 
@@ -151,7 +151,7 @@ export default function ProblemFilter({
       <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
         <Button
           onClick={onSearch}
-          className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg font-semibold text-white transition-all duration-300"
         >
           <Search className="w-5 h-5 mr-2" />
           Tìm kiếm

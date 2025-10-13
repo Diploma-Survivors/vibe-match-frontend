@@ -8,6 +8,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import type { ProblemListItem } from '@/types/problems';
+import type { SortBy, SortOrder } from '@/types/problems';
 import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import ProblemTableHeader from './problems-table-header';
@@ -19,6 +20,10 @@ interface ProblemTableProps {
   onLoadMore: () => void;
   isLoading?: boolean;
   totalCount?: number;
+  sortBy: SortBy;
+  sortOrder: SortOrder;
+  onSortByChange: (newSortBy: SortBy) => void;
+  onSortOrderChange: (newSortOrder: SortOrder) => void;
 }
 
 export default function ProblemTable({
@@ -27,12 +32,20 @@ export default function ProblemTable({
   onLoadMore,
   isLoading = false,
   totalCount = 0,
+  sortBy,
+  sortOrder,
+  onSortByChange,
+  onSortOrderChange,
 }: ProblemTableProps) {
   return (
-    <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
+    <div className="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 overflow-hidden">
       <ProblemTableHeader
         currentCount={problems.length}
         totalCount={totalCount}
+        sortBy={sortBy}
+        sortOrder={sortOrder}
+        onSortByChange={onSortByChange}
+        onSortOrderChange={onSortOrderChange}
       />
 
       <InfiniteScroll
