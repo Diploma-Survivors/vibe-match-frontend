@@ -24,6 +24,7 @@ interface SampleTestCasesPanelProps {
   activeTestCase: number;
   testResults?: SSEResult | null;
   isRunning?: boolean;
+  runError?: string | null;
   onTestCaseAdd: () => void;
   onTestCaseDelete: (id: string) => void;
   onTestCaseEdit: (id: string) => void;
@@ -42,6 +43,7 @@ export function SampleTestCasesPanel({
   activeTestCase,
   testResults,
   isRunning = false,
+  runError = null,
   onTestCaseAdd,
   onTestCaseDelete,
   onTestCaseEdit,
@@ -240,14 +242,17 @@ export function SampleTestCasesPanel({
         {testCases[activeTestCase] && (
           <div className="space-y-6">
             {activeTab === 'result' && !hasResults ? (
-              <div className="w-full py-20 text-center font-semibold text-slate-700 dark:text-slate-300 flex items-center justify-center gap-3">
+              <div
+                className={`w-full py-20 text-center font-semibold flex items-center justify-center gap-3 ${runError ? 'text-red-600' : 'text-slate-700 dark:text-slate-300'}`}
+              >
                 {isRunning && (
                   <div className="w-4 h-4 border-2 border-slate-400/30 border-t-slate-500 rounded-full animate-spin" />
                 )}
                 <span>
                   {isRunning
                     ? 'Đang chạy sample testcases...'
-                    : 'Bạn phải bấm run để xem kết quả testcase sample'}
+                    : runError ||
+                      'Bạn phải bấm run để xem kết quả testcase sample'}
                 </span>
               </div>
             ) : (

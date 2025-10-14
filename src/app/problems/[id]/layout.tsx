@@ -1,6 +1,6 @@
 'use client';
 
-import ProblemNavbar from '@/components/problems/problem-navbar';
+import ProblemNavbar from '@/components/problems/tabs/shared/problem-navbar';
 import { useApp } from '@/contexts/app-context';
 import { useParams, usePathname, useRouter } from 'next/navigation';
 

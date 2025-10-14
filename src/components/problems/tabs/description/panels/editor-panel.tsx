@@ -7,8 +7,8 @@ interface EditorPanelProps {
   height: number;
   isRunning: boolean;
   isSubmitting: boolean;
-  onRun: (sourceCode: string, languageId: string) => void;
-  onSubmit: (sourceCode: string, languageId: string) => void;
+  onRun: (sourceCode: string, languageId: number) => void;
+  onSubmit: (sourceCode: string, languageId: number) => void;
 }
 
 export function EditorPanel({
@@ -39,28 +39,12 @@ export function EditorPanel({
 
   const handleRunClick = () => {
     const languageId = getLanguageId(currentLanguage);
-    console.log(
-      'Run clicked - Code:',
-      currentCode,
-      'Language:',
-      currentLanguage,
-      'LanguageId:',
-      languageId
-    );
-    onRun(currentCode, languageId.toString());
+    onRun(currentCode, languageId);
   };
 
   const handleSubmitClick = () => {
     const languageId = getLanguageId(currentLanguage);
-    console.log(
-      'Submit clicked - Code:',
-      currentCode,
-      'Language:',
-      currentLanguage,
-      'LanguageId:',
-      languageId
-    );
-    onSubmit(currentCode, languageId.toString());
+    onSubmit(currentCode, languageId);
   };
 
   return (
@@ -71,13 +55,7 @@ export function EditorPanel({
       <div className="flex-1 min-h-0 flex flex-col">
         {/* Monaco Editor */}
         <div className="flex-1 min-h-0">
-          <MonacoSubmitEditor
-            onCodeChange={handleCodeChange}
-            onRun={handleRunClick}
-            onSubmit={handleSubmitClick}
-            isRunning={isRunning}
-            isSubmitting={isSubmitting}
-          />
+          <MonacoSubmitEditor onCodeChange={handleCodeChange} />
         </div>
 
         {/* Footer cố định chứa nút Run/Submit */}

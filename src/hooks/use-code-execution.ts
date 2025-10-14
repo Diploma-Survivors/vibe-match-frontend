@@ -15,9 +15,9 @@ interface Submission {
 export function useCodeExecution() {
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [output, setOutput] = useState('');
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [testResults, setTestResults] = useState<SSEResult | null>(null);
+  const [runError, setRunError] = useState<string | null>(null);
   const sseConnectedRef = useRef(false);
 
   // Cleanup SSE connection on unmount
@@ -33,18 +33,17 @@ export function useCodeExecution() {
   const handleRun = useCallback(
     async (
       sourceCode: string,
-      languageId: string,
+      languageId: number,
       problemId: string,
       testCases: Array<{ input: string; output: string }>
     ) => {
       setIsRunning(true);
-      setOutput('Running...');
       setTestResults(null);
+      setRunError(null);
 
       try {
-        // Convert string languageId to number
         const submissionRequest: SubmissionRequest = {
-          languageId: Number.parseInt(languageId, 10),
+          languageId,
           sourceCode,
           problemId,
           testCases,
@@ -57,19 +56,12 @@ export function useCodeExecution() {
         console.log('submissionId', submissionId);
 
         if (submissionId) {
-          setOutput(
-            `Submission created: ${response.data.submissionId}\nWaiting for results...`
-          );
-
           // Establish SSE connection
           sseService.connect(
             submissionId,
             (result: SSEResult) => {
               console.log('SSE result received:', result);
               setTestResults(result);
-              setOutput(
-                `Test completed!\nStatus: ${result.status}\nScore: ${result.score}%\nPassed: ${result.passedTests}/${result.totalTests}`
-              );
               setIsRunning(false);
               // Disconnect SSE after receiving result
               sseService.disconnect();
@@ -77,35 +69,18 @@ export function useCodeExecution() {
             },
             (error) => {
               console.error('SSE error:', error);
-              setOutput('Error: Failed to receive test results.');
+              setRunError('Đã có lỗi xảy ra, vui lòng thử lại sau');
               setIsRunning(false);
             }
           );
           sseConnectedRef.current = true;
         } else {
-          setOutput('Error: Failed to create submission.');
+          setRunError('Đã có lỗi xảy ra, vui lòng thử lại sau');
           setIsRunning(false);
         }
       } catch (error) {
         console.error('Error running code:', error);
-        let errorMessage = 'Error: Failed to run code. Please try again.';
-
-        if (error instanceof Error) {
-          errorMessage = `Error: ${error.message}`;
-        } else if (
-          typeof error === 'object' &&
-          error !== null &&
-          'response' in error
-        ) {
-          const axiosError = error as any;
-          if (axiosError.response?.data?.message) {
-            errorMessage = `Error: ${axiosError.response.data.message}`;
-          } else if (axiosError.response?.status) {
-            errorMessage = `Error: HTTP ${axiosError.response.status} - ${axiosError.response.statusText}`;
-          }
-        }
-
-        setOutput(errorMessage);
+        setRunError('Đã có lỗi xảy ra, vui lòng thử lại sau');
         setIsRunning(false);
       }
     },
@@ -115,16 +90,15 @@ export function useCodeExecution() {
   const handleSubmit = useCallback(
     async (
       sourceCode: string,
-      languageId: string,
+      languageId: number,
       problemId: string,
       testCases: Array<{ input: string; output: string }>
     ) => {
       setIsSubmitting(true);
-      setOutput('Submitting...');
 
       try {
         const submissionRequest: SubmissionRequest = {
-          languageId: Number.parseInt(languageId, 10),
+          languageId,
           sourceCode,
           problemId,
           testCases,
@@ -134,10 +108,6 @@ export function useCodeExecution() {
         const submissionId = response.data.submissionId;
 
         if (submissionId) {
-          setOutput(
-            `Submission created: ${response.data.submissionId}\nWaiting for results...`
-          );
-
           // For submit, we might want to handle it differently than run
           // For now, just show the submission ID
           const newSubmission: Submission = {
@@ -150,11 +120,6 @@ export function useCodeExecution() {
           };
 
           setSubmissions([newSubmission, ...submissions]);
-          setOutput(
-            `✅ Submission #${newSubmission.id} created!\n\nSubmission ID: ${response.data.submissionId}\nStatus: Pending`
-          );
-        } else {
-          setOutput('Error: Failed to create submission.');
         }
       } catch (error) {
         console.error('Error submitting code:', error);
@@ -174,8 +139,6 @@ export function useCodeExecution() {
             errorMessage = `Error: HTTP ${axiosError.response.status} - ${axiosError.response.statusText}`;
           }
         }
-
-        setOutput(errorMessage);
       } finally {
         setIsSubmitting(false);
       }
@@ -186,9 +149,9 @@ export function useCodeExecution() {
   return {
     isRunning,
     isSubmitting,
-    output,
     submissions,
     testResults,
+    runError,
     handleRun,
     handleSubmit,
   };

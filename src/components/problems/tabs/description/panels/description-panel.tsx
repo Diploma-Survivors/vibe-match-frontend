@@ -1,39 +1,41 @@
 import { Button } from '@/components/ui/button';
 import type { ProblemDetail } from '@/types/problems';
 import { ProblemDifficulty } from '@/types/problems';
+import type { TestcaseSample } from '@/types/testcases';
 import { FileText, MemoryStick, Timer } from 'lucide-react';
 import { Copy } from 'lucide-react';
 import { useState } from 'react';
 
-interface ProblemDescriptionPanelProps {
+interface DescriptionPanelProps {
   problem: ProblemDetail;
   width: number;
 }
 
-export function ProblemDescriptionPanel({
-  problem,
-  width,
-}: ProblemDescriptionPanelProps) {
+export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
+  const sampleCases: TestcaseSample[] = problem.testcaseSamples || [];
   const [activeSampleIndex, setActiveSampleIndex] = useState(0);
 
-  const getDifficultyLabel = (difficulty: string) => {
+  const getDifficultyLabel = (difficulty: string): string => {
     switch (difficulty) {
       case ProblemDifficulty.EASY:
-        return 'Dễ';
+        return 'Easy';
       case ProblemDifficulty.MEDIUM:
-        return 'Trung bình';
+        return 'Medium';
       case ProblemDifficulty.HARD:
-        return 'Khó';
+        return 'Hard';
       default:
         return difficulty;
     }
   };
 
+  // Format time and memory limit
   const timeLimitSeconds = (problem.timeLimitMs / 1000).toFixed(1);
   const memoryLimitMB = (problem.memoryLimitKb / 1024).toFixed(0);
-  const sampleCases = problem.testcaseSamples || [];
+
+  // Choose sample case
   const activeSample = sampleCases[activeSampleIndex];
 
+  // helper function to copy to clipboard
   const copyToClipboard = (text?: string) => {
     if (!text) return;
     navigator.clipboard.writeText(text);
@@ -61,15 +63,15 @@ export function ProblemDescriptionPanel({
                 >
                   {getDifficultyLabel(problem.difficulty)}
                 </div>
-                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
+                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
                   <Timer className="w-4 h-4" />
                   {timeLimitSeconds}s time limit
                 </div>
-                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
+                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
                   <MemoryStick className="w-4 h-4" />
                   {memoryLimitMB}MB memory
                 </div>
-                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400">
+                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
                   <FileText className="w-4 h-4" />
                   {problem.maxScore} điểm
                 </div>
@@ -119,11 +121,11 @@ export function ProblemDescriptionPanel({
                   Giới hạn
                 </h2>
                 <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                  <p className="text-slate-700 dark:text-slate-300">
+                  <p className="text-slate-700 dark:text-slate-300 font-semibold">
                     <span className="font-semibold">Thời gian</span>:{' '}
                     {timeLimitSeconds} <span className="font-semibold">s</span>
                   </p>
-                  <p className="text-slate-700 dark:text-slate-300">
+                  <p className="text-slate-700 dark:text-slate-300 font-semibold">
                     <span className="font-semibold">Bộ nhớ</span>:{' '}
                     {memoryLimitMB} <span className="font-semibold">MB</span>
                   </p>

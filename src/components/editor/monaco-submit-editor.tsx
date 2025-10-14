@@ -80,47 +80,26 @@ rl.question('', (n) => {
 };
 
 interface MonacoSubmitEditorProps {
-  onRun?: (code: string, language: string) => void;
-  onSubmit?: (code: string, language: string) => void;
-  isRunning?: boolean;
-  isSubmitting?: boolean;
-  onCodeChange?: (code: string, language: string) => void;
+  onCodeChange?: (sourceCode: string, language: string) => void;
 }
 
 export default function MonacoSubmitEditor({
-  onRun,
-  onSubmit,
-  isRunning = false,
-  isSubmitting = false,
   onCodeChange,
 }: MonacoSubmitEditorProps) {
   const [selectedLanguage, setSelectedLanguage] = useState('cpp');
-  const [code, setCode] = useState(defaultCode.cpp);
-  const [cursorPosition, setCursorPosition] = useState({ line: 1, column: 1 });
+  const [sourceCode, setSourceCode] = useState(defaultCode.cpp);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
   // Notify parent component of initial code when component mounts
   useEffect(() => {
-    onCodeChange?.(code, selectedLanguage);
-  }, [code, selectedLanguage, onCodeChange]);
+    onCodeChange?.(sourceCode, selectedLanguage);
+  }, [sourceCode, selectedLanguage, onCodeChange]);
 
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
-    const newCode = defaultCode[language as keyof typeof defaultCode];
-    setCode(newCode);
-    onCodeChange?.(newCode, language);
-  };
-
-  const copyCode = () => {
-    navigator.clipboard.writeText(code);
-  };
-
-  const handleRun = () => {
-    onRun?.(code, selectedLanguage);
-  };
-
-  const handleSubmit = () => {
-    onSubmit?.(code, selectedLanguage);
+    const newSourceCode = defaultCode[language as keyof typeof defaultCode];
+    setSourceCode(newSourceCode);
+    onCodeChange?.(newSourceCode, language);
   };
 
   const handleEditorDidMount = (
@@ -128,16 +107,8 @@ export default function MonacoSubmitEditor({
   ) => {
     editorRef.current = editorInstance;
 
-    // Track cursor position
-    editorInstance.onDidChangeCursorPosition((e) => {
-      setCursorPosition({
-        line: e.position.lineNumber,
-        column: e.position.column,
-      });
-    });
-
     // Notify parent component of initial code
-    onCodeChange?.(code, selectedLanguage);
+    onCodeChange?.(sourceCode, selectedLanguage);
   };
 
   const getCurrentLanguage = () => {
@@ -145,6 +116,11 @@ export default function MonacoSubmitEditor({
       languages.find((lang) => lang.value === selectedLanguage)?.monacoLang ||
       'python'
     );
+  };
+
+  // Copy to clipboard
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(sourceCode);
   };
 
   return (
@@ -172,7 +148,7 @@ export default function MonacoSubmitEditor({
           <Button
             variant="ghost"
             size="sm"
-            onClick={copyCode}
+            onClick={copyToClipboard}
             className="h-8 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
           >
             <Copy className="w-4 h-4 mr-1" />
@@ -186,11 +162,11 @@ export default function MonacoSubmitEditor({
         <Editor
           height="100%"
           language={getCurrentLanguage()}
-          value={code}
+          value={sourceCode}
           onChange={(value) => {
-            const newCode = value || '';
-            setCode(newCode);
-            onCodeChange?.(newCode, selectedLanguage);
+            const newSourceCode = value || '';
+            setSourceCode(newSourceCode);
+            onCodeChange?.(newSourceCode, selectedLanguage);
           }}
           theme="light"
           onMount={handleEditorDidMount}

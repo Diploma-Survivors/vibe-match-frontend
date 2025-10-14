@@ -1,4 +1,4 @@
-import SortControls from '@/components/common/sort-controls';
+import SortControls from '@/components/problems/problems-filter/sort-controls';
 import type { SortBy, SortOrder } from '@/types/problems';
 import { FaList } from 'react-icons/fa6';
 
