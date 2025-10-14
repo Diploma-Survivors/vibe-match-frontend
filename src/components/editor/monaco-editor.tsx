@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DEFAULT_CODE, LANGUAGES } from '@/lib/apis/constants/code-editor';
+import { DEFAULT_CODE, LANGUAGES } from '@/lib/constants/code-editor';
 import Editor from '@monaco-editor/react';
 import { Copy, Wand2 } from 'lucide-react';
 import type { editor } from 'monaco-editor';

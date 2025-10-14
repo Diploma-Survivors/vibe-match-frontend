@@ -4,9 +4,9 @@ import { useProblemDescription } from '@/hooks/use-problem-description';
 import type { ProblemDetail as ProblemDetailType } from '@/types/problems';
 import React from 'react';
 import { ResizableDivider } from './dividers/resizable-divider';
-import { DescriptionPanel } from './panels/description-panel';
-import { EditorPanel } from './panels/editor-panel';
-import { SampleTestCasesPanel } from './panels/sample-testcases-panel';
+import { DescriptionPanel } from './panels/description-panel/description-panel';
+import { EditorPanel } from './panels/editor-panel/editor-panel';
+import { SampleTestCasesPanel } from './panels/sample-testcases-panel/sample-testcases-panel';
 
 interface ProblemDescriptionProps {
   problem: ProblemDetailType;
@@ -103,8 +103,6 @@ export default function ProblemDescription({
               isRunning={isRunning}
               onTestCaseAdd={handleTestCaseAdd}
               onTestCaseDelete={handleTestCaseDelete}
-              onTestCaseEdit={handleTestCaseEdit}
-              onTestCaseSave={handleTestCaseSave}
               onTestCaseChange={handleTestCaseChange}
               onActiveTestCaseChange={setActiveTestCase}
             />
