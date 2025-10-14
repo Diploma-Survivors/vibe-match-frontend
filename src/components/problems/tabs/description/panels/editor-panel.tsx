@@ -1,4 +1,4 @@
-import MonacoSubmitEditor from '@/components/editor/monaco-submit-editor';
+import MonacoEditor from '@/components/editor/monaco-editor';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Play, Send } from 'lucide-react';
 import { useState } from 'react';
@@ -55,7 +55,7 @@ export function EditorPanel({
       <div className="flex-1 min-h-0 flex flex-col">
         {/* Monaco Editor */}
         <div className="flex-1 min-h-0">
-          <MonacoSubmitEditor onCodeChange={handleCodeChange} />
+          <MonacoEditor onCodeChange={handleCodeChange} />
         </div>
 
         {/* Footer cố định chứa nút Run/Submit */}

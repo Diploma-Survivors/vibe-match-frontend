@@ -8,109 +8,54 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { DEFAULT_CODE, LANGUAGES } from '@/lib/apis/constants/code-editor';
 import Editor from '@monaco-editor/react';
-import { Copy, Play, Send } from 'lucide-react';
+import { Copy, Wand2 } from 'lucide-react';
 import type { editor } from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
 
-const languages = [
-  {
-    value: 'python',
-    label: 'Python 3',
-    monacoLang: 'python',
-  },
-  { value: 'cpp', label: 'C++17', monacoLang: 'cpp' },
-  { value: 'java', label: 'Java 17', monacoLang: 'java' },
-  {
-    value: 'javascript',
-    label: 'JavaScript',
-    monacoLang: 'javascript',
-  },
-];
+const languages = LANGUAGES;
+const defaultCode = DEFAULT_CODE;
 
-const defaultCode = {
-  python: `# Nhập N từ bàn phím
-n = int(input())
-
-# Code của bạn ở đây
-for i in range(1, n + 1):
-    print(i, end=" ")
-`,
-  cpp: `#include <iostream>
-
-int main() {    
-    int soThuNhat, soThuHai, tong;
-    std::cin >> soThuNhat;
-    std::cin >> soThuHai;  
-    tong = soThuNhat + soThuHai;
- 
-    std::cout << tong;
-}`,
-  java: `import java.util.Scanner;
-
-public class Solution {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        
-        // Code của bạn ở đây
-        for (int i = 1; i <= n; i++) {
-            System.out.print(i + " ");
-        }
-        
-        sc.close();
-    }
-}`,
-  javascript: `const readline = require('readline');
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
-
-rl.question('', (n) => {
-    n = parseInt(n);
-    
-    // Code của bạn ở đây
-    for (let i = 1; i <= n; i++) {
-        process.stdout.write(i + " ");
-    }
-    
-    rl.close();
-});`,
-};
-
-interface MonacoSubmitEditorProps {
+interface MonacoEditorProps {
   onCodeChange?: (sourceCode: string, language: string) => void;
 }
 
-export default function MonacoSubmitEditor({
-  onCodeChange,
-}: MonacoSubmitEditorProps) {
+export default function MonacoEditor({ onCodeChange }: MonacoEditorProps) {
   const [selectedLanguage, setSelectedLanguage] = useState('cpp');
   const [sourceCode, setSourceCode] = useState(defaultCode.cpp);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
 
-  // Notify parent component of initial code when component mounts
+  // Notify parent when source code changes
   useEffect(() => {
     onCodeChange?.(sourceCode, selectedLanguage);
   }, [sourceCode, selectedLanguage, onCodeChange]);
 
+  // handle language change when user changes the language in the dropdown
   const handleLanguageChange = (language: string) => {
     setSelectedLanguage(language);
-    const newSourceCode = defaultCode[language as keyof typeof defaultCode];
+    const newSourceCode =
+      defaultCode[language as keyof typeof defaultCode] || '';
     setSourceCode(newSourceCode);
     onCodeChange?.(newSourceCode, language);
   };
 
+  // handle editor change when user changes the code in the editor
+  const handleEditorChange = (value?: string) => {
+    const newSourceCode = value || '';
+    setSourceCode(newSourceCode);
+    onCodeChange?.(newSourceCode, selectedLanguage);
+  };
+
+  // handle editor mount when editor is mounted (just call once when editor is mounted)
   const handleEditorDidMount = (
     editorInstance: editor.IStandaloneCodeEditor
   ) => {
     editorRef.current = editorInstance;
-
-    // Notify parent component of initial code
     onCodeChange?.(sourceCode, selectedLanguage);
   };
 
+  // get current language
   const getCurrentLanguage = () => {
     return (
       languages.find((lang) => lang.value === selectedLanguage)?.monacoLang ||
@@ -121,6 +66,15 @@ export default function MonacoSubmitEditor({
   // Copy to clipboard
   const copyToClipboard = () => {
     navigator.clipboard.writeText(sourceCode);
+  };
+
+  // Format code using Monaco editor ref (unsupported for python/cpp/java)
+  const handleFormatCode = () => {
+    const instance = editorRef.current;
+    if (!instance) return;
+
+    const action = instance.getAction?.('editor.action.formatDocument');
+    if (action) action.run();
   };
 
   return (
@@ -144,6 +98,16 @@ export default function MonacoSubmitEditor({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Format Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleFormatCode}
+            className="h-8 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+          >
+            <Wand2 className="w-4 h-4 mr-1" />
+            Format
+          </Button>
           {/* Copy Button */}
           <Button
             variant="ghost"
@@ -163,11 +127,7 @@ export default function MonacoSubmitEditor({
           height="100%"
           language={getCurrentLanguage()}
           value={sourceCode}
-          onChange={(value) => {
-            const newSourceCode = value || '';
-            setSourceCode(newSourceCode);
-            onCodeChange?.(newSourceCode, selectedLanguage);
-          }}
+          onChange={handleEditorChange}
           theme="light"
           onMount={handleEditorDidMount}
           options={{
