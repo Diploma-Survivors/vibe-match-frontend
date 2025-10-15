@@ -17,6 +17,7 @@ export function useCodeExecution() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [testResults, setTestResults] = useState<SSEResult | null>(null);
+  const [submitResults, setSubmitResults] = useState<SSEResult | null>(null);
   const [runError, setRunError] = useState<string | null>(null);
   const sseConnectedRef = useRef(false);
 
@@ -95,6 +96,7 @@ export function useCodeExecution() {
       testCases: Array<{ input: string; output: string }>
     ) => {
       setIsSubmitting(true);
+      setSubmitResults(null);
 
       try {
         const submissionRequest: SubmissionRequest = {
@@ -103,23 +105,38 @@ export function useCodeExecution() {
           problemId,
           testCases,
         };
-
-        const response = await SubmissionsService.run(submissionRequest);
-        const submissionId = response.data.submissionId;
+        const response = await SubmissionsService.submit(submissionRequest);
+        const submissionId =
+          response?.data?.data?.submissionId ?? response?.data?.submissionId;
 
         if (submissionId) {
-          // For submit, we might want to handle it differently than run
-          // For now, just show the submission ID
-          const newSubmission: Submission = {
-            id: submissions.length + 1,
-            timestamp: new Date().toLocaleString(),
-            status: 'Accepted', // Default status
-            runtime: '0.00s',
-            memory: '0.0MB',
-            score: 100,
-          };
-
-          setSubmissions([newSubmission, ...submissions]);
+          // Establish SSE connection for submit flow
+          sseService.connect(
+            submissionId,
+            (result: SSEResult) => {
+              setSubmitResults(result);
+              setIsSubmitting(false);
+              sseService.disconnect();
+              sseConnectedRef.current = false;
+              // optionally record a history entry
+              const newSubmission: Submission = {
+                id: submissions.length + 1,
+                timestamp: new Date().toLocaleString(),
+                status: (result.status as any) || 'Accepted',
+                runtime: `${result.runtime}`,
+                memory: `${result.memory}`,
+                score: result.score,
+              };
+              setSubmissions([newSubmission, ...submissions]);
+            },
+            (error) => {
+              console.error('SSE error (submit):', error);
+              setIsSubmitting(false);
+            }
+          );
+          sseConnectedRef.current = true;
+        } else {
+          setIsSubmitting(false);
         }
       } catch (error) {
         console.error('Error submitting code:', error);
@@ -151,8 +168,10 @@ export function useCodeExecution() {
     isSubmitting,
     submissions,
     testResults,
+    submitResults,
     runError,
     handleRun,
     handleSubmit,
+    clearSubmitResults: () => setSubmitResults(null),
   };
 }

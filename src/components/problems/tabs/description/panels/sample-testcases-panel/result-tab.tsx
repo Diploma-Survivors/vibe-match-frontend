@@ -1,22 +1,14 @@
-import { getStatusMeta, getTestResult } from '@/lib/utils/testcase-status';
+import { getStatusMeta } from '@/lib/utils/testcase-status';
 import type { SSEResult } from '@/services/sse-service';
-
-interface TestCase {
-  id: string;
-  input: string;
-  output: string;
-  isEditing: boolean;
-}
+import type { UITestcaseSample } from '@/types/testcases';
 
 interface ResultTabProps {
-  testCases: TestCase[];
+  testCases: UITestcaseSample[];
   activeTestCase: number;
   testResults?: SSEResult | null;
   isRunning?: boolean;
   runError?: string | null;
 }
-
-// use helpers from shared constants
 
 export function ResultTab({
   testCases,
@@ -45,6 +37,20 @@ export function ResultTab({
       </div>
     );
   }
+
+  const getTestResult = (
+    testResults: SSEResult | null | undefined,
+    index: number
+  ) => {
+    if (
+      !testResults ||
+      !testResults.results ||
+      index >= testResults.results.length
+    ) {
+      return null;
+    }
+    return testResults.results[index];
+  };
 
   const testResult = getTestResult(testResults, activeTestCase);
   const statusInfo = testResult ? getStatusMeta(testResult.status) : null;

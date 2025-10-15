@@ -1,14 +1,8 @@
+import type { UITestcaseSample } from '@/types/testcases';
 import { useCallback, useEffect } from 'react';
 
-interface TestCase {
-  id: string;
-  input: string;
-  output: string;
-  isEditing: boolean;
-}
-
 interface TestcaseTabProps {
-  testCases: TestCase[];
+  testCases: UITestcaseSample[];
   activeTestCase: number;
   onTestCaseChange: (
     id: string,

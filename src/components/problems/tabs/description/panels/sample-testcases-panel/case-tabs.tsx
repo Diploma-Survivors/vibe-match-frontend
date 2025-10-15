@@ -47,6 +47,7 @@ export function CaseTabs({
                   : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
               }`}
             >
+              {/* Show status icon for result tab */}
               {activeTab === 'result' && statusInfo ? (
                 <span className={statusInfo.iconColor}>{statusInfo.icon}</span>
               ) : null}

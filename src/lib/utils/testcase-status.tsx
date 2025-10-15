@@ -48,17 +48,3 @@ export const getStatusMeta = (status: string): StatusMeta => {
       };
   }
 };
-
-export const getTestResult = (
-  testResults: SSEResult | null | undefined,
-  index: number
-) => {
-  if (
-    !testResults ||
-    !testResults.results ||
-    index >= testResults.results.length
-  ) {
-    return null;
-  }
-  return testResults.results[index];
-};

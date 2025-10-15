@@ -1,21 +1,15 @@
 // import removed: getStatusMeta is handled inside child components now
 import type { SSEResult } from '@/services/sse-service';
+import type { UITestcaseSample } from '@/types/testcases';
 import { CheckCircle, Code } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { CaseTabs } from './case-tabs';
 import { ResultTab } from './result-tab';
 import { TestcaseTab } from './testcase-tab';
 
-interface TestCase {
-  id: string;
-  input: string;
-  output: string;
-  isEditing: boolean;
-}
-
 interface SampleTestCasesPanelProps {
   height: number;
-  testCases: TestCase[];
+  testCases: UITestcaseSample[];
   activeTestCase: number;
   testResults?: SSEResult | null;
   isRunning?: boolean;
@@ -132,8 +126,6 @@ export function SampleTestCasesPanel({
             )}
           </div>
         )}
-
-        {/* Bottom navigation removed as requested */}
       </div>
     </div>
   );

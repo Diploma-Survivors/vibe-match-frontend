@@ -20,9 +20,11 @@ export function useProblemDescription({
     isRunning,
     isSubmitting,
     testResults,
+    submitResults,
     runError,
     handleRun: executeRun,
     handleSubmit: executeSubmit,
+    clearSubmitResults,
   } = useCodeExecution();
 
   // Refetch key for consumers to re-query DB-backed testcase results
@@ -86,6 +88,7 @@ export function useProblemDescription({
     isRunning,
     isSubmitting,
     testResults,
+    submitResults,
     runError,
     refreshKey,
 
@@ -102,5 +105,6 @@ export function useProblemDescription({
 
     // Props
     problem,
+    clearSubmitResults,
   };
 }

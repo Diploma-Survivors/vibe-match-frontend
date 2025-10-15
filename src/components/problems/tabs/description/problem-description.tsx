@@ -7,6 +7,7 @@ import { ResizableDivider } from './dividers/resizable-divider';
 import { DescriptionPanel } from './panels/description-panel/description-panel';
 import { EditorPanel } from './panels/editor-panel/editor-panel';
 import { SampleTestCasesPanel } from './panels/sample-testcases-panel/sample-testcases-panel';
+import { SubmitResultTab } from './panels/submit-result/submit-result-tab';
 
 interface ProblemDescriptionProps {
   problem: ProblemDetailType;
@@ -35,6 +36,7 @@ export default function ProblemDescription({
     isRunning, // Đang chạy code (Run button)
     isSubmitting, // Đang submit code (Submit button)
     testResults, // Kết quả từ test case execution (SSE data)
+    submitResults, // Kết quả từ submit (SSE data)
     runError, // Lỗi khi gọi API run (nếu có)
 
     // Event handlers - Xử lý tương tác user
@@ -47,6 +49,7 @@ export default function ProblemDescription({
     handleTestCaseChange, // Cập nhật input/output của test case
     handleTestCaseAdd, // Thêm test case mới
     handleTestCaseDelete, // Xóa test case
+    clearSubmitResults, // Đóng submit panel
   } = useProblemDescription({
     problem,
   });
@@ -60,8 +63,16 @@ export default function ProblemDescription({
           height: 'calc(100vh - 60px)',
         }}
       >
-        {/* Left Panel - Problem Description */}
-        <DescriptionPanel problem={problem} width={leftWidth} />
+        {/* Left Panel - Problem Description or Submit Result */}
+        {submitResults ? (
+          <SubmitResultTab
+            width={leftWidth}
+            result={submitResults}
+            onClose={clearSubmitResults}
+          />
+        ) : (
+          <DescriptionPanel problem={problem} width={leftWidth} />
+        )}
 
         {/* Horizontal Resizer */}
         <ResizableDivider

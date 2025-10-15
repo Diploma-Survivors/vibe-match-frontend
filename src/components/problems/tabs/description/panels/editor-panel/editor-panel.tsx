@@ -1,4 +1,4 @@
-import MonacoEditor from '@/components/editor/monaco-editor';
+import MonacoEditor from '@/components/problems/tabs/description/panels/editor-panel/monaco-editor';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Play, Send } from 'lucide-react';
 import { useState } from 'react';

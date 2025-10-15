@@ -14,6 +14,12 @@ export interface TestcaseSample {
   updatedAt?: string;
 }
 
+// UI-only type: enriches TestcaseSample with required id and local editing state
+export type UITestcaseSample = TestcaseSample & {
+  id: string;
+  isEditing: boolean;
+};
+
 export interface CreateTestcaseRequest {
   testcases: TestcaseSample[];
 }

@@ -6,11 +6,12 @@ async function run(submissionRequest: SubmissionRequest) {
   return await clientApi.post('/submissions/run', submissionRequest);
 }
 
-async function getResults(submissionId: string) {
-  return await clientApi.get(`/submissions/${submissionId}/results`);
+async function submit(submissionRequest: SubmissionRequest) {
+  console.log('submissionRequest', submissionRequest);
+  return await clientApi.post('/submissions/submit', submissionRequest);
 }
 
 export const SubmissionsService = {
   run,
-  getResults,
+  submit,
 };
