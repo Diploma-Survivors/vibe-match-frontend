@@ -15,13 +15,9 @@ const clientApi = axios.create({
 clientApi.interceptors.request.use(
   async (config) => {
     const session = await getSession();
-    // if (session?.accessToken) {
-    //   config.headers.Authorization = `Bearer ${session.accessToken}`;
-    // }
-
-    // Hardcoded token for testing purposes
-    config.headers.Authorization =
-      'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5MDMwZjYyZS01NjE0LTQxMTgtODkxNi0zYTU0YzRlYjQ3YTQiLCJjb3Vyc2VJZCI6IjdkZTBhZDQ2LTRhOTgtNGRkOS1hY2E3LWNhM2U2NGU1NGFkOSIsImVtYWlsIjoidnV0aGV2eTEyMDkyMDA0QGdtYWlsLmNvbSIsImZpcnN0TmFtZSI6Ilbhu7kiLCJsYXN0TmFtZSI6IlbFqSBUaOG6vyIsInJvbGVzIjpbIklOU1RSVUNUT1IiXSwic3ViIjoiMiIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODg4OCIsImlhdCI6MTc1OTkzNjA2NCwiZXhwIjo1MzU5OTM2MDY0LCJhdWQiOiJsb2NhbGhvc3Q6MzAwMCJ9.1qqPQ21TZvfoy9cm3DPTccR5K1aTdt1wEuTT1ATewGE';
+    if (session?.accessToken) {
+      config.headers.Authorization = `Bearer ${session.accessToken}`;
+    }
 
     return config;
   },
