@@ -1,6 +1,6 @@
 import { getStatusMeta } from '@/lib/utils/testcase-status';
 import type { SSEResult } from '@/services/sse-service';
-import { X } from 'lucide-react';
+import { MemoryStick, Timer, X } from 'lucide-react';
 import { useState } from 'react';
 
 interface SubmitResultTabProps {
@@ -14,7 +14,7 @@ export function SubmitResultTab({
   result,
   onClose,
 }: SubmitResultTabProps) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const statusInfo = result ? getStatusMeta(result.status) : null;
   const total = result?.totalTests ?? 0;
@@ -25,7 +25,7 @@ export function SubmitResultTab({
     <div className="overflow-y-auto h-full pb-4" style={{ width: `${width}%` }}>
       <div className="pr-3">
         <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-          <div className="p-6 space-y-6">
+          <div className="p-8 space-y-7">
             {/* Header */}
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
@@ -42,13 +42,13 @@ export function SubmitResultTab({
 
             {/* Verdict */}
             {statusInfo && (
-              <div className={`p-4 rounded-lg border ${statusInfo.color}`}>
-                <div className="flex items-center gap-3 text-base font-semibold">
+              <div className={`p-5 rounded-lg border ${statusInfo.color}`}>
+                <div className="flex items-center gap-3 text-lg font-semibold">
                   {statusInfo.icon}
                   <span>{statusInfo.label}</span>
                 </div>
                 {result?.results?.length ? (
-                  <div className="text-slate-600 dark:text-slate-400 mt-1">
+                  <div className="text-slate-600 dark:text-slate-400 mt-2">
                     {result.passedTests}/{result.totalTests} test cases passed
                   </div>
                 ) : null}
@@ -56,22 +56,22 @@ export function SubmitResultTab({
             )}
 
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">
                 <div className="text-xs text-slate-500">SCORE</div>
-                <div className="text-lg font-semibold">
+                <div className="text-xl font-semibold">
                   {result?.score ?? 0} / 100
                 </div>
               </div>
-              <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">
                 <div className="text-xs text-slate-500">RUNTIME</div>
-                <div className="text-lg font-semibold">
+                <div className="text-xl font-semibold">
                   {result?.runtime ?? 0} ms
                 </div>
               </div>
-              <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-4">
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">
                 <div className="text-xs text-slate-500">MEMORY</div>
-                <div className="text-lg font-semibold">
+                <div className="text-xl font-semibold">
                   {result?.memory ?? 0} KB
                 </div>
               </div>
@@ -82,9 +82,9 @@ export function SubmitResultTab({
               <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Test Cases Passed: {passed}/{total}
               </div>
-              <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+              <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-green-500"
+                  className="h-full bg-black"
                   style={{ width: `${percent}%` }}
                 />
               </div>
@@ -102,15 +102,24 @@ export function SubmitResultTab({
                   >
                     <button
                       onClick={() => setOpenIndex(isOpen ? null : idx)}
-                      className="w-full flex items-center justify-between px-4 py-2 text-left"
+                      className="w-full flex items-center justify-between px-4 py-2 text-left cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                     >
                       <div className="flex items-center gap-2 font-semibold">
-                        {meta.icon}
+                        <span className={meta.iconColor}>{meta.icon}</span>
                         <span>Test Case {idx + 1}</span>
                       </div>
                       <div className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-4">
-                        <span>🕒 {r.time} ms</span>
-                        <span>🧠 {r.memory} KB</span>
+                        <span
+                          className={`${meta.iconColor} text-xs font-semibold px-2 py-0.5 rounded-full bg-white/0`}
+                        >
+                          {meta.label}
+                        </span>
+                        <span className="text-slate-700 dark:text-slate-200 font-semibold">
+                          Runtime: {r.time} ms
+                        </span>
+                        <span className="text-slate-700 dark:text-slate-200 font-semibold">
+                          Memory: {r.memory} KB
+                        </span>
                       </div>
                     </button>
                     {isOpen && (
