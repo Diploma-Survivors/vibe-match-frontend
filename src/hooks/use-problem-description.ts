@@ -57,12 +57,7 @@ export function useProblemDescription({
         output: tc.output,
       }));
 
-      await executeSubmit(
-        sourceCode,
-        languageId,
-        problem.id,
-        testCasesForSubmission
-      );
+      await executeSubmit(sourceCode, languageId, problem.id);
       setRefreshKey((prev) => prev + 1);
     },
     [executeSubmit, testCases.testCases, problem.id]

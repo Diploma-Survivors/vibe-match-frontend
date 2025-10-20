@@ -5,7 +5,7 @@ export interface SSEResult {
   score: number;
   runtime: string;
   memory: number;
-  results: Array<{
+  results?: Array<{
     stdout: string;
     stderr?: string;
     time: string;
@@ -14,6 +14,12 @@ export interface SSEResult {
     status: string;
     expectedOutput?: string;
   }>;
+  resultDescription?: {
+    message: string;
+    input: string;
+    expectedOutput: string;
+    actualOutput: string;
+  };
 }
 
 export class SSEService {

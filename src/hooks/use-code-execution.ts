@@ -3,19 +3,9 @@ import { SubmissionsService } from '@/services/submissions-service';
 import type { SubmissionRequest } from '@/types/submissions';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-interface Submission {
-  id: number;
-  timestamp: string;
-  status: 'Accepted' | 'Wrong Answer' | 'Time Limit Exceeded' | 'Runtime Error';
-  runtime: string;
-  memory: string;
-  score: number;
-}
-
 export function useCodeExecution() {
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [testResults, setTestResults] = useState<SSEResult | null>(null);
   const [submitResults, setSubmitResults] = useState<SSEResult | null>(null);
   const [runError, setRunError] = useState<string | null>(null);
@@ -89,12 +79,7 @@ export function useCodeExecution() {
   );
 
   const handleSubmit = useCallback(
-    async (
-      sourceCode: string,
-      languageId: number,
-      problemId: string,
-      testCases: Array<{ input: string; output: string }>
-    ) => {
+    async (sourceCode: string, languageId: number, problemId: string) => {
       setIsSubmitting(true);
       setSubmitResults(null);
 
@@ -103,7 +88,6 @@ export function useCodeExecution() {
           languageId,
           sourceCode,
           problemId,
-          testCases,
         };
         const response = await SubmissionsService.submit(submissionRequest);
         const submissionId =
@@ -118,16 +102,6 @@ export function useCodeExecution() {
               setIsSubmitting(false);
               sseService.disconnect();
               sseConnectedRef.current = false;
-              // optionally record a history entry
-              const newSubmission: Submission = {
-                id: submissions.length + 1,
-                timestamp: new Date().toLocaleString(),
-                status: (result.status as any) || 'Accepted',
-                runtime: `${result.runtime}`,
-                memory: `${result.memory}`,
-                score: result.score,
-              };
-              setSubmissions([newSubmission, ...submissions]);
             },
             (error) => {
               console.error('SSE error (submit):', error);
@@ -160,13 +134,12 @@ export function useCodeExecution() {
         setIsSubmitting(false);
       }
     },
-    [submissions]
+    []
   );
 
   return {
     isRunning,
     isSubmitting,
-    submissions,
     testResults,
     submitResults,
     runError,

@@ -1,5 +1,5 @@
 // import removed: getStatusMeta is handled inside child components now
-import type { SSEResult } from '@/services/sse-service';
+import type { SSERunResult } from '@/services/sse-service';
 import type { UITestcaseSample } from '@/types/testcases';
 import { CheckCircle, Code } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -11,7 +11,7 @@ interface SampleTestCasesPanelProps {
   height: number;
   testCases: UITestcaseSample[];
   activeTestCase: number;
-  testResults?: SSEResult | null;
+  testResults?: SSERunResult | null;
   isRunning?: boolean;
   runError?: string | null;
   onTestCaseAdd: () => void;

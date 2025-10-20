@@ -1,6 +1,6 @@
 import { getStatusMeta } from '@/lib/utils/testcase-status';
 import type { SSEResult } from '@/services/sse-service';
-import { MemoryStick, Timer, X } from 'lucide-react';
+import { MemoryStick, Timer, X, XCircle } from 'lucide-react';
 import { useState } from 'react';
 
 interface SubmitResultTabProps {
@@ -14,12 +14,7 @@ export function SubmitResultTab({
   result,
   onClose,
 }: SubmitResultTabProps) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-
   const statusInfo = result ? getStatusMeta(result.status) : null;
-  const total = result?.totalTests ?? 0;
-  const passed = result?.passedTests ?? 0;
-  const percent = total > 0 ? Math.round((passed / total) * 100) : 0;
 
   return (
     <div className="overflow-y-auto h-full pb-4" style={{ width: `${width}%` }}>
@@ -47,11 +42,9 @@ export function SubmitResultTab({
                   {statusInfo.icon}
                   <span>{statusInfo.label}</span>
                 </div>
-                {result?.results?.length ? (
-                  <div className="text-slate-600 dark:text-slate-400 mt-2">
-                    {result.passedTests}/{result.totalTests} test cases passed
-                  </div>
-                ) : null}
+                <div className="text-slate-600 dark:text-slate-400 mt-2">
+                  {result?.passedTests}/{result?.totalTests} test cases passed
+                </div>
               </div>
             )}
 
@@ -66,7 +59,8 @@ export function SubmitResultTab({
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">
                 <div className="text-xs text-slate-500">RUNTIME</div>
                 <div className="text-xl font-semibold">
-                  {result?.runtime ?? 0} ms
+                  {result?.runtime ? Number(result.runtime).toFixed(2) : '0.00'}{' '}
+                  ms
                 </div>
               </div>
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">
@@ -77,81 +71,56 @@ export function SubmitResultTab({
               </div>
             </div>
 
-            {/* Progress */}
-            <div className="space-y-1">
-              <div className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                Test Cases Passed: {passed}/{total}
-              </div>
-              <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-black"
-                  style={{ width: `${percent}%` }}
-                />
-              </div>
-            </div>
+            {/* Failed Test Case Details - Only show for failed cases */}
+            {result?.resultDescription && result.status !== 'ACCEPTED' && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300">
+                  <XCircle className="w-5 h-5 text-red-500" />
+                  <span>Failed Test Case Details</span>
+                </div>
 
-            {/* Details */}
-            <div className="space-y-2">
-              {result?.results?.map((r, idx) => {
-                const meta = getStatusMeta(r.status);
-                const isOpen = openIndex === idx;
-                return (
-                  <div
-                    key={r.token}
-                    className="rounded-lg border border-slate-200 dark:border-slate-700"
-                  >
-                    <button
-                      onClick={() => setOpenIndex(isOpen ? null : idx)}
-                      className="w-full flex items-center justify-between px-4 py-2 text-left cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
-                    >
-                      <div className="flex items-center gap-2 font-semibold">
-                        <span className={meta.iconColor}>{meta.icon}</span>
-                        <span>Test Case {idx + 1}</span>
-                      </div>
-                      <div className="text-sm text-slate-600 dark:text-slate-400 flex items-center gap-4">
-                        <span
-                          className={`${meta.iconColor} text-xs font-semibold px-2 py-0.5 rounded-full bg-white/0`}
-                        >
-                          {meta.label}
-                        </span>
-                        <span className="text-slate-700 dark:text-slate-200 font-semibold">
-                          Runtime: {r.time} ms
-                        </span>
-                        <span className="text-slate-700 dark:text-slate-200 font-semibold">
-                          Memory: {r.memory} KB
-                        </span>
-                      </div>
-                    </button>
-                    {isOpen && (
-                      <div className="border-t border-slate-200 dark:border-slate-700 p-4 space-y-3">
-                        <div>
-                          <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                            Input
-                          </div>
-                          <pre className="bg-slate-50 dark:bg-slate-900 rounded p-3 text-sm whitespace-pre-wrap" />
-                        </div>
-                        <div>
-                          <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                            Your Output (stdout)
-                          </div>
-                          <pre className="bg-slate-200 dark:bg-slate-600 rounded p-3 text-sm whitespace-pre-wrap">
-                            {r.stdout || '(no output)'}
-                          </pre>
-                        </div>
-                        <div>
-                          <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                            Expected Output
-                          </div>
-                          <pre className="bg-slate-50 dark:bg-slate-800 rounded p-3 text-sm whitespace-pre-wrap">
-                            {r.expectedOutput ?? ''}
-                          </pre>
-                        </div>
-                      </div>
-                    )}
+                <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4 space-y-3">
+                  <div>
+                    <div className="text-red-600 dark:text-red-400 font-medium">
+                      {result.resultDescription.message}
+                    </div>
                   </div>
-                );
-              })}
-            </div>
+
+                  {result.resultDescription.input && (
+                    <div>
+                      <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Input
+                      </div>
+                      <pre className="bg-slate-50 dark:bg-slate-900 rounded p-3 text-sm whitespace-pre-wrap">
+                        {result.resultDescription.input}
+                      </pre>
+                    </div>
+                  )}
+
+                  {result.resultDescription.expectedOutput && (
+                    <div>
+                      <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Expected Output
+                      </div>
+                      <pre className="bg-green-50 dark:bg-green-900 rounded p-3 text-sm whitespace-pre-wrap">
+                        {result.resultDescription.expectedOutput}
+                      </pre>
+                    </div>
+                  )}
+
+                  {result.resultDescription.actualOutput && (
+                    <div>
+                      <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                        Your Output
+                      </div>
+                      <pre className="bg-red-50 dark:bg-red-900 rounded p-3 text-sm whitespace-pre-wrap">
+                        {result.resultDescription.actualOutput}
+                      </pre>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

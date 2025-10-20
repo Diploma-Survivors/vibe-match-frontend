@@ -1,11 +1,11 @@
 import { getStatusMeta } from '@/lib/utils/testcase-status';
-import type { SSEResult } from '@/services/sse-service';
+import type { SSERunResult } from '@/services/sse-service';
 import type { UITestcaseSample } from '@/types/testcases';
 
 interface ResultTabProps {
   testCases: UITestcaseSample[];
   activeTestCase: number;
-  testResults?: SSEResult | null;
+  testResults?: SSERunResult | null;
   isRunning?: boolean;
   runError?: string | null;
 }
@@ -39,7 +39,7 @@ export function ResultTab({
   }
 
   const getTestResult = (
-    testResults: SSEResult | null | undefined,
+    testResults: SSERunResult | null | undefined,
     index: number
   ) => {
     if (
