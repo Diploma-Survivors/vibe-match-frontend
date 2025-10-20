@@ -130,7 +130,6 @@ export function useCodeExecution() {
             errorMessage = `Error: HTTP ${axiosError.response.status} - ${axiosError.response.statusText}`;
           }
         }
-      } finally {
         setIsSubmitting(false);
       }
     },

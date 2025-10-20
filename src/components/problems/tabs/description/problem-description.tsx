@@ -17,7 +17,6 @@ export default function ProblemDescription({
   problem,
 }: ProblemDescriptionProps) {
   const {
-    // Layout refs - References cho việc tính toán resize
     containerRef, // Ref chính để resize ngang (trái/phải)
     rightPanelRef, // Ref panel phải để resize dọc (editor/test cases)
 
@@ -64,10 +63,11 @@ export default function ProblemDescription({
         }}
       >
         {/* Left Panel - Problem Description or Submit Result */}
-        {submitResults ? (
+        {isSubmitting || submitResults ? (
           <SubmitResultTab
             width={leftWidth}
             result={submitResults}
+            isSubmitting={isSubmitting}
             onClose={clearSubmitResults}
           />
         ) : (
