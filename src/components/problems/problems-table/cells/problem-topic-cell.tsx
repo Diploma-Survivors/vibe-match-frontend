@@ -1,7 +1,4 @@
-interface Topic {
-  id: string;
-  name: string;
-}
+import type { Topic } from '@/types/topics';
 
 interface ProblemTopicCellProps {
   topics?: Topic[];

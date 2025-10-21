@@ -1,10 +1,6 @@
 import { ProblemDifficulty } from '@/types/problems';
+import type { Tag } from '@/types/tags';
 import Link from 'next/link';
-
-interface Tag {
-  id: string;
-  name: string;
-}
 
 interface ProblemTitleCellProps {
   id: string;
