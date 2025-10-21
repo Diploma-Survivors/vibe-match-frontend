@@ -27,7 +27,6 @@ export default function Header() {
 
   const connectWallet = () => {
     setWalletConnected(!walletConnected);
-    console.log('Connecting to Solana wallet...');
   };
 
   const scrollToSection = (id: string) => {

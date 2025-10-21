@@ -1,7 +1,6 @@
 import type React from 'react';
 import './globals.css';
 import { ConditionalLayout } from '@/components/layout';
-import { ClientProvider, ThemeProvider } from '@/components/providers';
 import { ServerProvider } from '@/components/providers/server-provider';
 import { AppProvider } from '@/contexts/app-context';
 import type { Metadata } from 'next';

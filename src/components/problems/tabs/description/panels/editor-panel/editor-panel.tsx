@@ -3,6 +3,16 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle, Play, Send } from 'lucide-react';
 import { useState } from 'react';
 
+const defaultCode = `#include <iostream>
+
+int main() {    
+    int soThuNhat, soThuHai, tong;
+    std::cin >> soThuNhat;
+    std::cin >> soThuHai;  
+    tong = soThuNhat + soThuHai;
+    std::cout << tong;
+}`;
+
 interface EditorPanelProps {
   height: number;
   isRunning: boolean;
@@ -18,33 +28,15 @@ export function EditorPanel({
   onRun,
   onSubmit,
 }: EditorPanelProps) {
-  const [currentCode, setCurrentCode] = useState('');
-  const [currentLanguage, setCurrentLanguage] = useState('cpp');
-
-  // Map language strings to languageId numbers
-  const getLanguageId = (language: string): number => {
-    const languageMap: Record<string, number> = {
-      python: 71,
-      cpp: 52,
-      java: 62,
-      javascript: 63,
-    };
-    return languageMap[language] || 52; // Default to C++ if not found
-  };
-
-  const handleCodeChange = (code: string, language: string) => {
-    setCurrentCode(code);
-    setCurrentLanguage(language);
-  };
+  const [currentCode, setCurrentCode] = useState(defaultCode);
+  const [currentLanguageId, setCurrentLanguageId] = useState(52);
 
   const handleRunClick = () => {
-    const languageId = getLanguageId(currentLanguage);
-    onRun(currentCode, languageId);
+    onRun(currentCode, currentLanguageId);
   };
 
   const handleSubmitClick = () => {
-    const languageId = getLanguageId(currentLanguage);
-    onSubmit(currentCode, languageId);
+    onSubmit(currentCode, currentLanguageId);
   };
 
   return (
@@ -53,16 +45,17 @@ export function EditorPanel({
       style={{ height: `${height}%` }}
     >
       <div className="flex-1 min-h-0 flex flex-col">
-        {/* Monaco Editor */}
         <div className="flex-1 min-h-0">
-          <MonacoEditor onCodeChange={handleCodeChange} />
+          <MonacoEditor
+            currentLanguageId={currentLanguageId}
+            setCurrentLanguageId={setCurrentLanguageId}
+            currentCode={currentCode}
+            setCurrentCode={setCurrentCode}
+          />
         </div>
 
-        {/* Footer cố định chứa nút Run/Submit */}
         <div className="flex items-center justify-between px-4 py-2 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex-shrink-0">
-          <div className="text-xs text-slate-500 dark:text-slate-400">
-            {/* Hiện tại không lấy được vị trí con trỏ, có thể bổ sung nếu cần */}
-          </div>
+          <div className="text-xs text-slate-500 dark:text-slate-400" />
           <div className="flex items-center gap-2">
             <Button
               onClick={handleRunClick}

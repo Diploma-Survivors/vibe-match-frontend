@@ -20,8 +20,6 @@ export function SubmitResultTab({
 }: SubmitResultTabProps) {
   const statusInfo = result ? getStatusMeta(result.status) : null;
 
-  console.log('isSubmitting', isSubmitting);
-
   if (isSubmitting) {
     return (
       <div

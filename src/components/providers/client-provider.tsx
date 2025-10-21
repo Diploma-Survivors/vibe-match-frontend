@@ -1,6 +1,6 @@
 'use client';
 
-import { ThemeProvider } from '@/components/providers';
+import { ThemeProvider } from '@/components/providers/theme-provider';
 import { AppProvider } from '@/contexts/app-context';
 import type { UserInfo } from '@/types/states';
 import { SessionProvider } from 'next-auth/react';

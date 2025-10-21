@@ -10,8 +10,8 @@ import type { Topic } from '@/types/topics';
 import { RotateCcw, Search } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
 import DifficultyFilter from './difficulty-filter';
-import TagFilter from './tag-filter';
-import TopicFilter from './topic-filter';
+import TagFilter from './tags-filter';
+import TopicFilter from './topics-filter';
 
 interface ProblemFilterProps {
   keyWord: string;

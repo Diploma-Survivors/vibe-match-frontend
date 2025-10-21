@@ -39,7 +39,7 @@ export default function TopicFilter({
           Đang tải...
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto pr-1">
           {topics.map((topic) => {
             const isSelected = selectedTopicIds.includes(topic.id);
 

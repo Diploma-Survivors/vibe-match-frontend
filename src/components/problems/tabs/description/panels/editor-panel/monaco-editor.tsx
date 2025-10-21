@@ -8,64 +8,83 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DEFAULT_CODE, LANGUAGES } from '@/lib/constants/code-editor';
+
+import { SubmissionsService } from '@/services/submissions-service';
 import Editor from '@monaco-editor/react';
 import { Copy, Wand2 } from 'lucide-react';
 import type { editor } from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
 
-const languages = LANGUAGES;
-const defaultCode = DEFAULT_CODE;
-
-interface MonacoEditorProps {
-  onCodeChange?: (sourceCode: string, language: string) => void;
+interface Language {
+  id: number;
+  name: string;
 }
 
-export default function MonacoEditor({ onCodeChange }: MonacoEditorProps) {
-  const [selectedLanguage, setSelectedLanguage] = useState('cpp');
-  const [sourceCode, setSourceCode] = useState(defaultCode.cpp);
+interface MonacoEditorProps {
+  currentLanguageId: number;
+  setCurrentLanguageId: (languageId: number) => void;
+  currentCode: string;
+  setCurrentCode: (code: string) => void;
+}
+
+export default function MonacoEditor({
+  currentLanguageId,
+  setCurrentLanguageId,
+  currentCode,
+  setCurrentCode,
+}: MonacoEditorProps) {
+  const [languageList, setLanguageList] = useState<Language[]>([]);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-
-  // Notify parent when source code changes
-  useEffect(() => {
-    onCodeChange?.(sourceCode, selectedLanguage);
-  }, [sourceCode, selectedLanguage, onCodeChange]);
-
-  // handle language change when user changes the language in the dropdown
-  const handleLanguageChange = (language: string) => {
-    setSelectedLanguage(language);
-    const newSourceCode =
-      defaultCode[language as keyof typeof defaultCode] || '';
-    setSourceCode(newSourceCode);
-    onCodeChange?.(newSourceCode, language);
-  };
-
-  // handle editor change when user changes the code in the editor
-  const handleEditorChange = (value?: string) => {
-    const newSourceCode = value || '';
-    setSourceCode(newSourceCode);
-    onCodeChange?.(newSourceCode, selectedLanguage);
-  };
 
   // handle editor mount when editor is mounted (just call once when editor is mounted)
   const handleEditorDidMount = (
     editorInstance: editor.IStandaloneCodeEditor
   ) => {
     editorRef.current = editorInstance;
-    onCodeChange?.(sourceCode, selectedLanguage);
   };
 
-  // get current language
-  const getCurrentLanguage = () => {
-    return (
-      languages.find((lang) => lang.value === selectedLanguage)?.monacoLang ||
-      'python'
-    );
+  // Get language list
+  useEffect(() => {
+    const fetchLanguageList = async () => {
+      const response = await SubmissionsService.getLanguageList();
+      setLanguageList(response.data.data);
+    };
+
+    fetchLanguageList();
+  }, []);
+
+  // handle language change when user changes the language in the dropdown
+  const handleLanguageChange = (languageName: string) => {
+    const languageId =
+      languageList.find((lang) => lang.name === languageName)?.id || 1;
+    setCurrentLanguageId(languageId);
+  };
+
+  // handle editor change when user changes the code in the editor
+  const handleEditorChange = (value?: string) => {
+    const newSourceCode = value || '';
+    setCurrentCode(newSourceCode);
+  };
+
+  // get current language name for the selected language in the dropdown
+  const getCurrentLanguageName = () => {
+    return languageList.find((lang) => lang.id === currentLanguageId)?.name;
+  };
+
+  // map language name to Monaco language id
+  const mapLanguageNameToMonaco = (languageName?: string) => {
+    if (!languageName) return 'plaintext';
+    const name = languageName.toLowerCase();
+    if (name.includes('python')) return 'python';
+    if (name.includes('c++') || name.includes('cpp')) return 'cpp';
+    if (name.includes('java') && !name.includes('javascript')) return 'java';
+    if (name.includes('javascript') || name === 'js') return 'javascript';
+    return 'plaintext';
   };
 
   // Copy to clipboard
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(sourceCode);
+    navigator.clipboard.writeText(currentCode);
   };
 
   // Format code using Monaco editor ref (unsupported for python/cpp/java)
@@ -83,14 +102,17 @@ export default function MonacoEditor({ onCodeChange }: MonacoEditorProps) {
       <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
         <div className="flex items-center gap-3">
           {/* Language Selector */}
-          <Select value={selectedLanguage} onValueChange={handleLanguageChange}>
+          <Select
+            value={getCurrentLanguageName()}
+            onValueChange={handleLanguageChange}
+          >
             <SelectTrigger className="w-36 h-8 text-sm border-slate-300 dark:border-slate-600">
               <SelectValue placeholder="Select language" />
             </SelectTrigger>
             <SelectContent>
-              {languages.map((lang) => (
-                <SelectItem key={lang.value} value={lang.value}>
-                  {lang.label}
+              {languageList.map((lang) => (
+                <SelectItem key={lang.id} value={lang.name}>
+                  {lang.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -125,11 +147,16 @@ export default function MonacoEditor({ onCodeChange }: MonacoEditorProps) {
       <div className="flex-1">
         <Editor
           height="100%"
-          language={getCurrentLanguage()}
-          value={sourceCode}
+          language={mapLanguageNameToMonaco(getCurrentLanguageName())}
+          value={currentCode}
           onChange={handleEditorChange}
           theme="light"
           onMount={handleEditorDidMount}
+          loading={
+            <div className="w-full h-full flex items-center justify-center">
+              <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+            </div>
+          }
           options={{
             fontSize: 14,
             fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",

@@ -31,22 +31,6 @@ export enum ProblemType {
   HYBRID = 'hybrid',
 }
 
-export interface CreateProblemRequest {
-  title: string;
-  description: string;
-  inputDescription: string;
-  outputDescription: string;
-  maxScore: number;
-  timeLimitMs: number;
-  memoryLimitKb: number;
-  difficulty: ProblemDifficulty;
-  type: ProblemType;
-  tagIds: string[];
-  topicIds: string[];
-  testcaseId: string;
-  testcaseSamples: TestcaseSample[];
-}
-
 export interface ProblemDetail {
   id: string;
   title: string;

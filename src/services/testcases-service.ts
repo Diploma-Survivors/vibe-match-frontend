@@ -77,13 +77,11 @@ async function createTestcaseComplete(file: File): Promise<string> {
     const cachedResponse = getTestcaseFromCache(cacheKey);
 
     if (cachedResponse) {
-      console.log('Using cached testcase response:', cachedResponse);
       return cachedResponse.id;
     }
     // Upload new testcase and cache the result
     const testcaseResponse = await createTestcaseFile(file);
     saveTestcaseToCache(cacheKey, testcaseResponse);
-    console.log('Testcase uploaded and cached:', testcaseResponse);
     return testcaseResponse.id;
   } catch (error) {
     console.error('Error in complete testcase creation:', error);

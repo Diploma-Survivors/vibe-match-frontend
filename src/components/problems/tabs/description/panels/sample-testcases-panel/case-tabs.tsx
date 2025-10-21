@@ -1,5 +1,5 @@
 import { getStatusMeta } from '@/lib/utils/testcase-status';
-import type { SSERunResult } from '@/services/sse-service';
+import type { SSEResult } from '@/services/sse-service';
 import { Plus, X } from 'lucide-react';
 
 type ActiveTab = 'testcase' | 'result';
@@ -9,7 +9,7 @@ interface CaseTabsProps {
   hasResults: boolean;
   testCases: Array<{ id: string }>;
   activeTestCase: number;
-  testResults?: SSERunResult | null;
+  testResults?: SSEResult | null;
   onActiveTestCaseChange: (index: number) => void;
   onTestCaseDelete: (id: string) => void;
   onTestCaseAdd: () => void;

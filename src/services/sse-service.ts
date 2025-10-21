@@ -38,14 +38,12 @@ export class SSEService {
     this.eventSource = new EventSource(url);
 
     this.eventSource.onopen = () => {
-      console.log('SSE connection opened');
+      // connection opened
     };
 
     this.eventSource.addEventListener('result', (event) => {
       try {
-        console.log('SSE result event received:', event.data);
         const result: SSEResult = JSON.parse(event.data);
-        console.log('Parsed SSE result:', result);
 
         // Clear timeout since we got a result
         if (this.timeoutId) {
@@ -67,7 +65,6 @@ export class SSEService {
 
     // Set a timeout to close the connection after 30 seconds
     this.timeoutId = setTimeout(() => {
-      console.log('SSE timeout - closing connection');
       this.disconnect();
     }, 30000);
   }

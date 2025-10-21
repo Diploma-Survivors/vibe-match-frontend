@@ -44,14 +44,11 @@ export function useCodeExecution() {
 
         const submissionId = response.data.data.submissionId;
 
-        console.log('submissionId', submissionId);
-
         if (submissionId) {
           // Establish SSE connection
           sseService.connect(
             submissionId,
             (result: SSEResult) => {
-              console.log('SSE result received:', result);
               setTestResults(result);
               setIsRunning(false);
               // Disconnect SSE after receiving result

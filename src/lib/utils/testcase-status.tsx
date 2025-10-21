@@ -1,5 +1,4 @@
-import type { SSERunResult } from '@/services/sse-service';
-import { AlertTriangle, CheckCircle, Clock, X, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle, Clock, XCircle } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 export interface StatusMeta {
