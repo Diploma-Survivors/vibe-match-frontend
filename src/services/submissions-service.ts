@@ -13,6 +13,10 @@ async function getLanguageList() {
   return await clientApi.get('/languages');
 }
 
+// async function getSubmissionList(submissionListRequest: SubmissionListRequest) {
+//   return await clientApi.get('/submissions', submissionListRequest);
+// }
+
 export const SubmissionsService = {
   run,
   submit,

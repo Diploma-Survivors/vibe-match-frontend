@@ -32,10 +32,15 @@ export const getStatusMeta = (status: string): StatusMeta => {
         label: 'Time Limit Exceeded',
       };
     case 'RUNTIME_ERROR':
+    case 'SIGSEGV':
+    case 'SIGXFSZ':
+    case 'SIGFPE':
+    case 'SIGABRT':
+    case 'NZEC':
       return {
         icon: <AlertTriangle className="w-4 h-4" />,
-        color: 'text-purple-600 bg-purple-50 dark:bg-purple-900/20',
-        iconColor: 'text-purple-600',
+        color: 'text-red-600 bg-red-50 dark:bg-red-900/20',
+        iconColor: 'text-red-600',
         label: 'Runtime Error',
       };
     default:
