@@ -1,7 +1,7 @@
 'use client';
 
 import { useProblemDescription } from '@/hooks/use-problem-description';
-import type { ProblemDetail as ProblemDetailType } from '@/types/problems';
+import type { ProblemDescription as ProblemDetailType } from '@/types/problems';
 import React from 'react';
 import { ResizableDivider } from './dividers/resizable-divider';
 import { DescriptionPanel } from './panels/description-panel/description-panel';

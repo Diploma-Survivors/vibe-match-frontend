@@ -5,9 +5,9 @@ import { useState } from 'react';
 
 interface TagFilterProps {
   tags: Tag[];
-  selectedTagIds: string[];
+  selectedTagIds: number[];
   isLoading: boolean;
-  onTagToggle: (tagId: string, isSelected: boolean) => void;
+  onTagToggle: (tagId: number, isSelected: boolean) => void;
   onClearAll: () => void;
   displayLimit?: number;
 }

@@ -31,7 +31,7 @@ export enum ProblemType {
   HYBRID = 'hybrid',
 }
 
-export interface ProblemDetail {
+export interface ProblemDescription {
   id: string;
   title: string;
   description: string;
@@ -44,18 +44,14 @@ export interface ProblemDetail {
   type?: string;
   createdAt?: string;
   updatedAt?: string;
-  tags?: string[];
-  topics?: string[];
-  testcase?: string;
   testcaseSamples?: TestcaseSample[];
-  score?: number; // For use in contests or assignments
 }
 
 export interface ProblemFilters {
   difficulty?: ProblemDifficulty;
   type?: ProblemType;
-  topicIds?: string[];
-  tagIds?: string[];
+  topicIds?: number[];
+  tagIds?: number[];
 }
 
 export interface GetProblemListRequest {
@@ -74,7 +70,6 @@ export interface ProblemListItem {
   id: string;
   title: string;
   difficulty: ProblemDifficulty;
-  createAt: string;
   tags: Tag[];
   topics: Topic[];
 }

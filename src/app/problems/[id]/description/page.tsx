@@ -2,7 +2,7 @@
 
 import ProblemDescription from '@/components/problems/tabs/description/problem-description';
 import { ProblemsService } from '@/services/problems-service';
-import type { ProblemDetail as ProblemDetailType } from '@/types/problems';
+import type { ProblemDescription as ProblemDetailType } from '@/types/problems';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 

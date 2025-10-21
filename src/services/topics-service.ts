@@ -39,7 +39,7 @@ async function getAllTopics(): Promise<Topic[]> {
 }
 
 // Fetch topic by ID
-async function getTopicById(id: string): Promise<Topic> {
+async function getTopicById(id: number): Promise<Topic> {
   try {
     const response = await clientApi.get(`/topics/${id}`);
     return response.data.data;
@@ -52,7 +52,7 @@ async function getTopicById(id: string): Promise<Topic> {
 // Update topic
 async function updateTopic(
   topic: UpdateTopicRequest,
-  id: string
+  id: number
 ): Promise<Topic> {
   try {
     const response = await clientApi.patch(`/topics/${id}`, topic);
@@ -64,7 +64,7 @@ async function updateTopic(
 }
 
 // Delete topic
-async function deleteTopic(id: string): Promise<void> {
+async function deleteTopic(id: number): Promise<void> {
   try {
     await clientApi.delete(`/topics/${id}`);
   } catch (error) {

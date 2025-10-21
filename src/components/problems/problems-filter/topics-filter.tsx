@@ -4,9 +4,9 @@ import type { Topic } from '@/types/topics';
 
 interface TopicFilterProps {
   topics: Topic[];
-  selectedTopicIds: string[];
+  selectedTopicIds: number[];
   isLoading: boolean;
-  onTopicToggle: (topicId: string, isSelected: boolean) => void;
+  onTopicToggle: (topicId: number, isSelected: boolean) => void;
   onClearAll: () => void;
 }
 

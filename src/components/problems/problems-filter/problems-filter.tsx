@@ -63,10 +63,10 @@ export default function ProblemFilter({
 
   // Helper function to toggle items in array filters (topicIds, tagIds)
   const toggleArrayFilter = useCallback(
-    (filterKey: 'topicIds' | 'tagIds', itemId: string, isSelected: boolean) => {
+    (filterKey: 'topicIds' | 'tagIds', itemId: number, isSelected: boolean) => {
       const currentItems = filters[filterKey] || [];
       const newItems = isSelected
-        ? currentItems.filter((id: string) => id !== itemId)
+        ? currentItems.filter((id: number) => id !== itemId)
         : [...currentItems, itemId];
 
       onFiltersChange({ ...filters, [filterKey]: newItems });

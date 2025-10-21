@@ -2,7 +2,7 @@ import clientApi from '@/lib/apis/axios-client';
 import type { ApiResponse } from '@/types/api';
 import type {
   GetProblemListRequest,
-  ProblemDetail,
+  ProblemDescription,
   ProblemListResponse,
 } from '@/types/problems';
 import type { AxiosResponse } from 'axios';
@@ -16,14 +16,16 @@ async function getProblemListForTraining(
     skipNulls: true,
   });
 
+  console.log(getProblemListRequest);
+
   const url = queryString
     ? `/problems/training?${queryString}`
     : '/problems/training';
   return await clientApi.get(url);
 }
 
-async function getProblemById(problemId: string): Promise<ProblemDetail> {
-  const response = await clientApi.get<ApiResponse<ProblemDetail>>(
+async function getProblemById(problemId: string): Promise<ProblemDescription> {
+  const response = await clientApi.get<ApiResponse<ProblemDescription>>(
     `/problems/${problemId}`
   );
 

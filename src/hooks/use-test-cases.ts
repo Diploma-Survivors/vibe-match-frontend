@@ -1,4 +1,4 @@
-import type { ProblemDetail } from '@/types/problems';
+import type { ProblemDescription } from '@/types/problems';
 import { useCallback, useState } from 'react';
 
 interface TestCase {
@@ -8,7 +8,7 @@ interface TestCase {
   isEditing: boolean;
 }
 
-export function useTestCases(problem: ProblemDetail) {
+export function useTestCases(problem: ProblemDescription) {
   const [activeTestCase, setActiveTestCase] = useState(0);
 
   // Initialize test cases from problem data

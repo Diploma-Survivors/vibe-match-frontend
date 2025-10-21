@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import type { ProblemDetail } from '@/types/problems';
+import type { ProblemDescription } from '@/types/problems';
 import { ProblemDifficulty } from '@/types/problems';
 import type { TestcaseSample } from '@/types/testcases';
 import { FileText, MemoryStick, Timer } from 'lucide-react';
@@ -7,7 +7,7 @@ import { Copy } from 'lucide-react';
 import { useState } from 'react';
 
 interface DescriptionPanelProps {
-  problem: ProblemDetail;
+  problem: ProblemDescription;
   width: number;
 }
 

@@ -1,11 +1,11 @@
-import type { ProblemDetail } from '@/types/problems';
+import type { ProblemDescription } from '@/types/problems';
 import { useCallback, useState } from 'react';
 import { useCodeExecution } from './use-code-execution';
 import { useResizable } from './use-resizable';
 import { useTestCases } from './use-test-cases';
 
 interface UseProblemDescriptionOptions {
-  problem: ProblemDetail;
+  problem: ProblemDescription;
 }
 
 export function useProblemDescription({
