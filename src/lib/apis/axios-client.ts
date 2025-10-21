@@ -1,12 +1,12 @@
-'use client'
+'use client';
 
 import axios from 'axios';
-import {getSession} from "next-auth/react";
+import { getSession } from 'next-auth/react';
 
 // Create a custom Axios instance
 const clientApi = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/v1', // Replace with your API base URL
-  timeout: 5000, // Request timeout in milliseconds
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -18,6 +18,7 @@ clientApi.interceptors.request.use(
     if (session?.accessToken) {
       config.headers.Authorization = `Bearer ${session.accessToken}`;
     }
+
     return config;
   },
   (error) => {

@@ -1,19 +1,18 @@
-import type React from "react";
-import "./globals.css";
-import { ThemeProvider, ClientProvider } from "@/components/providers";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { AppProvider } from "@/contexts/app-context";
-import { SessionProvider } from "next-auth/react";
-import { ConditionalLayout } from "@/components/layout";
-import { ServerProvider } from "@/components/providers/server-provider";
+import type React from 'react';
+import './globals.css';
+import { ConditionalLayout } from '@/components/layout';
+import { ServerProvider } from '@/components/providers/server-provider';
+import { AppProvider } from '@/contexts/app-context';
+import type { Metadata } from 'next';
+import { SessionProvider } from 'next-auth/react';
+import { Inter } from 'next/font/google';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "Vibe Match - Decentralized Social Media",
+  title: 'Vibe Match - Decentralized Social Media',
   description:
-    "Empowering creators with decentralized ownership, privacy, and fair rewards.",
+    'Empowering creators with decentralized ownership, privacy, and fair rewards.',
 };
 
 export default function RootLayout({

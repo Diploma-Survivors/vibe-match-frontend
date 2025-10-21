@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
 
 export function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -9,7 +9,7 @@ export function ParticleBackground() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     // Set canvas dimensions with pixel ratio for better quality
@@ -27,7 +27,7 @@ export function ParticleBackground() {
     };
 
     setCanvasDimensions();
-    window.addEventListener("resize", setCanvasDimensions);
+    window.addEventListener('resize', setCanvasDimensions);
 
     // Mouse interaction
     const mouse = {
@@ -36,12 +36,12 @@ export function ParticleBackground() {
       radius: 100,
     };
 
-    window.addEventListener("mousemove", (event) => {
+    window.addEventListener('mousemove', (event) => {
       mouse.x = event.x;
       mouse.y = event.y;
     });
 
-    window.addEventListener("mouseout", () => {
+    window.addEventListener('mouseout', () => {
       mouse.x = undefined;
       mouse.y = undefined;
     });
@@ -115,7 +115,7 @@ export function ParticleBackground() {
         if (!ctx) return;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = "#603fff";
+        ctx.fillStyle = '#603fff';
         ctx.fill();
       }
     }
@@ -187,7 +187,7 @@ export function ParticleBackground() {
     animate();
 
     return () => {
-      window.removeEventListener("resize", setCanvasDimensions);
+      window.removeEventListener('resize', setCanvasDimensions);
     };
   }, []);
 
