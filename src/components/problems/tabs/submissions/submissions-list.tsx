@@ -1,18 +1,8 @@
 'use client';
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { getStatusMeta } from '@/lib/utils/testcase-status';
-import { SubmissionsService } from '@/services/submissions-service';
-import { SubmissionStatus } from '@/types/submissions';
-import type { Language } from '@/types/submissions';
-import { Clock, Cpu, Search } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Search } from 'lucide-react';
+import SubmissionRow from './submission-row';
+import SubmissionsFilter from './submissions-filter';
 
 interface SubmissionNode {
   id: number;
@@ -46,91 +36,16 @@ interface SubmissionsListProps {
   onFilterChange: (filters: { status: string; language: string }) => void;
 }
 
-const formatRuntime = (runtime: number) => {
-  if (runtime === 0) return 'CE';
-  const runtimeInMs = runtime * 1000;
-  return `${runtimeInMs.toFixed(0)} ms`;
-};
-
-const formatMemory = (memory: number) => {
-  if (memory === 0) return 'CE';
-  const memoryInMB = memory / 1024;
-  return `${memoryInMB.toFixed(0)} MB`;
-};
-
 export default function SubmissionsList({
   submissions,
   selectedSubmissionId,
   onSelectSubmission,
   onFilterChange,
 }: SubmissionsListProps) {
-  const [statusFilter, setStatusFilter] = useState('ALL');
-  const [languageFilter, setLanguageFilter] = useState('ALL');
-  const [languageList, setLanguageList] = useState<Language[]>([]);
-
-  // Get language list
-  useEffect(() => {
-    const fetchLanguageList = async () => {
-      const response = await SubmissionsService.getLanguageList();
-      setLanguageList(response.data.data);
-    };
-
-    fetchLanguageList();
-  }, []);
-
-  const handleStatusChange = (value: string) => {
-    setStatusFilter(value);
-    onFilterChange({ status: value, language: languageFilter });
-  };
-
-  const handleLanguageChange = (value: string) => {
-    setLanguageFilter(value);
-    onFilterChange({ status: statusFilter, language: value });
-  };
-
   return (
     <div className="h-full flex flex-col bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden pl-2">
       {/* Search Filters */}
-      <div className="p-3 border-b bg-gray-50">
-        <div className="flex gap-2">
-          <div className="flex-1">
-            <Select value={statusFilter} onValueChange={handleStatusChange}>
-              <SelectTrigger className="h-8 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-xs">
-                <SelectValue placeholder="Trạng thái" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Status</SelectItem>
-                {(() => {
-                  const items = [];
-                  for (const [key, value] of Object.entries(SubmissionStatus)) {
-                    items.push(
-                      <SelectItem key={key} value={key}>
-                        {value}
-                      </SelectItem>
-                    );
-                  }
-                  return items;
-                })()}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex-1">
-            <Select value={languageFilter} onValueChange={handleLanguageChange}>
-              <SelectTrigger className="h-8 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-xs">
-                <SelectValue placeholder="Ngôn ngữ" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Languages</SelectItem>
-                {languageList.map((lang) => (
-                  <SelectItem key={lang.id} value={lang.name}>
-                    {lang.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
+      <SubmissionsFilter onFilterChange={onFilterChange} />
 
       {/* Submissions Table */}
       <div className="flex-1 overflow-y-auto bg-gray-50">
@@ -167,83 +82,13 @@ export default function SubmissionsList({
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {submissions.map((submission, index) => (
-                  <tr
+                  <SubmissionRow
                     key={submission.node.id}
-                    className={`cursor-pointer transition-all duration-200 group ${
-                      selectedSubmissionId === submission.node.id
-                        ? 'bg-gray-200'
-                        : 'hover:bg-gray-100'
-                    }`}
-                    onClick={() => onSelectSubmission(submission.node)}
-                    style={{
-                      animationDelay: `${index * 50}ms`,
-                      animation: 'fadeInUp 0.25s ease-out forwards',
-                    }}
-                  >
-                    {/* Status */}
-                    <td className="px-4 py-3">
-                      {(() => {
-                        const statusInfo = getStatusMeta(
-                          submission.node.status
-                        );
-                        return (
-                          <div className="flex items-center gap-3">
-                            <div
-                              className={`p-1.5 rounded-md transition-all duration-200 group-hover:scale-105 ${statusInfo.color}`}
-                            >
-                              <span className={statusInfo.iconColor}>
-                                {statusInfo.icon}
-                              </span>
-                            </div>
-                            <div className="flex flex-col">
-                              <span
-                                className={`text-xs font-semibold text-gray-900 capitalize ${statusInfo.color}`}
-                              >
-                                {statusInfo.label}
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      })()}
-                    </td>
-
-                    {/* Language */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="text-xs flex items-baseline gap-1">
-                          <span className="font-semibold text-gray-900">
-                            {submission.node.language.name.split(' ')[0]}
-                          </span>
-                          <span className="text-gray-500 text-[11px]">
-                            {submission.node.language.name
-                              .split(' ')
-                              .slice(1)
-                              .join(' ')}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Runtime */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-4 w-4 text-gray-400" />
-                        <span className="text-xs font-medium text-gray-900">
-                          {formatRuntime(submission.node.runtime)}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Memory */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
-                        <Cpu className="h-4 w-4 text-gray-400" />
-                        <span className="text-xs font-medium text-gray-900">
-                          {formatMemory(submission.node.memory)}
-                        </span>
-                      </div>
-                    </td>
-                  </tr>
+                    submission={submission.node}
+                    index={index}
+                    isSelected={selectedSubmissionId === submission.node.id}
+                    onSelect={onSelectSubmission}
+                  />
                 ))}
               </tbody>
             </table>
