@@ -1,19 +1,24 @@
 import { TestCase } from './testcases';
 
 export enum SubmissionStatus {
-  PENDING = 'PENDING',
-  RUNNING = 'RUNNING',
-  ACCEPTED = 'ACCEPTED',
-  WRONG_ANSWER = 'WRONG_ANSWER',
-  TIME_LIMIT_EXCEEDED = 'TIME_LIMIT_EXCEEDED',
+  PENDING = 'Pending',
+  RUNNING = 'Running',
+  ACCEPTED = 'Accepted',
+  WRONG_ANSWER = 'Wrong Answer',
+  TIME_LIMIT_EXCEEDED = 'Time Limit Exceeded',
   SIGSEGV = 'SIGSEGV',
   SIGXFSZ = 'SIGXFSZ',
   SIGFPE = 'SIGFPE',
   SIGABRT = 'SIGABRT',
   NZEC = 'NZEC',
-  RUNTIME_ERROR = 'RUNTIME_ERROR',
-  COMPILATION_ERROR = 'COMPILATION_ERROR',
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
+  RUNTIME_ERROR = 'Runtime Error',
+  COMPILATION_ERROR = 'Compilation Error',
+  UNKNOWN_ERROR = 'Unknown Error',
+}
+
+export interface Language {
+  id: number;
+  name: string;
 }
 
 export interface TestCaseSubmission {

@@ -7,16 +7,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  AlertCircle,
-  Check,
-  Clock,
-  Filter,
-  RefreshCw,
-  Search,
-  X,
-} from 'lucide-react';
-import { useState } from 'react';
+import { getStatusMeta } from '@/lib/utils/testcase-status';
+import { SubmissionsService } from '@/services/submissions-service';
+import { SubmissionStatus } from '@/types/submissions';
+import type { Language } from '@/types/submissions';
+import { Clock, Cpu, Search } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface SubmissionNode {
   id: number;
@@ -50,75 +46,16 @@ interface SubmissionsListProps {
   onFilterChange: (filters: { status: string; language: string }) => void;
 }
 
-const statusOptions = [
-  { value: 'ALL', label: 'All Status' },
-  { value: 'ACCEPTED', label: 'Accepted' },
-  { value: 'WRONG_ANSWER', label: 'Wrong Answer' },
-  { value: 'TIME_LIMIT_EXCEEDED', label: 'Time Limit Exceeded' },
-  { value: 'RUNTIME_ERROR', label: 'Runtime Error' },
-  { value: 'COMPILATION_ERROR', label: 'Compilation Error' },
-  { value: 'NZEC', label: 'NZEC' },
-  { value: 'PENDING', label: 'Pending' },
-  { value: 'RUNNING', label: 'Running' },
-];
-
-const getStatusIcon = (status: string) => {
-  switch (status) {
-    case 'ACCEPTED':
-      return <Check className="h-4 w-4 text-emerald-600" />;
-    case 'WRONG_ANSWER':
-      return <X className="h-4 w-4 text-red-500" />;
-    case 'TIME_LIMIT_EXCEEDED':
-      return <Clock className="h-4 w-4 text-amber-500" />;
-    case 'RUNTIME_ERROR':
-    case 'COMPILATION_ERROR':
-    case 'NZEC':
-      return <AlertCircle className="h-4 w-4 text-red-500" />;
-    case 'PENDING':
-    case 'RUNNING':
-      return <Clock className="h-4 w-4 text-blue-500 animate-pulse" />;
-    default:
-      return <AlertCircle className="h-4 w-4 text-gray-500" />;
-  }
-};
-
-const getStatusBgColor = (status: string) => {
-  switch (status) {
-    case 'ACCEPTED':
-      return 'bg-emerald-50 border-emerald-200';
-    case 'WRONG_ANSWER':
-      return 'bg-red-50 border-red-200';
-    case 'TIME_LIMIT_EXCEEDED':
-      return 'bg-amber-50 border-amber-200';
-    case 'RUNTIME_ERROR':
-    case 'COMPILATION_ERROR':
-    case 'NZEC':
-      return 'bg-red-50 border-red-200';
-    case 'PENDING':
-    case 'RUNNING':
-      return 'bg-blue-50 border-blue-200';
-    default:
-      return 'bg-gray-50 border-gray-200';
-  }
-};
-
 const formatRuntime = (runtime: number) => {
-  if (runtime === 0) return '0s';
-  return `${runtime.toFixed(3)}s`;
+  if (runtime === 0) return 'CE';
+  const runtimeInMs = runtime * 1000;
+  return `${runtimeInMs.toFixed(0)} ms`;
 };
 
 const formatMemory = (memory: number) => {
-  if (memory === 0) return '0 KB';
-  return `${memory} KB`;
-};
-
-const formatTime = (createdAt: string) => {
-  const date = new Date(createdAt);
-  return date.toLocaleTimeString('vi-VN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
+  if (memory === 0) return 'CE';
+  const memoryInMB = memory / 1024;
+  return `${memoryInMB.toFixed(0)} MB`;
 };
 
 export default function SubmissionsList({
@@ -129,11 +66,17 @@ export default function SubmissionsList({
 }: SubmissionsListProps) {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [languageFilter, setLanguageFilter] = useState('ALL');
+  const [languageList, setLanguageList] = useState<Language[]>([]);
 
-  // Get unique languages from submissions
-  const languages = Array.from(
-    new Set(submissions.map((sub) => sub.node.language.name))
-  ).map((name) => ({ value: name, label: name }));
+  // Get language list
+  useEffect(() => {
+    const fetchLanguageList = async () => {
+      const response = await SubmissionsService.getLanguageList();
+      setLanguageList(response.data.data);
+    };
+
+    fetchLanguageList();
+  }, []);
 
   const handleStatusChange = (value: string) => {
     setStatusFilter(value);
@@ -146,34 +89,41 @@ export default function SubmissionsList({
   };
 
   return (
-    <div className="h-full flex flex-col bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mr-3">
+    <div className="h-full flex flex-col bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden pl-2">
       {/* Search Filters */}
-      <div className="p-4 border-b bg-gray-50">
-        <div className="flex gap-3">
+      <div className="p-3 border-b bg-gray-50">
+        <div className="flex gap-2">
           <div className="flex-1">
             <Select value={statusFilter} onValueChange={handleStatusChange}>
-              <SelectTrigger className="h-9 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+              <SelectTrigger className="h-8 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-xs">
                 <SelectValue placeholder="Trạng thái" />
               </SelectTrigger>
               <SelectContent>
-                {statusOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
+                <SelectItem value="ALL">All Status</SelectItem>
+                {(() => {
+                  const items = [];
+                  for (const [key, value] of Object.entries(SubmissionStatus)) {
+                    items.push(
+                      <SelectItem key={key} value={key}>
+                        {value}
+                      </SelectItem>
+                    );
+                  }
+                  return items;
+                })()}
               </SelectContent>
             </Select>
           </div>
           <div className="flex-1">
             <Select value={languageFilter} onValueChange={handleLanguageChange}>
-              <SelectTrigger className="h-9 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-sm">
+              <SelectTrigger className="h-8 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-xs">
                 <SelectValue placeholder="Ngôn ngữ" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="ALL">Tất cả ngôn ngữ</SelectItem>
-                {languages.map((lang) => (
-                  <SelectItem key={lang.value} value={lang.value}>
-                    {lang.label}
+                <SelectItem value="ALL">All Languages</SelectItem>
+                {languageList.map((lang) => (
+                  <SelectItem key={lang.id} value={lang.name}>
+                    {lang.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -199,22 +149,19 @@ export default function SubmissionsList({
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-white border-b border-gray-200 sticky top-0 z-10">
+              <thead className="bg-white border-b border-gray-200 sticky top-0 z-10 text-xs">
                 <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                    Trạng thái
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 tracking-wider">
+                    Status
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                    Ngôn ngữ
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 tracking-wider">
+                    Language
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 tracking-wider">
                     Runtime
                   </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left font-semibold text-gray-700 tracking-wider">
                     Memory
-                  </th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                    Điểm
                   </th>
                 </tr>
               </thead>
@@ -222,85 +169,78 @@ export default function SubmissionsList({
                 {submissions.map((submission, index) => (
                   <tr
                     key={submission.node.id}
-                    className={`cursor-pointer transition-all duration-300 hover:bg-blue-50 hover:shadow-sm group ${
+                    className={`cursor-pointer transition-all duration-200 group ${
                       selectedSubmissionId === submission.node.id
-                        ? 'bg-blue-50 border-l-4 border-blue-500 shadow-sm'
-                        : 'border-l-4 border-transparent hover:border-blue-300'
+                        ? 'bg-gray-200'
+                        : 'hover:bg-gray-100'
                     }`}
                     onClick={() => onSelectSubmission(submission.node)}
                     style={{
                       animationDelay: `${index * 50}ms`,
-                      animation: 'fadeInUp 0.3s ease-out forwards',
+                      animation: 'fadeInUp 0.25s ease-out forwards',
                     }}
                   >
                     {/* Status */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`p-2 rounded-lg border ${getStatusBgColor(submission.node.status)} transition-all duration-200 group-hover:scale-105`}
-                        >
-                          {getStatusIcon(submission.node.status)}
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="text-sm font-semibold text-gray-900 capitalize">
-                            {submission.node.status
-                              .replace(/_/g, ' ')
-                              .toLowerCase()}
-                          </span>
-                          {submission.node.note && (
-                            <span className="text-xs text-gray-500 truncate max-w-32">
-                              {submission.node.note}
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                    <td className="px-4 py-3">
+                      {(() => {
+                        const statusInfo = getStatusMeta(
+                          submission.node.status
+                        );
+                        return (
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`p-1.5 rounded-md transition-all duration-200 group-hover:scale-105 ${statusInfo.color}`}
+                            >
+                              <span className={statusInfo.iconColor}>
+                                {statusInfo.icon}
+                              </span>
+                            </div>
+                            <div className="flex flex-col">
+                              <span
+                                className={`text-xs font-semibold text-gray-900 capitalize ${statusInfo.color}`}
+                              >
+                                {statusInfo.label}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </td>
 
                     {/* Language */}
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-500 rounded-full" />
-                        <div className="text-sm">
-                          <div className="font-semibold text-gray-900">
+                        <div className="text-xs flex items-baseline gap-1">
+                          <span className="font-semibold text-gray-900">
                             {submission.node.language.name.split(' ')[0]}
-                          </div>
-                          <div className="text-gray-500 text-xs">
+                          </span>
+                          <span className="text-gray-500 text-[11px]">
                             {submission.node.language.name
                               .split(' ')
                               .slice(1)
                               .join(' ')}
-                          </div>
+                          </span>
                         </div>
                       </div>
                     </td>
 
                     {/* Runtime */}
-                    <td className="px-6 py-4">
+                    <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3 text-gray-400" />
-                        <span className="text-sm font-medium text-gray-900">
+                        <Clock className="h-4 w-4 text-gray-400" />
+                        <span className="text-xs font-medium text-gray-900">
                           {formatRuntime(submission.node.runtime)}
                         </span>
                       </div>
                     </td>
 
                     {/* Memory */}
-                    <td className="px-6 py-4">
-                      <span className="text-sm font-medium text-gray-900">
-                        {formatMemory(submission.node.memory)}
-                      </span>
-                    </td>
-
-                    {/* Score */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-center">
-                        {submission.node.score !== null ? (
-                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            {submission.node.score.toFixed(1)}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-gray-400">-</span>
-                        )}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1">
+                        <Cpu className="h-4 w-4 text-gray-400" />
+                        <span className="text-xs font-medium text-gray-900">
+                          {formatMemory(submission.node.memory)}
+                        </span>
                       </div>
                     </td>
                   </tr>

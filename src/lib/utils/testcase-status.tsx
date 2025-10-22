@@ -31,6 +31,13 @@ export const getStatusMeta = (status: string): StatusMeta => {
         iconColor: 'text-orange-600',
         label: 'Time Limit Exceeded',
       };
+    case 'COMPILATION_ERROR':
+      return {
+        icon: <AlertTriangle className="w-4 h-4" />,
+        color: 'text-red-600 bg-red-50 dark:bg-red-900/20',
+        iconColor: 'text-red-600',
+        label: 'Compilation Error',
+      };
     case 'RUNTIME_ERROR':
     case 'SIGSEGV':
     case 'SIGXFSZ':

@@ -148,7 +148,7 @@ export default function ProblemSubmissionsPage({
         }}
       >
         {/* Left Panel - Submissions List */}
-        <div style={{ width: `${leftWidth}%` }}>
+        <div style={{ width: `calc(${leftWidth}% - 6px)` }}>
           <SubmissionsList
             submissions={submissions}
             selectedSubmissionId={selectedSubmission?.id || null}
@@ -158,7 +158,7 @@ export default function ProblemSubmissionsPage({
         </div>
 
         {/* Horizontal Resizer - Centered between panels */}
-        <div className="w-1 flex items-center justify-center bg-slate-200 dark:bg-slate-700">
+        <div className="w-1 mx-1 flex items-center justify-center bg-slate-200 dark:bg-slate-700 rounded">
           <ResizableDivider
             direction="horizontal"
             isDragging={isDragging}
@@ -167,7 +167,7 @@ export default function ProblemSubmissionsPage({
         </div>
 
         {/* Right Panel - Submission Detail */}
-        <div style={{ width: `${100 - leftWidth}%` }}>
+        <div style={{ width: `calc(${100 - leftWidth}% - 6px)` }}>
           <SubmissionDetail submission={selectedSubmissionDetail} />
         </div>
       </div>

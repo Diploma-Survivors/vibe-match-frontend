@@ -2,8 +2,9 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { getStatusMeta } from '@/lib/utils/testcase-status';
 import { Copy } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/default-highlight';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
@@ -36,25 +37,7 @@ interface SubmissionDetailProps {
   submission: SubmissionDetailData | null;
 }
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'ACCEPTED':
-      return 'bg-green-100 text-green-800 border-green-200';
-    case 'WRONG_ANSWER':
-      return 'bg-red-100 text-red-800 border-red-200';
-    case 'TIME_LIMIT_EXCEEDED':
-      return 'bg-orange-100 text-orange-800 border-orange-200';
-    case 'RUNTIME_ERROR':
-    case 'COMPILATION_ERROR':
-    case 'NZEC':
-      return 'bg-red-100 text-red-800 border-red-200';
-    case 'PENDING':
-    case 'RUNNING':
-      return 'bg-blue-100 text-blue-800 border-blue-200';
-    default:
-      return 'bg-gray-100 text-gray-800 border-gray-200';
-  }
-};
+// Using shared status meta (icon, color, label)
 
 const formatRuntime = (runtime: number) => {
   if (runtime === 0) return '0ms';
@@ -82,6 +65,21 @@ export default function SubmissionDetail({
   submission,
 }: SubmissionDetailProps) {
   const [isCodeExpanded, setIsCodeExpanded] = useState(true);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const [isScrolling, setIsScrolling] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    let timeoutId: any;
+    const onScroll = () => {
+      setIsScrolling(true);
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => setIsScrolling(false), 700);
+    };
+    el.addEventListener('scroll', onScroll);
+    return () => el.removeEventListener('scroll', onScroll);
+  }, []);
 
   // Calculate code height based on number of lines
   const getCodeHeight = () => {
@@ -128,9 +126,12 @@ export default function SubmissionDetail({
   };
 
   return (
-    <div className="overflow-y-auto h-full pb-4">
-      <div className="pr-3">
-        <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+    <div className="h-full">
+      <div className="pr-3 h-full">
+        <div
+          ref={scrollRef}
+          className={`rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 h-full overflow-y-auto scrollbar-on-scroll ${isScrolling ? 'scrolling' : ''}`}
+        >
           <div className="p-8 space-y-7">
             {/* Header */}
             <div className="flex items-center justify-between">
@@ -140,17 +141,23 @@ export default function SubmissionDetail({
             </div>
 
             {/* Status */}
-            <div
-              className={`p-5 rounded-lg border ${getStatusColor(submission.status)}`}
-            >
-              <div className="flex items-center gap-3 text-lg font-semibold">
-                <span>{submission.status}</span>
-              </div>
-              <div className="text-slate-600 dark:text-slate-400 mt-2">
-                {submission.passedTests}/{submission.totalTests} test cases
-                passed
-              </div>
-            </div>
+            {(() => {
+              const statusInfo = getStatusMeta(submission.status);
+              return (
+                <div className={`p-5 rounded-lg border ${statusInfo.color}`}>
+                  <div className="flex items-center gap-3 text-lg font-semibold">
+                    <span className={statusInfo.iconColor}>
+                      {statusInfo.icon}
+                    </span>
+                    <span>{statusInfo.label}</span>
+                  </div>
+                  <div className="text-slate-600 dark:text-slate-400 mt-2">
+                    {submission.passedTests}/{submission.totalTests} test cases
+                    passed
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -235,4 +242,24 @@ export default function SubmissionDetail({
       </div>
     </div>
   );
+}
+
+// Inject show-scrollbar-only-when-scrolling styles
+const scrollbarOnScrollStyles = `
+  .scrollbar-on-scroll { scrollbar-width: none; }
+  .scrollbar-on-scroll::-webkit-scrollbar { width: 0px; height: 0px; }
+  .scrollbar-on-scroll.scrolling { scrollbar-width: thin; }
+  .scrollbar-on-scroll.scrolling::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scrollbar-on-scroll::-webkit-scrollbar-thumb { background-color: rgba(100,116,139,0.45); border-radius: 9999px; }
+  .scrollbar-on-scroll::-webkit-scrollbar-track { background: transparent; }
+`;
+
+if (
+  typeof document !== 'undefined' &&
+  !document.getElementById('submission-scrollbar-onscroll')
+) {
+  const styleSheet = document.createElement('style');
+  styleSheet.id = 'submission-scrollbar-onscroll';
+  styleSheet.textContent = scrollbarOnScrollStyles;
+  document.head.appendChild(styleSheet);
 }
