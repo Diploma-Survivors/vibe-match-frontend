@@ -1,39 +1,25 @@
 'use client';
 
-import { Search } from 'lucide-react';
+import type { SubmissionListItem } from '@/types/submissions';
+import { Loader2, Search } from 'lucide-react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import SubmissionRow from './submission-row';
 import SubmissionsFilter from './submissions-filter';
 
-interface SubmissionNode {
-  id: number;
-  status: string;
-  language: {
-    id: number;
-    name: string;
-  };
-  runtime: number;
-  memory: number;
-  score: number | null;
-  note: string | null;
-  createdAt?: string;
-  user: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-}
-
 interface SubmissionEdge {
-  node: SubmissionNode;
+  node: SubmissionListItem;
   cursor: string;
 }
 
 interface SubmissionsListProps {
   submissions: SubmissionEdge[];
   selectedSubmissionId: number | null;
-  onSelectSubmission: (submission: SubmissionNode) => void;
+  onSelectSubmission: (submission: SubmissionListItem) => void;
   onFilterChange: (filters: { status: string; language: string }) => void;
+  hasMore?: boolean;
+  onLoadMore?: () => void;
+  isLoading?: boolean;
+  totalCount?: number;
 }
 
 export default function SubmissionsList({
@@ -41,6 +27,10 @@ export default function SubmissionsList({
   selectedSubmissionId,
   onSelectSubmission,
   onFilterChange,
+  hasMore = false,
+  onLoadMore,
+  isLoading = false,
+  totalCount = 0,
 }: SubmissionsListProps) {
   return (
     <div className="h-full flex flex-col bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden pl-2">
@@ -48,7 +38,10 @@ export default function SubmissionsList({
       <SubmissionsFilter onFilterChange={onFilterChange} />
 
       {/* Submissions Table */}
-      <div className="flex-1 overflow-y-auto bg-gray-50">
+      <div
+        className="flex-1 overflow-y-auto bg-gray-50"
+        id="submissions-scroll-container"
+      >
         {submissions.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-8">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -62,7 +55,18 @@ export default function SubmissionsList({
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <InfiniteScroll
+            dataLength={submissions.length}
+            next={onLoadMore || (() => {})}
+            hasMore={hasMore}
+            loader={
+              <div className="flex flex-col items-center justify-center py-12 px-4">
+                <div className="dots-loader mb-4" />
+              </div>
+            }
+            scrollableTarget="submissions-scroll-container"
+            className="overflow-x-auto"
+          >
             <table className="w-full">
               <thead className="bg-white border-b border-gray-200 sticky top-0 z-10 text-xs">
                 <tr>
@@ -92,34 +96,9 @@ export default function SubmissionsList({
                 ))}
               </tbody>
             </table>
-          </div>
+          </InfiniteScroll>
         )}
       </div>
     </div>
   );
-}
-
-// Add CSS animations
-const styles = `
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-`;
-
-// Inject styles if not already present
-if (
-  typeof document !== 'undefined' &&
-  !document.getElementById('submissions-animations')
-) {
-  const styleSheet = document.createElement('style');
-  styleSheet.id = 'submissions-animations';
-  styleSheet.textContent = styles;
-  document.head.appendChild(styleSheet);
 }

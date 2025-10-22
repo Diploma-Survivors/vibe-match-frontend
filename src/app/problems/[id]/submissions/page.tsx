@@ -3,24 +3,44 @@
 import { ResizableDivider } from '@/components/problems/tabs/description/dividers/resizable-divider';
 import SubmissionDetail from '@/components/problems/tabs/submissions/submission-detail';
 import SubmissionsList from '@/components/problems/tabs/submissions/submissions-list';
+import { useResizable } from '@/hooks/use-resizable';
+import useSubmissions from '@/hooks/use-submissions';
 import { SubmissionsService } from '@/services/submissions-service';
-import { useEffect, useRef, useState } from 'react';
+import type { SubmissionStatus } from '@/types/submissions';
+import { useEffect, useState } from 'react';
 
 export default function ProblemSubmissionsPage({
   params,
 }: { params: Promise<{ id: string }> }) {
   const [problemId, setProblemId] = useState<string>('');
-  const [submissions, setSubmissions] = useState([]);
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
   const [selectedSubmissionDetail, setSelectedSubmissionDetail] =
     useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [filters, setFilters] = useState({ status: 'ALL', language: 'ALL' });
 
-  // Resize state
-  const [leftWidth, setLeftWidth] = useState(50); // Percentage
-  const [isDragging, setIsDragging] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  // Use resizable hook
+  const {
+    containerRef,
+    leftWidth,
+    isHorizontalDragging,
+    handleHorizontalMouseDown,
+  } = useResizable({
+    initialLeftWidth: 50,
+    minLeftWidth: 20,
+    maxLeftWidth: 80,
+  });
+
+  // Use submissions hook
+  const {
+    submissions,
+    pageInfo,
+    totalCount,
+    isLoading,
+    error,
+    request,
+    handleFiltersChange,
+    handleLoadMore,
+    handleReset,
+  } = useSubmissions(problemId);
 
   // Effect 1: Resolve params only once
   useEffect(() => {
@@ -31,42 +51,12 @@ export default function ProblemSubmissionsPage({
     resolveParams();
   }, [params]);
 
-  // Effect 2: Fetch submissions when problemId changes
+  // Effect 2: Auto-select first submission when submissions change
   useEffect(() => {
-    if (!problemId) return;
-
-    async function fetchSubmissions() {
-      setIsLoading(true);
-      try {
-        const submissionListRequest = {
-          first: 10,
-          sortBy: 'createdAt',
-          sortOrder: 'desc',
-          matchMode: 'any',
-        };
-
-        const response = await SubmissionsService.getSubmissionList(
-          submissionListRequest,
-          problemId
-        );
-        const submissionsData = response.data.data.edges;
-
-        console.log('Submissions:', submissionsData);
-        setSubmissions(submissionsData);
-
-        // Auto-select first submission if available
-        if (submissionsData.length > 0) {
-          handleSelectSubmission(submissionsData[0].node);
-        }
-      } catch (error) {
-        console.error('Error fetching submissions:', error);
-      } finally {
-        setIsLoading(false);
-      }
+    if (submissions.length > 0 && !selectedSubmission) {
+      handleSelectSubmission(submissions[0].node);
     }
-
-    fetchSubmissions();
-  }, [problemId]);
+  }, [submissions, selectedSubmission]);
 
   // Handle submission selection
   const handleSelectSubmission = async (submission: any) => {
@@ -88,51 +78,36 @@ export default function ProblemSubmissionsPage({
     status: string;
     language: string;
   }) => {
-    setFilters(newFilters);
-    // TODO: Implement filtering logic
-    console.log('Filters changed:', newFilters);
-  };
-
-  // Handle resize
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    e.preventDefault();
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging || !containerRef.current) return;
-
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const newLeftWidth =
-        ((e.clientX - containerRect.left) / containerRect.width) * 100;
-
-      // Constrain between 20% and 80%
-      const constrainedWidth = Math.min(Math.max(newLeftWidth, 20), 80);
-      setLeftWidth(constrainedWidth);
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging(false);
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+    // Convert UI filters to API filters
+    const apiFilters: any = {};
+    if (newFilters.status !== 'ALL') {
+      apiFilters.status = newFilters.status as SubmissionStatus;
+    }
+    if (newFilters.language !== 'ALL') {
+      apiFilters.languageId = Number.parseInt(newFilters.language);
     }
 
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging]);
+    handleFiltersChange({ filters: apiFilters });
+  };
 
-  if (isLoading) {
+  // Resize logic is now handled by useResizable hook
+
+  if (isLoading && submissions.length === 0) {
     return (
       <div className="h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4" />
           <p className="text-gray-600">Loading submissions...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600">{error}</p>
         </div>
       </div>
     );
@@ -154,6 +129,10 @@ export default function ProblemSubmissionsPage({
             selectedSubmissionId={selectedSubmission?.id || null}
             onSelectSubmission={handleSelectSubmission}
             onFilterChange={handleFilterChange}
+            hasMore={pageInfo?.hasNextPage ?? false}
+            onLoadMore={handleLoadMore}
+            isLoading={isLoading}
+            totalCount={totalCount}
           />
         </div>
 
@@ -161,8 +140,8 @@ export default function ProblemSubmissionsPage({
         <div className="w-1 mx-1 flex items-center justify-center bg-slate-200 dark:bg-slate-700 rounded">
           <ResizableDivider
             direction="horizontal"
-            isDragging={isDragging}
-            onMouseDown={handleMouseDown}
+            isDragging={isHorizontalDragging}
+            onMouseDown={handleHorizontalMouseDown}
           />
         </div>
 

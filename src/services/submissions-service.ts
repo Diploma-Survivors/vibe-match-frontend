@@ -1,5 +1,8 @@
 import clientApi from '@/lib/apis/axios-client';
-import type { SubmissionRequest } from '@/types/submissions';
+import type {
+  GetSubmissionListRequest,
+  SubmissionRequest,
+} from '@/types/submissions';
 import qs from 'qs';
 
 async function run(submissionRequest: SubmissionRequest) {
@@ -15,7 +18,7 @@ async function getLanguageList() {
 }
 
 async function getSubmissionList(
-  submissionListRequest: any,
+  submissionListRequest: GetSubmissionListRequest,
   problemId: string
 ) {
   const queryString = qs.stringify(submissionListRequest, {

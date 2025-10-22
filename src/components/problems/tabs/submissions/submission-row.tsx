@@ -1,33 +1,14 @@
 'use client';
 
 import { getStatusMeta } from '@/lib/utils/testcase-status';
+import type { SubmissionListItem } from '@/types/submissions';
 import { Clock, Cpu } from 'lucide-react';
 
-interface SubmissionNode {
-  id: number;
-  status: string;
-  language: {
-    id: number;
-    name: string;
-  };
-  runtime: number;
-  memory: number;
-  score: number | null;
-  note: string | null;
-  createdAt?: string;
-  user: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-}
-
 interface SubmissionRowProps {
-  submission: SubmissionNode;
+  submission: SubmissionListItem;
   index: number;
   isSelected: boolean;
-  onSelect: (submission: SubmissionNode) => void;
+  onSelect: (submission: SubmissionListItem) => void;
 }
 
 const formatRuntime = (runtime: number) => {
