@@ -16,8 +16,10 @@ export function ResizableDivider({
   return (
     <div
       className={`${
-        isHorizontal ? 'w-1 cursor-col-resize' : 'h-1 cursor-row-resize my-3'
-      } bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors flex-shrink-0 ${
+        isHorizontal
+          ? 'w-1 cursor-col-resize h-full'
+          : 'h-1 cursor-row-resize my-3'
+      } bg-transparent hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors flex-shrink-0 ${
         isDragging ? 'bg-blue-500 dark:bg-blue-400' : ''
       }`}
       onMouseDown={onMouseDown}
@@ -26,7 +28,7 @@ export function ResizableDivider({
         <div
           className={`${
             isHorizontal ? 'w-0.5 h-8' : 'h-0.5 w-8'
-          } bg-slate-400 dark:bg-slate-500 rounded-full opacity-50`}
+          } bg-slate-400 dark:bg-slate-500 rounded-full opacity-70`}
         />
       </div>
     </div>
