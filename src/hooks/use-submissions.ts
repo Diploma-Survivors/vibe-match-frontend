@@ -2,6 +2,7 @@ import { SubmissionsService } from '@/services/submissions-service';
 import {
   type GetSubmissionListRequest,
   type PageInfo,
+  type SubmissionFilters,
   type SubmissionListItem,
   type SubmissionListResponse,
   SubmissionStatus,
@@ -24,16 +25,15 @@ interface UseSubmissionsState {
 }
 
 interface UseSubmissionsActions {
-  handleFiltersChange: (newFilters: Partial<GetSubmissionListRequest>) => void;
+  handleFiltersChange: (newFilters: SubmissionFilters) => void;
   handleLoadMore: () => void;
-  handleReset: () => void;
 }
 
 interface UseSubmissionsReturn
   extends UseSubmissionsState,
     UseSubmissionsActions {
   // Request params (exposed for UI)
-  request: GetSubmissionListRequest;
+  filters: SubmissionFilters;
   problemId: string;
 }
 
@@ -56,6 +56,9 @@ export default function useSubmissions(
     sortOrder: 'desc',
     matchMode: 'any',
   });
+
+  // Filters state to manage filters
+  const [filters, setFilters] = useState<SubmissionFilters>({});
 
   // Fetch submissions function
   const fetchSubmissions = useCallback(
@@ -124,8 +127,16 @@ export default function useSubmissions(
 
   // Handle filter changes
   const handleFiltersChange = useCallback(
-    (newFilters: Partial<GetSubmissionListRequest>) => {
-      updateRequest(newFilters, true);
+    (filters: SubmissionFilters) => {
+      // Filter out undefined values
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters || {}).filter(
+          ([_, value]) => value !== undefined
+        )
+      );
+
+      setFilters(cleanFilters);
+      updateRequest({ filters: cleanFilters }, true);
     },
     [updateRequest]
   );
@@ -146,22 +157,6 @@ export default function useSubmissions(
     );
   }, [state.isLoading, state.pageInfo, updateRequest]);
 
-  // Handle reset
-  const handleReset = useCallback(() => {
-    updateRequest(
-      {
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-        sortBy: 'createdAt',
-        sortOrder: 'desc',
-        matchMode: 'any',
-      },
-      true
-    );
-  }, [updateRequest]);
-
   return {
     // State
     submissions: state.submissions,
@@ -171,12 +166,11 @@ export default function useSubmissions(
     error: state.error,
 
     // Request params (exposed for UI)
-    request,
+    filters,
     problemId,
 
     // Handlers
     handleFiltersChange,
     handleLoadMore,
-    handleReset,
   };
 }

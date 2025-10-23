@@ -1,6 +1,10 @@
 'use client';
 
-import type { SubmissionListItem } from '@/types/submissions';
+import type {
+  SubmissionFilters,
+  SubmissionListItem,
+} from '@/types/submissions';
+import type { GetSubmissionListRequest } from '@/types/submissions';
 import { Loader2, Search } from 'lucide-react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import SubmissionRow from './submission-row';
@@ -15,7 +19,8 @@ interface SubmissionsListProps {
   submissions: SubmissionEdge[];
   selectedSubmissionId: number | null;
   onSelectSubmission: (submission: SubmissionListItem) => void;
-  onFilterChange: (filters: { status: string; language: string }) => void;
+  filters: SubmissionFilters;
+  onFilterChange: (filters: SubmissionFilters) => void;
   hasMore?: boolean;
   onLoadMore?: () => void;
   isLoading?: boolean;
@@ -26,6 +31,7 @@ export default function SubmissionsList({
   submissions,
   selectedSubmissionId,
   onSelectSubmission,
+  filters,
   onFilterChange,
   hasMore = false,
   onLoadMore,
@@ -35,7 +41,7 @@ export default function SubmissionsList({
   return (
     <div className="h-full flex flex-col bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden pl-2">
       {/* Search Filters */}
-      <SubmissionsFilter onFilterChange={onFilterChange} />
+      <SubmissionsFilter onFilterChange={onFilterChange} filters={filters} />
 
       {/* Submissions Table */}
       <div

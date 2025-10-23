@@ -9,18 +9,28 @@ import {
 } from '@/components/ui/select';
 import { SubmissionsService } from '@/services/submissions-service';
 import { SubmissionStatus } from '@/types/submissions';
-import type { Language } from '@/types/submissions';
+import type {
+  GetSubmissionListRequest,
+  Language,
+  SubmissionFilters,
+} from '@/types/submissions';
 import { useEffect, useState } from 'react';
 
 interface SubmissionsFilterProps {
-  onFilterChange: (filters: { status: string; language: string }) => void;
+  onFilterChange: (filters: SubmissionFilters) => void;
+  filters: SubmissionFilters;
 }
 
 export default function SubmissionsFilter({
   onFilterChange,
+  filters,
 }: SubmissionsFilterProps) {
-  const [statusFilter, setStatusFilter] = useState('ALL');
-  const [languageFilter, setLanguageFilter] = useState('ALL');
+  const [statusFilter, setStatusFilter] = useState<string>(
+    filters.status || 'ALL'
+  );
+  const [languageFilter, setLanguageFilter] = useState<string>(
+    filters.languageId?.toString() || 'ALL'
+  );
   const [languageList, setLanguageList] = useState<Language[]>([]);
 
   // Get language list
@@ -34,13 +44,24 @@ export default function SubmissionsFilter({
   }, []);
 
   const handleStatusChange = (value: string) => {
+    console.log('value', value);
+
     setStatusFilter(value);
-    onFilterChange({ status: value, language: languageFilter });
+    onFilterChange({
+      status: value as SubmissionStatus,
+      languageId:
+        languageFilter === 'ALL' ? undefined : Number.parseInt(languageFilter),
+    });
   };
 
   const handleLanguageChange = (value: string) => {
+    console.log('value', value);
+
     setLanguageFilter(value);
-    onFilterChange({ status: statusFilter, language: value });
+    onFilterChange({
+      status: statusFilter as SubmissionStatus,
+      languageId: value === 'ALL' ? undefined : Number.parseInt(value),
+    });
   };
 
   return (
@@ -75,7 +96,7 @@ export default function SubmissionsFilter({
             <SelectContent>
               <SelectItem value="ALL">All Languages</SelectItem>
               {languageList.map((lang) => (
-                <SelectItem key={lang.id} value={lang.name}>
+                <SelectItem key={lang.id} value={lang.id.toString()}>
                   {lang.name}
                 </SelectItem>
               ))}

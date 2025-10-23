@@ -33,6 +33,11 @@ export interface SubmissionRequest {
   testCases?: TestCaseSubmission[];
 }
 
+export interface SubmissionFilters {
+  status?: SubmissionStatus;
+  languageId?: number;
+}
+
 export interface GetSubmissionListRequest {
   after?: string;
   before?: string;
@@ -41,10 +46,7 @@ export interface GetSubmissionListRequest {
   sortBy?: string;
   sortOrder?: string;
   matchMode?: string;
-  filters?: {
-    status?: SubmissionStatus;
-    languageId?: number;
-  };
+  filters?: SubmissionFilters;
 }
 
 export interface SubmissionListItem {

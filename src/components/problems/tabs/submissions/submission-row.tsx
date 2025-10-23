@@ -46,9 +46,7 @@ export default function SubmissionRow({
           const statusInfo = getStatusMeta(submission.status);
           return (
             <div className="flex items-center gap-3">
-              <div
-                className={`p-1.5 rounded-md transition-all duration-200 group-hover:scale-105 ${statusInfo.color}`}
-              >
+              <div className="p-1.5 rounded-md transition-all duration-200 group-hover:scale-105">
                 <span className={statusInfo.iconColor}>{statusInfo.icon}</span>
               </div>
               <div className="flex flex-col">

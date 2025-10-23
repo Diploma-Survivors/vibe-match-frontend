@@ -243,23 +243,3 @@ export default function SubmissionDetail({
     </div>
   );
 }
-
-// Inject show-scrollbar-only-when-scrolling styles
-const scrollbarOnScrollStyles = `
-  .scrollbar-on-scroll { scrollbar-width: none; }
-  .scrollbar-on-scroll::-webkit-scrollbar { width: 0px; height: 0px; }
-  .scrollbar-on-scroll.scrolling { scrollbar-width: thin; }
-  .scrollbar-on-scroll.scrolling::-webkit-scrollbar { width: 8px; height: 8px; }
-  .scrollbar-on-scroll::-webkit-scrollbar-thumb { background-color: rgba(100,116,139,0.45); border-radius: 9999px; }
-  .scrollbar-on-scroll::-webkit-scrollbar-track { background: transparent; }
-`;
-
-if (
-  typeof document !== 'undefined' &&
-  !document.getElementById('submission-scrollbar-onscroll')
-) {
-  const styleSheet = document.createElement('style');
-  styleSheet.id = 'submission-scrollbar-onscroll';
-  styleSheet.textContent = scrollbarOnScrollStyles;
-  document.head.appendChild(styleSheet);
-}

@@ -26,6 +26,8 @@ async function getSubmissionList(
     skipNulls: true,
   });
 
+  console.log('submissionListRequest', submissionListRequest);
+
   const url = queryString
     ? `/submissions/problem/${problemId}?${queryString}`
     : `/submissions/problem/${problemId}`;
