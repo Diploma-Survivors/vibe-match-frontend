@@ -3,9 +3,11 @@
 import { ResizableDivider } from '@/components/problems/tabs/description/dividers/resizable-divider';
 import SubmissionDetail from '@/components/problems/tabs/submissions/submission-detail';
 import SubmissionsList from '@/components/problems/tabs/submissions/submissions-list';
+import SubmissionsSkeleton from '@/components/problems/tabs/submissions/submissions-skeleton';
 import { useResizable } from '@/hooks/use-resizable';
 import useSubmissions from '@/hooks/use-submissions';
 import { SubmissionsService } from '@/services/submissions-service';
+import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface SubmissionsPageProps {
@@ -16,6 +18,8 @@ export default function SubmissionsPage({ problemId }: SubmissionsPageProps) {
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
   const [selectedSubmissionDetail, setSelectedSubmissionDetail] =
     useState<any>(null);
+  const [isLoadingForSubmissionDetail, setIsLoadingForSubmissionDetail] =
+    useState(true);
 
   // Use resizable hook
   const {
@@ -51,6 +55,8 @@ export default function SubmissionsPage({ problemId }: SubmissionsPageProps) {
   // Handle submission selection
   const handleSelectSubmission = async (submission: any) => {
     setSelectedSubmission(submission);
+    setSelectedSubmissionDetail(null);
+    setIsLoadingForSubmissionDetail(true);
 
     try {
       const response = await SubmissionsService.getSubmissionById(
@@ -60,18 +66,13 @@ export default function SubmissionsPage({ problemId }: SubmissionsPageProps) {
       setSelectedSubmissionDetail(response.data.data);
     } catch (error) {
       console.error('Error fetching submission detail:', error);
+    } finally {
+      setIsLoadingForSubmissionDetail(false);
     }
   };
 
   if (isLoading && submissions.length === 0) {
-    return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4" />
-          <p className="text-gray-600">Loading submissions...</p>
-        </div>
-      </div>
-    );
+    return <SubmissionsSkeleton showRightPanel={true} />;
   }
 
   if (error) {
@@ -119,7 +120,13 @@ export default function SubmissionsPage({ problemId }: SubmissionsPageProps) {
 
         {/* Right Panel - Submission Detail */}
         <div style={{ width: `calc(${100 - leftWidth}% - 6px)` }}>
-          <SubmissionDetail submission={selectedSubmissionDetail} />
+          {isLoadingForSubmissionDetail || !selectedSubmissionDetail ? (
+            <div className="h-full flex items-center justify-center">
+              <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
+            </div>
+          ) : (
+            <SubmissionDetail submission={selectedSubmissionDetail} />
+          )}
         </div>
       </div>
     </div>

@@ -3,41 +3,15 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getStatusMeta } from '@/lib/utils/testcase-status';
-import { Copy } from 'lucide-react';
+import type { SubmissionDetailData } from '@/types/submissions';
+import { Copy, Loader2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/default-highlight';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
-interface SubmissionDetailData {
-  id: number;
-  status: string;
-  score: number;
-  runtime: number;
-  memory: number;
-  sourceCode: string;
-  createdAt: string;
-  totalTests: number;
-  passedTests: number;
-  language: {
-    id: number;
-    name: string;
-  };
-  resultDescription: {
-    message: string;
-  };
-  user: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-}
-
 interface SubmissionDetailProps {
-  submission: SubmissionDetailData | null;
+  submission: SubmissionDetailData;
 }
-
-// Using shared status meta (icon, color, label)
 
 const formatRuntime = (runtime: number) => {
   if (runtime === 0) return '0ms';
@@ -47,18 +21,6 @@ const formatRuntime = (runtime: number) => {
 const formatMemory = (memory: number) => {
   if (memory === 0) return '0 KB';
   return `${(memory / 1024).toFixed(0)} KB`;
-};
-
-const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
-  return date.toLocaleString('vi-VN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
 };
 
 export default function SubmissionDetail({
@@ -93,20 +55,6 @@ export default function SubmissionDetail({
     const totalHeight = Math.max(lines * lineHeight + padding, 200);
     return { height: `${totalHeight}px` };
   };
-
-  if (!submission) {
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center text-gray-500">
-          <div className="text-6xl mb-4">📝</div>
-          <h3 className="text-lg font-medium mb-2">No Submission Selected</h3>
-          <p className="text-sm">
-            Select a submission from the list to view details
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(submission.sourceCode);

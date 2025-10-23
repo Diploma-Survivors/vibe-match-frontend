@@ -81,3 +81,25 @@ export interface SubmissionListResponse {
   pageInfos: PageInfo;
   totalCount: number;
 }
+
+export interface SubmissionDetailData {
+  id: number;
+  status: string;
+  score: number;
+  runtime: number;
+  memory: number;
+  sourceCode: string;
+  createdAt: string;
+  totalTests: number;
+  passedTests: number;
+  language: Language;
+  resultDescription: {
+    message: string;
+  };
+  user: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+}
