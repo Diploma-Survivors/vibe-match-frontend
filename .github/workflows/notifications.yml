@@ -1,0 +1,10 @@
+name: Notify Discord on PR Events
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, closed]
+
+jobs:
+  notify:
+    uses: Diploma-Survivors/actions-template/.github/workflows/discord-pr-announcer.yml@main
+    secrets: inherit
