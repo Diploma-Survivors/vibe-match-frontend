@@ -62,7 +62,6 @@ export default function SubmissionsPage({ problemId }: SubmissionsPageProps) {
       const response = await SubmissionsService.getSubmissionById(
         submission.id.toString()
       );
-      console.log('Submission detail:', response.data.data);
       setSelectedSubmissionDetail(response.data.data);
     } catch (error) {
       console.error('Error fetching submission detail:', error);

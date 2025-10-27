@@ -44,8 +44,6 @@ export default function SubmissionsFilter({
   }, []);
 
   const handleStatusChange = (value: string) => {
-    console.log('value', value);
-
     setStatusFilter(value);
     onFilterChange({
       status: value as SubmissionStatus,
@@ -55,8 +53,6 @@ export default function SubmissionsFilter({
   };
 
   const handleLanguageChange = (value: string) => {
-    console.log('value', value);
-
     setLanguageFilter(value);
     onFilterChange({
       status: statusFilter as SubmissionStatus,

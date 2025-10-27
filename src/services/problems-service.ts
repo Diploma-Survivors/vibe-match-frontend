@@ -16,8 +16,6 @@ async function getProblemListForTraining(
     skipNulls: true,
   });
 
-  console.log(getProblemListRequest);
-
   const url = queryString
     ? `/problems/training?${queryString}`
     : '/problems/training';
