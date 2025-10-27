@@ -105,3 +105,15 @@ export interface SubmissionDetailData {
     email: string;
   };
 }
+
+// Map language names to Highlight.js language keys
+export const languageMap: Record<string, string> = {
+  'C++': 'cpp',
+  Python: 'python',
+  Java: 'java',
+  JavaScript: 'javascript',
+  TypeScript: 'typescript',
+  'C#': 'csharp',
+  Go: 'go',
+  Rust: 'rust',
+};

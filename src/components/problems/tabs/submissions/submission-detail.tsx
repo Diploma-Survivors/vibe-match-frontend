@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getStatusMeta } from '@/lib/utils/testcase-status';
 import type { SubmissionDetailData } from '@/types/submissions';
+import { languageMap } from '@/types/submissions';
 import { Copy, Loader2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/default-highlight';
@@ -61,15 +62,13 @@ export default function SubmissionDetail({
   };
 
   const getSyntaxLanguage = (languageName: string) => {
-    // Highlight.js language keys
-    if (languageName.includes('C++')) return 'cpp';
-    if (languageName.includes('Python')) return 'python';
-    if (languageName.includes('Java')) return 'java';
-    if (languageName.includes('JavaScript')) return 'javascript';
-    if (languageName.includes('TypeScript')) return 'typescript';
-    if (languageName.includes('C#')) return 'csharp';
-    if (languageName.includes('Go')) return 'go';
-    if (languageName.includes('Rust')) return 'rust';
+    // Find matching language key
+    for (const [key, value] of Object.entries(languageMap)) {
+      if (languageName.includes(key)) {
+        return value;
+      }
+    }
+
     return 'plaintext';
   };
 
