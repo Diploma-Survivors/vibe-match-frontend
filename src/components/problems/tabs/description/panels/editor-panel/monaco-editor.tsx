@@ -10,15 +10,11 @@ import {
 } from '@/components/ui/select';
 
 import { SubmissionsService } from '@/services/submissions-service';
+import type { Language } from '@/types/submissions';
 import Editor from '@monaco-editor/react';
 import { Copy, Wand2 } from 'lucide-react';
 import type { editor } from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
-
-interface Language {
-  id: number;
-  name: string;
-}
 
 interface MonacoEditorProps {
   currentLanguageId: number;

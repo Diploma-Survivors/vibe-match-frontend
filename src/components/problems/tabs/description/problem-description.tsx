@@ -17,38 +17,38 @@ export default function ProblemDescription({
   problem,
 }: ProblemDescriptionProps) {
   const {
-    containerRef, // Ref chính để resize ngang (trái/phải)
-    rightPanelRef, // Ref panel phải để resize dọc (editor/test cases)
+    containerRef,
+    rightPanelRef,
 
-    // Layout state - Kích thước và trạng thái resize
-    leftWidth, // Phần trăm chiều rộng panel trái (problem description)
-    editorHeight, // Phần trăm chiều cao editor trong panel phải
-    isHorizontalDragging, // Đang kéo divider ngang
-    isVerticalDragging, // Đang kéo divider dọc
+    // Layout state
+    leftWidth,
+    editorHeight,
+    isHorizontalDragging,
+    isVerticalDragging,
 
-    // Test cases state - Quản lý test cases
-    testCases, // Mảng test cases với input/output
-    activeTestCase, // Index test case đang chọn
-    setActiveTestCase, // Function thay đổi test case active
+    // Test cases state
+    testCases,
+    activeTestCase,
+    setActiveTestCase,
 
-    // Code execution state - Chạy và submit code
-    isRunning, // Đang chạy code (Run button)
-    isSubmitting, // Đang submit code (Submit button)
-    testResults, // Kết quả từ test case execution (SSE data)
-    submitResults, // Kết quả từ submit (SSE data)
-    runError, // Lỗi khi gọi API run (nếu có)
+    // Code execution state
+    isRunning,
+    isSubmitting,
+    testResults,
+    submitResults,
+    runError,
 
     // Event handlers - Xử lý tương tác user
-    handleHorizontalMouseDown, // Bắt đầu resize ngang
-    handleVerticalMouseDown, // Bắt đầu resize dọc
-    handleRun, // Chạy code với sample test cases
-    handleSubmit, // Submit code để đánh giá cuối
-    handleTestCaseSave, // Lưu thay đổi test case
-    handleTestCaseEdit, // Toggle edit mode cho test case
-    handleTestCaseChange, // Cập nhật input/output của test case
-    handleTestCaseAdd, // Thêm test case mới
-    handleTestCaseDelete, // Xóa test case
-    clearSubmitResults, // Đóng submit panel
+    handleHorizontalMouseDown,
+    handleVerticalMouseDown,
+    handleRun,
+    handleSubmit,
+    handleTestCaseSave,
+    handleTestCaseEdit,
+    handleTestCaseChange,
+    handleTestCaseAdd,
+    handleTestCaseDelete,
+    clearSubmitResults,
   } = useProblemDescription({
     problem,
   });

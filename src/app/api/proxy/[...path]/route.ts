@@ -53,7 +53,6 @@ export async function POST(
 
       return response;
     } catch (error) {
-      console.error('Error in POST proxy handler:', error);
       return NextResponse.json(
         { error: 'Failed to process request' },
         { status: 500 }
@@ -129,10 +128,8 @@ async function getCSRFToken(
         cookies: setCookieHeaders.length > 0 ? setCookieHeaders : undefined,
       };
     }
-    console.error('❌ Failed to get CSRF token:', csrfResponse.status);
     throw new Error(`CSRF request failed with status: ${csrfResponse.status}`);
   } catch (error) {
-    console.error('❌ CSRF token error:', error);
     // Return a fallback token if NextAuth fails
     return {
       token: 'fallback-',
