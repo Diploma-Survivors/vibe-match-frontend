@@ -73,11 +73,13 @@ export interface PageInfo {
   endCursor: string;
 }
 
+export interface SubmissionEdge {
+  node: SubmissionListItem;
+  cursor: string;
+}
+
 export interface SubmissionListResponse {
-  edges: Array<{
-    node: SubmissionListItem;
-    cursor: string;
-  }>;
+  edges: SubmissionEdge[];
   pageInfos: PageInfo;
   totalCount: number;
 }

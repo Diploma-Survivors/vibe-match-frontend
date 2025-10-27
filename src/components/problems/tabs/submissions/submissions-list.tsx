@@ -4,16 +4,14 @@ import type {
   SubmissionFilters,
   SubmissionListItem,
 } from '@/types/submissions';
-import type { GetSubmissionListRequest } from '@/types/submissions';
+import type {
+  GetSubmissionListRequest,
+  SubmissionEdge,
+} from '@/types/submissions';
 import { Loader2, Search } from 'lucide-react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import SubmissionRow from './submission-row';
 import SubmissionsFilter from './submissions-filter';
-
-interface SubmissionEdge {
-  node: SubmissionListItem;
-  cursor: string;
-}
 
 interface SubmissionsListProps {
   submissions: SubmissionEdge[];
