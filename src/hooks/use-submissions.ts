@@ -2,6 +2,7 @@ import { SubmissionsService } from '@/services/submissions-service';
 import {
   type GetSubmissionListRequest,
   type PageInfo,
+  type SubmissionEdge,
   type SubmissionFilters,
   type SubmissionListItem,
   type SubmissionListResponse,
@@ -10,11 +11,6 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 
 const ITEMS_PER_PAGE = 10;
-
-interface SubmissionEdge {
-  node: SubmissionListItem;
-  cursor: string;
-}
 
 interface UseSubmissionsState {
   submissions: SubmissionEdge[];
