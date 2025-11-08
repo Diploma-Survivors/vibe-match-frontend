@@ -14,9 +14,10 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token.refreshToken}`,
         },
         body: JSON.stringify({
-          refreshToken: token.refreshToken, // Use the refresh token from the old token
+          deviceId: token.deviceId,
         }),
       }
     );
