@@ -25,14 +25,26 @@ export interface ContestProblem {
   timeLimitMs: number;
 }
 
-export interface ContestDetail {
-  id: string;
+export enum ContestDeadlineEnforcement {
+  STRICT = 'strict',
+  FLEXIBLE = 'flexible',
+}
+
+export interface Contest {
+  id?: number;
   name: string;
   description: string;
   startTime: string;
   endTime: string;
-  durationMinutes: number;
+  isHasDurationMinutes?: boolean;
+  durationMinutes?: number;
+  lateDeadline?: string;
+  deadlineEnforcement: ContestDeadlineEnforcement;
   problems: ContestProblem[];
+  createdBy?: string;
+  createdAt?: string;
+  participantStartTime?: string;
+  submittedTime?: string;
 }
 
 // Filter types
@@ -84,14 +96,21 @@ export interface ContestListResponse {
   totalCount: number;
 }
 
-// -------- Mock Data & Constants, It will be deleted, replaced or edit in the future --------
 export enum ContestStatus {
-  PUBLIC = 'public',
-  PRIVATE = 'private',
-  UPCOMING = 'upcoming',
-  ONGOING = 'ongoing',
-  FINISHED = 'finished',
+  NOT_STARTED = 'not_started', // chưa bắt đầu
+  ONGOING = 'ongoing', // đang diễn ra
+  FINISHED = 'finished', // đã kết thúc
+  IN_PROGRESS = 'in_progress', // đang làm
+  COMPLETED = 'completed', // đã hoàn thành
 }
+
+export const ContestStatusLabels: Record<ContestStatus, string> = {
+  [ContestStatus.NOT_STARTED]: 'Chưa bắt đầu',
+  [ContestStatus.ONGOING]: 'Đang diễn ra',
+  [ContestStatus.FINISHED]: 'Đã kết thúc',
+  [ContestStatus.IN_PROGRESS]: 'Đang làm',
+  [ContestStatus.COMPLETED]: 'Đã hoàn thành',
+};
 
 export const CONTEST_STATUS_OPTIONS = [
   { value: 'all', label: 'Tất cả' },

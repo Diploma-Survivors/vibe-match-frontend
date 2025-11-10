@@ -1,6 +1,11 @@
 import clientApi from '@/lib/apis/axios-client';
 import type { ApiResponse } from '@/types/api';
-import type { ContestListRequest, ContestListResponse } from '@/types/contests';
+import {
+  type Contest,
+  type ContestListRequest,
+  type ContestListResponse,
+  ContestStatus,
+} from '@/types/contests';
 import type { AxiosResponse } from 'axios';
 import qs from 'qs';
 
@@ -20,7 +25,32 @@ async function getContestById(id: string) {
   return await clientApi.get(`/contests/${id}`);
 }
 
+function getContestStatus(contest: Contest): ContestStatus {
+  const now = new Date();
+  const startTime = new Date(contest.startTime);
+  const endTime = new Date(contest.endTime);
+
+  if (now < startTime) {
+    return ContestStatus.NOT_STARTED;
+  }
+
+  if (contest.participantStartTime && !contest.submittedTime) {
+    return ContestStatus.IN_PROGRESS;
+  }
+
+  if (contest.submittedTime) {
+    return ContestStatus.COMPLETED;
+  }
+
+  if (now > endTime) {
+    return ContestStatus.FINISHED;
+  }
+
+  return ContestStatus.ONGOING;
+}
+
 export const ContestsService = {
   getContestList,
   getContestById,
+  getContestStatus,
 };

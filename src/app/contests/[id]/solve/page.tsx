@@ -5,7 +5,7 @@ import ContestTopBar from '@/components/contest/contest-topbar';
 import ContestProblemWrapper from '@/components/problems/tabs/description/contest-problem-wrapper';
 import { ContestsService } from '@/services/contests-service';
 import { ProblemsService } from '@/services/problems-service';
-import type { ContestDetail } from '@/types/contests';
+import type { Contest } from '@/types/contests';
 import type { ProblemDescription } from '@/types/problems';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -59,7 +59,7 @@ export default function ContestSolvePage() {
   const params = useParams();
   const contestId = params.id as string;
 
-  const [contest, setContest] = useState<ContestDetail | null>(null);
+  const [contest, setContest] = useState<Contest | null>(null);
   const [currentProblem, setCurrentProblem] =
     useState<ProblemDescription | null>(null);
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
@@ -77,7 +77,7 @@ export default function ContestSolvePage() {
       try {
         setLoading(true);
         const response = await ContestsService.getContestById(contestId);
-        const contestData = response?.data?.data as ContestDetail;
+        const contestData = response?.data?.data as Contest;
         setContest(contestData);
 
         // Load first problem

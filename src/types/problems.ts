@@ -45,6 +45,7 @@ export interface ProblemDescription {
   createdAt?: string;
   updatedAt?: string;
   testcaseSamples?: TestcaseSample[];
+  score?: number; // For contest problems
 }
 
 export interface ProblemFilters {
