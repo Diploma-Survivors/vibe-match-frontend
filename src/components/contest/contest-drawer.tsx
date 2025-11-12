@@ -47,18 +47,25 @@ export default function ContestDrawer({
     'problems'
   );
 
-  if (!isOpen) return null;
-
   return (
     <>
       {/* Overlay */}
-      <div
-        className="fixed inset-0 bg-black/50 z-40 transition-opacity"
-        onClick={onClose}
-      />
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+          onClick={onClose}
+        />
+      )}
 
       {/* Drawer */}
-      <div className="fixed left-0 top-0 bottom-0 w-96 bg-white dark:bg-slate-800 z-50 shadow-2xl flex flex-col">
+      <div
+        className={`
+          fixed left-0 top-0 bottom-0 w-96 bg-white dark:bg-slate-800 
+          z-50 shadow-2xl flex flex-col
+          transform transition-transform duration-500 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}
+      >
         {/* Header */}
         <div className="border-b border-slate-200 dark:border-slate-700 p-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">
@@ -66,7 +73,7 @@ export default function ContestDrawer({
           </h2>
           <button
             onClick={onClose}
-            className="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            className="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer"
             type="button"
           >
             <X className="w-5 h-5" />
@@ -77,7 +84,7 @@ export default function ContestDrawer({
         <div className="flex border-b border-slate-200 dark:border-slate-700">
           <button
             onClick={() => setActiveTab('problems')}
-            className={`flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
               activeTab === 'problems'
                 ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
                 : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
@@ -88,7 +95,7 @@ export default function ContestDrawer({
           </button>
           <button
             onClick={() => setActiveTab('ranking')}
-            className={`flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
               activeTab === 'ranking'
                 ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
                 : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
@@ -110,7 +117,7 @@ export default function ContestDrawer({
                     onProblemClick(problem.id);
                     onClose();
                   }}
-                  className={`w-full text-left p-4 rounded-lg border transition-all ${
+                  className={`w-full text-left p-4 rounded-lg border transition-all cursor-pointer ${
                     currentProblemId === problem.id
                       ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
                       : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'
@@ -132,7 +139,9 @@ export default function ContestDrawer({
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge
-                          className={`${difficultyColors[problem.difficulty]} text-xs`}
+                          className={`${
+                            difficultyColors[problem.difficulty]
+                          } text-xs`}
                         >
                           {problem.difficulty}
                         </Badge>

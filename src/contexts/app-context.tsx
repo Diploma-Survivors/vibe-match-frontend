@@ -43,7 +43,8 @@ export function AppProvider({
   const pathname = usePathname();
 
   const isInDedicatedPages = DEDICATED_PAGES_REGEX.test(pathname);
-  const shouldHideNavigation = issuer === 'moodle' && isInDedicatedPages;
+  //const shouldHideNavigation = issuer === 'moodle' && isInDedicatedPages;
+  const shouldHideNavigation = true;
 
   const clearUserData = () => {
     setUser(null);

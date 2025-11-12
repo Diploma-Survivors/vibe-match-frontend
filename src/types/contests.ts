@@ -1,3 +1,5 @@
+import { CheckCircle, FileText } from 'lucide-react';
+
 export enum SortBy {
   NAME = 'name',
   START_TIME = 'startTime',
@@ -162,4 +164,14 @@ export const PARTICIPATION_OPTIONS = [
   { value: 'all', label: 'Tất cả' },
   { value: 'yes', label: 'Đã tham gia' },
   { value: 'no', label: 'Chưa tham gia' },
+];
+
+export enum ContestNavTabs {
+  DESCRIPTION = 'description',
+  SUBMISSIONS = 'submissions',
+}
+
+export const CONTEST_NAV_TABS_DETAIL = [
+  { id: ContestNavTabs.DESCRIPTION, label: 'Problem', icon: FileText },
+  { id: ContestNavTabs.SUBMISSIONS, label: 'Submissions', icon: CheckCircle },
 ];

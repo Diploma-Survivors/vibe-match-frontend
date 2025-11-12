@@ -3,9 +3,10 @@
 import ContestDrawer from '@/components/contest/contest-drawer';
 import ContestTopBar from '@/components/contest/contest-topbar';
 import ContestProblemWrapper from '@/components/problems/tabs/description/contest-problem-wrapper';
+import SubmissionsPage from '@/components/problems/tabs/submissions/submissions-page';
 import { ContestsService } from '@/services/contests-service';
 import { ProblemsService } from '@/services/problems-service';
-import type { Contest } from '@/types/contests';
+import { type Contest, ContestNavTabs } from '@/types/contests';
 import type { ProblemDescription } from '@/types/problems';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -70,6 +71,9 @@ export default function ContestSolvePage() {
   const [problemStatuses, setProblemStatuses] = useState<
     Record<string, ProblemStatus>
   >({});
+  const [activeTab, setActiveTab] = useState<ContestNavTabs>(
+    ContestNavTabs.DESCRIPTION
+  );
 
   // Fetch contest data
   useEffect(() => {
@@ -118,6 +122,11 @@ export default function ContestSolvePage() {
     [contest]
   );
 
+  const handleTabChange = (tab: ContestNavTabs) => {
+    console.log('Tab changed to:', tab);
+    setActiveTab(tab);
+  };
+
   if (loading || !contest || !currentProblem) {
     return (
       <div className="h-screen flex items-center justify-center bg-slate-900">
@@ -145,12 +154,18 @@ export default function ContestSolvePage() {
         contestName={contest.name}
         problemTitle={`Q${currentProblemIndex + 1}. ${currentProblem.title}`}
         endTime={contest.endTime}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
         onMenuClick={() => setIsDrawerOpen(true)}
       />
 
       {/* Main Content - Problem Solving Interface */}
       <div className="flex-1 overflow-hidden">
-        <ContestProblemWrapper problem={currentProblem} contestMode={true} />
+        {activeTab === ContestNavTabs.DESCRIPTION ? (
+          <ContestProblemWrapper problem={currentProblem} contestMode={true} />
+        ) : (
+          <SubmissionsPage problemId={currentProblem.id} />
+        )}
       </div>
 
       {/* Drawer */}
