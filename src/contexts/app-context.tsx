@@ -1,6 +1,6 @@
 'use client';
 
-import type { UserInfo } from '@/types/states';
+import { IssuerType, type UserInfo } from '@/types/states';
 import { usePathname } from 'next/navigation';
 import {
   type ReactNode,
@@ -13,12 +13,12 @@ import {
 interface AppProviderProps {
   children: ReactNode;
   initialUser: UserInfo | null;
-  initialIssuer: 'local' | 'moodle';
+  initialIssuer: IssuerType;
 }
 
 interface AppContextType {
   user: UserInfo | null;
-  issuer: 'local' | 'moodle';
+  issuer: IssuerType;
   isInDedicatedPages: boolean;
   shouldHideNavigation: boolean;
   isLoading: boolean;
@@ -29,7 +29,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 const dedicatedPagesPattern =
   process.env.NEXT_PUBLIC_DEDICATED_PAGES_PATTERN ||
   '/problems/[^/]+(?:/(problem|submit|submissions|solutions|standing|test))?';
-const DEDICATED_PAGES_REGEX = new RegExp(`^${dedicatedPagesPattern}$`);
+const DEDICATED_PAGES_REGEX = new RegExp(`${dedicatedPagesPattern}`);
 
 export function AppProvider({
   children,
@@ -37,18 +37,18 @@ export function AppProvider({
   initialIssuer,
 }: AppProviderProps) {
   const [user, setUser] = useState<UserInfo | null>(initialUser);
-  const [issuer, setIssuer] = useState<'local' | 'moodle'>(initialIssuer);
+  const [issuer, setIssuer] = useState<IssuerType>(initialIssuer);
   const [isLoading, setIsLoading] = useState(false);
 
   const pathname = usePathname();
 
   const isInDedicatedPages = DEDICATED_PAGES_REGEX.test(pathname);
-  //const shouldHideNavigation = issuer === 'moodle' && isInDedicatedPages;
-  const shouldHideNavigation = true;
+  const shouldHideNavigation =
+    issuer === IssuerType.MOODLE && isInDedicatedPages;
 
   const clearUserData = () => {
     setUser(null);
-    setIssuer('local');
+    setIssuer(IssuerType.LOCAL);
   };
 
   const value: AppContextType = {

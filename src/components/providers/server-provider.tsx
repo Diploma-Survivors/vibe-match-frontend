@@ -1,5 +1,9 @@
 import { authOptions } from '@/lib/auth';
-import type { DecodedAccessToken, UserInfo } from '@/types/states';
+import {
+  type DecodedAccessToken,
+  IssuerType,
+  type UserInfo,
+} from '@/types/states';
 import { jwtDecode } from 'jwt-decode';
 import { getServerSession } from 'next-auth';
 // app/ServerProvider.tsx
@@ -14,7 +18,7 @@ export async function ServerProvider({ children }: ServerProviderProps) {
   const session = await getServerSession(authOptions);
 
   let initialUser: UserInfo | null = null;
-  let initialIssuer: 'local' | 'moodle' = 'local';
+  let initialIssuer: IssuerType = IssuerType.LOCAL;
 
   if (session?.accessToken) {
     try {
@@ -32,8 +36,8 @@ export async function ServerProvider({ children }: ServerProviderProps) {
       initialIssuer = decoded.iss?.includes(
         process.env.NEXT_PUBLIC_LOCAL_ISSUER_IDENTIFIER || 'local_issuer'
       )
-        ? 'local'
-        : 'moodle';
+        ? IssuerType.LOCAL
+        : IssuerType.MOODLE;
     } catch (err) {
       console.error('❌ Failed to decode access token:', err);
     }

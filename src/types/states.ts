@@ -19,3 +19,8 @@ export interface UserInfo {
   fullName?: string;
   roles?: string[];
 }
+
+export enum IssuerType {
+  LOCAL = 'local',
+  MOODLE = 'moodle',
+}
