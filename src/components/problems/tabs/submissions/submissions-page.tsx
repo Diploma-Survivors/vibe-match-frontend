@@ -12,9 +12,13 @@ import { useEffect, useState } from 'react';
 
 interface SubmissionsPageProps {
   problemId: string;
+  contestParticipationId?: number;
 }
 
-export default function SubmissionsPage({ problemId }: SubmissionsPageProps) {
+export default function SubmissionsPage({
+  problemId,
+  contestParticipationId,
+}: SubmissionsPageProps) {
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
   const [selectedSubmissionDetail, setSelectedSubmissionDetail] =
     useState<any>(null);
@@ -43,7 +47,7 @@ export default function SubmissionsPage({ problemId }: SubmissionsPageProps) {
     filters,
     handleFiltersChange,
     handleLoadMore,
-  } = useSubmissions(problemId);
+  } = useSubmissions(problemId, contestParticipationId);
 
   // Effect: Auto-select first submission when submissions change
   useEffect(() => {

@@ -1,28 +1,35 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { CONTEST_NAV_TABS_DETAIL, ContestNavTabs } from '@/types/contests';
+import { ContestsService } from '@/services/contests-service';
+import { selectContest } from '@/store/slides/contest-slice';
+import {
+  CONTEST_NAV_TABS_DETAIL,
+  Contest,
+  ContestNavTabs,
+  ContestStatus,
+} from '@/types/contests';
 import { Menu } from 'lucide-react';
 import React from 'react';
+import { useSelector } from 'react-redux';
 import ContestTimer from './contest-timer';
 
 interface ContestTopBarProps {
-  contestName: string;
-  problemTitle: string;
-  endTime: string;
   activeTab?: ContestNavTabs;
   onTabChange: (tab: ContestNavTabs) => void;
   onMenuClick: () => void;
+  onEndContest: () => void;
 }
 
 export default function ContestTopBar({
-  contestName,
-  problemTitle,
-  endTime,
   activeTab = ContestNavTabs.DESCRIPTION,
   onTabChange,
   onMenuClick,
+  onEndContest,
 }: ContestTopBarProps) {
+  const contest = useSelector(selectContest);
+  const isInProgress = ContestsService.isInprogress(contest);
+
   return (
     <div className="h-14 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center justify-between px-4 gap-4">
       {/* Left: Contest Name (Clickable) */}
@@ -34,7 +41,7 @@ export default function ContestTopBar({
           className="hover:bg-slate-100 dark:hover:bg-slate-700"
         >
           <Menu className="w-5 h-5" />
-          {contestName}
+          {contest.name}
         </Button>
         <button
           onClick={onMenuClick}
@@ -69,8 +76,19 @@ export default function ContestTopBar({
       </div>
 
       {/* Right: Timer */}
-      <div className="flex items-center gap-2">
-        <ContestTimer endTime={endTime} />
+      <div className="flex items-center gap-4">
+        {isInProgress && (
+          <>
+            <ContestTimer />
+            <Button
+              onClick={onEndContest}
+              className="h-8 text-sm bg-green-600 hover:bg-green-700 text-white"
+              size="sm"
+            >
+              Kết thúc
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

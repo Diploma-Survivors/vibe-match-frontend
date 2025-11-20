@@ -1,7 +1,7 @@
 'use client';
 
 import { useProblemDescription } from '@/hooks/use-problem-description';
-import type { ProblemDescription as ProblemDetailType } from '@/types/problems';
+import type { ProblemDescription } from '@/types/problems';
 import React from 'react';
 import { ResizableDivider } from './dividers/resizable-divider';
 import { DescriptionPanel } from './panels/description-panel/description-panel';
@@ -10,7 +10,7 @@ import { SampleTestCasesPanel } from './panels/sample-testcases-panel/sample-tes
 import { SubmitResultTab } from './panels/submit-result/submit-result-tab';
 
 interface ContestProblemWrapperProps {
-  problem: ProblemDetailType;
+  problem: ProblemDescription;
   showSubmissions?: boolean;
   contestMode?: boolean;
 }
@@ -92,6 +92,7 @@ export default function ContestProblemWrapper({
           <div className="pl-3 flex flex-col h-full gap-0">
             {/* Editor Section */}
             <EditorPanel
+              contestMode={contestMode}
               height={editorHeight}
               isRunning={isRunning}
               isSubmitting={isSubmitting}

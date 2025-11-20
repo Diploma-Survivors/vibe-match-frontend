@@ -32,6 +32,20 @@ export enum ContestDeadlineEnforcement {
   FLEXIBLE = 'flexible',
 }
 
+export enum ContestSubmissionStrategy {
+  SINGLE_SUBMISSION = 'SINGLE_SUBMISSION',
+  BEST_SCORE = 'BEST_SCORE',
+  LATEST_SCORE = 'LATEST_SCORE',
+  AVERAGE_SCORE = 'AVERAGE_SCORE',
+}
+
+export interface ContestParticipation {
+  participationId?: number;
+  startTime?: string;
+  endTime?: string;
+  finalScore?: number;
+}
+
 export interface Contest {
   id?: number;
   name: string;
@@ -42,11 +56,39 @@ export interface Contest {
   durationMinutes?: number;
   lateDeadline?: string;
   deadlineEnforcement: ContestDeadlineEnforcement;
+  submissionStrategy: ContestSubmissionStrategy;
   problems: ContestProblem[];
   createdBy?: string;
   createdAt?: string;
-  participantStartTime?: string;
-  submittedTime?: string;
+  participation?: ContestParticipation;
+}
+
+export const INITIAL_CONTEST: Contest = {
+  name: '',
+  description: '',
+  startTime: '',
+  endTime: '',
+  deadlineEnforcement: ContestDeadlineEnforcement.STRICT,
+  submissionStrategy: ContestSubmissionStrategy.SINGLE_SUBMISSION,
+  problems: [],
+};
+
+export interface ContestOverView {
+  id?: number;
+  name: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  durationMinutes?: number;
+  lateDeadline?: string;
+  deadlineEnforcement: ContestDeadlineEnforcement;
+  submissionStrategy: ContestSubmissionStrategy;
+  totalProblems: number;
+  participationCount: number;
+  hasParticipated: boolean;
+  author?: User;
+  createdBy?: string;
+  createdAt?: string;
 }
 
 // Filter types
@@ -104,6 +146,7 @@ export enum ContestStatus {
   FINISHED = 'finished', // đã kết thúc
   IN_PROGRESS = 'in_progress', // đang làm
   COMPLETED = 'completed', // đã hoàn thành
+  LATE_SUBMISSION = 'late_submission', // Trong thời gian gia hạn
 }
 
 export const ContestStatusLabels: Record<ContestStatus, string> = {
@@ -112,6 +155,7 @@ export const ContestStatusLabels: Record<ContestStatus, string> = {
   [ContestStatus.FINISHED]: 'Đã kết thúc',
   [ContestStatus.IN_PROGRESS]: 'Đang làm',
   [ContestStatus.COMPLETED]: 'Đã hoàn thành',
+  [ContestStatus.LATE_SUBMISSION]: 'Trong thời gian gia hạn',
 };
 
 export const CONTEST_STATUS_OPTIONS = [
@@ -150,7 +194,7 @@ export const CONTEST_STATUS_COLORS = {
     'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200',
   private:
     'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-} as const;
+};
 
 export const CONTEST_STATUS_LABELS = {
   upcoming: 'Sắp diễn ra',

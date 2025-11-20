@@ -33,8 +33,9 @@ export class SSEService {
   ): void {
     // Close existing connection if any
     this.disconnect();
-
-    const url = `http://localhost:3000/v1/submissions/${submissionId}/stream`;
+    const baseURL =
+      process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000/v1';
+    const url = `${baseURL}/submissions/${submissionId}/stream`;
     this.eventSource = new EventSource(url);
 
     this.eventSource.onopen = () => {

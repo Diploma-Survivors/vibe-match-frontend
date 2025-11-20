@@ -10,7 +10,12 @@ async function run(submissionRequest: SubmissionRequest) {
 }
 
 async function submit(submissionRequest: SubmissionRequest) {
-  return await clientApi.post('/submissions/submit', submissionRequest);
+  const { contestId, ...payload } = submissionRequest;
+  let path = '/submissions/submit';
+  if (contestId) {
+    path = `/contests/${contestId}/submit`;
+  }
+  return await clientApi.post(path, payload);
 }
 
 async function getLanguageList() {
@@ -19,16 +24,23 @@ async function getLanguageList() {
 
 async function getSubmissionList(
   submissionListRequest: GetSubmissionListRequest,
-  problemId: string
+  problemId: string,
+  contestParticipationId?: number
 ) {
   const queryString = qs.stringify(submissionListRequest, {
     allowDots: true,
     skipNulls: true,
   });
-
-  const url = queryString
-    ? `/submissions/problem/${problemId}?${queryString}`
-    : `/submissions/problem/${problemId}`;
+  let url = '';
+  if (contestParticipationId) {
+    url = queryString
+      ? `/submissions/contest-participation/${contestParticipationId}/problem/${problemId}?${queryString}`
+      : `/submissions/contest-participation/${contestParticipationId}/problem/${problemId}`;
+  } else {
+    url = queryString
+      ? `/submissions/problem/${problemId}?${queryString}`
+      : `/submissions/problem/${problemId}`;
+  }
   return await clientApi.get(url);
 }
 

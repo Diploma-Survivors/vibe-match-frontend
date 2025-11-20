@@ -23,10 +23,6 @@ async function getProblemListForTraining(
 }
 
 async function getProblemById(problemId: string): Promise<ProblemDescription> {
-  console.log(
-    'full request',
-    `headers: ${JSON.stringify(clientApi.defaults.headers.common)}`
-  );
   const response = await clientApi.get<ApiResponse<ProblemDescription>>(
     `/problems/${problemId}`
   );

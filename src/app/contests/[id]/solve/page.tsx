@@ -6,10 +6,12 @@ import ContestProblemWrapper from '@/components/problems/tabs/description/contes
 import SubmissionsPage from '@/components/problems/tabs/submissions/submissions-page';
 import { ContestsService } from '@/services/contests-service';
 import { ProblemsService } from '@/services/problems-service';
+import { setContest } from '@/store/slides/contest-slice';
 import { type Contest, ContestNavTabs } from '@/types/contests';
 import type { ProblemDescription } from '@/types/problems';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 interface ProblemStatus {
   problemId: string;
@@ -59,8 +61,9 @@ const MOCK_RANKING = [
 export default function ContestSolvePage() {
   const params = useParams();
   const contestId = params.id as string;
+  const dispatch = useDispatch();
 
-  const [contest, setContest] = useState<Contest | null>(null);
+  const [contestData, setContestData] = useState<Contest | null>(null);
   const [currentProblem, setCurrentProblem] =
     useState<ProblemDescription | null>(null);
   const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
@@ -80,9 +83,10 @@ export default function ContestSolvePage() {
     const fetchContestData = async () => {
       try {
         setLoading(true);
-        const response = await ContestsService.getContestById(contestId);
+        const response = await ContestsService.getContestDetail(contestId);
         const contestData = response?.data?.data as Contest;
-        setContest(contestData);
+        setContestData(contestData);
+        dispatch(setContest(contestData));
 
         // Load first problem
         if (contestData?.problems?.[0]) {
@@ -100,13 +104,13 @@ export default function ContestSolvePage() {
     };
 
     fetchContestData();
-  }, [contestId]);
+  }, [contestId, dispatch]);
 
   const handleProblemChange = useCallback(
     async (problemId: string) => {
-      if (!contest) return;
+      if (!contestData) return;
 
-      const problemIndex = contest.problems.findIndex(
+      const problemIndex = contestData.problems.findIndex(
         (p) => p.id === problemId
       );
       if (problemIndex === -1) return;
@@ -119,15 +123,18 @@ export default function ContestSolvePage() {
         console.error('Error fetching problem:', error);
       }
     },
-    [contest]
+    [contestData]
   );
 
   const handleTabChange = (tab: ContestNavTabs) => {
-    console.log('Tab changed to:', tab);
     setActiveTab(tab);
   };
 
-  if (loading || !contest || !currentProblem) {
+  const handleEndContest = () => {
+    // TODO: Implement contest ending logic
+  };
+
+  if (loading || !contestData || !currentProblem) {
     return (
       <div className="h-screen flex items-center justify-center bg-slate-900">
         <div className="text-center">
@@ -139,7 +146,7 @@ export default function ContestSolvePage() {
   }
 
   // Map contest problems to drawer format
-  const drawerProblems = contest.problems.map((p, idx) => ({
+  const drawerProblems = contestData.problems.map((p, idx) => ({
     id: p.id,
     title: p.title,
     difficulty: p.difficulty,
@@ -151,9 +158,7 @@ export default function ContestSolvePage() {
     <div className="h-screen flex flex-col bg-slate-900">
       {/* Top Bar */}
       <ContestTopBar
-        contestName={contest.name}
-        problemTitle={`Q${currentProblemIndex + 1}. ${currentProblem.title}`}
-        endTime={contest.endTime}
+        onEndContest={handleEndContest}
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onMenuClick={() => setIsDrawerOpen(true)}
@@ -164,7 +169,10 @@ export default function ContestSolvePage() {
         {activeTab === ContestNavTabs.DESCRIPTION ? (
           <ContestProblemWrapper problem={currentProblem} contestMode={true} />
         ) : (
-          <SubmissionsPage problemId={currentProblem.id} />
+          <SubmissionsPage
+            problemId={currentProblem.id}
+            contestParticipationId={contestData.participation?.participationId}
+          />
         )}
       </div>
 
@@ -172,7 +180,7 @@ export default function ContestSolvePage() {
       <ContestDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
-        contestName={contest.name}
+        contestName={contestData.name}
         problems={drawerProblems}
         ranking={MOCK_RANKING}
         currentProblemId={currentProblem.id}

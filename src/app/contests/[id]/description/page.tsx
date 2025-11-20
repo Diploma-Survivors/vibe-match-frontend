@@ -4,27 +4,29 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ContestsService } from '@/services/contests-service';
 import {
-  CONTEST_STATUS_COLORS,
   type Contest,
+  type ContestOverView,
   ContestStatus,
   ContestStatusLabels,
 } from '@/types/contests';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 export default function ContestInfoPage() {
   const params = useParams();
   const contestId = params.id as string;
+  const router = useRouter();
 
-  const [contest, setContest] = useState<Contest | null>(null);
+  const [contestDetail, setContestDetail] = useState<Contest | null>(null);
+  const [contestOverview, setContestOverview] = useState<ContestOverView>();
   const [loading, setLoading] = useState(true);
   const [contestStatus, setContestStatus] = useState<ContestStatus>();
 
-  const fetchContestData = useCallback(async () => {
+  const fetchContestDetail = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await ContestsService.getContestById(contestId);
-      setContest(response.data.data);
+      const response = await ContestsService.getContestDetail(contestId);
+      setContestDetail(response.data.data);
     } catch (error) {
       console.error('Error fetching contest:', error);
     } finally {
@@ -32,15 +34,42 @@ export default function ContestInfoPage() {
     }
   }, [contestId]);
 
-  useEffect(() => {
-    fetchContestData();
-  }, [fetchContestData]);
+  const fetchContestOverview = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await ContestsService.getContestOverview(contestId);
+      const contestOverview: ContestOverView = response?.data?.data;
+      console.log(contestOverview.hasParticipated);
+      if (contestOverview.hasParticipated) {
+        fetchContestDetail();
+      }
+      setContestOverview(contestOverview);
+    } catch (error) {
+      console.error('Error fetching contest:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [contestId, fetchContestDetail]);
 
   useEffect(() => {
-    if (contest) {
-      setContestStatus(ContestsService.getContestStatus(contest));
+    fetchContestOverview();
+  }, [fetchContestOverview]);
+
+  useEffect(() => {
+    if (contestDetail) {
+      setContestStatus(ContestsService.getContestStatus(contestDetail));
+    } else if (contestOverview) {
+      setContestStatus(
+        ContestsService.getContestStatus(contestOverview as unknown as Contest)
+      );
     }
-  }, [contest]);
+  }, [contestDetail, contestOverview]);
+
+  const start = () => {
+    // send startContest request
+    // ...
+    router.push(`/contests/${contestId}/solve`);
+  };
 
   if (loading) {
     return (
@@ -55,7 +84,7 @@ export default function ContestInfoPage() {
     );
   }
 
-  if (!contest) {
+  if (!contestDetail) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-8 max-w-md">
@@ -70,8 +99,6 @@ export default function ContestInfoPage() {
     );
   }
 
-  const totalScore = contest.problems.reduce((sum, p) => sum + p.score, 0);
-
   return (
     <div className="container mx-auto px-6 py-8">
       <div className="max-w-7xl mx-auto grid grid-cols-1 gap-8">
@@ -79,36 +106,20 @@ export default function ContestInfoPage() {
         <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-8">
           <div className="text-center mb-6 grid grid-cols-1 gap-2">
             <h2 className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-4">
-              {contest.name}
+              {contestDetail.name}
             </h2>
             <div className="space-y-4">
               <div className="text-center">
                 <Badge
                   className={`${
-                    contestStatus === ContestStatus.NOT_STARTED
-                      ? CONTEST_STATUS_COLORS.upcoming
-                      : contestStatus === ContestStatus.ONGOING
-                        ? CONTEST_STATUS_COLORS.ongoing
-                        : contestStatus === ContestStatus.IN_PROGRESS
-                          ? CONTEST_STATUS_COLORS.ongoing
-                          : contestStatus === ContestStatus.COMPLETED
-                            ? CONTEST_STATUS_COLORS.finished
-                            : contestStatus === ContestStatus.FINISHED
-                              ? CONTEST_STATUS_COLORS.finished
-                              : CONTEST_STATUS_COLORS.finished
+                    contestStatus !== undefined
+                      ? ContestsService.getContestStatusColor(contestStatus)
+                      : ''
                   } text-lg px-4 py-2`}
                 >
-                  {contestStatus === ContestStatus.NOT_STARTED
-                    ? ContestStatusLabels[ContestStatus.NOT_STARTED]
-                    : contestStatus === ContestStatus.ONGOING
-                      ? ContestStatusLabels[ContestStatus.ONGOING]
-                      : contestStatus === ContestStatus.IN_PROGRESS
-                        ? ContestStatusLabels[ContestStatus.IN_PROGRESS]
-                        : contestStatus === ContestStatus.COMPLETED
-                          ? ContestStatusLabels[ContestStatus.COMPLETED]
-                          : contestStatus === ContestStatus.FINISHED
-                            ? ContestStatusLabels[ContestStatus.FINISHED]
-                            : ContestStatusLabels[ContestStatus.FINISHED]}
+                  {contestStatus !== undefined
+                    ? ContestStatusLabels[contestStatus]
+                    : 'Đang tải...'}
                 </Badge>
               </div>
             </div>
@@ -120,15 +131,19 @@ export default function ContestInfoPage() {
                   {
                     id: 'start',
                     name: 'Bắt đầu',
-                    timestamp: contest.startTime,
+                    timestamp: contestDetail.startTime,
                   },
-                  { id: 'end', name: 'Kết thúc', timestamp: contest.endTime },
-                  ...(contest.lateDeadline
+                  {
+                    id: 'end',
+                    name: 'Kết thúc',
+                    timestamp: contestDetail.endTime,
+                  },
+                  ...(contestDetail.lateDeadline
                     ? [
                         {
                           id: 'late',
                           name: 'Hạn chót nộp muộn',
-                          timestamp: contest.lateDeadline,
+                          timestamp: contestDetail.lateDeadline,
                         },
                       ]
                     : []),
@@ -137,21 +152,21 @@ export default function ContestInfoPage() {
             </div>
           </div>
           <div className="space-y-4 text-slate-700 dark:text-slate-300">
-            <p className="text-base">{contest.description}</p>
+            <p className="text-base">{contestDetail.description}</p>
             <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-              <p className="font-semibold mb-2">Thông tin cuộc thi:</p>
+              {/* <p className="font-semibold mb-2">Thông tin:</p> */}
               <div className="space-y-2">
-                <p className="pl-4">
+                {/* <p className="pl-4">
                   • Số bài tập: <strong>{contest.problems.length} bài</strong>
-                </p>
-                <p className="pl-4">
+                </p> */}
+                {/* <p className="pl-4">
                   • Tổng điểm: <strong>{totalScore} điểm</strong>
-                </p>
+                </p> */}
                 <p className="pl-4">
-                  • Thời lượng:{' '}
+                  Thời lượng:{' '}
                   <strong>
-                    {contest.durationMinutes != null
-                      ? `${contest.durationMinutes} phút`
+                    {contestDetail.durationMinutes != null
+                      ? `${contestDetail.durationMinutes} phút`
                       : 'không giới hạn thời gian'}
                   </strong>
                 </p>
@@ -165,8 +180,10 @@ export default function ContestInfoPage() {
                 contestStatus === ContestStatus.NOT_STARTED ||
                 contestStatus === ContestStatus.FINISHED
               }
+              onClick={start}
             >
-              {contestStatus === ContestStatus.ONGOING
+              {contestStatus === ContestStatus.ONGOING ||
+              contestStatus === ContestStatus.LATE_SUBMISSION
                 ? 'Bắt đầu làm'
                 : contestStatus === ContestStatus.IN_PROGRESS
                   ? 'Tiếp tục làm bài'

@@ -51,13 +51,13 @@ export function useProblemDescription({
   );
 
   const handleSubmit = useCallback(
-    async (sourceCode: string, languageId: number) => {
+    async (sourceCode: string, languageId: number, contestId?: number) => {
       const testCasesForSubmission = testCases.testCases.map((tc) => ({
         input: tc.input,
         output: tc.output,
       }));
 
-      await executeSubmit(sourceCode, languageId, problem.id);
+      await executeSubmit(sourceCode, languageId, problem.id, contestId);
       setRefreshKey((prev) => prev + 1);
     },
     [executeSubmit, testCases.testCases, problem.id]

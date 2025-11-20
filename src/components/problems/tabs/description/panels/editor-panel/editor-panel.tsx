@@ -1,7 +1,11 @@
 import MonacoEditor from '@/components/problems/tabs/description/panels/editor-panel/monaco-editor';
 import { Button } from '@/components/ui/button';
+import { ContestsService } from '@/services/contests-service';
+import { selectContest } from '@/store/slides/contest-slice';
 import { CheckCircle, Play, Send } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const defaultCode = `#include <iostream>
 
@@ -17,17 +21,29 @@ interface EditorPanelProps {
   height: number;
   isRunning: boolean;
   isSubmitting: boolean;
+  contestMode?: boolean;
   onRun: (sourceCode: string, languageId: number) => void;
-  onSubmit: (sourceCode: string, languageId: number) => void;
+  onSubmit: (
+    sourceCode: string,
+    languageId: number,
+    contestId?: number
+  ) => void;
 }
 
 export function EditorPanel({
   height,
   isRunning,
   isSubmitting,
+  contestMode = false,
   onRun,
   onSubmit,
 }: EditorPanelProps) {
+  const pathname = usePathname();
+  const segments = pathname.split('/');
+  const contestId =
+    segments[1] === 'contests' && segments[2]
+      ? Number.parseInt(segments[2], 10)
+      : undefined;
   const [currentCode, setCurrentCode] = useState(defaultCode);
   const [currentLanguageId, setCurrentLanguageId] = useState(52);
 
@@ -36,8 +52,12 @@ export function EditorPanel({
   };
 
   const handleSubmitClick = () => {
-    onSubmit(currentCode, currentLanguageId);
+    onSubmit(currentCode, currentLanguageId, contestId);
   };
+
+  const isInProgress = contestMode
+    ? ContestsService.isInprogress(useSelector(selectContest))
+    : true;
 
   return (
     <div
@@ -78,7 +98,7 @@ export function EditorPanel({
             </Button>
             <Button
               onClick={handleSubmitClick}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isInProgress}
               className="h-8 text-sm bg-green-600 hover:bg-green-700 text-white"
               size="sm"
             >

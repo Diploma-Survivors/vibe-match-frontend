@@ -1,6 +1,7 @@
 import clientApi from '@/lib/apis/axios-client';
 import type { ApiResponse } from '@/types/api';
 import {
+  CONTEST_STATUS_COLORS,
   type Contest,
   type ContestListRequest,
   type ContestListResponse,
@@ -21,8 +22,12 @@ async function getContestList(
   return await clientApi.get(url);
 }
 
-async function getContestById(id: string) {
+async function getContestDetail(id: string) {
   return await clientApi.get(`/contests/${id}`);
+}
+
+async function getContestOverview(id: string) {
+  return await clientApi.get(`/contests/${id}/overview`);
 }
 
 function getContestStatus(contest: Contest): ContestStatus {
@@ -34,23 +39,52 @@ function getContestStatus(contest: Contest): ContestStatus {
     return ContestStatus.NOT_STARTED;
   }
 
-  if (contest.participantStartTime && !contest.submittedTime) {
+  if (contest.participation?.startTime && !contest.participation?.endTime) {
     return ContestStatus.IN_PROGRESS;
   }
 
-  if (contest.submittedTime) {
+  if (contest.participation?.endTime) {
     return ContestStatus.COMPLETED;
   }
 
-  if (now > endTime) {
+  if (
+    (!contest.lateDeadline && now > endTime) ||
+    (contest.lateDeadline && now > new Date(contest.lateDeadline))
+  ) {
     return ContestStatus.FINISHED;
+  }
+
+  if (contest.lateDeadline && now <= new Date(contest.lateDeadline)) {
+    return ContestStatus.LATE_SUBMISSION;
   }
 
   return ContestStatus.ONGOING;
 }
 
+function isInprogress(contest: Contest): boolean {
+  return getContestStatus(contest) === ContestStatus.IN_PROGRESS;
+}
+
+function getContestStatusColor(status: ContestStatus): string {
+  switch (status) {
+    case ContestStatus.NOT_STARTED:
+      return CONTEST_STATUS_COLORS.upcoming;
+    case ContestStatus.ONGOING:
+    case ContestStatus.IN_PROGRESS:
+      return CONTEST_STATUS_COLORS.ongoing;
+    case ContestStatus.COMPLETED:
+    case ContestStatus.FINISHED:
+      return CONTEST_STATUS_COLORS.finished;
+    default:
+      return CONTEST_STATUS_COLORS.finished;
+  }
+}
+
 export const ContestsService = {
   getContestList,
-  getContestById,
+  getContestDetail,
   getContestStatus,
+  getContestStatusColor,
+  getContestOverview,
+  isInprogress,
 };
