@@ -65,11 +65,14 @@ export default function ContestInfoPage() {
     }
   }, [contestDetail, contestOverview]);
 
-  const start = () => {
-    // send startContest request
-    // ...
-    router.push(`/contests/${contestId}/solve`);
-  };
+  const start = useCallback(async () => {
+    try {
+      await ContestsService.participateContest(contestId);
+      router.push(`/contests/${contestId}/solve`);
+    } catch (error) {
+      console.error('Error starting contest:', error);
+    }
+  }, [contestId, router]);
 
   if (loading) {
     return (
@@ -84,16 +87,13 @@ export default function ContestInfoPage() {
     );
   }
 
-  if (!contestDetail) {
+  if (!contestOverview) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-8 max-w-md">
           <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-200 mb-2">
             Không tìm thấy
           </h2>
-          <p className="text-slate-600 dark:text-slate-400">
-            Cuộc thi này không tồn tại hoặc đã bị xóa.
-          </p>
         </div>
       </div>
     );
@@ -106,7 +106,7 @@ export default function ContestInfoPage() {
         <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-8">
           <div className="text-center mb-6 grid grid-cols-1 gap-2">
             <h2 className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-4">
-              {contestDetail.name}
+              {contestOverview.name}
             </h2>
             <div className="space-y-4">
               <div className="text-center">
@@ -131,19 +131,19 @@ export default function ContestInfoPage() {
                   {
                     id: 'start',
                     name: 'Bắt đầu',
-                    timestamp: contestDetail.startTime,
+                    timestamp: contestOverview.startTime,
                   },
                   {
                     id: 'end',
                     name: 'Kết thúc',
-                    timestamp: contestDetail.endTime,
+                    timestamp: contestOverview.endTime,
                   },
-                  ...(contestDetail.lateDeadline
+                  ...(contestOverview.lateDeadline
                     ? [
                         {
                           id: 'late',
                           name: 'Hạn chót nộp muộn',
-                          timestamp: contestDetail.lateDeadline,
+                          timestamp: contestOverview.lateDeadline,
                         },
                       ]
                     : []),
@@ -152,7 +152,7 @@ export default function ContestInfoPage() {
             </div>
           </div>
           <div className="space-y-4 text-slate-700 dark:text-slate-300">
-            <p className="text-base">{contestDetail.description}</p>
+            <p className="text-base">{contestOverview.description}</p>
             <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
               {/* <p className="font-semibold mb-2">Thông tin:</p> */}
               <div className="space-y-2">
@@ -165,8 +165,8 @@ export default function ContestInfoPage() {
                 <p className="pl-4">
                   Thời lượng:{' '}
                   <strong>
-                    {contestDetail.durationMinutes != null
-                      ? `${contestDetail.durationMinutes} phút`
+                    {contestOverview.durationMinutes != null
+                      ? `${contestOverview.durationMinutes} phút`
                       : 'không giới hạn thời gian'}
                   </strong>
                 </p>

@@ -1,5 +1,6 @@
 'use client';
 
+import { toastService } from '@/services/toasts-service';
 import { selectContest } from '@/store/slides/contest-slice';
 import { ContestDeadlineEnforcement } from '@/types/contests';
 import { use, useCallback, useEffect, useState } from 'react';
@@ -13,8 +14,8 @@ export default function ContestTimer() {
 
   useEffect(() => {
     if (isOverTime) {
-      console.log('Contest is over time');
-      // TODOS: Handle overtime scenario (e.g., notify user, disable actions, etc.)
+      toastService.error('Thời gian đã hết.');
+      window.location.reload();
     }
   }, [isOverTime]);
 

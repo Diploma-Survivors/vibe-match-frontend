@@ -81,7 +81,7 @@ export default function ContestDrawer({
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b border-slate-200 dark:border-slate-700">
+        {/* <div className="flex border-b border-slate-200 dark:border-slate-700">
           <button
             onClick={() => setActiveTab('problems')}
             className={`flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
@@ -104,7 +104,7 @@ export default function ContestDrawer({
           >
             Ranking
           </button>
-        </div>
+        </div> */}
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto">

@@ -46,7 +46,7 @@ export default function SubmissionsFilter({
   const handleStatusChange = (value: string) => {
     setStatusFilter(value);
     onFilterChange({
-      status: value as SubmissionStatus,
+      status: value === 'ALL' ? undefined : (value as SubmissionStatus),
       languageId:
         languageFilter === 'ALL' ? undefined : Number.parseInt(languageFilter),
     });
@@ -55,7 +55,8 @@ export default function SubmissionsFilter({
   const handleLanguageChange = (value: string) => {
     setLanguageFilter(value);
     onFilterChange({
-      status: statusFilter as SubmissionStatus,
+      status:
+        statusFilter === 'ALL' ? undefined : (statusFilter as SubmissionStatus),
       languageId: value === 'ALL' ? undefined : Number.parseInt(value),
     });
   };

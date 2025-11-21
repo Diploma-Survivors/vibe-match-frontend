@@ -6,10 +6,11 @@ import ContestProblemWrapper from '@/components/problems/tabs/description/contes
 import SubmissionsPage from '@/components/problems/tabs/submissions/submissions-page';
 import { ContestsService } from '@/services/contests-service';
 import { ProblemsService } from '@/services/problems-service';
+import { toastService } from '@/services/toasts-service';
 import { setContest } from '@/store/slides/contest-slice';
 import { type Contest, ContestNavTabs } from '@/types/contests';
 import type { ProblemDescription } from '@/types/problems';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
@@ -130,9 +131,13 @@ export default function ContestSolvePage() {
     setActiveTab(tab);
   };
 
-  const handleEndContest = () => {
-    // TODO: Implement contest ending logic
-  };
+  const handleEndContest = useCallback(async () => {
+    try {
+      await ContestsService.finishContest(contestId);
+      toastService.success('Kết thúc thành công!.');
+      window.location.reload();
+    } catch (error) {}
+  }, [contestId]);
 
   if (loading || !contestData || !currentProblem) {
     return (

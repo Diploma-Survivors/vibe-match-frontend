@@ -43,6 +43,7 @@ export interface ContestParticipation {
   participationId?: number;
   startTime?: string;
   endTime?: string;
+  finishedAt?: string;
   finalScore?: number;
 }
 

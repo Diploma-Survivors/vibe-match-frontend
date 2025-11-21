@@ -30,6 +30,14 @@ async function getContestOverview(id: string) {
   return await clientApi.get(`/contests/${id}/overview`);
 }
 
+async function finishContest(id: string) {
+  return await clientApi.post(`/contests/${id}/finish`);
+}
+
+async function participateContest(id: string) {
+  return await clientApi.post(`/contests/${id}/participate`);
+}
+
 function getContestStatus(contest: Contest): ContestStatus {
   const now = new Date();
   const startTime = new Date(contest.startTime);
@@ -39,11 +47,11 @@ function getContestStatus(contest: Contest): ContestStatus {
     return ContestStatus.NOT_STARTED;
   }
 
-  if (contest.participation?.startTime && !contest.participation?.endTime) {
+  if (contest.participation?.startTime && !contest.participation?.finishedAt) {
     return ContestStatus.IN_PROGRESS;
   }
 
-  if (contest.participation?.endTime) {
+  if (contest.participation?.finishedAt) {
     return ContestStatus.COMPLETED;
   }
 
@@ -87,4 +95,6 @@ export const ContestsService = {
   getContestStatusColor,
   getContestOverview,
   isInprogress,
+  finishContest,
+  participateContest,
 };

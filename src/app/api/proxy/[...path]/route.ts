@@ -21,11 +21,13 @@ export async function POST(
       const accessToken = formData.get('accessToken')?.toString() || '';
       const refreshToken = formData.get('refreshToken')?.toString() || '';
       const redirectPath = formData.get('redirect')?.toString() || '/dashboard';
+      const deviceId = formData.get('deviceId')?.toString() || '';
 
       const htmlContent = generateAuthForm(
         accessToken,
         refreshToken,
         redirectPath,
+        deviceId,
         csrfData.token,
         request
       );
@@ -141,6 +143,7 @@ function generateAuthForm(
   accessToken: string,
   refreshToken: string,
   redirectPath: string,
+  deviceId: string,
   csrfToken: string,
   request: NextRequest
 ): string {
@@ -262,6 +265,7 @@ function generateAuthForm(
             <form id="postRedirectForm" action="${targetUrl}" method="POST" style="margin-top: 20px;">
                 <input type="hidden" name="accessToken" value="${accessToken}" />
                 <input type="hidden" name="refreshToken" value="${refreshToken}" />
+                <input type="hidden" name="deviceId" value="${deviceId}" />
                 <input type="hidden" name="csrfToken" value="${csrfToken}" />
                 <input type="hidden" name="callbackUrl" value="${redirectPath}" />
                 <button type="submit">
