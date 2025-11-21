@@ -159,6 +159,29 @@ export const ContestStatusLabels: Record<ContestStatus, string> = {
   [ContestStatus.LATE_SUBMISSION]: 'Trong thời gian gia hạn',
 };
 
+export const CONTEST_SUBMISSION_STRATEGY_LABELS: Record<
+  ContestSubmissionStrategy,
+  string
+> = {
+  [ContestSubmissionStrategy.SINGLE_SUBMISSION]: 'Nộp một lần',
+  [ContestSubmissionStrategy.BEST_SCORE]: 'Điểm cao nhất',
+  [ContestSubmissionStrategy.LATEST_SCORE]: 'Điểm lần nộp cuối',
+  [ContestSubmissionStrategy.AVERAGE_SCORE]: 'Điểm trung bình',
+};
+
+export const CONTEST_SUBMISSION_STRATEGY_DESCRIPTION: Record<
+  ContestSubmissionStrategy,
+  string
+> = {
+  [ContestSubmissionStrategy.SINGLE_SUBMISSION]:
+    'Chỉ cho phép nộp một lần cho mỗi problem',
+  [ContestSubmissionStrategy.BEST_SCORE]:
+    'Lấy điểm cao nhất trong tất cả các lần nộp',
+  [ContestSubmissionStrategy.LATEST_SCORE]: 'Lấy điểm của lần nộp cuối cùng',
+  [ContestSubmissionStrategy.AVERAGE_SCORE]:
+    'Lấy điểm trung bình của tất cả các lần nộp',
+};
+
 export const CONTEST_STATUS_OPTIONS = [
   { value: 'all', label: 'Tất cả' },
   { value: 'chưa bắt đầu', label: 'Chưa bắt đầu' },

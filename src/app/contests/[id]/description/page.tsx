@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ContestsService } from '@/services/contests-service';
 import {
+  CONTEST_SUBMISSION_STRATEGY_DESCRIPTION,
   type Contest,
   type ContestOverView,
   ContestStatus,
@@ -67,12 +68,17 @@ export default function ContestInfoPage() {
 
   const start = useCallback(async () => {
     try {
-      await ContestsService.participateContest(contestId);
+      if (
+        contestStatus === ContestStatus.ONGOING ||
+        contestStatus === ContestStatus.LATE_SUBMISSION
+      ) {
+        await ContestsService.participateContest(contestId);
+      }
       router.push(`/contests/${contestId}/solve`);
     } catch (error) {
       console.error('Error starting contest:', error);
     }
-  }, [contestId, router]);
+  }, [contestId, router, contestStatus]);
 
   if (loading) {
     return (
@@ -162,13 +168,23 @@ export default function ContestInfoPage() {
                 {/* <p className="pl-4">
                   • Tổng điểm: <strong>{totalScore} điểm</strong>
                 </p> */}
-                <p className="pl-4">
-                  Thời lượng:{' '}
-                  <strong>
-                    {contestOverview.durationMinutes != null
-                      ? `${contestOverview.durationMinutes} phút`
-                      : 'không giới hạn thời gian'}
-                  </strong>
+                <p className="">
+                  <strong>Thời lượng: </strong>
+
+                  {contestOverview.durationMinutes != null
+                    ? `${contestOverview.durationMinutes} phút`
+                    : 'không giới hạn thời gian'}
+                </p>
+              </div>
+              <div className="space-y-2">
+                <p className="">
+                  <strong>Quy định nộp bài (áp dụng cho từng problem):</strong>{' '}
+                  {
+                    CONTEST_SUBMISSION_STRATEGY_DESCRIPTION[
+                      contestOverview.submissionStrategy
+                    ]
+                  }{' '}
+                  bài
                 </p>
               </div>
             </div>

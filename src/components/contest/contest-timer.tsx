@@ -64,7 +64,7 @@ export default function ContestTimer() {
     let formatted = '';
 
     if (days > 0) {
-      formatted += `${days} days `;
+      formatted += `${days}D `;
     }
 
     formatted += `${String(hours).padStart(2, '0')}:`;
