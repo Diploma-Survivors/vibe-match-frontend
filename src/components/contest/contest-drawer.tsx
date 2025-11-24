@@ -2,36 +2,27 @@
 
 import { Badge } from '@/components/ui/badge';
 import type { ContestRanking } from '@/types/contest-solve';
+import { type ContestProblem, ContestProblemStatus } from '@/types/contests';
+import { DIFFICULTY_COLORS, getDifficultyColor } from '@/types/problems';
 import { CheckCircle, Circle, Minus, X } from 'lucide-react';
-import { useState } from 'react';
+import { type JSX, useState } from 'react';
 
 interface ContestDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   contestName: string;
-  problems: Array<{
-    id: string;
-    title: string;
-    difficulty: 'easy' | 'medium' | 'hard';
-    score: number;
-    status: 'unsolved' | 'attempted' | 'solved';
-  }>;
+  problems: ContestProblem[];
   ranking: ContestRanking[];
   currentProblemId: string;
   onProblemClick: (problemId: string) => void;
 }
 
-const difficultyColors = {
-  easy: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  medium:
-    'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-  hard: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-};
-
-const statusIcons = {
-  solved: <CheckCircle className="w-5 h-5 text-green-600" />,
-  attempted: <Minus className="w-5 h-5 text-orange-600" />,
-  unsolved: <Circle className="w-5 h-5 text-slate-400" />,
+const ContestProblemStatusIcons: Record<ContestProblemStatus, JSX.Element> = {
+  [ContestProblemStatus.SOLVED]: (
+    <CheckCircle className="w-5 h-5 text-green-600" />
+  ),
+  [ContestProblemStatus.UN_ATTEMPTED]: <div />,
+  [ContestProblemStatus.UNSOLVED]: <X className="w-5 h-5 text-red-600" />,
 };
 
 export default function ContestDrawer({
@@ -125,8 +116,8 @@ export default function ContestDrawer({
                   type="button"
                 >
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 mt-0.5">
-                      {statusIcons[problem.status]}
+                    <div className="flex-shrink-0 mt-0.5 min-w-5">
+                      {ContestProblemStatusIcons[problem.status]}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -139,14 +130,14 @@ export default function ContestDrawer({
                       </div>
                       <div className="flex items-center gap-2">
                         <Badge
-                          className={`${
-                            difficultyColors[problem.difficulty]
-                          } text-xs`}
+                          className={`${getDifficultyColor(
+                            problem.difficulty
+                          )} text-xs`}
                         >
                           {problem.difficulty}
                         </Badge>
                         <span className="text-xs text-slate-600 dark:text-slate-400">
-                          {problem.score} pt
+                          {`${problem.userScore ?? 0}/${problem.maxScore ?? 0} pts`}
                         </span>
                       </div>
                     </div>

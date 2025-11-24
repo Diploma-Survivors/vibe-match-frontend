@@ -1,4 +1,6 @@
 import { CheckCircle, FileText } from 'lucide-react';
+import { JSX } from 'react';
+import type { ProblemDifficulty } from './problems';
 
 export enum SortBy {
   NAME = 'name',
@@ -17,12 +19,20 @@ export enum MatchMode {
   ALL = 'all',
 }
 
+export enum ContestProblemStatus {
+  UN_ATTEMPTED = 'UNATTEMPTED',
+  UNSOLVED = 'UNSOLVED',
+  SOLVED = 'SOLVED',
+}
+
 // Contest Detail types
 export interface ContestProblem {
   id: string;
   title: string;
-  score: number;
-  difficulty: 'easy' | 'medium' | 'hard';
+  maxScore: number;
+  userScore?: number;
+  status: ContestProblemStatus;
+  difficulty: ProblemDifficulty;
   memoryLimitKb: number;
   timeLimitMs: number;
 }

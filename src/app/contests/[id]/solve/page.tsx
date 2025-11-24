@@ -186,7 +186,7 @@ export default function ContestSolvePage() {
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         contestName={contestData.name}
-        problems={drawerProblems}
+        problems={contestData.problems}
         ranking={MOCK_RANKING}
         currentProblemId={currentProblem.id}
         onProblemClick={handleProblemChange}
