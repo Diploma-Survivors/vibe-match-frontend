@@ -2,10 +2,15 @@
 
 import { Badge } from '@/components/ui/badge';
 import type { ContestRanking } from '@/types/contest-solve';
-import { type ContestProblem, ContestProblemStatus } from '@/types/contests';
+import {
+  type ContestProblem,
+  ContestProblemStatus,
+  ContestProblemStatusTooltip,
+} from '@/types/contests';
 import { DIFFICULTY_COLORS, getDifficultyColor } from '@/types/problems';
 import { CheckCircle, Circle, Minus, X } from 'lucide-react';
 import { type JSX, useState } from 'react';
+import { Tooltip } from '../ui/tooltip';
 
 interface ContestDrawerProps {
   isOpen: boolean;
@@ -22,6 +27,9 @@ const ContestProblemStatusIcons: Record<ContestProblemStatus, JSX.Element> = {
     <CheckCircle className="w-5 h-5 text-green-600" />
   ),
   [ContestProblemStatus.UN_ATTEMPTED]: <div />,
+  [ContestProblemStatus.ATTEMPTED]: (
+    <Minus className="w-5 h-5 text-amber-600" />
+  ),
   [ContestProblemStatus.UNSOLVED]: <X className="w-5 h-5 text-red-600" />,
 };
 
@@ -116,9 +124,13 @@ export default function ContestDrawer({
                   type="button"
                 >
                   <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 mt-0.5 min-w-5">
-                      {ContestProblemStatusIcons[problem.status]}
-                    </div>
+                    <Tooltip
+                      content={ContestProblemStatusTooltip[problem.status]}
+                    >
+                      <div className="flex-shrink-0 mt-0.5 min-w-5">
+                        {ContestProblemStatusIcons[problem.status]}
+                      </div>
+                    </Tooltip>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm font-mono text-slate-600 dark:text-slate-400">

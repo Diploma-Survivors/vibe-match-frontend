@@ -23,7 +23,16 @@ export enum ContestProblemStatus {
   UN_ATTEMPTED = 'UNATTEMPTED',
   UNSOLVED = 'UNSOLVED',
   SOLVED = 'SOLVED',
+  ATTEMPTED = 'ATTEMPTED',
 }
+
+export const ContestProblemStatusTooltip: Record<ContestProblemStatus, string> =
+  {
+    [ContestProblemStatus.UN_ATTEMPTED]: 'Unattempted',
+    [ContestProblemStatus.UNSOLVED]: 'Unsolved',
+    [ContestProblemStatus.SOLVED]: 'Solved',
+    [ContestProblemStatus.ATTEMPTED]: 'Attempted',
+  };
 
 // Contest Detail types
 export interface ContestProblem {
