@@ -7,6 +7,8 @@ import { ReduxProvider } from '@/store/providers';
 import type { IssuerType, UserInfo } from '@/types/states';
 import { SessionProvider } from 'next-auth/react';
 import { Provider } from 'react-redux';
+import { DialogProvider } from './dialog-provider';
+import { ToastProvider } from './toast-provider';
 
 interface ClientProviderProps {
   children: React.ReactNode;
@@ -26,11 +28,18 @@ export function ClientProvider({
         defaultTheme="light"
         enableSystem={false}
       >
-        <ReduxProvider>
-          <AppProvider initialUser={initialUser} initialIssuer={initialIssuer}>
-            {children}
-          </AppProvider>
-        </ReduxProvider>
+        <DialogProvider>
+          <ToastProvider>
+            <ReduxProvider>
+              <AppProvider
+                initialUser={initialUser}
+                initialIssuer={initialIssuer}
+              >
+                {children}
+              </AppProvider>
+            </ReduxProvider>
+          </ToastProvider>
+        </DialogProvider>
       </ThemeProvider>
     </SessionProvider>
   );

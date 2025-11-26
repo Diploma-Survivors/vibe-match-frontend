@@ -1,23 +1,32 @@
 'use client';
 
-import { toastService } from '@/services/toasts-service';
 import { selectContest } from '@/store/slides/contest-slice';
 import { ContestDeadlineEnforcement } from '@/types/contests';
 import { use, useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useDialog } from '../providers/dialog-provider';
 
 export default function ContestTimer() {
   const [timeLeft, setTimeLeft] = useState<string>('');
   const [isWarning, setIsWarning] = useState(false);
   const [isOverTime, setIsOverTime] = useState(false);
   const [isLate, setIsLate] = useState(false);
+  const { alert } = useDialog();
 
   useEffect(() => {
-    if (isOverTime) {
-      toastService.error('Thời gian đã hết.');
-      window.location.reload();
-    }
-  }, [isOverTime]);
+    const handleTimeOver = async () => {
+      if (isOverTime) {
+        await alert({
+          title: 'Hết thời gian',
+          message: 'Thời gian làm bài đã hết',
+          buttonText: 'OK',
+          color: 'green',
+        });
+        window.location.reload();
+      }
+    };
+    handleTimeOver();
+  }, [isOverTime, alert]);
 
   const contest = useSelector(selectContest);
   const calculateTimeLeft = useCallback(() => {

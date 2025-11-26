@@ -4,6 +4,8 @@ import ContestDrawer from '@/components/contest/contest-drawer';
 import ContestTopBar from '@/components/contest/contest-topbar';
 import ContestProblemWrapper from '@/components/problems/tabs/description/contest-problem-wrapper';
 import SubmissionsPage from '@/components/problems/tabs/submissions/submissions-page';
+import { useDialog } from '@/components/providers/dialog-provider';
+import { useToast } from '@/components/providers/toast-provider';
 import { ContestsService } from '@/services/contests-service';
 import { ProblemsService } from '@/services/problems-service';
 import { toastService } from '@/services/toasts-service';
@@ -13,11 +15,6 @@ import type { ProblemDescription } from '@/types/problems';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
-
-interface ProblemStatus {
-  problemId: string;
-  status: 'unsolved' | 'attempted' | 'solved';
-}
 
 // Mock ranking data - replace with actual API call
 const MOCK_RANKING = [
@@ -63,6 +60,7 @@ export default function ContestSolvePage() {
   const params = useParams();
   const contestId = params.id as string;
   const dispatch = useDispatch();
+  const { confirm, alert } = useDialog();
 
   const [contestData, setContestData] = useState<Contest | null>(null);
   const [currentProblem, setCurrentProblem] =
@@ -71,10 +69,6 @@ export default function ContestSolvePage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Track problem statuses (in real app, this would come from backend)
-  const [problemStatuses, setProblemStatuses] = useState<
-    Record<string, ProblemStatus>
-  >({});
   const [activeTab, setActiveTab] = useState<ContestNavTabs>(
     ContestNavTabs.DESCRIPTION
   );
@@ -133,11 +127,26 @@ export default function ContestSolvePage() {
 
   const handleEndContest = useCallback(async () => {
     try {
+      const result = await confirm({
+        title: 'Kết thúc',
+        message: 'Bạn có muốn nộp bài và kết thúc không?',
+        confirmText: 'Kết thúc',
+        cancelText: 'Hủy',
+        color: 'red',
+      });
+      if (!result) return;
+
       await ContestsService.finishContest(contestId);
-      toastService.success('Kết thúc thành công!.');
+      await alert({
+        title: 'Đã kết thúc',
+        message: 'Cuộc thi đã được kết thúc thành công.',
+        buttonText: 'OK',
+        color: 'green',
+      });
+
       window.location.reload();
     } catch (error) {}
-  }, [contestId]);
+  }, [contestId, confirm, alert]);
 
   if (loading || !contestData || !currentProblem) {
     return (
@@ -149,15 +158,6 @@ export default function ContestSolvePage() {
       </div>
     );
   }
-
-  // Map contest problems to drawer format
-  const drawerProblems = contestData.problems.map((p, idx) => ({
-    id: p.id,
-    title: p.title,
-    difficulty: p.difficulty,
-    score: p.score,
-    status: problemStatuses[p.id]?.status || 'unsolved',
-  }));
 
   return (
     <div className="h-screen flex flex-col bg-slate-900">
