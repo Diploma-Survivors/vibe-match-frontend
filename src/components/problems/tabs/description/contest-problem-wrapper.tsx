@@ -13,12 +13,14 @@ interface ContestProblemWrapperProps {
   problem: ProblemDescription;
   showSubmissions?: boolean;
   contestMode?: boolean;
+  onSubmitSuccess?: () => void;
 }
 
 export default function ContestProblemWrapper({
   problem,
   showSubmissions = false,
   contestMode = false,
+  onSubmitSuccess,
 }: ContestProblemWrapperProps) {
   const {
     containerRef,
@@ -54,6 +56,17 @@ export default function ContestProblemWrapper({
   } = useProblemDescription({
     problem,
   });
+
+  const handleSubmitClick = async (
+    sourceCode: string,
+    languageId: number,
+    contestId?: number
+  ) => {
+    await handleSubmit(sourceCode, languageId, contestId);
+    if (onSubmitSuccess) {
+      onSubmitSuccess();
+    }
+  };
 
   return (
     <div className="h-full">
@@ -97,7 +110,7 @@ export default function ContestProblemWrapper({
               isRunning={isRunning}
               isSubmitting={isSubmitting}
               onRun={handleRun}
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmitClick}
             />
 
             {/* Vertical Resizer */}

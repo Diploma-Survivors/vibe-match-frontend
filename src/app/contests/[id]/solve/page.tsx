@@ -73,33 +73,33 @@ export default function ContestSolvePage() {
     ContestNavTabs.DESCRIPTION
   );
 
+  const fetchContestData = useCallback(async () => {
+    try {
+      // do not set loading to true here to avoid causing rerender as we would like to update contest data in background
+      const response = await ContestsService.getContestDetail(contestId);
+      const contestData = response?.data?.data as Contest;
+      setContestData(contestData);
+      dispatch(setContest(contestData));
+
+      // Load first problem
+      if (!currentProblem && contestData?.problems?.[0]) {
+        const problemData = await ProblemsService.getProblemById(
+          contestData.problems[0].id
+        );
+        setCurrentProblem(problemData);
+        setCurrentProblemIndex(0);
+      }
+    } catch (error) {
+      console.error('Error fetching contest:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [contestId, currentProblem, dispatch]);
+
   // Fetch contest data
   useEffect(() => {
-    const fetchContestData = async () => {
-      try {
-        setLoading(true);
-        const response = await ContestsService.getContestDetail(contestId);
-        const contestData = response?.data?.data as Contest;
-        setContestData(contestData);
-        dispatch(setContest(contestData));
-
-        // Load first problem
-        if (contestData?.problems?.[0]) {
-          const problemData = await ProblemsService.getProblemById(
-            contestData.problems[0].id
-          );
-          setCurrentProblem(problemData);
-          setCurrentProblemIndex(0);
-        }
-      } catch (error) {
-        console.error('Error fetching contest:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchContestData();
-  }, [contestId, dispatch]);
+  }, [fetchContestData]);
 
   const handleProblemChange = useCallback(
     async (problemId: string) => {
@@ -148,6 +148,24 @@ export default function ContestSolvePage() {
     } catch (error) {}
   }, [contestId, confirm, alert]);
 
+  const handleMoveToNextProblem = useCallback(() => {
+    if (!contestData || !contestData.problems) return;
+
+    if (currentProblemIndex < contestData.problems.length - 1) {
+      const nextProblem = contestData.problems[currentProblemIndex + 1];
+      handleProblemChange(nextProblem.id);
+    }
+  }, [contestData, currentProblemIndex, handleProblemChange]);
+
+  const handleMoveToPreviousProblem = useCallback(() => {
+    if (!contestData || !contestData.problems) return;
+
+    if (currentProblemIndex > 0) {
+      const prevProblem = contestData.problems[currentProblemIndex - 1];
+      handleProblemChange(prevProblem.id);
+    }
+  }, [contestData, currentProblemIndex, handleProblemChange]);
+
   if (loading || !contestData || !currentProblem) {
     return (
       <div className="h-screen flex items-center justify-center bg-slate-900">
@@ -163,16 +181,29 @@ export default function ContestSolvePage() {
     <div className="h-screen flex flex-col bg-slate-900">
       {/* Top Bar */}
       <ContestTopBar
+        onNextProblem={handleMoveToNextProblem}
+        onPreviousProblem={handleMoveToPreviousProblem}
         onEndContest={handleEndContest}
         activeTab={activeTab}
         onTabChange={handleTabChange}
         onMenuClick={() => setIsDrawerOpen(true)}
+        disableNext={
+          !contestData?.problems ||
+          currentProblemIndex >= contestData.problems.length - 1
+        }
+        disablePrevious={!contestData?.problems || currentProblemIndex <= 0}
       />
 
       {/* Main Content - Problem Solving Interface */}
       <div className="flex-1 overflow-hidden">
         {activeTab === ContestNavTabs.DESCRIPTION ? (
-          <ContestProblemWrapper problem={currentProblem} contestMode={true} />
+          <ContestProblemWrapper
+            problem={currentProblem}
+            contestMode={true}
+            onSubmitSuccess={() => {
+              fetchContestData();
+            }}
+          />
         ) : (
           <SubmissionsPage
             problemId={currentProblem.id}

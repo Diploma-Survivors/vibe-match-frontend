@@ -9,23 +9,32 @@ import {
   ContestNavTabs,
   ContestStatus,
 } from '@/types/contests';
-import { Menu } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Menu } from 'lucide-react';
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { Tooltip } from '../ui/tooltip';
 import ContestTimer from './contest-timer';
 
 interface ContestTopBarProps {
   activeTab?: ContestNavTabs;
+  disableNext?: boolean;
+  disablePrevious?: boolean;
   onTabChange: (tab: ContestNavTabs) => void;
   onMenuClick: () => void;
   onEndContest: () => void;
+  onNextProblem: () => void;
+  onPreviousProblem: () => void;
 }
 
 export default function ContestTopBar({
   activeTab = ContestNavTabs.DESCRIPTION,
+  disableNext = false,
+  disablePrevious = false,
   onTabChange,
   onMenuClick,
   onEndContest,
+  onNextProblem,
+  onPreviousProblem,
 }: ContestTopBarProps) {
   const contest = useSelector(selectContest);
   const isInProgress = ContestsService.isInprogress(contest);
@@ -43,11 +52,30 @@ export default function ContestTopBar({
           <Menu className="w-5 h-5" />
           {contest.name}
         </Button>
-        <button
-          onClick={onMenuClick}
-          className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
-          type="button"
-        />
+        <div className="flex items-center">
+          <Tooltip content="Bài trước" side="bottom">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onPreviousProblem}
+              disabled={disablePrevious}
+              className="hover:bg-slate-100 dark:hover:bg-slate-700"
+            >
+              <ChevronLeft className="w-6 h-6 size-6" />
+            </Button>
+          </Tooltip>
+          <Tooltip content="Bài tiếp theo" side="bottom">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onNextProblem}
+              disabled={disableNext}
+              className="hover:bg-slate-100 dark:hover:bg-slate-700"
+            >
+              <ChevronRight className="w-6 h-6 size-6" />
+            </Button>
+          </Tooltip>
+        </div>
       </div>
 
       {/* Navigation Tabs */}
@@ -76,7 +104,7 @@ export default function ContestTopBar({
       </div>
 
       {/* Right: Timer */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center min-w-[250px] gap-4 justify-end">
         {isInProgress && (
           <>
             <ContestTimer />

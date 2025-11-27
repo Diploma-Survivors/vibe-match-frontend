@@ -109,7 +109,6 @@ export function useCodeExecution() {
             submissionId,
             (result: SSEResult) => {
               setSubmitResults(result);
-              console.log('Submit result received via SSE:', result);
               setIsSubmitting(false);
               sseService.disconnect();
               sseConnectedRef.current = false;
