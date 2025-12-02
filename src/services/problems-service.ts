@@ -27,8 +27,7 @@ async function getProblemById(problemId: string): Promise<ProblemDescription> {
     `/problems/${problemId}`
   );
 
-  const problem = response.data.data;
-  return problem;
+  return response.data.data;
 }
 
 export const ProblemsService = {

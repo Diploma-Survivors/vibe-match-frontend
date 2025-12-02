@@ -31,6 +31,13 @@ export enum ProblemType {
   HYBRID = 'hybrid',
 }
 
+export enum ProblemStatus {
+  UNSOLVED = 'unsolved',
+  ATTEMPTED = 'attempted',
+  UN_ATTEMPTED = 'un_attempted',
+  SOLVED = 'solved',
+}
+
 export interface ProblemDescription {
   id: string;
   title: string;
@@ -45,6 +52,8 @@ export interface ProblemDescription {
   createdAt?: string;
   updatedAt?: string;
   testcaseSamples?: TestcaseSample[];
+  score?: number; // For contest problems
+  status?: ProblemStatus;
 }
 
 export interface ProblemFilters {

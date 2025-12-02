@@ -30,6 +30,8 @@ export interface SubmissionRequest {
   languageId: number;
   sourceCode: string;
   problemId: string;
+  contestId?: number;
+  contestParticipationId?: number;
   testCases?: TestCaseSubmission[];
 }
 

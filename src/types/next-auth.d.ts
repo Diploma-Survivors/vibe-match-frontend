@@ -7,6 +7,7 @@ declare module 'next-auth' {
     refreshToken?: string;
     redirect?: string;
     callbackUrl?: string;
+    deviceId?: string;
   }
 
   interface Session extends DefaultSession {

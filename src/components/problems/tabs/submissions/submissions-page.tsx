@@ -12,14 +12,18 @@ import { useEffect, useState } from 'react';
 
 interface SubmissionsPageProps {
   problemId: string;
+  contestParticipationId?: number;
 }
 
-export default function SubmissionsPage({ problemId }: SubmissionsPageProps) {
+export default function SubmissionsPage({
+  problemId,
+  contestParticipationId,
+}: SubmissionsPageProps) {
   const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
   const [selectedSubmissionDetail, setSelectedSubmissionDetail] =
     useState<any>(null);
   const [isLoadingForSubmissionDetail, setIsLoadingForSubmissionDetail] =
-    useState(true);
+    useState(false);
 
   // Use resizable hook
   const {
@@ -43,7 +47,7 @@ export default function SubmissionsPage({ problemId }: SubmissionsPageProps) {
     filters,
     handleFiltersChange,
     handleLoadMore,
-  } = useSubmissions(problemId);
+  } = useSubmissions(problemId, contestParticipationId);
 
   // Effect: Auto-select first submission when submissions change
   useEffect(() => {
@@ -119,7 +123,7 @@ export default function SubmissionsPage({ problemId }: SubmissionsPageProps) {
 
         {/* Right Panel - Submission Detail */}
         <div style={{ width: `calc(${100 - leftWidth}% - 6px)` }}>
-          {isLoadingForSubmissionDetail || !selectedSubmissionDetail ? (
+          {isLoadingForSubmissionDetail ? (
             <div className="h-full flex items-center justify-center">
               <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
             </div>

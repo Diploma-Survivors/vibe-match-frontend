@@ -52,6 +52,7 @@ export const authOptions: NextAuthOptions = {
         refreshToken: { label: 'Refresh Token', type: 'text' },
         redirect: { label: 'Redirect', type: 'text' },
         callbackUrl: { label: 'Callback URL', type: 'text' },
+        deviceId: { label: 'Device ID', type: 'text' },
       },
       async authorize(credentials) {
         if (!credentials?.accessToken) return null;
@@ -61,6 +62,7 @@ export const authOptions: NextAuthOptions = {
           refreshToken: credentials.refreshToken,
           redirect: credentials.redirect,
           callbackUrl: credentials.callbackUrl,
+          deviceId: credentials.deviceId,
         };
       },
     }),
@@ -73,6 +75,7 @@ export const authOptions: NextAuthOptions = {
         token.refreshToken = user.refreshToken;
         token.redirect = user.redirect;
         token.callbackUrl = user.callbackUrl;
+        token.deviceId = user.deviceId;
 
         try {
           const decoded: DecodedAccessToken = jwtDecode(

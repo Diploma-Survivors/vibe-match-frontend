@@ -1,7 +1,9 @@
 import { type SSEResult, sseService } from '@/services/sse-service';
 import { SubmissionsService } from '@/services/submissions-service';
+import { selectContest } from '@/store/slides/contest-slice';
 import type { SubmissionRequest } from '@/types/submissions';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 export function useCodeExecution() {
   const [isRunning, setIsRunning] = useState(false);
@@ -10,6 +12,8 @@ export function useCodeExecution() {
   const [submitResults, setSubmitResults] = useState<SSEResult | null>(null);
   const [runError, setRunError] = useState<string | null>(null);
   const sseConnectedRef = useRef(false);
+
+  const contest = useSelector(selectContest);
 
   // Cleanup SSE connection on unmount
   useEffect(() => {
@@ -76,7 +80,12 @@ export function useCodeExecution() {
   );
 
   const handleSubmit = useCallback(
-    async (sourceCode: string, languageId: number, problemId: string) => {
+    async (
+      sourceCode: string,
+      languageId: number,
+      problemId: string,
+      contestId?: number
+    ) => {
       setIsSubmitting(true);
       setSubmitResults(null);
 
@@ -85,6 +94,10 @@ export function useCodeExecution() {
           languageId,
           sourceCode,
           problemId,
+          contestId,
+          contestParticipationId: contestId
+            ? contest.participation?.participationId
+            : undefined,
         };
         const response = await SubmissionsService.submit(submissionRequest);
         const submissionId =
@@ -130,7 +143,7 @@ export function useCodeExecution() {
         setIsSubmitting(false);
       }
     },
-    []
+    [contest.participation?.participationId]
   );
 
   return {

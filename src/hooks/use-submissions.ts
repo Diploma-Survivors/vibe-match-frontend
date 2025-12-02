@@ -34,7 +34,8 @@ interface UseSubmissionsReturn
 }
 
 export default function useSubmissions(
-  problemId: string
+  problemId: string,
+  contestParticipationId?: number
 ): UseSubmissionsReturn {
   // Main state to manage submissions and loading/error states
   const [state, setState] = useState<UseSubmissionsState>({
@@ -65,7 +66,8 @@ export default function useSubmissions(
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
         const axiosResponse = await SubmissionsService.getSubmissionList(
           requestParams,
-          problemId
+          problemId,
+          contestParticipationId
         );
         const response: SubmissionListResponse = axiosResponse?.data?.data;
 
@@ -96,7 +98,7 @@ export default function useSubmissions(
         }));
       }
     },
-    [problemId]
+    [problemId, contestParticipationId]
   );
 
   // Effect to fetch submissions when request or problemId changes

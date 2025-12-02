@@ -1,7 +1,12 @@
 import MonacoEditor from '@/components/problems/tabs/description/panels/editor-panel/monaco-editor';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Play, Send } from 'lucide-react';
+import { ContestsService } from '@/services/contests-service';
+import { selectContest } from '@/store/slides/contest-slice';
+import { CONTEST_SUBMISSION_STRATEGY_DESCRIPTION } from '@/types/contests';
+import { AlertCircle, CheckCircle, Play, Send } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 const defaultCode = `#include <iostream>
 
@@ -17,17 +22,29 @@ interface EditorPanelProps {
   height: number;
   isRunning: boolean;
   isSubmitting: boolean;
+  contestMode?: boolean;
   onRun: (sourceCode: string, languageId: number) => void;
-  onSubmit: (sourceCode: string, languageId: number) => void;
+  onSubmit: (
+    sourceCode: string,
+    languageId: number,
+    contestId?: number
+  ) => void;
 }
 
 export function EditorPanel({
   height,
   isRunning,
   isSubmitting,
+  contestMode = false,
   onRun,
   onSubmit,
 }: EditorPanelProps) {
+  const pathname = usePathname();
+  const segments = pathname.split('/');
+  const contestId =
+    segments[1] === 'contests' && segments[2]
+      ? Number.parseInt(segments[2], 10)
+      : undefined;
   const [currentCode, setCurrentCode] = useState(defaultCode);
   const [currentLanguageId, setCurrentLanguageId] = useState(52);
 
@@ -36,8 +53,14 @@ export function EditorPanel({
   };
 
   const handleSubmitClick = () => {
-    onSubmit(currentCode, currentLanguageId);
+    onSubmit(currentCode, currentLanguageId, contestId);
   };
+
+  const contest = useSelector(selectContest);
+
+  const isInProgress = contestMode
+    ? ContestsService.isInprogress(contest)
+    : true;
 
   return (
     <div
@@ -55,7 +78,17 @@ export function EditorPanel({
         </div>
 
         <div className="flex items-center justify-between px-4 py-2 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex-shrink-0">
-          <div className="text-xs text-slate-500 dark:text-slate-400" />
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+            <AlertCircle className="w-3.5 h-3.5 text-yellow-600 dark:text-yellow-500" />
+            <span className="text-yellow-600 dark:text-yellow-500">
+              {
+                CONTEST_SUBMISSION_STRATEGY_DESCRIPTION[
+                  contest.submissionStrategy
+                ]
+              }
+            </span>
+          </div>
+
           <div className="flex items-center gap-2">
             <Button
               onClick={handleRunClick}
@@ -78,7 +111,7 @@ export function EditorPanel({
             </Button>
             <Button
               onClick={handleSubmitClick}
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isInProgress}
               className="h-8 text-sm bg-green-600 hover:bg-green-700 text-white"
               size="sm"
             >

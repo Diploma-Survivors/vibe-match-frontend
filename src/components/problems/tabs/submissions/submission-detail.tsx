@@ -72,6 +72,17 @@ export default function SubmissionDetail({
     return 'plaintext';
   };
 
+  if (!submission) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center text-slate-500 dark:text-slate-400 space-y-2">
+          <div className="text-lg font-semibold">Chưa có submission nào</div>
+          <div>Vui lòng chọn một submission từ danh sách.</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="h-full">
       <div className="pr-3 h-full">
