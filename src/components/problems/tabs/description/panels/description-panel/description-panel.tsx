@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { toastService } from '@/services/toasts-service';
 import type { ProblemDescription } from '@/types/problems';
 import { ProblemDifficulty } from '@/types/problems';
 import type { TestcaseSample } from '@/types/testcases';
@@ -39,6 +40,7 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
   const copyToClipboard = (text?: string) => {
     if (!text) return;
     navigator.clipboard.writeText(text);
+    toastService.success('Đã sao chép vào clipboard!');
   };
 
   return (
