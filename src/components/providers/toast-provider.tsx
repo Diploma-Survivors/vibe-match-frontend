@@ -1,3 +1,4 @@
+import { ToastType, toastService } from '@/services/toasts-service';
 import { X } from 'lucide-react'; // Assuming you use Lucide or Heroicons
 import React, {
   createContext,
@@ -5,9 +6,8 @@ import React, {
   useState,
   useCallback,
   type ReactNode,
+  useEffect,
 } from 'react';
-
-type ToastType = 'success' | 'error' | 'info' | 'warning';
 
 interface Toast {
   id: number;
@@ -20,6 +20,7 @@ interface ToastContextType {
   success: (message: ReactNode, duration?: number) => void;
   error: (message: ReactNode, duration?: number) => void;
   info: (message: ReactNode, duration?: number) => void;
+  warning: (message: ReactNode, duration?: number) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -32,7 +33,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const openToast = useCallback(
-    (message: ReactNode, type: ToastType = 'info', duration = 10000) => {
+    (
+      message: ReactNode,
+      type: ToastType = ToastType.INFO,
+      duration = 10000
+    ) => {
       const id = Date.now();
       const newToast = { id, message, type };
 
@@ -46,16 +51,22 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     [removeToast]
   );
 
+  useEffect(() => {
+    toastService.subscribe(openToast);
+  }, [openToast]);
+
   // Helper functions for cleaner API
   const success = (message: ReactNode, duration?: number) =>
-    openToast(message, 'success', duration);
+    openToast(message, ToastType.SUCCESS, duration);
   const error = (message: ReactNode, duration?: number) =>
-    openToast(message, 'error', duration);
+    openToast(message, ToastType.ERROR, duration);
   const info = (message: ReactNode, duration?: number) =>
-    openToast(message, 'info', duration);
+    openToast(message, ToastType.INFO, duration);
+  const warning = (message: ReactNode, duration?: number) =>
+    openToast(message, ToastType.WARNING, duration);
 
   return (
-    <ToastContext.Provider value={{ openToast, success, error, info }}>
+    <ToastContext.Provider value={{ openToast, success, error, info, warning }}>
       {children}
 
       {/* Toast Container (Fixed to bottom-right) */}
