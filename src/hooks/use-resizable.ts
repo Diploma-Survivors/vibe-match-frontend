@@ -12,10 +12,10 @@ interface UseResizableOptions {
 export function useResizable({
   initialLeftWidth = 50,
   initialEditorHeight = 50,
-  minLeftWidth = 30,
+  minLeftWidth = 5,
   maxLeftWidth = 80,
   minEditorHeight = 30,
-  maxEditorHeight = 80,
+  maxEditorHeight = 100,
 }: UseResizableOptions = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const rightPanelRef = useRef<HTMLDivElement>(null);

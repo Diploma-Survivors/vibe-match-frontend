@@ -10,9 +10,10 @@ import {
 } from '@/components/ui/select';
 
 import { SubmissionsService } from '@/services/submissions-service';
-import type { Language } from '@/types/submissions';
+import { toastService } from '@/services/toasts-service';
+import { LANGUAGE_DEFINITIONS, type Language } from '@/types/submissions';
 import Editor from '@monaco-editor/react';
-import { Copy, Wand2 } from 'lucide-react';
+import { Copy, Moon, Sun, Wand2 } from 'lucide-react';
 import type { editor } from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
 
@@ -23,6 +24,24 @@ interface MonacoEditorProps {
   setCurrentCode: (code: string) => void;
 }
 
+const getMonacoLanguageId = (backendName?: string): string => {
+  if (!backendName) return 'plaintext';
+
+  const name = backendName.toLowerCase();
+
+  // Find the first configuration where:
+  // 1. None of the 'exclude' keywords are present
+  // 2. At least one of the 'keywords' is present
+  const matchedLang = LANGUAGE_DEFINITIONS.find((config) => {
+    const isExcluded = config.exclude?.some((term) => name.includes(term));
+    if (isExcluded) return false;
+
+    return config.keywords.some((term) => name.includes(term));
+  });
+
+  return matchedLang ? matchedLang.monacoId : 'plaintext';
+};
+
 export default function MonacoEditor({
   currentLanguageId,
   setCurrentLanguageId,
@@ -31,12 +50,17 @@ export default function MonacoEditor({
 }: MonacoEditorProps) {
   const [languageList, setLanguageList] = useState<Language[]>([]);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const [editorTheme, setEditorTheme] = useState('light');
 
   // handle editor mount when editor is mounted (just call once when editor is mounted)
   const handleEditorDidMount = (
     editorInstance: editor.IStandaloneCodeEditor
   ) => {
     editorRef.current = editorInstance;
+  };
+
+  const toggleTheme = () => {
+    setEditorTheme((prev) => (prev === 'vs-dark' ? 'light' : 'vs-dark'));
   };
 
   // Get language list
@@ -62,25 +86,14 @@ export default function MonacoEditor({
     setCurrentCode(newSourceCode);
   };
 
-  // get current language name for the selected language in the dropdown
-  const getCurrentLanguageName = () => {
-    return languageList.find((lang) => lang.id === currentLanguageId)?.name;
-  };
-
-  // map language name to Monaco language id
-  const mapLanguageNameToMonaco = (languageName?: string) => {
-    if (!languageName) return 'plaintext';
-    const name = languageName.toLowerCase();
-    if (name.includes('python')) return 'python';
-    if (name.includes('c++') || name.includes('cpp')) return 'cpp';
-    if (name.includes('java') && !name.includes('javascript')) return 'java';
-    if (name.includes('javascript') || name === 'js') return 'javascript';
-    return 'plaintext';
-  };
+  const currentLanguageName = languageList.find(
+    (lang) => lang.id === currentLanguageId
+  )?.name;
 
   // Copy to clipboard
   const copyToClipboard = () => {
     navigator.clipboard.writeText(currentCode);
+    toastService.success('Đã copy vào clipboard!');
   };
 
   // Format code using Monaco editor ref (unsupported for python/cpp/java)
@@ -99,7 +112,7 @@ export default function MonacoEditor({
         <div className="flex items-center gap-3">
           {/* Language Selector */}
           <Select
-            value={getCurrentLanguageName()}
+            value={currentLanguageName}
             onValueChange={handleLanguageChange}
           >
             <SelectTrigger className="w-36 h-8 text-sm border-slate-300 dark:border-slate-600">
@@ -116,6 +129,20 @@ export default function MonacoEditor({
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Theme Toggle Button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleTheme}
+            className="h-8 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+          >
+            {editorTheme === 'vs-dark' ? (
+              <Sun className="w-4 h-4 mr-1" />
+            ) : (
+              <Moon className="w-4 h-4 mr-1" />
+            )}
+            Theme
+          </Button>
           {/* Format Button */}
           <Button
             variant="ghost"
@@ -143,10 +170,10 @@ export default function MonacoEditor({
       <div className="flex-1">
         <Editor
           height="100%"
-          language={mapLanguageNameToMonaco(getCurrentLanguageName())}
+          language={getMonacoLanguageId(currentLanguageName)}
           value={currentCode}
           onChange={handleEditorChange}
-          theme="light"
+          theme={editorTheme}
           onMount={handleEditorDidMount}
           loading={
             <div className="w-full h-full flex items-center justify-center">

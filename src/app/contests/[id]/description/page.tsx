@@ -10,6 +10,7 @@ import {
   ContestStatus,
   ContestStatusLabels,
 } from '@/types/contests';
+import { FileText } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -23,28 +24,30 @@ export default function ContestInfoPage() {
   const [loading, setLoading] = useState(true);
   const [contestStatus, setContestStatus] = useState<ContestStatus>();
 
-  const fetchContestDetail = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await ContestsService.getContestDetail(contestId);
-      setContestDetail(response.data.data);
-    } catch (error) {
-      console.error('Error fetching contest:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [contestId]);
+  const fetchContestDetail = useCallback(
+    async (contestOverview: ContestOverView) => {
+      try {
+        const response = await ContestsService.getContestDetail(contestId);
+        setContestOverview(contestOverview);
+        setContestDetail(response.data.data);
+        console.log('contest detail and overview set');
+      } catch (error) {
+        console.error('Error fetching contest:', error);
+      }
+    },
+    [contestId]
+  );
 
   const fetchContestOverview = useCallback(async () => {
     try {
       setLoading(true);
       const response = await ContestsService.getContestOverview(contestId);
       const contestOverview: ContestOverView = response?.data?.data;
-      console.log(contestOverview.hasParticipated);
       if (contestOverview.hasParticipated) {
-        fetchContestDetail();
+        await fetchContestDetail(contestOverview);
+      } else {
+        setContestOverview(contestOverview);
       }
-      setContestOverview(contestOverview);
     } catch (error) {
       console.error('Error fetching contest:', error);
     } finally {
@@ -59,6 +62,7 @@ export default function ContestInfoPage() {
   useEffect(() => {
     if (contestDetail) {
       setContestStatus(ContestsService.getContestStatus(contestDetail));
+      console.log('contest status set');
     } else if (contestOverview) {
       setContestStatus(
         ContestsService.getContestStatus(contestOverview as unknown as Contest)
@@ -80,6 +84,7 @@ export default function ContestInfoPage() {
     }
   }, [contestId, router, contestStatus]);
 
+  console.log('component rendered');
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -189,6 +194,7 @@ export default function ContestInfoPage() {
               </div>
             </div>
           </div>
+          {/* Start Button */}
           <div className="w-full max-w-md mx-auto mt-6">
             <Button
               className="w-full bg-green-600 hover:bg-green-700"
@@ -209,6 +215,56 @@ export default function ContestInfoPage() {
             </Button>
           </div>
         </div>
+
+        {/* Problems List */}
+        {contestOverview.hasParticipated && contestDetail && (
+          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
+            <div className="bg-slate-800 dark:bg-slate-900 text-white p-4">
+              <div className="flex items-center gap-3">
+                <FileText className="w-6 h-6" />
+                <h2 className="text-xl font-bold">Bài tập</h2>
+              </div>
+            </div>
+
+            <div className="divide-y divide-slate-200 dark:divide-slate-700">
+              {contestDetail.problems.map((problem, index) => (
+                <div
+                  key={problem.id}
+                  className="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                >
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded flex items-center justify-center">
+                      <span className="text-sm font-mono text-slate-600 dark:text-slate-300">
+                        {index + 1}
+                      </span>
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-slate-800 dark:text-slate-200 font-medium">
+                        {problem.title}
+                      </h3>
+                      {/* <div className="flex items-center gap-3 mt-1">
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                          Thời gian: {problem.timeLimitMs}ms
+                        </span>
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                          Bộ nhớ: {Math.round(problem.memoryLimitKb / 1024)}MB
+                        </span>
+                      </div> */}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">
+                      {`${problem.userScore ?? 0}/${problem.maxScore ?? 0} pts`}
+                    </span>
+                    {/* <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">
+                      điểm
+                    </span> */}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -10,32 +10,26 @@ export enum ToastType {
 }
 
 class ToastService {
-  private formatMessage(type: ToastType, message: string): string {
-    return `${type.toUpperCase()}: ${message}`;
+  private listeners: Array<(message: string, type: ToastType) => void> = [];
+  subscribe(listener: (message: string, type: ToastType) => void) {
+    this.listeners.push(listener);
   }
-
-  show(message: string, type: ToastType = ToastType.INFO): void {
-    alert(this.formatMessage(type, message));
+  private notify(message: string, type: ToastType) {
+    for (const listener of this.listeners) {
+      listener(message, type);
+    }
   }
-
-  success(message: string): void {
-    this.show(message, ToastType.SUCCESS);
+  success(message: string) {
+    this.notify(message, ToastType.SUCCESS);
   }
-
-  error(message: string): void {
-    this.show(message, ToastType.ERROR);
+  error(message: string) {
+    this.notify(message, ToastType.ERROR);
   }
-
-  warning(message: string): void {
-    this.show(message, ToastType.WARNING);
+  warning(message: string) {
+    this.notify(message, ToastType.WARNING);
   }
-
-  info(message: string): void {
-    this.show(message, ToastType.INFO);
-  }
-
-  clear(): void {
-    // No-op for now since we're just using alert()
+  info(message: string) {
+    this.notify(message, ToastType.INFO);
   }
 }
 

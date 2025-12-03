@@ -12,9 +12,9 @@ interface ContestNavbarProps {
 
 const navItems = [
   { id: 'description', label: 'Mô tả', icon: FileText },
-  { id: 'stats', label: 'Thống kê', icon: BarChart2 },
+  // { id: 'stats', label: 'Thống kê', icon: BarChart2 },
   { id: 'ranking', label: 'Bảng xếp hạng', icon: Trophy },
-  { id: 'join', label: 'Tham gia', icon: UserPlus },
+  // { id: 'join', label: 'Tham gia', icon: UserPlus },
 ];
 
 export default function ContestNavbar({

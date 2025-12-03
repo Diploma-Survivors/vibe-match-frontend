@@ -3,20 +3,11 @@ import { Button } from '@/components/ui/button';
 import { ContestsService } from '@/services/contests-service';
 import { selectContest } from '@/store/slides/contest-slice';
 import { CONTEST_SUBMISSION_STRATEGY_DESCRIPTION } from '@/types/contests';
+import { getDefaultCode } from '@/types/languages';
 import { AlertCircle, CheckCircle, Play, Send } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-
-const defaultCode = `#include <iostream>
-
-int main() {    
-    int soThuNhat, soThuHai, tong;
-    std::cin >> soThuNhat;
-    std::cin >> soThuHai;  
-    tong = soThuNhat + soThuHai;
-    std::cout << tong;
-}`;
 
 interface EditorPanelProps {
   height: number;
@@ -45,7 +36,7 @@ export function EditorPanel({
     segments[1] === 'contests' && segments[2]
       ? Number.parseInt(segments[2], 10)
       : undefined;
-  const [currentCode, setCurrentCode] = useState(defaultCode);
+  const [currentCode, setCurrentCode] = useState(getDefaultCode(52));
   const [currentLanguageId, setCurrentLanguageId] = useState(52);
 
   const handleRunClick = () => {
@@ -62,6 +53,12 @@ export function EditorPanel({
     ? ContestsService.isInprogress(contest)
     : true;
 
+  const onLanguageIdChange = (languageId: number) => {
+    setCurrentLanguageId(languageId);
+    const defaultCode = getDefaultCode(languageId);
+    setCurrentCode(defaultCode);
+  };
+
   return (
     <div
       className="flex flex-col overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
@@ -71,7 +68,7 @@ export function EditorPanel({
         <div className="flex-1 min-h-0">
           <MonacoEditor
             currentLanguageId={currentLanguageId}
-            setCurrentLanguageId={setCurrentLanguageId}
+            setCurrentLanguageId={onLanguageIdChange}
             currentCode={currentCode}
             setCurrentCode={setCurrentCode}
           />
