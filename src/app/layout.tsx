@@ -1,5 +1,6 @@
 import type React from 'react';
 import './globals.css';
+import './styles/editor-theme.css';
 import { ConditionalLayout } from '@/components/layout';
 import { ServerProvider } from '@/components/providers/server-provider';
 import { AppProvider } from '@/contexts/app-context';

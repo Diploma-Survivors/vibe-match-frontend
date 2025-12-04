@@ -1,3 +1,4 @@
+import ReadOnlyEditor from '@/components/lexical-editor/lexical-editor';
 import { Button } from '@/components/ui/button';
 import { toastService } from '@/services/toasts-service';
 import type { ProblemDescription } from '@/types/problems';
@@ -85,10 +86,9 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
               <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
                 Mô tả bài toán
               </h2>
-              <div className="prose prose-slate dark:prose-invert max-w-none">
-                <p className="text-slate-700 dark:text-slate-300 leading-relaxed whitespace-pre-wrap">
-                  {problem.description}
-                </p>
+              {/* Added text-color classes here so Lexical content inherits them */}
+              <div className="prose prose-slate dark:prose-invert max-w-none text-slate-700 dark:text-slate-300">
+                <ReadOnlyEditor value={problem.description} />
               </div>
             </section>
 
@@ -97,10 +97,8 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
               <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
                 Đầu vào
               </h2>
-              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
-                  {problem.inputDescription}
-                </p>
+              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                <ReadOnlyEditor value={problem.inputDescription} />
               </div>
             </section>
 
@@ -109,10 +107,8 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
               <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
                 Đầu ra
               </h2>
-              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
-                  {problem.outputDescription}
-                </p>
+              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                <ReadOnlyEditor value={problem.outputDescription} />
               </div>
             </section>
 

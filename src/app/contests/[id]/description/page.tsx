@@ -1,5 +1,6 @@
 'use client';
 import Timeline from '@/components/contest/timeline';
+import ReadOnlyEditor from '@/components/lexical-editor/lexical-editor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ContestsService } from '@/services/contests-service';
@@ -163,7 +164,9 @@ export default function ContestInfoPage() {
             </div>
           </div>
           <div className="space-y-4 text-slate-700 dark:text-slate-300">
-            <p className="text-base">{contestOverview.description}</p>
+            <div className="text-base text-slate-700 dark:text-slate-300">
+              <ReadOnlyEditor value={contestOverview.description} />
+            </div>
             <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
               {/* <p className="font-semibold mb-2">Thông tin:</p> */}
               <div className="space-y-2">
