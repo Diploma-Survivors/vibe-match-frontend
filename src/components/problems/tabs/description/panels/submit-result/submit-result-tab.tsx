@@ -26,7 +26,7 @@ export function SubmitResultTab({
         className="overflow-y-auto h-full pb-4"
         style={{ width: `${width}%` }}
       >
-        <div className="pr-3">
+        <div className="">
           <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
             <div className="p-8 space-y-7">
               {/* Header (Skeleton while submitting) */}
@@ -108,7 +108,7 @@ export function SubmitResultTab({
   }
   return (
     <div className="overflow-y-auto h-full pb-4" style={{ width: `${width}%` }}>
-      <div className="pr-3">
+      <div className="">
         <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
           <div className="p-8 space-y-7">
             {/* Header */}

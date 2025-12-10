@@ -102,7 +102,7 @@ export default function ContestProblemWrapper({
           className="flex flex-col overflow-hidden pb-4"
           style={{ width: `${100 - leftWidth}%` }}
         >
-          <div className="pl-3 flex flex-col h-full gap-0">
+          <div className="flex flex-col h-full gap-0">
             {/* Editor Section */}
             <EditorPanel
               contestMode={contestMode}

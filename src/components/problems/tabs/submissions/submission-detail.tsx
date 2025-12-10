@@ -4,10 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getStatusMeta } from '@/lib/utils/testcase-status';
 import { toastService } from '@/services/toasts-service';
+import { toggleVisibility } from '@/store/slides/ai-review-slice';
 import type { SubmissionDetailData } from '@/types/submissions';
 import { languageMap } from '@/types/submissions';
-import { Copy, Loader2 } from 'lucide-react';
+import { Copy, Loader2, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/default-highlight';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 
@@ -28,6 +30,7 @@ const formatMemory = (memory: number) => {
 export default function SubmissionDetail({
   submission,
 }: SubmissionDetailProps) {
+  const dispatch = useDispatch();
   const [isCodeExpanded, setIsCodeExpanded] = useState(true);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -87,17 +90,26 @@ export default function SubmissionDetail({
 
   return (
     <div className="h-full">
-      <div className="pr-3 h-full">
+      <div className="h-full">
         <div
           ref={scrollRef}
           className={`rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 h-full overflow-y-auto scrollbar-on-scroll ${isScrolling ? 'scrolling' : ''}`}
         >
-          <div className="p-8 space-y-7">
+          <div className="p-8 pt-3 space-y-7">
             {/* Header */}
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
                 Submission #{submission.id}
               </h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => dispatch(toggleVisibility())}
+                className="gap-2 text-yellow-600 border-yellow-200 hover:bg-yellow-50 dark:text-yellow-400 dark:border-yellow-900 dark:hover:bg-yellow-900/20"
+              >
+                <Sparkles className="w-4 h-4" />
+                Nhận xét với AI
+              </Button>
             </div>
 
             {/* Status */}

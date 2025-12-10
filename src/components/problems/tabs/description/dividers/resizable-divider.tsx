@@ -16,9 +16,7 @@ export function ResizableDivider({
   return (
     <div
       className={`${
-        isHorizontal
-          ? 'w-1 cursor-col-resize h-full'
-          : 'h-1 cursor-row-resize my-3'
+        isHorizontal ? 'w-1 cursor-col-resize h-full' : 'h-1 cursor-row-resize'
       } bg-transparent hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors flex-shrink-0 ${
         isDragging ? 'bg-blue-500 dark:bg-blue-400' : ''
       }`}
