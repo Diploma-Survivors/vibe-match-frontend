@@ -1,5 +1,6 @@
 import type { DecodedAccessToken } from '@/types/states';
 import { jwtDecode } from 'jwt-decode';
+import { Database } from 'lucide-react';
 import NextAuth from 'next-auth';
 import type { NextAuthOptions } from 'next-auth';
 import { getServerSession } from 'next-auth'; // Add this import
@@ -66,6 +67,61 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
+    CredentialsProvider({
+      id: 'credentials',
+      name: 'Credentials',
+      credentials: {
+        username: { label: 'Username', type: 'text' },
+        password: { label: 'Password', type: 'password' },
+        // deviceId: { label: "Device ID", type: "text" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.username || !credentials?.password) {
+          throw new Error('Missing username or password');
+        }
+
+        try {
+          // Call your backend login API
+          // const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
+          //   method: 'POST',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify({
+          //     username: credentials.username,
+          //     password: credentials.password,
+          //   }),
+          // });
+
+          // mock data here
+          const data = {
+            user: {
+              id: 'user-id',
+            },
+            accessToken:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImNvdXJzZUlkIjoxLCJlbWFpbCI6InN0dWRlbnRAZ21haWwuY29tIiwiZmlyc3ROYW1lIjoic3R1ZGVudCIsImxhc3ROYW1lIjoic3R1ZGVudCIsInJvbGVzIjpbIlNUVURFTlQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODg4OCIsImx0aVNlc3Npb25JZCI6ImI1YmZmNTk1LTlkOWYtNGNhMS1iYzVlLWNhOTQ5MjU0YmFmNCIsImlhdCI6MTc2NTM3MzAzMywiZXhwIjoxNzY1Mzc2NjMzLCJhdWQiOiJsb2NhbGhvc3Q6MzAwMCJ9.nVuZsvMz2qgpA_4YaeBQfnwm9HFdw4rOZ5NyxxuH5C8',
+            refreshToken:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImNvdXJzZUlkIjoxLCJlbWFpbCI6InN0dWRlbnRAZ21haWwuY29tIiwiZmlyc3ROYW1lIjoic3R1ZGVudCIsImxhc3ROYW1lIjoic3R1ZGVudCIsInJvbGVzIjpbIlNUVURFTlQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODg4OCIsImx0aVNlc3Npb25JZCI6ImI1YmZmNTk1LTlkOWYtNGNhMS1iYzVlLWNhOTQ5MjU0YmFmNCIsImlhdCI6MTc2NTM3MzAzMywiZXhwIjoxNzY1NDU5NDMzLCJhdWQiOiJsb2NhbGhvc3Q6MzAwMCJ9.VQs1G6VfS0d8EHq2L71jsvAX0H56OcxgG6rZ3fSsO8U',
+            deviceId: 'device-id',
+          };
+
+          // if (!res.ok) {
+          //   // Throw error to be caught by NextAuth frontend
+          //   throw new Error(data.message || 'Authentication failed');
+          // }
+
+          // Return object MUST match the shape used in 'jwt' callback below
+          return {
+            id: data.user?.id || 'user-id',
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+            deviceId: data.deviceId,
+          };
+        } catch (error: any) {
+          console.error('Login logic error:', error);
+          // Return null to display a generic error, or throw to display specific error
+          throw new Error(error.message || 'Login failed');
+        }
+      },
+    }),
   ],
   callbacks: {
     async jwt({ token, user }) {
@@ -114,7 +170,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: '/auth/signin/abc',
+    signIn: '/login',
     error: '/',
   },
   session: {
