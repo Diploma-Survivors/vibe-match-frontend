@@ -74,7 +74,7 @@ export default function ContestProblemWrapper({
         ref={containerRef}
         className="flex h-full gap-0 relative bg-slate-50 dark:bg-slate-900"
         style={{
-          height: contestMode ? '100%' : 'calc(100vh - 60px)',
+          height: '100%',
         }}
       >
         {/* Left Panel - Problem Description or Submit Result */}
@@ -99,7 +99,7 @@ export default function ContestProblemWrapper({
         {/* Right Panel - Editor and Test Cases */}
         <div
           ref={rightPanelRef}
-          className="flex flex-col overflow-hidden pb-4"
+          className="flex flex-col overflow-hidden"
           style={{ width: `${100 - leftWidth}%` }}
         >
           <div className="flex flex-col h-full gap-0">

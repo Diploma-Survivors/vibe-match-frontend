@@ -13,6 +13,7 @@ import { SubmissionsService } from '@/services/submissions-service';
 import { toastService } from '@/services/toasts-service';
 import { LANGUAGE_DEFINITIONS, type Language } from '@/types/submissions';
 import Editor from '@monaco-editor/react';
+import { motion } from 'framer-motion';
 import { Copy, Moon, Sun, Wand2 } from 'lucide-react';
 import type { editor } from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
@@ -42,6 +43,9 @@ const getMonacoLanguageId = (backendName?: string): string => {
   return matchedLang ? matchedLang.monacoId : 'plaintext';
 };
 
+// Create a MotionButton component to avoid type issues with Shadcn Button
+const MotionButton = motion.create(Button);
+
 export default function MonacoEditor({
   currentLanguageId,
   setCurrentLanguageId,
@@ -50,7 +54,7 @@ export default function MonacoEditor({
 }: MonacoEditorProps) {
   const [languageList, setLanguageList] = useState<Language[]>([]);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-  const [editorTheme, setEditorTheme] = useState('light');
+  const [editorTheme, setEditorTheme] = useState('vs-dark');
 
   // handle editor mount when editor is mounted (just call once when editor is mounted)
   const handleEditorDidMount = (
@@ -106,9 +110,9 @@ export default function MonacoEditor({
   };
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-slate-900 rounded-lg overflow-hidden">
+    <div className="h-full flex flex-col bg-white dark:bg-slate-800 rounded-lg overflow-hidden">
       {/* Header - LeetCode style */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
         <div className="flex items-center gap-3">
           {/* Language Selector */}
           <Select
@@ -130,7 +134,9 @@ export default function MonacoEditor({
 
         <div className="flex items-center gap-2">
           {/* Theme Toggle Button */}
-          <Button
+          <MotionButton
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             variant="ghost"
             size="sm"
             onClick={toggleTheme}
@@ -142,9 +148,11 @@ export default function MonacoEditor({
               <Moon className="w-4 h-4 mr-1" />
             )}
             Theme
-          </Button>
+          </MotionButton>
           {/* Format Button */}
-          <Button
+          <MotionButton
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             variant="ghost"
             size="sm"
             onClick={handleFormatCode}
@@ -152,9 +160,11 @@ export default function MonacoEditor({
           >
             <Wand2 className="w-4 h-4 mr-1" />
             Format
-          </Button>
+          </MotionButton>
           {/* Copy Button */}
-          <Button
+          <MotionButton
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             variant="ghost"
             size="sm"
             onClick={copyToClipboard}
@@ -162,7 +172,7 @@ export default function MonacoEditor({
           >
             <Copy className="w-4 h-4 mr-1" />
             Copy
-          </Button>
+          </MotionButton>
         </div>
       </div>
 

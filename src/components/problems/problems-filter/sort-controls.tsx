@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { SortBy, SortOrder } from '@/types/problems';
+import { motion } from 'framer-motion';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import React from 'react';
 
@@ -32,26 +33,21 @@ export default function SortControls({
   onSortByChange,
   onSortOrderChange,
 }: SortControlsProps) {
-  const getSortIcon = () => {
-    if (sortOrder === SortOrder.ASC) {
-      return <ArrowUp className="w-4 h-4" />;
-    }
-    return <ArrowDown className="w-4 h-4" />;
-  };
-
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex flex-wrap items-center gap-2 sm:gap-4">
       <div className="flex items-center gap-2">
         <ArrowUpDown className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300 hidden sm:inline">
           Sắp xếp:
         </span>
       </div>
 
       <Select value={sortBy} onValueChange={onSortByChange}>
-        <SelectTrigger className="w-48 h-10 rounded-xl border-0 bg-slate-100 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
-          <SelectValue />
-        </SelectTrigger>
+        <div className="relative group">
+          <SelectTrigger className="w-[140px] sm:w-48 h-10 rounded-xl border-0 bg-slate-100 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200 group-hover:scale-[1.02]">
+            <SelectValue />
+          </SelectTrigger>
+        </div>
         <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
           {SORT_OPTIONS.map((option) => (
             <SelectItem
@@ -65,21 +61,33 @@ export default function SortControls({
         </SelectContent>
       </Select>
 
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() =>
-          onSortOrderChange(
-            sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC
-          )
-        }
-        className="flex items-center gap-2 h-10 px-4 border-0 bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition-all duration-200 hover:scale-105"
-      >
-        {getSortIcon()}
-        <span className="font-medium">
-          {sortOrder === SortOrder.ASC ? 'Tăng dần' : 'Giảm dần'}
-        </span>
-      </Button>
+      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() =>
+            onSortOrderChange(
+              sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC
+            )
+          }
+          className="flex items-center gap-2 h-10 px-4 border-0 bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition-colors duration-200"
+        >
+          <motion.div
+            initial={false}
+            animate={{ rotate: sortOrder === SortOrder.ASC ? 0 : 180 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 10 }}
+          >
+            {sortOrder === SortOrder.ASC ? (
+              <ArrowUp className="w-4 h-4" />
+            ) : (
+              <ArrowUp className="w-4 h-4" />
+            )}
+          </motion.div>
+          <span className="font-medium">
+            {sortOrder === SortOrder.ASC ? 'Tăng dần' : 'Giảm dần'}
+          </span>
+        </Button>
+      </motion.div>
     </div>
   );
 }

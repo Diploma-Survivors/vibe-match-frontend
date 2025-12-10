@@ -54,9 +54,9 @@ export default function SubmissionsSkeleton({
                   </div>
 
                   {/* Table Rows Skeleton */}
-                  {Array.from({ length: 8 }).map((_, index) => (
+                  {Array.from([1, 2, 3, 4, 5, 6, 7, 8]).map((val) => (
                     <div
-                      key={index}
+                      key={val}
                       className="bg-white border-b border-gray-200"
                     >
                       <div className="flex px-4 py-3">
@@ -147,15 +147,17 @@ export default function SubmissionsSkeleton({
                       <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
                         <div className="p-4">
                           <div className="space-y-2">
-                            {Array.from({ length: 12 }).map((_, index) => {
+                            {Array.from([
+                              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                            ]).map((val) => {
                               const widths = [
                                 95, 88, 92, 85, 90, 87, 93, 89, 86, 91, 88, 94,
                               ];
                               return (
                                 <Skeleton
-                                  key={index}
+                                  key={val}
                                   height={16}
-                                  width={`${widths[index % widths.length]}%`}
+                                  width={`${widths[val % widths.length]}%`}
                                 />
                               );
                             })}

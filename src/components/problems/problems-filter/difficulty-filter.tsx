@@ -1,5 +1,6 @@
 import type { ProblemDifficulty } from '@/types/problems';
 import { DIFFICULTY_OPTIONS } from '@/types/problems';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface DifficultyFilterProps {
   selectedDifficulty?: ProblemDifficulty;
@@ -16,15 +17,20 @@ export default function DifficultyFilter({
         <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
           Mức độ:
         </label>
-        {selectedDifficulty && (
-          <button
-            type="button"
-            onClick={() => onDifficultyChange(undefined)}
-            className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
-          >
-            Xóa
-          </button>
-        )}
+        <AnimatePresence>
+          {selectedDifficulty && (
+            <motion.button
+              initial={{ opacity: 0, x: 10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              type="button"
+              onClick={() => onDifficultyChange(undefined)}
+              className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
+            >
+              Xóa
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
 
       <div className="grid grid-cols-3 gap-2">
@@ -32,19 +38,21 @@ export default function DifficultyFilter({
           const isSelected = selectedDifficulty === option.value;
           const colorMap: Record<string, string> = {
             easy: isSelected
-              ? 'bg-green-50 text-green-700 border-2 border-green-400 dark:bg-green-900/20 dark:text-green-300 dark:border-green-500'
+              ? 'bg-green-50 text-green-700 border-2 border-green-400 dark:bg-green-900/20 dark:text-green-300 dark:border-green-500 shadow-sm'
               : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-green-300 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600',
             medium: isSelected
-              ? 'bg-yellow-50 text-yellow-700 border-2 border-yellow-400 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-500'
+              ? 'bg-yellow-50 text-yellow-700 border-2 border-yellow-400 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-500 shadow-sm'
               : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-yellow-300 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600',
             hard: isSelected
-              ? 'bg-red-50 text-red-700 border-2 border-red-400 dark:bg-red-900/20 dark:text-red-300 dark:border-red-500'
+              ? 'bg-red-50 text-red-700 border-2 border-red-400 dark:bg-red-900/20 dark:text-red-300 dark:border-red-500 shadow-sm'
               : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-red-300 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600',
           };
 
           return (
-            <button
+            <motion.button
               key={option.value}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               type="button"
               onClick={() =>
                 onDifficultyChange(
@@ -53,12 +61,12 @@ export default function DifficultyFilter({
               }
               className={`
                 px-3 py-2 rounded-lg border text-xs font-medium
-                transition-all duration-200 hover:scale-105
+                transition-colors duration-200
                 ${colorMap[option.value]}
               `}
             >
               {option.label}
-            </button>
+            </motion.button>
           );
         })}
       </div>
