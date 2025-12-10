@@ -123,5 +123,6 @@ export function useResizable({
     // Handlers
     handleHorizontalMouseDown,
     handleVerticalMouseDown,
+    setLeftWidth,
   };
 }

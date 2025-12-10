@@ -90,6 +90,7 @@ export interface SubmissionDetailData {
   id: number;
   status: string;
   score: number;
+  maxScore: number;
   runtime: number;
   memory: number;
   sourceCode: string;

@@ -57,7 +57,7 @@ export default function ProblemDescriptionPage({
               className="overflow-y-auto h-full pb-4"
               style={{ width: '50%' }}
             >
-              <div className="pr-3">
+              <div className="">
                 <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
                   <div className="p-8 space-y-8">
                     {/* Problem Title Header Skeleton */}
@@ -155,7 +155,7 @@ export default function ProblemDescriptionPage({
               className="flex flex-col overflow-hidden pb-4"
               style={{ width: '50%' }}
             >
-              <div className="pl-3 flex flex-col h-full gap-0">
+              <div className="flex flex-col h-full gap-0">
                 {/* Editor Section Skeleton */}
                 <div
                   className="flex flex-col overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"

@@ -46,7 +46,7 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
 
   return (
     <div className="overflow-y-auto h-full pb-4" style={{ width: `${width}%` }}>
-      <div className="pr-3">
+      <div className="">
         <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
           <div className="p-8 space-y-8">
             {/* Problem Title Header */}
@@ -66,18 +66,18 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
                 >
                   {getDifficultyLabel(problem.difficulty)}
                 </div>
-                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
+                {/* <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
                   <Timer className="w-4 h-4" />
                   {timeLimitSeconds}s time limit
                 </div>
                 <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
                   <MemoryStick className="w-4 h-4" />
                   {memoryLimitMB}MB memory
-                </div>
-                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
+                </div> */}
+                {/* <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
                   <FileText className="w-4 h-4" />
                   {problem.maxScore} điểm
-                </div>
+                </div> */}
               </div>
             </div>
 
