@@ -3,6 +3,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { getStatusMeta } from '@/lib/utils/testcase-status';
+import { toastService } from '@/services/toasts-service';
 import type { SubmissionDetailData } from '@/types/submissions';
 import { languageMap } from '@/types/submissions';
 import { Copy, Loader2 } from 'lucide-react';
@@ -59,6 +60,7 @@ export default function SubmissionDetail({
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(submission.sourceCode);
+    toastService.success('Đã sao chép mã nguồn vào clipboard!');
   };
 
   const getSyntaxLanguage = (languageName: string) => {
@@ -122,7 +124,7 @@ export default function SubmissionDetail({
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">
                 <div className="text-xs text-slate-500">SCORE</div>
                 <div className="text-xl font-semibold">
-                  {submission.score} / 100
+                  {submission.score} / {submission.maxScore}
                 </div>
               </div>
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">

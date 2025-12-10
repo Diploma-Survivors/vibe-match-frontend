@@ -66,18 +66,18 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
                 >
                   {getDifficultyLabel(problem.difficulty)}
                 </div>
-                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
+                {/* <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
                   <Timer className="w-4 h-4" />
                   {timeLimitSeconds}s time limit
                 </div>
                 <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
                   <MemoryStick className="w-4 h-4" />
                   {memoryLimitMB}MB memory
-                </div>
-                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
+                </div> */}
+                {/* <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
                   <FileText className="w-4 h-4" />
                   {problem.maxScore} điểm
-                </div>
+                </div> */}
               </div>
             </div>
 
