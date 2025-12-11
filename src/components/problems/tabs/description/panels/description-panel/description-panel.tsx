@@ -5,7 +5,7 @@ import { toastService } from '@/services/toasts-service';
 import type { ProblemDescription } from '@/types/problems';
 import { ProblemDifficulty } from '@/types/problems';
 import { IssuerType } from '@/types/states';
-import type { TestcaseSample } from '@/types/testcases';
+import type { SampleTestcase } from '@/types/testcases';
 import { FileText, MemoryStick, Timer } from 'lucide-react';
 import { Copy } from 'lucide-react';
 import { useContext, useState } from 'react';
@@ -17,7 +17,7 @@ interface DescriptionPanelProps {
 
 export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
   const { issuer } = useApp();
-  const sampleCases: TestcaseSample[] = problem.testcaseSamples || [];
+  const sampleCases: SampleTestcase[] = problem.testcaseSamples || [];
   const [activeSampleIndex, setActiveSampleIndex] = useState(0);
 
   const getDifficultyLabel = (difficulty: string): string => {

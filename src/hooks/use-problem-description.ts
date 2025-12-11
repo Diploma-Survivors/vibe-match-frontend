@@ -92,8 +92,6 @@ export function useProblemDescription({
     handleVerticalMouseDown: resizable.handleVerticalMouseDown,
     handleRun,
     handleSubmit,
-    handleTestCaseSave: testCases.handleTestCaseSave,
-    handleTestCaseEdit: testCases.handleTestCaseEdit,
     handleTestCaseChange: testCases.handleTestCaseChange,
     handleTestCaseAdd: testCases.handleTestCaseAdd,
     handleTestCaseDelete: testCases.handleTestCaseDelete,

@@ -11,6 +11,7 @@ import { ContestsService } from '@/services/contests-service';
 import { ProblemsService } from '@/services/problems-service';
 import { toastService } from '@/services/toasts-service';
 import { setContest } from '@/store/slides/contest-slice';
+import { setProblem } from '@/store/slides/problem-slice';
 import { type Contest, ContestNavTabs } from '@/types/contests';
 import type { ProblemDescription } from '@/types/problems';
 import { useParams, useRouter } from 'next/navigation';
@@ -88,6 +89,7 @@ export default function ContestSolvePage() {
           contestData.problems[0].id
         );
         setCurrentProblem(problemData);
+        dispatch(setProblem(problemData));
         setCurrentProblemIndex(0);
       }
     } catch (error) {
@@ -115,11 +117,12 @@ export default function ContestSolvePage() {
         const problemData = await ProblemsService.getProblemById(problemId);
         setCurrentProblem(problemData);
         setCurrentProblemIndex(problemIndex);
+        dispatch(setProblem(problemData));
       } catch (error) {
         console.error('Error fetching problem:', error);
       }
     },
-    [contestData]
+    [contestData, dispatch]
   );
 
   const handleTabChange = (tab: ContestNavTabs) => {

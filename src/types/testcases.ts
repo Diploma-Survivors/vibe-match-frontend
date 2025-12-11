@@ -5,7 +5,7 @@ export interface TestCase {
   isSample: boolean;
 }
 
-export interface TestcaseSample {
+export interface SampleTestcase {
   id?: string;
   input: string;
   output: string;
@@ -14,14 +14,8 @@ export interface TestcaseSample {
   updatedAt?: string;
 }
 
-// UI-only type: enriches TestcaseSample with required id and local editing state
-export type UITestcaseSample = TestcaseSample & {
-  id: string;
-  isEditing: boolean;
-};
-
 export interface CreateTestcaseRequest {
-  testcases: TestcaseSample[];
+  testcases: SampleTestcase[];
 }
 
 export interface CreateTestcaseFileResponse {
