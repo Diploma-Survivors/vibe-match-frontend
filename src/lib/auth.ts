@@ -36,10 +36,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     };
   } catch (error) {
     console.error('Error refreshing access token:', error);
-    return {
-      ...token,
-      error: 'RefreshAccessTokenError',
-    };
+    throw error;
   }
 }
 
@@ -97,9 +94,9 @@ export const authOptions: NextAuthOptions = {
               id: 'user-id',
             },
             accessToken:
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImNvdXJzZUlkIjoxLCJlbWFpbCI6InN0dWRlbnRAZ21haWwuY29tIiwiZmlyc3ROYW1lIjoic3R1ZGVudCIsImxhc3ROYW1lIjoic3R1ZGVudCIsInJvbGVzIjpbIlNUVURFTlQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODg4OCIsImx0aVNlc3Npb25JZCI6ImI1YmZmNTk1LTlkOWYtNGNhMS1iYzVlLWNhOTQ5MjU0YmFmNCIsImlhdCI6MTc2NTM3MzAzMywiZXhwIjoxNzY1Mzc2NjMzLCJhdWQiOiJsb2NhbGhvc3Q6MzAwMCJ9.nVuZsvMz2qgpA_4YaeBQfnwm9HFdw4rOZ5NyxxuH5C8',
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImNvdXJzZUlkIjoxLCJlbWFpbCI6InN0dWRlbnRAZ21haWwuY29tIiwiZmlyc3ROYW1lIjoic3R1ZGVudCIsImxhc3ROYW1lIjoic3R1ZGVudCIsInJvbGVzIjpbIlNUVURFTlQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODg4OCIsImx0aVNlc3Npb25JZCI6ImU2YmQ2NWZmLWMzMGUtNDA2OS05ZWVmLWRmZGQzNDBmMTYyNyIsImlhdCI6MTc2NTQxOTY3MywiZXhwIjoxNzY1NDE5Njc0LCJhdWQiOiJsb2NhbGhvc3Q6MzAwMCJ9.h5pczel1OPQI-Uiw93IQxX_gnhec_6A2urIl5ykqfUc',
             refreshToken:
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImNvdXJzZUlkIjoxLCJlbWFpbCI6InN0dWRlbnRAZ21haWwuY29tIiwiZmlyc3ROYW1lIjoic3R1ZGVudCIsImxhc3ROYW1lIjoic3R1ZGVudCIsInJvbGVzIjpbIlNUVURFTlQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODg4OCIsImx0aVNlc3Npb25JZCI6ImI1YmZmNTk1LTlkOWYtNGNhMS1iYzVlLWNhOTQ5MjU0YmFmNCIsImlhdCI6MTc2NTM3MzAzMywiZXhwIjoxNzY1NDU5NDMzLCJhdWQiOiJsb2NhbGhvc3Q6MzAwMCJ9.VQs1G6VfS0d8EHq2L71jsvAX0H56OcxgG6rZ3fSsO8U',
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImNvdXJzZUlkIjoxLCJlbWFpbCI6InN0dWRlbnRAZ21haWwuY29tIiwiZmlyc3ROYW1lIjoic3R1ZGVudCIsImxhc3ROYW1lIjoic3R1ZGVudCIsInJvbGVzIjpbIlNUVURFTlQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODg4OCIsImx0aVNlc3Npb25JZCI6ImU2YmQ2NWZmLWMzMGUtNDA2OS05ZWVmLWRmZGQzNDBmMTYyNyIsImlhdCI6MTc2NTQxOTY3MywiZXhwIjoxNzY1NTA2MDczLCJhdWQiOiJsb2NhbGhvc3Q6MzAwMCJ9.r2L3-b1e21g4ODmdXpOulLc5gZkEVKuCNa_bhuh8JKg',
             deviceId: 'device-id',
           };
 
@@ -124,7 +121,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.accessToken = user.accessToken;
         token.userId = user.id;
@@ -132,31 +129,13 @@ export const authOptions: NextAuthOptions = {
         token.redirect = user.redirect;
         token.callbackUrl = user.callbackUrl;
         token.deviceId = user.deviceId;
-
-        try {
-          const decoded: DecodedAccessToken = jwtDecode(
-            user.accessToken as string
-          );
-          token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
-        } catch (err) {
-          console.error('Failed to decode access token:', err);
-        }
+        return token;
       }
-      if (
-        !token.accessToken ||
-        Date.now() > (token.accessTokenExpires as number)
-      ) {
-        try {
-          const data = await refreshAccessToken(token);
-          token.accessToken = data.accessToken;
-          token.refreshToken = data.refreshToken;
-          const decoded: DecodedAccessToken = jwtDecode(
-            data.accessToken as string
-          );
-          token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
-        } catch (err) {
-          console.error('Failed to decode access token:', err);
-        }
+
+      if (trigger === 'update' && session?.action === 'refresh') {
+        const data = await refreshAccessToken(token);
+        token.accessToken = data.accessToken;
+        token.refreshToken = data.refreshToken;
       }
       return token;
     },

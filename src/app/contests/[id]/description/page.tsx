@@ -31,7 +31,6 @@ export default function ContestInfoPage() {
         const response = await ContestsService.getContestDetail(contestId);
         setContestOverview(contestOverview);
         setContestDetail(response.data.data);
-        console.log('contest detail and overview set');
       } catch (error) {
         console.error('Error fetching contest:', error);
       }
@@ -63,7 +62,6 @@ export default function ContestInfoPage() {
   useEffect(() => {
     if (contestDetail) {
       setContestStatus(ContestsService.getContestStatus(contestDetail));
-      console.log('contest status set');
     } else if (contestOverview) {
       setContestStatus(
         ContestsService.getContestStatus(contestOverview as unknown as Contest)
@@ -85,7 +83,6 @@ export default function ContestInfoPage() {
     }
   }, [contestId, router, contestStatus]);
 
-  console.log('component rendered');
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
