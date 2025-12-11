@@ -112,7 +112,7 @@ export default function ContestInfoPage() {
     <div className="container mx-auto px-6 py-8">
       <div className="max-w-7xl mx-auto grid grid-cols-1 gap-8">
         {/* Contest Info*/}
-        <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-8">
+        <div className="bg-white/80 dark:bg-slate-800/80 rounded-2xl border border-slate-200 shadow-xl dark:border-slate-700/50 p-8">
           <div className="text-center mb-6 grid grid-cols-1 gap-2">
             <h2 className="text-3xl font-bold text-emerald-600 dark:text-emerald-400 mb-4">
               {contestOverview.name}
@@ -195,7 +195,7 @@ export default function ContestInfoPage() {
             </div>
           </div>
           {/* Start Button */}
-          <div className="w-full max-w-md mx-auto mt-6">
+          <div className="w-full max-w-md mx-auto mt-6 mb-6">
             <Button
               className="w-full bg-green-600 hover:bg-green-700"
               hidden={
@@ -214,35 +214,34 @@ export default function ContestInfoPage() {
                     : 'Không xác định'}
             </Button>
           </div>
-        </div>
 
-        {/* Problems List */}
-        {contestOverview.hasParticipated && contestDetail && (
-          <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl overflow-hidden">
-            <div className="bg-slate-800 dark:bg-slate-900 text-white p-4">
-              <div className="flex items-center gap-3">
-                <FileText className="w-6 h-6" />
-                <h2 className="text-xl font-bold">Bài tập</h2>
+          {/* Problems List */}
+          {contestOverview.hasParticipated && contestDetail && (
+            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-slate-700/50 overflow-hidden">
+              <div className="bg-slate-50 dark:bg-slate-900 text-slate-900 p-4">
+                <div className="flex items-center gap-3">
+                  <FileText className="w-6 h-6" />
+                  <h2 className="text-xl font-bold">Bài tập</h2>
+                </div>
               </div>
-            </div>
 
-            <div className="divide-y divide-slate-200 dark:divide-slate-700">
-              {contestDetail.problems.map((problem, index) => (
-                <div
-                  key={problem.id}
-                  className="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
-                >
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded flex items-center justify-center">
-                      <span className="text-sm font-mono text-slate-600 dark:text-slate-300">
-                        {index + 1}
-                      </span>
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="text-slate-800 dark:text-slate-200 font-medium">
-                        {problem.title}
-                      </h3>
-                      {/* <div className="flex items-center gap-3 mt-1">
+              <div className="divide-y divide-slate-200 dark:divide-slate-700">
+                {contestDetail.problems.map((problem, index) => (
+                  <div
+                    key={problem.id}
+                    className="flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="w-8 h-8 bg-slate-200 dark:bg-slate-700 rounded flex items-center justify-center">
+                        <span className="text-sm font-mono text-slate-600 dark:text-slate-300">
+                          {index + 1}
+                        </span>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-slate-800 dark:text-slate-200 font-medium">
+                          {problem.title}
+                        </h3>
+                        {/* <div className="flex items-center gap-3 mt-1">
                         <span className="text-xs text-slate-500 dark:text-slate-400">
                           Thời gian: {problem.timeLimitMs}ms
                         </span>
@@ -250,21 +249,22 @@ export default function ContestInfoPage() {
                           Bộ nhớ: {Math.round(problem.memoryLimitKb / 1024)}MB
                         </span>
                       </div> */}
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">
-                      {`${problem.userScore ?? 0}/${problem.maxScore ?? 0} pts`}
-                    </span>
-                    {/* <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">
+                    <div className="text-right">
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">
+                        {`${problem.userScore ?? 0}/${problem.maxScore ?? 0} pts`}
+                      </span>
+                      {/* <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">
                       điểm
                     </span> */}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

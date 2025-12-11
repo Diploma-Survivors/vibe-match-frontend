@@ -1,12 +1,14 @@
 import ReadOnlyEditor from '@/components/lexical-editor/lexical-editor';
 import { Button } from '@/components/ui/button';
+import { useApp } from '@/contexts/app-context';
 import { toastService } from '@/services/toasts-service';
 import type { ProblemDescription } from '@/types/problems';
 import { ProblemDifficulty } from '@/types/problems';
+import { IssuerType } from '@/types/states';
 import type { TestcaseSample } from '@/types/testcases';
 import { FileText, MemoryStick, Timer } from 'lucide-react';
 import { Copy } from 'lucide-react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 
 interface DescriptionPanelProps {
   problem: ProblemDescription;
@@ -14,6 +16,7 @@ interface DescriptionPanelProps {
 }
 
 export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
+  const { issuer } = useApp();
   const sampleCases: TestcaseSample[] = problem.testcaseSamples || [];
   const [activeSampleIndex, setActiveSampleIndex] = useState(0);
 
@@ -113,23 +116,26 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
             </section>
 
             {/* Constraints */}
-            {problem.timeLimitMs && problem.memoryLimitKb && (
-              <section>
-                <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-                  Giới hạn
-                </h2>
-                <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                  <p className="text-slate-700 dark:text-slate-300 font-semibold">
-                    <span className="font-semibold">Thời gian</span>:{' '}
-                    {timeLimitSeconds} <span className="font-semibold">s</span>
-                  </p>
-                  <p className="text-slate-700 dark:text-slate-300 font-semibold">
-                    <span className="font-semibold">Bộ nhớ</span>:{' '}
-                    {memoryLimitMB} <span className="font-semibold">MB</span>
-                  </p>
-                </div>
-              </section>
-            )}
+            {issuer === IssuerType.LOCAL &&
+              problem.timeLimitMs &&
+              problem.memoryLimitKb && (
+                <section>
+                  <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
+                    Giới hạn
+                  </h2>
+                  <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                    <p className="text-slate-700 dark:text-slate-300 font-semibold">
+                      <span className="font-semibold">Thời gian</span>:{' '}
+                      {timeLimitSeconds}{' '}
+                      <span className="font-semibold">s</span>
+                    </p>
+                    <p className="text-slate-700 dark:text-slate-300 font-semibold">
+                      <span className="font-semibold">Bộ nhớ</span>:{' '}
+                      {memoryLimitMB} <span className="font-semibold">MB</span>
+                    </p>
+                  </div>
+                </section>
+              )}
 
             {/* Sample Cases - compact view */}
             {sampleCases.length > 0 && (
