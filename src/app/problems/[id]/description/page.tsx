@@ -39,6 +39,7 @@ export default function ProblemDescriptionPage({
         const axiosResponse = await ProblemsService.getProblemById(id);
 
         setProblemData(axiosResponse);
+        dispatch(setProblem(axiosResponse));
       } catch (error) {
         console.error('Error fetching problem:', error);
       } finally {
@@ -47,10 +48,7 @@ export default function ProblemDescriptionPage({
     }
 
     fetchProblem(problemId);
-    if (problemData) {
-      dispatch(setProblem(problemData));
-    }
-  }, [problemId, dispatch, problemData]);
+  }, [problemId, dispatch]);
 
   if (isLoading || !problemData) {
     return (
