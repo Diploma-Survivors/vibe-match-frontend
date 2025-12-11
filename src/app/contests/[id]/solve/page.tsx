@@ -1,6 +1,7 @@
 'use client';
 
 import ContestDrawer from '@/components/contest/contest-drawer';
+import ContestSolvePageSkeleton from '@/components/contest/contest-solve-skeleton';
 import ContestTopBar from '@/components/contest/contest-topbar';
 import ContestProblemWrapper from '@/components/problems/tabs/description/contest-problem-wrapper';
 import SubmissionsPage from '@/components/problems/tabs/submissions/submissions-page';
@@ -167,14 +168,7 @@ export default function ContestSolvePage() {
   }, [contestData, currentProblemIndex, handleProblemChange]);
 
   if (loading || !contestData || !currentProblem) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-slate-900">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4" />
-          <p className="text-slate-400">Loading contest...</p>
-        </div>
-      </div>
-    );
+    return <ContestSolvePageSkeleton />;
   }
 
   return (

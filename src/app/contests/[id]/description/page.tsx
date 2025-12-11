@@ -1,8 +1,10 @@
 'use client';
+
 import Timeline from '@/components/contest/timeline';
 import ReadOnlyEditor from '@/components/lexical-editor/lexical-editor';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ContestsService } from '@/services/contests-service';
 import {
   CONTEST_SUBMISSION_STRATEGY_DESCRIPTION,
@@ -83,14 +85,78 @@ export default function ContestInfoPage() {
     }
   }, [contestId, router, contestStatus]);
 
+  // SKELETON LOADING STATE
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4" />
-          <p className="text-slate-600 dark:text-slate-400">
-            Đang tải thông tin...
-          </p>
+      <div className="container mx-auto px-6 py-8">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 gap-8">
+          <div className="bg-white/80 dark:bg-slate-800/80 rounded-2xl border border-slate-200 shadow-xl dark:border-slate-700/50 p-8">
+            <div className="text-center mb-6 grid grid-cols-1 gap-6">
+              {/* Title Skeleton */}
+              <Skeleton className="h-10 w-3/4 mx-auto bg-slate-200 dark:bg-slate-700" />
+
+              {/* Badge Skeleton */}
+              <div className="flex justify-center">
+                <Skeleton className="h-8 w-32 rounded-full bg-slate-200 dark:bg-slate-700" />
+              </div>
+
+              {/* Timeline Skeleton simulation */}
+              <div className="w-full max-w-2xl mx-auto py-4">
+                <div className="flex justify-between items-center">
+                  <Skeleton className="h-4 w-16 rounded-full" />
+                  <Skeleton className="h-1 w-full mx-2" />
+                  <Skeleton className="h-4 w-16 rounded-full" />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {/* Description Skeletons */}
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-[95%]" />
+                <Skeleton className="h-4 w-[90%]" />
+                <Skeleton className="h-4 w-[80%]" />
+              </div>
+
+              {/* Footer Info Skeletons */}
+              <div className="pt-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
+                <Skeleton className="h-5 w-1/3" />
+                <Skeleton className="h-5 w-1/2" />
+              </div>
+            </div>
+
+            {/* Button Skeleton */}
+            <div className="w-full max-w-md mx-auto mt-6 mb-6">
+              <Skeleton className="h-10 w-full rounded-md bg-slate-200 dark:bg-slate-700" />
+            </div>
+
+            {/* Problems List Skeleton (Optional visual) */}
+            <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-slate-700/50 overflow-hidden mt-8">
+              <div className="bg-slate-50 dark:bg-slate-900 p-4">
+                <div className="flex items-center gap-3">
+                  <Skeleton className="w-6 h-6 rounded" />
+                  <Skeleton className="h-6 w-24" />
+                </div>
+              </div>
+              <div className="divide-y divide-slate-200 dark:divide-slate-700">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="flex items-center justify-between p-4"
+                  >
+                    <div className="flex items-center gap-4 flex-1">
+                      <Skeleton className="w-8 h-8 rounded" />
+                      <div className="space-y-2 flex-1">
+                        <Skeleton className="h-5 w-1/3" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-5 w-16" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -165,17 +231,9 @@ export default function ContestInfoPage() {
               <ReadOnlyEditor value={contestOverview.description} />
             </div>
             <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-              {/* <p className="font-semibold mb-2">Thông tin:</p> */}
               <div className="space-y-2">
-                {/* <p className="pl-4">
-                  • Số bài tập: <strong>{contest.problems.length} bài</strong>
-                </p> */}
-                {/* <p className="pl-4">
-                  • Tổng điểm: <strong>{totalScore} điểm</strong>
-                </p> */}
                 <p className="">
                   <strong>Thời lượng: </strong>
-
                   {contestOverview.durationMinutes != null
                     ? `${contestOverview.durationMinutes} phút`
                     : 'không giới hạn thời gian'}
@@ -241,23 +299,12 @@ export default function ContestInfoPage() {
                         <h3 className="text-slate-800 dark:text-slate-200 font-medium">
                           {problem.title}
                         </h3>
-                        {/* <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs text-slate-500 dark:text-slate-400">
-                          Thời gian: {problem.timeLimitMs}ms
-                        </span>
-                        <span className="text-xs text-slate-500 dark:text-slate-400">
-                          Bộ nhớ: {Math.round(problem.memoryLimitKb / 1024)}MB
-                        </span>
-                      </div> */}
                       </div>
                     </div>
                     <div className="text-right">
                       <span className="font-semibold text-slate-800 dark:text-slate-200">
                         {`${problem.userScore ?? 0}/${problem.maxScore ?? 0} pts`}
                       </span>
-                      {/* <span className="text-xs text-slate-500 dark:text-slate-400 ml-1">
-                      điểm
-                    </span> */}
                     </div>
                   </div>
                 ))}
