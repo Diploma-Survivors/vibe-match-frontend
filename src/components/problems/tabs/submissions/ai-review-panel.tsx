@@ -53,7 +53,7 @@ export default function AIReviewPanel({
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
+          {/* <div className="flex items-center justify-between">
             <label htmlFor="customize-prompt" className="text-sm font-medium">
               Tiêu chí nhận xét
             </label>
@@ -109,7 +109,7 @@ export default function AIReviewPanel({
             >
               {customPrompt}
             </div>
-          )}
+          )} */}
 
           <Button
             onClick={handleSubmit}

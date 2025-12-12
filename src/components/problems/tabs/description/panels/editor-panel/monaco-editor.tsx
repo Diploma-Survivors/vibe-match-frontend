@@ -19,9 +19,9 @@ import { useEffect, useRef, useState } from 'react';
 
 interface MonacoEditorProps {
   currentLanguageId: number;
-  setCurrentLanguageId: (languageId: number) => void;
+  onCurrentLanguageIdChange: (languageId: number) => void;
   currentCode: string;
-  setCurrentCode: (code: string) => void;
+  onCurrentCodeChange: (code: string) => void;
 }
 
 const getMonacoLanguageId = (backendName?: string): string => {
@@ -44,9 +44,9 @@ const getMonacoLanguageId = (backendName?: string): string => {
 
 export default function MonacoEditor({
   currentLanguageId,
-  setCurrentLanguageId,
+  onCurrentLanguageIdChange: setCurrentLanguageId,
   currentCode,
-  setCurrentCode,
+  onCurrentCodeChange: setCurrentCode,
 }: MonacoEditorProps) {
   const [languageList, setLanguageList] = useState<Language[]>([]);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);

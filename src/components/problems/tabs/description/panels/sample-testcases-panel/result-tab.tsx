@@ -1,9 +1,9 @@
 import { getStatusMeta } from '@/lib/utils/testcase-status';
 import type { SSEResult } from '@/services/sse-service';
-import type { UITestcaseSample } from '@/types/testcases';
+import type { SampleTestcase } from '@/types/testcases';
 
 interface ResultTabProps {
-  testCases: UITestcaseSample[];
+  testCases: SampleTestcase[];
   activeTestCase: number;
   testResults?: SSEResult | null;
   isRunning?: boolean;

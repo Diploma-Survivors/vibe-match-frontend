@@ -2,12 +2,12 @@ import clientApi from '@/lib/apis/axios-client';
 import type {
   CreateTestcaseFileResponse,
   CreateTestcaseResponse,
-  TestcaseSample,
+  SampleTestcase,
 } from '@/types/testcases';
 
 // Create test cases from array (returns testcase ID)
 async function createTestcase(
-  testcases: TestcaseSample[]
+  testcases: SampleTestcase[]
 ): Promise<CreateTestcaseResponse> {
   try {
     const response = await clientApi.post('/testcases', { testcases });

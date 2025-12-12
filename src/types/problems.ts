@@ -1,5 +1,5 @@
 import type { Tag } from './tags';
-import type { TestcaseSample } from './testcases';
+import type { SampleTestcase } from './testcases';
 import type { Topic } from './topics';
 
 export enum ProblemDifficulty {
@@ -51,10 +51,28 @@ export interface ProblemDescription {
   type?: string;
   createdAt?: string;
   updatedAt?: string;
-  testcaseSamples?: TestcaseSample[];
+  testcaseSamples?: SampleTestcase[];
   score?: number; // For contest problems
   status?: ProblemStatus;
 }
+
+export const INITIAL_PROBLEM: ProblemDescription = {
+  id: '',
+  title: '',
+  description: '',
+  inputDescription: '',
+  outputDescription: '',
+  maxScore: 0,
+  timeLimitMs: 0,
+  memoryLimitKb: 0,
+  difficulty: ProblemDifficulty.EASY,
+  type: ProblemType.STANDALONE,
+  createdAt: '',
+  updatedAt: '',
+  testcaseSamples: [],
+  score: 0,
+  status: ProblemStatus.UNSOLVED,
+};
 
 export interface ProblemFilters {
   difficulty?: ProblemDifficulty;

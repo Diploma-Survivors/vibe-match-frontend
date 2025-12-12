@@ -1,6 +1,7 @@
 'use client';
 
 import ContestDrawer from '@/components/contest/contest-drawer';
+import ContestSolvePageSkeleton from '@/components/contest/contest-solve-skeleton';
 import ContestTopBar from '@/components/contest/contest-topbar';
 import ContestProblemWrapper from '@/components/problems/tabs/description/contest-problem-wrapper';
 import SubmissionsPage from '@/components/problems/tabs/submissions/submissions-page';
@@ -10,6 +11,7 @@ import { ContestsService } from '@/services/contests-service';
 import { ProblemsService } from '@/services/problems-service';
 import { toastService } from '@/services/toasts-service';
 import { setContest } from '@/store/slides/contest-slice';
+import { setProblem } from '@/store/slides/problem-slice';
 import { type Contest, ContestNavTabs } from '@/types/contests';
 import type { ProblemDescription } from '@/types/problems';
 import { useParams, useRouter } from 'next/navigation';
@@ -87,6 +89,7 @@ export default function ContestSolvePage() {
           contestData.problems[0].id
         );
         setCurrentProblem(problemData);
+        dispatch(setProblem(problemData));
         setCurrentProblemIndex(0);
       }
     } catch (error) {
@@ -114,11 +117,12 @@ export default function ContestSolvePage() {
         const problemData = await ProblemsService.getProblemById(problemId);
         setCurrentProblem(problemData);
         setCurrentProblemIndex(problemIndex);
+        dispatch(setProblem(problemData));
       } catch (error) {
         console.error('Error fetching problem:', error);
       }
     },
-    [contestData]
+    [contestData, dispatch]
   );
 
   const handleTabChange = (tab: ContestNavTabs) => {
@@ -167,14 +171,7 @@ export default function ContestSolvePage() {
   }, [contestData, currentProblemIndex, handleProblemChange]);
 
   if (loading || !contestData || !currentProblem) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-slate-900">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto mb-4" />
-          <p className="text-slate-400">Loading contest...</p>
-        </div>
-      </div>
-    );
+    return <ContestSolvePageSkeleton />;
   }
 
   return (

@@ -6,7 +6,7 @@ export default function HomePage() {
     <main className="min-h-screen">
       <section className="container mx-auto px-6 py-20">
         <div className="max-w-3xl">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+          <h1 className="text-4xl md:text-5xl text-green-600 font-bold tracking-tight mb-4">
             VibeMatch
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-300 mb-8">
@@ -16,7 +16,9 @@ export default function HomePage() {
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/problems">
-              <Button className="px-6">Khám phá bài toán</Button>
+              <Button className="px-6 bg-green-600 hover:bg-green-700 text-white">
+                Khám phá bài toán
+              </Button>
             </Link>
             <Link href="/contests">
               <Button variant="outline" className="px-6">
