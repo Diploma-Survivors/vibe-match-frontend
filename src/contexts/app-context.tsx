@@ -30,6 +30,7 @@ const dedicatedPagesPattern =
   process.env.NEXT_PUBLIC_DEDICATED_PAGES_PATTERN ||
   '/problems/[^/]+(?:/(problem|submit|submissions|solutions|standing|test))?';
 const DEDICATED_PAGES_REGEX = new RegExp(`${dedicatedPagesPattern}`);
+const LOCAL_PROBLEMS_REGEX = /^\/problems\/[^/]+(?:\/.*)?$/;
 
 export function AppProvider({
   children,
@@ -44,7 +45,8 @@ export function AppProvider({
 
   const isInDedicatedPages = DEDICATED_PAGES_REGEX.test(pathname);
   const shouldHideNavigation =
-    issuer === IssuerType.MOODLE && isInDedicatedPages;
+    (issuer === IssuerType.MOODLE && isInDedicatedPages) ||
+    (issuer === IssuerType.LOCAL && LOCAL_PROBLEMS_REGEX.test(pathname));
 
   const clearUserData = () => {
     setUser(null);
