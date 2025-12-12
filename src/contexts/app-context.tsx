@@ -1,5 +1,6 @@
 'use client';
 
+import { persistor } from '@/store';
 import { IssuerType, type UserInfo } from '@/types/states';
 import { usePathname } from 'next/navigation';
 import {
@@ -9,6 +10,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { useDispatch } from 'react-redux';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -42,15 +44,18 @@ export function AppProvider({
   const [isLoading, setIsLoading] = useState(false);
 
   const pathname = usePathname();
+  const dispatch = useDispatch();
 
   const isInDedicatedPages = DEDICATED_PAGES_REGEX.test(pathname);
   const shouldHideNavigation =
     (issuer === IssuerType.MOODLE && isInDedicatedPages) ||
     (issuer === IssuerType.LOCAL && LOCAL_PROBLEMS_REGEX.test(pathname));
 
-  const clearUserData = () => {
+  const clearUserData = async () => {
     setUser(null);
     setIssuer(IssuerType.LOCAL);
+    dispatch({ type: 'USER_LOGOUT' });
+    await persistor.purge();
   };
 
   const value: AppContextType = {

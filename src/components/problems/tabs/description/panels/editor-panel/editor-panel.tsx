@@ -98,18 +98,20 @@ export function EditorPanel({
         </div>
 
         <div className="flex items-center justify-between px-4 py-2 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex-shrink-0">
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-            <AlertCircle className="w-3.5 h-3.5 text-yellow-600 dark:text-yellow-500" />
-            <span className="text-yellow-600 dark:text-yellow-500">
-              {
-                CONTEST_SUBMISSION_STRATEGY_DESCRIPTION[
-                  contest.submissionStrategy
-                ]
-              }
-            </span>
-          </div>
+          {contestMode && (
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+              <AlertCircle className="w-3.5 h-3.5 text-yellow-600 dark:text-yellow-500" />
+              <span className="text-yellow-600 dark:text-yellow-500">
+                {
+                  CONTEST_SUBMISSION_STRATEGY_DESCRIPTION[
+                    contest.submissionStrategy
+                  ]
+                }
+              </span>
+            </div>
+          )}
 
-          <div className="flex items-center gap-2">
+          <div className="flex ml-auto items-center gap-2">
             <Button
               onClick={handleRunClick}
               disabled={isRunning}

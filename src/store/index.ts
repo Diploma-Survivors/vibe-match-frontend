@@ -1,4 +1,9 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import {
+  type AnyAction,
+  type Reducer,
+  combineReducers,
+  configureStore,
+} from '@reduxjs/toolkit';
 import {
   FLUSH,
   PAUSE,
@@ -24,31 +29,49 @@ const persistConfig = {
   whitelist: ['workspace', 'aiReview'],
 };
 
-// 2. Combine your reducers into one root
-const rootReducer = combineReducers({
+// 2. Combine your reducers into one "App Reducer"
+const appReducer = combineReducers({
   contest: contestReducer,
   problem: problemReducer,
   aiReview: aiReviewReducer,
   workspace: workspaceReducer,
 });
 
-// 3. Wrap the root reducer with the persist logic
+// 3. Define the State Type based on the reducers (Before store creation)
+type AppState = ReturnType<typeof appReducer>;
+
+// 4. Create the Root Reducer (Wrapper to handle Reset)
+const rootReducer: Reducer<AppState | undefined, AnyAction> = (
+  state,
+  action
+) => {
+  if (action.type === 'USER_LOGOUT') {
+    // We pass undefined to appReducer to force it to return Initial State
+    // Note: We don't modify 'state' variable directly, we return the result of the reducer
+    storage.removeItem('persist:root'); // Optional: force clear storage key
+    return appReducer(undefined, action);
+  }
+
+  return appReducer(state, action);
+};
+
+// 5. Wrap the ROOT reducer (not appReducer) with persist logic
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-// 4. Create the store
+// 6. Create the store
 export const store = configureStore({
-  reducer: persistedReducer, // Use the wrapped reducer
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Required to ignore redux-persist's non-serializable actions
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
 });
 
-// 5. Export the persistor (Need this for main.tsx)
+// 7. Export the persistor
 export const persistor = persistStore(store);
 
+// 8. Export Types
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
