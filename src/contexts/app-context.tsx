@@ -30,9 +30,8 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 const dedicatedPagesPattern =
   process.env.NEXT_PUBLIC_DEDICATED_PAGES_PATTERN ||
-  '/problems/[^/]+(?:/(problem|submit|submissions|solutions|standing|test))?';
+  '^/(problems|contests)/.+$';
 const DEDICATED_PAGES_REGEX = new RegExp(`${dedicatedPagesPattern}`);
-const LOCAL_PROBLEMS_REGEX = /^\/problems\/[^/]+(?:\/.*)?$/;
 
 export function AppProvider({
   children,
@@ -47,9 +46,8 @@ export function AppProvider({
   const dispatch = useDispatch();
 
   const isInDedicatedPages = DEDICATED_PAGES_REGEX.test(pathname);
-  const shouldHideNavigation =
-    (issuer === IssuerType.MOODLE && isInDedicatedPages) ||
-    (issuer === IssuerType.LOCAL && LOCAL_PROBLEMS_REGEX.test(pathname));
+  console.log('isInDeficatedPages', isInDedicatedPages);
+  const shouldHideNavigation = isInDedicatedPages;
 
   const clearUserData = async () => {
     setUser(null);

@@ -1,18 +1,11 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { useApp } from '@/contexts/app-context';
-import { ChevronDown, LogIn, LogOut, User, Wallet } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { UserMenu } from './user-menu';
 
 export default function Header() {
   const { user, clearUserData } = useApp();
@@ -132,39 +125,7 @@ export default function Header() {
           ))}
         </div>
 
-        {user ? (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white border-none shadow-none">
-                <User size={18} />
-                {user.fullName || `${user.firstName} ${user.lastName}`}
-                <ChevronDown size={16} className="ml-1 opacity-70" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link href="/profile" className="cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Hồ sơ của tôi</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="text-red-600 cursor-pointer"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Logout</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ) : (
-          <Link href="/login">
-            <Button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white">
-              <LogIn size={18} />
-              Go to login
-            </Button>
-          </Link>
-        )}
+        <UserMenu user={user} onLogout={handleLogout} />
       </div>
     </nav>
   );

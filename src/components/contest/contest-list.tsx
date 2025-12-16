@@ -45,8 +45,8 @@ export default function ContestList({
         <div className="space-y-4">
           {/* Header */}
           <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl border border-white/20 dark:border-slate-700/50 shadow-xl p-6">
-            <h3 className="text-xl font-bold bg-gradient-to-r from-slate-700 via-slate-800 to-slate-900 dark:from-slate-200 dark:via-slate-100 dark:to-slate-200 bg-clip-text text-transparent flex items-center gap-3">
-              <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg shadow-lg shadow-emerald-500/25">
+            <h3 className="text-xl font-bold text-green-600 flex items-center gap-3">
+              <div className="p-2 bg-green-600 rounded-lg shadow-lg shadow-emerald-500/25">
                 <Trophy className="w-5 h-5 text-white" />
               </div>
               Danh sách cuộc thi

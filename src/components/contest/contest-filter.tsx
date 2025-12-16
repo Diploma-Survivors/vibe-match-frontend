@@ -44,12 +44,12 @@ export default function ContestFilter({
     <div className="space-y-6">
       {/* Filter Header */}
       <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600">
+            <div className="p-2 rounded-xl bg-gradient-to-r bg-green-600">
               <Filter className="w-5 h-5 text-white" />
             </div>
-            <h3 className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+            <h3 className="text-xl font-bold bg-green-600 bg-clip-text text-transparent">
               Bộ lọc contest
             </h3>
           </div>
@@ -61,6 +61,17 @@ export default function ContestFilter({
           >
             <RotateCcw className="w-4 h-4 mr-2" />
             Đặt lại
+          </Button>
+        </div>
+
+        {/* Buttons */}
+        <div className="border-t border-slate-200 dark:border-slate-700 mb-4">
+          <Button
+            onClick={onSearch}
+            className="w-full h-12 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold text-white shadow-lg"
+          >
+            <Search className="w-5 h-5 mr-2" />
+            Tìm kiếm
           </Button>
         </div>
 
@@ -161,17 +172,6 @@ export default function ContestFilter({
               className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
             />
           </div>
-        </div>
-
-        {/* Buttons */}
-        <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
-          <Button
-            onClick={onSearch}
-            className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-          >
-            <Search className="w-5 h-5 mr-2" />
-            Tìm kiếm
-          </Button>
         </div>
       </div>
     </div>

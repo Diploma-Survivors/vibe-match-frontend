@@ -1,5 +1,6 @@
 'use client';
 
+import { UserMenu } from '@/components/layout/user-menu';
 import { Button } from '@/components/ui/button';
 import { useApp } from '@/contexts/app-context';
 import { IssuerType } from '@/types/states';
@@ -58,18 +59,17 @@ export default function ProblemNavbar({
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Back Button - only show if hideNavigation is false */}
-          {issuer === IssuerType.LOCAL && (
-            <Link href="/problems">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Trở về danh sách
-              </Button>
-            </Link>
-          )}
+
+          <Link href="/problems">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Trở về danh sách
+            </Button>
+          </Link>
 
           {/* If hideNavigation is true, render an empty div to maintain layout */}
           {/* {hideNavigation && <div className="w-20" />} */}
@@ -99,9 +99,11 @@ export default function ProblemNavbar({
             })}
           </div>
 
+          <UserMenu user={user} onLogout={handleLogout} />
+
           {/* Placeholder for future actions */}
           {/* <div className="w-20" /> */}
-          {user ? (
+          {/* {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button className="flex z-1000 items-center gap-2 bg-green-600 hover:bg-green-700 text-white border-none shadow-none">
@@ -127,7 +129,7 @@ export default function ProblemNavbar({
                 Go to login
               </Button>
             </Link>
-          )}
+          )} */}
         </div>
       </div>
     </nav>
