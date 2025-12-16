@@ -70,34 +70,36 @@ export default function ProblemTable({
         style={{ overflow: 'visible' }}
       >
         <div className="overflow-x-auto max-w-full">
-          <div className="min-w-[1000px]">
-            <Table className="w-full">
-              <TableHeader>
-                <TableRow className="border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-700/20">
-                  <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                    ID
-                  </TableHead>
-                  <TableHead className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 w-96">
-                    Tên
-                  </TableHead>
-                  <TableHead className="w-48 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                    Topic
-                  </TableHead>
-                  <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                    % AC
-                  </TableHead>
-                  <TableHead className="w-24 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3">
-                    Trạng thái
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {problems.map((problem) => (
-                  <ProblemTableRow key={problem.id} problem={problem} />
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <Table className="w-full">
+            <TableHeader>
+              <TableRow className="border-b border-slate-200/50 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-700/20">
+                <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3 hidden md:table-cell">
+                  ID
+                </TableHead>
+                <TableHead className="font-bold text-slate-700 dark:text-slate-300 px-4 py-3 w-auto">
+                  Tên
+                </TableHead>
+                <TableHead className="w-48 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3 hidden lg:table-cell">
+                  Topic
+                </TableHead>
+                <TableHead className="w-20 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3 hidden xl:table-cell">
+                  % AC
+                </TableHead>
+                <TableHead className="w-24 font-bold text-slate-700 dark:text-slate-300 text-center px-4 py-3 hidden sm:table-cell">
+                  Trạng thái
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {problems.map((problem, index) => (
+                <ProblemTableRow
+                  key={problem.id}
+                  problem={problem}
+                  index={index}
+                />
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </InfiniteScroll>
     </div>

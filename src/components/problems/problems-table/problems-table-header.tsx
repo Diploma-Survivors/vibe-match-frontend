@@ -22,14 +22,12 @@ export default function ProblemTableHeader({
   return (
     <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h3 className="text-xl font-bold flex items-center gap-2">
+        <h3 className="text-xl font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100">
           <FaList className="text-slate-700 dark:text-slate-200" />
-          <span className="bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent">
-            Danh sách bài tập
-          </span>
+          <span>Danh sách bài tập</span>
         </h3>
-        <div className="flex items-center gap-4">
-          <div className="text-sm text-slate-600 dark:text-slate-400">
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="text-sm text-slate-600 dark:text-slate-400 whitespace-nowrap">
             <span className="font-bold text-slate-900 dark:text-slate-100">
               {currentCount}
             </span>{' '}

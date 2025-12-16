@@ -4,7 +4,8 @@ import { ContestsService } from '@/services/contests-service';
 import { selectContest } from '@/store/slides/contest-slice';
 import { CONTEST_SUBMISSION_STRATEGY_DESCRIPTION } from '@/types/contests';
 import { getDefaultCode } from '@/types/languages';
-import { AlertCircle, CheckCircle, Play, Send } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { AlertCircle, Play, Send } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
@@ -21,6 +22,8 @@ interface EditorPanelProps {
     contestId?: number
   ) => void;
 }
+
+const MotionButton = motion.create(Button);
 
 export function EditorPanel({
   height,
@@ -61,7 +64,7 @@ export function EditorPanel({
 
   return (
     <div
-      className="flex flex-col overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+      className="flex flex-col overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
       style={{ height: `${height}%` }}
     >
       <div className="flex-1 min-h-0 flex flex-col">
@@ -87,43 +90,80 @@ export function EditorPanel({
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
+            <MotionButton
+              layout
               onClick={handleRunClick}
               disabled={isRunning}
               variant="outline"
               size="sm"
-              className="h-8 text-sm"
+              className="h-8 text-sm overflow-hidden"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 17 }}
             >
-              {isRunning ? (
-                <>
-                  <div className="w-3 h-3 border-2 border-slate-400/20 border-t-slate-400 rounded-full animate-spin mr-1.5" />
-                  Running...
-                </>
-              ) : (
-                <>
-                  <Play className="w-3.5 h-3.5 mr-1.5" />
-                  Run
-                </>
-              )}
-            </Button>
-            <Button
+              <AnimatePresence mode="wait" initial={false}>
+                {isRunning ? (
+                  <motion.div
+                    key="running"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="flex items-center"
+                  >
+                    <div className="w-3 h-3 border-2 border-slate-400/20 border-t-slate-400 rounded-full animate-spin mr-1.5" />
+                    Running...
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="run"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="flex items-center"
+                  >
+                    <Play className="w-3.5 h-3.5 mr-1.5" />
+                    Run
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </MotionButton>
+            <MotionButton
+              layout
               onClick={handleSubmitClick}
               disabled={isSubmitting || !isInProgress}
-              className="h-8 text-sm bg-green-600 hover:bg-green-700 text-white"
+              className="h-8 text-sm bg-green-600 hover:bg-green-700 text-white overflow-hidden relative"
               size="sm"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
-              {isSubmitting ? (
-                <>
-                  <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin mr-1.5" />
-                  Submitting...
-                </>
-              ) : (
-                <>
-                  <Send className="w-3.5 h-3.5 mr-1.5" />
-                  Submit
-                </>
-              )}
-            </Button>
+              <AnimatePresence mode="wait" initial={false}>
+                {isSubmitting ? (
+                  <motion.div
+                    key="submitting"
+                    initial={{ opacity: 0, scale: 0.5, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.5, y: -20 }}
+                    transition={{ type: 'spring', stiffness: 500, damping: 25 }}
+                    className="flex items-center"
+                  >
+                    <div className="w-3 h-3 border-2 border-white/20 border-t-white rounded-full animate-spin mr-1.5" />
+                    Submitting...
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="submit"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 50, transition: { duration: 0.2 } }}
+                    className="flex items-center"
+                  >
+                    <Send className="w-3.5 h-3.5 mr-1.5" />
+                    Submit
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </MotionButton>
           </div>
         </div>
       </div>

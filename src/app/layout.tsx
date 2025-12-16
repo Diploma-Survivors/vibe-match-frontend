@@ -6,9 +6,13 @@ import { ServerProvider } from '@/components/providers/server-provider';
 import { AppProvider } from '@/contexts/app-context';
 import type { Metadata } from 'next';
 import { SessionProvider } from 'next-auth/react';
-import { Inter } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+});
 
 export const metadata: Metadata = {
   title: 'Vibe Match - Decentralized Social Media',
@@ -23,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans`}>
         <ServerProvider>
           <ConditionalLayout>{children}</ConditionalLayout>
         </ServerProvider>

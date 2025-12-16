@@ -16,23 +16,29 @@ export default function ProblemLayout({
   const problemId = params.id as string;
 
   // Extract active tab from pathname
-  const activeTab = pathname.split('/').pop() || 'problem';
+  const lastSegment = pathname.split('/').pop() || '';
+  const validTabs = ['description', 'submissions', 'solutions', 'standing'];
+  const activeTab = validTabs.includes(lastSegment)
+    ? lastSegment
+    : 'description';
 
   const handleTabChange = (tab: string) => {
     router.push(`/problems/${problemId}/${tab}`);
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900">
+    <div className="h-screen flex flex-col overflow-hidden bg-white dark:bg-slate-900">
       {/* Problem Navigation */}
-      <ProblemNavbar
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-        hideNavigation={shouldHideNavigation}
-      />
+      <div className="flex-none">
+        <ProblemNavbar
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+          hideNavigation={shouldHideNavigation}
+        />
+      </div>
 
       {/* Main Content - Full Width for all tabs */}
-      <div className="container mx-auto px-4 bg-white dark:bg-slate-900">
+      <div className="flex-1 min-h-0 w-full bg-slate-50 dark:bg-slate-900 p-1.5">
         {children}
       </div>
     </div>

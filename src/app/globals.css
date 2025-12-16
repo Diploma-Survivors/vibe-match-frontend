@@ -44,72 +44,137 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.75rem;
+
+  /* Deep Navy / Bootcamp "Light" (High Contrast) */
+  --background: oklch(0.98 0.01 145);
+  --foreground: oklch(0.2 0.02 145);
+
+  --card: oklch(0.98 0.01 145);
+  --card-foreground: oklch(0.2 0.02 145);
+
+  --popover: oklch(0.98 0.01 145);
+  --popover-foreground: oklch(0.2 0.02 145);
+
+  --primary: oklch(0.65 0.22 145); /* Vibrant Emerald/Neon Green */
+  --primary-foreground: oklch(0.98 0 0);
+
+  --secondary: oklch(0.95 0.01 145);
+  --secondary-foreground: oklch(0.3 0.02 145);
+
+  --muted: oklch(0.95 0.01 145);
+  --muted-foreground: oklch(0.5 0.02 145);
+
+  --accent: oklch(0.95 0.02 145);
+  --accent-foreground: oklch(0.3 0.05 145);
+
+  --destructive: oklch(0.6 0.2 20);
+  --destructive-foreground: oklch(0.98 0 0);
+
+  --border: oklch(0.9 0.01 145);
+  --input: oklch(0.9 0.01 145);
+  --ring: oklch(0.65 0.22 145);
+
+  --chart-1: oklch(0.65 0.22 145); /* Emerald */
+  --chart-2: oklch(0.6 0.18 170); /* Teal */
+  --chart-3: oklch(0.7 0.15 120); /* Lime */
+  --chart-4: oklch(0.6 0.18 190); /* Cyan */
+  --chart-5: oklch(0.7 0.15 80); /* Yellow-Green */
+
+  --sidebar: oklch(0.98 0.01 145);
+  --sidebar-foreground: oklch(0.2 0.02 145);
+  --sidebar-primary: oklch(0.65 0.22 145);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.95 0.01 145);
+  --sidebar-accent-foreground: oklch(0.3 0.02 145);
+  --sidebar-border: oklch(0.9 0.01 145);
+  --sidebar-ring: oklch(0.65 0.22 145);
+
+  /* Soft UI Shadows - Light */
+  --neu-shadow-light: 6px 6px 12px #d1d5db, -6px -6px 12px #ffffff;
+  --neu-shadow-inset-light: inset 4px 4px 8px #d1d5db, inset -4px -4px 8px
+    #ffffff;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Matrix/Terminal Dark */
+  --background: oklch(0.12 0.02 145); /* Deep Green-Black */
+  --foreground: oklch(0.95 0.01 145);
+
+  --card: oklch(0.14 0.02 145);
+  --card-foreground: oklch(0.95 0.01 145);
+
+  --popover: oklch(0.14 0.02 145);
+  --popover-foreground: oklch(0.95 0.01 145);
+
+  /* Neon Green Accents */
+  --primary: oklch(0.7 0.22 145); /* Neon Green */
+  --primary-foreground: oklch(0.12 0.02 145);
+
+  --secondary: oklch(0.2 0.03 145);
+  --secondary-foreground: oklch(0.9 0.01 145);
+
+  --muted: oklch(0.2 0.03 145);
+  --muted-foreground: oklch(0.65 0.02 145);
+
+  --accent: oklch(0.2 0.03 145);
+  --accent-foreground: oklch(0.9 0.01 145);
+
+  --destructive: oklch(0.4 0.15 20);
+  --destructive-foreground: oklch(0.9 0 0);
+
+  --border: oklch(0.25 0.03 145);
+  --input: oklch(0.25 0.03 145);
+  --ring: oklch(0.7 0.22 145);
+
+  --chart-1: oklch(0.7 0.22 145); /* Neon Green */
+  --chart-2: oklch(0.6 0.18 170); /* Teal */
+  --chart-3: oklch(0.7 0.15 120); /* Lime */
+  --chart-4: oklch(0.6 0.18 190); /* Cyan */
+  --chart-5: oklch(0.7 0.15 80); /* Yellow-Green */
+
+  --sidebar: oklch(0.12 0.02 145);
+  --sidebar-foreground: oklch(0.95 0.01 145);
+  --sidebar-primary: oklch(0.7 0.22 145);
+  --sidebar-primary-foreground: oklch(0.12 0.02 145);
+  --sidebar-accent: oklch(0.2 0.03 145);
+  --sidebar-accent-foreground: oklch(0.9 0.01 145);
+  --sidebar-border: oklch(0.25 0.03 145);
+  --sidebar-ring: oklch(0.7 0.22 145);
+
+  /* Soft UI Shadows - Dark */
+  --neu-shadow-dark: 8px 8px 16px #0a0f0d, -8px -8px 16px #1a2420;
+  --neu-shadow-inset-dark: inset 6px 6px 12px #0a0f0d, inset -6px -6px 12px
+    #1a2420;
+}
+
+/* Neumorphism Utilities */
+@utility neu-flat {
+  box-shadow: var(--neu-shadow-light);
+  border-radius: var(--radius);
+}
+.dark .neu-flat {
+  box-shadow: var(--neu-shadow-dark);
+}
+
+@utility neu-pressed {
+  box-shadow: var(--neu-shadow-inset-light);
+  border-radius: var(--radius);
+}
+.dark .neu-pressed {
+  box-shadow: var(--neu-shadow-inset-dark);
+}
+
+@utility neu-card {
+  @apply bg-card text-card-foreground neu-flat border-border/10;
+}
+
+@utility neu-btn {
+  @apply bg-primary text-primary-foreground px-6 py-2 rounded-xl transition-all active:scale-95 hover:brightness-110 shadow-lg shadow-primary/20;
+}
+
+@utility neu-btn-outline {
+  @apply bg-transparent border-2 border-primary/50 text-primary px-6 py-2 rounded-xl transition-all hover:bg-primary/10 hover:border-primary shadow-sm;
 }
 
 @layer base {

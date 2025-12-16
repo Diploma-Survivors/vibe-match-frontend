@@ -10,8 +10,8 @@ interface UseResizableOptions {
 }
 
 export function useResizable({
-  initialLeftWidth = 50,
-  initialEditorHeight = 50,
+  initialLeftWidth = 38.196601125,
+  initialEditorHeight = 61.803398875,
   minLeftWidth = 5,
   maxLeftWidth = 80,
   minEditorHeight = 30,

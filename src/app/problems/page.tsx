@@ -4,6 +4,7 @@ import ProblemFilter from '@/components/problems/problems-filter/problems-filter
 import ProblemStats from '@/components/problems/problems-stats/problem-stats';
 import ProblemTable from '@/components/problems/problems-table/problems-table';
 import useProblems from '@/hooks/use-problems';
+import { motion } from 'framer-motion';
 import React from 'react';
 
 export default function ProblemsPage() {
@@ -34,7 +35,12 @@ export default function ProblemsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pt-4">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700"
+      >
         <div className="container mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
             <div>
@@ -48,13 +54,18 @@ export default function ProblemsPage() {
             <ProblemStats problems={problems} />
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Main Content */}
       <div className="container mx-auto px-6 py-4">
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
           {/* Left Sidebar - Filters */}
-          <div className="xl:col-span-1">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="xl:col-span-1"
+          >
             <div className="xl:sticky xl:top-32">
               <ProblemFilter
                 keyWord={keyword}
@@ -66,10 +77,15 @@ export default function ProblemsPage() {
                 isLoading={isLoading}
               />
             </div>
-          </div>
+          </motion.div>
 
           {/* Right Content - Problem List */}
-          <div className="xl:col-span-3">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="xl:col-span-3"
+          >
             <div className="space-y-6">
               {/* Controls moved into table header */}
 
@@ -107,7 +123,7 @@ export default function ProblemsPage() {
                 />
               )}
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>

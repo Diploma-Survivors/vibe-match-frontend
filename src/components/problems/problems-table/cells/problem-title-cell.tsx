@@ -33,14 +33,16 @@ export default function ProblemTitleCell({
       <Link href={`/problems/${id}/description`}>
         <button
           type="button"
-          className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-bold text-base text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full"
+          className="text-left group-hover:text-green-600 dark:group-hover:text-green-400 font-bold text-base text-slate-900 dark:text-slate-100 transition-colors duration-200 hover:underline block w-full hover:cursor-pointer"
         >
           {title}
         </button>
       </Link>
       <div className="flex items-center gap-3 flex-wrap">
         <div
-          className={`${getDifficultyColor(difficulty)} font-medium px-3 py-1 rounded-lg border text-xs inline-block`}
+          className={`${getDifficultyColor(
+            difficulty
+          )} font-medium px-3 py-1 rounded-lg border text-xs inline-block`}
         >
           {difficulty}
         </div>

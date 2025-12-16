@@ -1,6 +1,7 @@
 // import removed: getStatusMeta is handled inside child components now
 import type { SSEResult } from '@/services/sse-service';
 import type { UITestcaseSample } from '@/types/testcases';
+import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Code } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { CaseTabs } from './case-tabs';
@@ -57,21 +58,28 @@ export function SampleTestCasesPanel({
 
   return (
     <div
-      className="flex flex-col overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+      className="flex flex-col overflow-y-auto rounded-lg border border-slate-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800"
       style={{ height: `${height}%` }}
     >
       {/* Header Tabs */}
-      <div className="px-6 pt-4">
-        <div className="inline-flex items-center gap-2 rounded-xl p-1 bg-slate-100/70 dark:bg-slate-700/40">
+      <div className="px-5 pt-4">
+        <div className="inline-flex items-center gap-2 rounded-xl p-1 bg-slate-100/70 dark:bg-slate-700/40 relative">
           {/* Tescase tab */}
           <button
             onClick={() => setActiveTab('testcase')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${
+            className={`relative z-10 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
               activeTab === 'testcase'
-                ? 'bg-white dark:bg-slate-800 shadow text-slate-900 dark:text-white'
+                ? 'text-slate-900 dark:text-white'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
+            {activeTab === 'testcase' && (
+              <motion.div
+                layoutId="activeTabBackground"
+                className="absolute inset-0 bg-white dark:bg-slate-800 shadow rounded-lg -z-10"
+                transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+              />
+            )}
             <CheckCircle className="w-4 h-4" />
             Testcase
           </button>
@@ -79,19 +87,26 @@ export function SampleTestCasesPanel({
           {/* Result tab */}
           <button
             onClick={() => setActiveTab('result')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${
+            className={`relative z-10 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-colors ${
               activeTab === 'result'
-                ? 'bg-white dark:bg-slate-800 shadow text-slate-900 dark:text-white'
+                ? 'text-slate-900 dark:text-white'
                 : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
+            {activeTab === 'result' && (
+              <motion.div
+                layoutId="activeTabBackground"
+                className="absolute inset-0 bg-white dark:bg-slate-800 shadow rounded-lg -z-10"
+                transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+              />
+            )}
             <Code className="w-4 h-4" />
             Test Result
           </button>
         </div>
       </div>
 
-      <div className="p-6 pt-4 flex-1">
+      <div className="p-5 pt-4 flex-1">
         {/* Show CaseTabs in all cases except when on the 'result' tab with no results yet */}
         {!(activeTab === 'result' && !hasResults) && (
           <CaseTabs
@@ -106,26 +121,35 @@ export function SampleTestCasesPanel({
           />
         )}
 
-        {/* Content */}
-        {testCases[activeTestCase] && (
-          <div className="space-y-6">
-            {activeTab === 'result' ? (
-              <ResultTab
-                testCases={testCases}
-                activeTestCase={activeTestCase}
-                testResults={testResults}
-                isRunning={isRunning}
-                runError={runError}
-              />
-            ) : (
-              <TestcaseTab
-                testCases={testCases}
-                activeTestCase={activeTestCase}
-                onTestCaseChange={onTestCaseChange}
-              />
-            )}
-          </div>
-        )}
+        {/* Content using AnimatePresence for smooth transitions */}
+        <AnimatePresence mode="wait" initial={false}>
+          {testCases[activeTestCase] && (
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+              className="space-y-6"
+            >
+              {activeTab === 'result' ? (
+                <ResultTab
+                  testCases={testCases}
+                  activeTestCase={activeTestCase}
+                  testResults={testResults}
+                  isRunning={isRunning}
+                  runError={runError}
+                />
+              ) : (
+                <TestcaseTab
+                  testCases={testCases}
+                  activeTestCase={activeTestCase}
+                  onTestCaseChange={onTestCaseChange}
+                />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

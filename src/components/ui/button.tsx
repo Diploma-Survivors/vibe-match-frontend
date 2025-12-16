@@ -1,5 +1,6 @@
 import { Slot } from '@radix-ui/react-slot';
 import { type VariantProps, cva } from 'class-variance-authority';
+import { motion } from 'framer-motion';
 import type * as React from 'react';
 
 import { cn } from '@/lib/utils';
@@ -41,16 +42,27 @@ function Button({
   size,
   asChild = false,
   ...props
-}: React.ComponentProps<'button'> &
+}: React.ComponentProps<typeof motion.button> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
   }) {
-  const Comp = asChild ? Slot : 'button';
+  if (asChild) {
+    return (
+      <Slot
+        data-slot="button"
+        className={cn(buttonVariants({ variant, size, className }))}
+        {...(props as any)}
+      />
+    );
+  }
 
   return (
-    <Comp
+    <motion.button
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
+      whileTap={{ scale: 0.95 }}
+      whileHover={{ scale: 1.02 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
       {...props}
     />
   );
