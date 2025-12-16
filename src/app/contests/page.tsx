@@ -30,7 +30,7 @@ export default function ContestsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       <div className="container mx-auto px-6 py-8">
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -44,7 +44,7 @@ export default function ContestsPage() {
             Tham gia các cuộc thi lập trình để thử thách bản thân và nâng cao kỹ
             năng
           </p>
-        </motion.div>
+        </motion.div> */}
 
         <div className="flex flex-col xl:flex-row gap-8">
           {/* Left Panel - Contest List (70%) */}

@@ -77,11 +77,8 @@ export default function ProblemFilter({
   return (
     <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-slate-200 dark:border-slate-700">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600">
-            <Search className="w-5 h-5 text-white" />
-          </div>
           <h3 className="text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
             Bộ lọc tìm kiếm
           </h3>
@@ -94,6 +91,16 @@ export default function ProblemFilter({
         >
           <RotateCcw className="w-4 h-4 mr-2" />
           Đặt lại
+        </Button>
+      </div>
+      {/* Buttons */}
+      <div className="border-t border-slate-200 dark:border-slate-700 mb-2">
+        <Button
+          onClick={onSearch}
+          className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg font-semibold text-white transition-all duration-300"
+        >
+          <Search className="w-5 h-5 mr-2" />
+          Tìm kiếm
         </Button>
       </div>
 
@@ -145,17 +152,6 @@ export default function ProblemFilter({
           onClearAll={() => onFiltersChange({ ...filters, tagIds: [] })}
           displayLimit={3}
         />
-      </div>
-
-      {/* Buttons */}
-      <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
-        <Button
-          onClick={onSearch}
-          className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg font-semibold text-white transition-all duration-300"
-        >
-          <Search className="w-5 h-5 mr-2" />
-          Tìm kiếm
-        </Button>
       </div>
     </div>
   );
