@@ -79,7 +79,6 @@ export default function ProfilePage() {
   const [selectedYear, setSelectedYear] = useState<string>(
     new Date().getFullYear().toString()
   );
-  W;
 
   useEffect(() => {
     const fetchData = async () => {
