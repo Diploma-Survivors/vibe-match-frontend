@@ -47,22 +47,6 @@ export default function ContestsPage() {
         </motion.div> */}
 
         <div className="flex flex-col xl:flex-row gap-8">
-          {/* Left Panel - Contest List (70%) */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex-1 xl:w-[70%]"
-          >
-            <ContestList
-              contests={contests}
-              isLoading={isLoading}
-              error={error}
-              pageInfo={pageInfo}
-              onLoadMore={handleLoadMore}
-            />
-          </motion.div>
-
           {/* Right Panel - Filter (30%) */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -77,6 +61,22 @@ export default function ContestsPage() {
               onFiltersChange={handleFiltersChange}
               onSearch={handleSearch}
               onReset={handleReset}
+            />
+          </motion.div>
+
+          {/* Left Panel - Contest List (70%) */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="flex-1 xl:w-[70%]"
+          >
+            <ContestList
+              contests={contests}
+              isLoading={isLoading}
+              error={error}
+              pageInfo={pageInfo}
+              onLoadMore={handleLoadMore}
             />
           </motion.div>
         </div>

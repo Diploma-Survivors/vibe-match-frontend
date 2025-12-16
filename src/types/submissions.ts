@@ -66,6 +66,7 @@ export interface SubmissionListItem {
     lastName: string;
     email: string;
   };
+  problemId?: string;
 }
 
 export interface PageInfo {
