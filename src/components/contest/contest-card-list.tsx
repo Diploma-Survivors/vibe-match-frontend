@@ -3,12 +3,18 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { CONTEST_STATUS_COLORS, CONTEST_STATUS_LABELS } from '@/types/contests';
+import {
+  CONTEST_STATUS_COLORS,
+  CONTEST_STATUS_LABELS,
+  type ContestListItem,
+  ContestOverView,
+} from '@/types/contests';
 import { motion } from 'framer-motion';
 import {
   Calendar,
   CheckCircle,
   Clock,
+  History,
   Timer,
   Trophy,
   UserCheck,
@@ -16,7 +22,7 @@ import {
 import Link from 'next/link';
 
 interface ContestCardProps {
-  contest: any;
+  contest: ContestListItem;
   index: number;
 }
 
@@ -58,12 +64,8 @@ const getStatusIcon = (status: string) => {
       return <Clock className="w-4 h-4" />;
     case 'ongoing':
       return <Timer className="w-4 h-4" />;
-    case 'finished':
-      return <Trophy className="w-4 h-4" />;
-    case 'public':
-      return <Trophy className="w-4 h-4" />;
-    case 'private':
-      return <Trophy className="w-4 h-4" />;
+    case 'ended':
+      return <History className="w-4 h-4" />;
     default:
       return <Trophy className="w-4 h-4" />;
   }
@@ -120,7 +122,7 @@ export default function ContestCard({ contest, index }: ContestCardProps) {
                   {getStatusLabel(contest.status)}
                 </Badge>
 
-                {/* User Completion Status */}
+                {/* User Completion Status
                 <Badge
                   className={
                     'flex items-center gap-1 text-sm bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200 pointer-events-none'
@@ -130,7 +132,7 @@ export default function ContestCard({ contest, index }: ContestCardProps) {
                     <CheckCircle className="w-4 h-4" />
                     Đã hoàn thành
                   </>
-                </Badge>
+                </Badge> */}
               </div>
 
               {/* Contest Details - Inline */}
@@ -179,7 +181,7 @@ export default function ContestCard({ contest, index }: ContestCardProps) {
             </div>
 
             {/* Right Section - Participation Status */}
-            <div className="flex-shrink-0">
+            {/* <div className="flex-shrink-0">
               {contest.userParticipated ? (
                 <Button
                   variant="outline"
@@ -199,7 +201,7 @@ export default function ContestCard({ contest, index }: ContestCardProps) {
                   Tham gia
                 </Button>
               )}
-            </div>
+            </div> */}
           </div>
         </CardContent>
       </Card>

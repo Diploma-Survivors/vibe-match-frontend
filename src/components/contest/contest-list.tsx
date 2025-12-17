@@ -1,11 +1,12 @@
 'use client';
 
+import { type ContestListItem, ContestOverView } from '@/types/contests';
 import { Trophy } from 'lucide-react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import ContestCard from './contest-card-list';
 
 interface ContestListProps {
-  contests: any[];
+  contests: ContestListItem[];
   isLoading: boolean;
   error: string | null;
   pageInfo: any;

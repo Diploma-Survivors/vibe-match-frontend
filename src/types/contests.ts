@@ -117,6 +117,7 @@ export interface ContestFilters {
   endTime?: string;
   minDurationMinutes?: number;
   maxDurationMinutes?: number;
+  status?: string[];
 }
 
 // Request types
@@ -242,7 +243,7 @@ export const CONTEST_STATUS_COLORS = {
 export const CONTEST_STATUS_LABELS = {
   upcoming: 'Sắp diễn ra',
   ongoing: 'Đang diễn ra',
-  finished: 'Đã kết thúc',
+  ended: 'Đã kết thúc',
   public: 'Công khai',
   private: 'Riêng tư',
 } as const;

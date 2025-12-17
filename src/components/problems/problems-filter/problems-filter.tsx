@@ -97,7 +97,7 @@ export default function ProblemFilter({
       <div className="border-t border-slate-200 dark:border-slate-700 mb-2">
         <Button
           onClick={onSearch}
-          className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg font-semibold text-white transition-all duration-300"
+          className="w-full h-12 bg-green-600 hover:bg-green-700 rounded-lg font-semibold text-white transition-all duration-300"
         >
           <Search className="w-5 h-5 mr-2" />
           Tìm kiếm
