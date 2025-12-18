@@ -108,6 +108,7 @@ export interface SubmissionDetailData {
     lastName: string;
     email: string;
   };
+  problemId: string;
 }
 
 // Map language names to Highlight.js language keys

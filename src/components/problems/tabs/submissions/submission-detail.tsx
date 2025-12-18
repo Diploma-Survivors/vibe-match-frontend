@@ -2,13 +2,18 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Tooltip } from '@/components/ui/tooltip';
 import { getStatusMeta } from '@/lib/utils/testcase-status';
 import { toastService } from '@/services/toasts-service';
 import { toggleVisibility } from '@/store/slides/ai-review-slice';
+import { selectProblem } from '@/store/slides/problem-slice';
 import type { SubmissionDetailData } from '@/types/submissions';
-import { languageMap } from '@/types/submissions';
-import { Copy, Loader2, Sparkles } from 'lucide-react';
+import { SubmissionStatus, languageMap } from '@/types/submissions';
+import { Copy, Loader2, PenSquare, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/default-highlight';
 import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/hljs';
@@ -31,6 +36,9 @@ export default function SubmissionDetail({
   submission,
 }: SubmissionDetailProps) {
   const dispatch = useDispatch();
+  const params = useParams();
+  const problemId = params.id as string;
+
   const [isCodeExpanded, setIsCodeExpanded] = useState(true);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -47,6 +55,9 @@ export default function SubmissionDetail({
     el.addEventListener('scroll', onScroll);
     return () => el.removeEventListener('scroll', onScroll);
   }, []);
+
+  const currentProblem = useSelector(selectProblem);
+  console.log(currentProblem);
 
   // Calculate code height based on number of lines
   const getCodeHeight = () => {
@@ -98,9 +109,27 @@ export default function SubmissionDetail({
           <div className="p-8 pt-3 space-y-7">
             {/* Header */}
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
-                Submission #{submission.id}
-              </h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
+                  Submission #{submission.id}
+                </h2>
+                {submission.status.toLowerCase() ===
+                  SubmissionStatus.ACCEPTED.toLowerCase() && (
+                  <Link
+                    href={`/problems/${problemId}/solutions/create/${submission.id}`}
+                    target="_blank"
+                  >
+                    <Tooltip content="Chia sẻ solution">
+                      <Button
+                        className="bg-green-600 hover:bg-green-700 text-white gap-2"
+                        size="sm"
+                      >
+                        <PenSquare className="w-4 h-4" />
+                      </Button>
+                    </Tooltip>
+                  </Link>
+                )}
+              </div>
               <Button
                 variant="outline"
                 size="sm"

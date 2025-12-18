@@ -12,10 +12,10 @@ export default function SubmissionsSkeleton({
 }: SubmissionsSkeletonProps) {
   return (
     <SkeletonTheme baseColor="#f3f4f6" highlightColor="#e5e7eb">
-      <div className="h-screen">
+      <div className="h-full">
         <div
           className="flex h-full relative bg-slate-50 dark:bg-slate-900"
-          style={{ height: 'calc(100vh - 60px)' }}
+          style={{ height: 'calc(100vh - 65px)' }}
         >
           {/* Left Panel - Submissions Skeleton */}
           <div style={{ width: showRightPanel ? 'calc(50% - 6px)' : '100%' }}>
@@ -56,6 +56,7 @@ export default function SubmissionsSkeleton({
                   {/* Table Rows Skeleton */}
                   {Array.from({ length: 8 }).map((_, index) => (
                     <div
+                      // biome-ignore lint/suspicious/noArrayIndexKey: Skeleton items are static
                       key={index}
                       className="bg-white border-b border-gray-200"
                     >
@@ -153,6 +154,7 @@ export default function SubmissionsSkeleton({
                               ];
                               return (
                                 <Skeleton
+                                  // biome-ignore lint/suspicious/noArrayIndexKey: Skeleton items are static
                                   key={index}
                                   height={16}
                                   width={`${widths[index % widths.length]}%`}

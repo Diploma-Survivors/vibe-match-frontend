@@ -1,4 +1,6 @@
 import clientApi from '@/lib/apis/axios-client';
+import { store } from '@/store';
+import { setLanguages } from '@/store/slides/workspace-slice';
 import {
   type GetSubmissionListRequest,
   type SubmissionListItem,
@@ -21,7 +23,16 @@ async function submit(submissionRequest: SubmissionRequest) {
 }
 
 async function getLanguageList() {
-  return await clientApi.get('/languages');
+  const state = store.getState();
+  const cachedLanguages = state.workspace.languages;
+
+  if (cachedLanguages && cachedLanguages.length > 0) {
+    return { data: { data: cachedLanguages } };
+  }
+
+  const response = await clientApi.get('/languages');
+  store.dispatch(setLanguages(response.data.data));
+  return response;
 }
 
 async function getSubmissionList(

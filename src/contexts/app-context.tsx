@@ -46,7 +46,6 @@ export function AppProvider({
   const dispatch = useDispatch();
 
   const isInDedicatedPages = DEDICATED_PAGES_REGEX.test(pathname);
-  console.log('isInDeficatedPages', isInDedicatedPages);
   const shouldHideNavigation = isInDedicatedPages;
 
   const clearUserData = async () => {

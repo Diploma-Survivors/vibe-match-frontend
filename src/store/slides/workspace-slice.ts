@@ -1,3 +1,4 @@
+import type { Language } from '@/types/submissions';
 import type { SampleTestcase } from '@/types/testcases';
 import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
 import type { RootState } from '..'; // Adjust path as needed
@@ -16,12 +17,16 @@ export interface Workspace {
 
   // Key: problemId -> Value: Array of test cases
   currentSampleTestCases: Record<string, SampleTestcase[]>;
+
+  // Cached languages
+  languages: Language[];
 }
 
 const INITIAL_WORKSPACE: Workspace = {
   currentLanguage: {},
   currentCode: {},
   currentSampleTestCases: {},
+  languages: [],
 };
 
 type WorkspaceState = Workspace;
@@ -89,6 +94,10 @@ const WorkspaceSlice = createSlice({
     },
 
     setWorkspace: (state, action: PayloadAction<Workspace>) => action.payload,
+
+    setLanguages: (state, action: PayloadAction<Language[]>) => {
+      state.languages = action.payload;
+    },
   },
 });
 
@@ -98,6 +107,7 @@ export const {
   updateCurrentCode,
   updateCurrentSampleTestCases,
   updateSingleTestCase,
+  setLanguages,
 } = WorkspaceSlice.actions;
 
 export const selectWorkspace = (state: RootState) => state.workspace;

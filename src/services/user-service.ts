@@ -1,11 +1,11 @@
 import type { UserProfile } from '@/types/user';
 
-async function getUserProfile(): Promise<UserProfile> {
+async function getUserProfile(userId: number): Promise<UserProfile> {
   // Mock data
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
-        id: 1,
+        id: userId,
         username: '@nguyenvana',
         firstName: 'Nguyen Van',
         lastName: 'A',
@@ -19,6 +19,30 @@ async function getUserProfile(): Promise<UserProfile> {
   });
 }
 
+async function getMe(): Promise<any> {
+  // Mock data for current user
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        data: {
+          data: {
+            id: 101,
+            username: '@currentuser',
+            firstName: 'Current',
+            lastName: 'User',
+            email: 'current@example.com',
+            address: '456 Tran Hung Dao',
+            phone: '0909999999',
+            rank: 100,
+            avatarUrl: 'https://github.com/shadcn.png',
+          },
+        },
+      } as any);
+    }, 300);
+  });
+}
+
 export const UserService = {
   getUserProfile,
+  getMe,
 };

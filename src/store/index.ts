@@ -19,6 +19,7 @@ import storage from 'redux-persist/lib/storage';
 // Import your slices
 import aiReviewReducer from './slides/ai-review-slice';
 import contestReducer from './slides/contest-slice';
+import createSolutionReducer from './slides/create-solution-slice';
 import problemReducer from './slides/problem-slice';
 import workspaceReducer from './slides/workspace-slice';
 
@@ -26,7 +27,7 @@ import workspaceReducer from './slides/workspace-slice';
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['workspace', 'aiReview'],
+  whitelist: ['workspace', 'aiReview', 'createSolution'],
 };
 
 // 2. Combine your reducers into one "App Reducer"
@@ -35,6 +36,7 @@ const appReducer = combineReducers({
   problem: problemReducer,
   aiReview: aiReviewReducer,
   workspace: workspaceReducer,
+  createSolution: createSolutionReducer,
 });
 
 // 3. Define the State Type based on the reducers (Before store creation)

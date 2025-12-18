@@ -56,7 +56,7 @@ export default function ProblemDescriptionPage({
         <div className="h-full">
           <div
             className="flex h-full gap-0 relative bg-slate-50 dark:bg-slate-900"
-            style={{ height: 'calc(100vh - 60px)' }}
+            style={{ height: 'calc(100vh - 65px)' }}
           >
             {/* Left Panel Skeleton - Problem Description */}
             <div

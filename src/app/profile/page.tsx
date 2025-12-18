@@ -85,7 +85,7 @@ export default function ProfilePage() {
       try {
         const [userData, solvedData, allData, submissionsData] =
           await Promise.all([
-            UserService.getUserProfile(),
+            UserService.getUserProfile(1),
             ProblemsService.getSolvedProblems(),
             ProblemsService.getAllProblems(),
             SubmissionsService.getAllSubmissions(),
