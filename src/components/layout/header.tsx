@@ -42,6 +42,7 @@ export default function Header() {
     { name: 'Home', href: '/', onClick: undefined },
     { name: 'Problems', href: '/problems', onClick: undefined },
     { name: 'Contests', href: '/contests', onClick: undefined },
+    { name: 'Ranking', href: '/ranking', onClick: undefined },
   ];
 
   const handleLogout = async () => {

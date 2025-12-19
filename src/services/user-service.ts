@@ -61,7 +61,35 @@ async function getMe(): Promise<any> {
   });
 }
 
+async function getAllUsers(): Promise<UserProfile[]> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const users: UserProfile[] = Array.from({ length: 50 }).map((_, i) => ({
+        id: i + 1,
+        username: `@user${i + 1}`,
+        firstName: 'User',
+        lastName: `${i + 1}`,
+        email: `user${i + 1}@example.com`,
+        address: '123 Street, City',
+        phone: '0123456789',
+        rank: Math.floor(Math.random() * 100) + 1,
+        avatarUrl: `https://i.pravatar.cc/150?u=${i + 1}`,
+      }));
+      resolve(users);
+    }, 500);
+  });
+}
+
+async function getAllContestParticipants(
+  contestId: string
+): Promise<UserProfile[]> {
+  // Mock data - same as getAllUsers for now, but conceptually filtered by contest
+  return getAllUsers();
+}
+
 export const UserService = {
   getUserProfile,
   getMe,
+  getAllUsers,
+  getAllContestParticipants,
 };

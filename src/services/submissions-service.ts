@@ -67,55 +67,73 @@ async function getAllSubmissions(
   // Mock data
   return new Promise((resolve) => {
     setTimeout(() => {
-      const submissions: SubmissionListItem[] = Array.from({ length: 500 }).map(
-        (_, i) => {
-          const statuses = [
-            SubmissionStatus.ACCEPTED,
-            SubmissionStatus.WRONG_ANSWER,
-            SubmissionStatus.RUNTIME_ERROR,
-            SubmissionStatus.TIME_LIMIT_EXCEEDED,
-            SubmissionStatus.COMPILATION_ERROR,
-          ];
-          // Weighted random status (more accepted and wrong answer)
-          const statusWeights = [0.4, 0.3, 0.1, 0.1, 0.1];
-          let status = SubmissionStatus.ACCEPTED;
-          const random = Math.random();
-          let sum = 0;
-          for (let j = 0; j < statuses.length; j++) {
-            sum += statusWeights[j];
-            if (random < sum) {
-              status = statuses[j];
-              break;
-            }
+      // Seed random with userId to get consistent results for the same user
+      // Simple pseudo-random generator
+      const seed = userId;
+      const random = () => {
+        const x = Math.sin(seed + Math.random()) * 10000;
+        return x - Math.floor(x);
+      };
+
+      const submissionCount = Math.floor(Math.random() * 50) + 10; // 10 to 60 submissions
+
+      const submissions: SubmissionListItem[] = Array.from({
+        length: submissionCount,
+      }).map((_, i) => {
+        const statuses = [
+          SubmissionStatus.ACCEPTED,
+          SubmissionStatus.WRONG_ANSWER,
+          SubmissionStatus.RUNTIME_ERROR,
+          SubmissionStatus.TIME_LIMIT_EXCEEDED,
+          SubmissionStatus.COMPILATION_ERROR,
+        ];
+        // Weighted random status (more accepted and wrong answer)
+        const statusWeights = [0.4, 0.3, 0.1, 0.1, 0.1];
+        let status = SubmissionStatus.ACCEPTED;
+        const r = Math.random();
+        let sum = 0;
+        for (let j = 0; j < statuses.length; j++) {
+          sum += statusWeights[j];
+          if (r < sum) {
+            status = statuses[j];
+            break;
           }
-
-          const daysAgo = Math.floor(Math.random() * 365);
-          const createdAt = new Date(
-            Date.now() - daysAgo * 24 * 60 * 60 * 1000
-          ).toISOString();
-
-          return {
-            id: i + 1,
-            language: { id: 1, name: 'Python' },
-            memory: Math.floor(Math.random() * 10000),
-            note: null,
-            runtime: Math.floor(Math.random() * 1000),
-            score: status === SubmissionStatus.ACCEPTED ? 100 : 0,
-            status,
-            createdAt,
-            user: {
-              id: 1,
-              firstName: 'Nguyen Van',
-              lastName: 'A',
-              email: 'nguyenvana@example.com',
-            },
-            problemId: Math.floor(Math.random() * 100 + 1).toString(),
-          };
         }
-      );
+
+        const daysAgo = Math.floor(Math.random() * 365);
+        const createdAt = new Date(
+          Date.now() - daysAgo * 24 * 60 * 60 * 1000
+        ).toISOString();
+
+        return {
+          id: i + 1,
+          language: { id: 1, name: 'Python' },
+          memory: Math.floor(Math.random() * 10000),
+          note: null,
+          runtime: Math.floor(Math.random() * 1000),
+          score: status === SubmissionStatus.ACCEPTED ? 100 : 0,
+          status,
+          createdAt,
+          user: {
+            id: userId,
+            firstName: 'User',
+            lastName: `${userId}`,
+            email: `user${userId}@example.com`,
+          },
+          problemId: Math.floor(Math.random() * 100 + 1).toString(),
+        };
+      });
       resolve(submissions);
     }, 500);
   });
+}
+
+async function getAllContestSubmissions(
+  contestId: string,
+  userId: number
+): Promise<SubmissionListItem[]> {
+  // Mock data - similar to getAllSubmissions but conceptually for a specific contest
+  return getAllSubmissions(userId);
 }
 
 export const SubmissionsService = {
@@ -125,4 +143,5 @@ export const SubmissionsService = {
   getSubmissionList,
   getSubmissionById,
   getAllSubmissions,
+  getAllContestSubmissions,
 };

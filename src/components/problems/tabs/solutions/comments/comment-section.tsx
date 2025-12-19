@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Textarea } from '@/components/ui/textarea';
+import { useApp } from '@/contexts/app-context';
 import { SolutionsService } from '@/services/solutions-service';
 import { UserService } from '@/services/user-service';
 import { type SolutionComment, SolutionCommentSortBy } from '@/types/solutions';
@@ -28,6 +29,7 @@ interface CommentSectionProps {
 }
 
 export default function CommentSection({ solutionId }: CommentSectionProps) {
+  const { user } = useApp();
   const [comments, setComments] = useState<SolutionComment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState<SolutionCommentSortBy>(
@@ -42,8 +44,9 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
 
   useEffect(() => {
     // Fetch current user for the avatar in the input
-    UserService.getMe().then((res) => setCurrentUser(res.data.data));
-  }, []);
+    if (!user) return;
+    UserService.getUserProfile(user.id).then((res) => setCurrentUser(res));
+  }, [user]);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -214,9 +217,7 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
         {isLoading
           ? // Skeleton
             Array.from({ length: 3 }).map((_, i) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: Skeleton items are static
               <div key={i} className="flex gap-4">
-                <Skeleton className="w-10 h-10 rounded-full" />
                 <div className="flex-1 space-y-2">
                   <Skeleton className="h-4 w-32" />
                   <Skeleton className="h-4 w-full" />
