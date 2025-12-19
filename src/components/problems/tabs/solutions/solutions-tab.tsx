@@ -1,6 +1,7 @@
 'use client';
 
 import { ResizableDivider } from '@/components/problems/tabs/description/dividers/resizable-divider';
+import { useApp } from '@/contexts/app-context';
 import { useResizable } from '@/hooks/use-resizable';
 import useSolutions from '@/hooks/use-solutions';
 import { SolutionsService } from '@/services/solutions-service';
@@ -37,6 +38,7 @@ export default function SolutionsTab({ problemId }: SolutionsTabProps) {
   const router = useRouter();
   const pathname = usePathname();
   const solutionIdParam = searchParams.get('solutionId');
+  const { user } = useApp();
 
   const [selectedSolutionId, setSelectedSolutionId] = useState<string | null>(
     solutionIdParam
@@ -53,8 +55,9 @@ export default function SolutionsTab({ problemId }: SolutionsTabProps) {
 
   useEffect(() => {
     const checkACStatus = async () => {
+      if (!user?.id) return;
       try {
-        const submissions = await SubmissionsService.getAllSubmissions();
+        const submissions = await SubmissionsService.getAllSubmissions(user.id);
         const acSubmissions = submissions
           .filter(
             (s) =>
@@ -77,7 +80,7 @@ export default function SolutionsTab({ problemId }: SolutionsTabProps) {
       }
     };
     checkACStatus();
-  }, [problemId]);
+  }, [problemId, user]);
 
   const [fetchedSolution, setFetchedSolution] = useState<Solution | null>(null);
 
