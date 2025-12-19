@@ -12,13 +12,16 @@
         "useValidAnchor": "off",
         "useSemanticElements": "off",
         "useKeyWithClickEvents": "off",
-        "useButtonType": "off"
+        "useButtonType": "off",
+        "noSvgWithoutTitle": "off",
+        "useAltText": "off"
       },
       "complexity": {
-        "noStaticOnlyClass": "warn"
+        "noStaticOnlyClass": "warn",
+        "noForEach": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "warn",
+        "noArrayIndexKey": "off",
         "noExplicitAny": "off"
       }
     }

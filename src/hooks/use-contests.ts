@@ -4,6 +4,7 @@ import {
   type ContestListItem,
   type ContestListRequest,
   type ContestListResponse,
+  ContestStatusLabels,
   MatchMode,
   type PageInfo,
   SortBy,
@@ -72,10 +73,49 @@ export default function useContests(): UseContestsReturn {
         const response: ContestListResponse = axiosResponse?.data?.data;
 
         // Extract contests from edges
-        const contestsData: ContestListItem[] =
+        let contestsData: ContestListItem[] =
           response?.edges?.map((edge) => ({
             ...edge.node,
           })) || [];
+
+        // Fetch overview for each contest to get full details for status calculation
+        // We need to do this because the list item doesn't have enough info (like participation)
+        // if (contestsData.length > 0) {
+        //   const contestsWithStatus = await Promise.all(
+        //     contestsData.map(async (contest) => {
+        //       try {
+        //         const overviewResponse =
+        //           await ContestsService.getContestOverview(contest.id);
+        //         const overview = overviewResponse.data.data;
+
+        //         const fullContest = { ...overview };
+        //         const status = ContestsService.getContestStatus(fullContest);
+        //         const statusLabel = ContestStatusLabels[status];
+        //         return {
+        //           ...contest,
+        //           status: statusLabel,
+        //         };
+        //       } catch (e) {
+        //         console.error(
+        //           `Error fetching overview for contest ${contest.id}`,
+        //           e
+        //         );
+        //         return contest;
+        //       }
+        //     })
+        //   );
+
+        //  contestsData = contestsWithStatus;
+
+        // Filter by status on frontend if status filters are present
+        if (
+          requestParams.filters?.status &&
+          requestParams.filters.status.length > 0
+        ) {
+          contestsData = contestsData.filter((contest) =>
+            requestParams.filters?.status?.includes(contest.status)
+          );
+        }
 
         setState((prev) => ({
           ...prev,
@@ -170,6 +210,7 @@ export default function useContests(): UseContestsReturn {
       endTime: undefined,
       minDurationMinutes: undefined,
       maxDurationMinutes: undefined,
+      status: [],
     });
 
     updateRequest(

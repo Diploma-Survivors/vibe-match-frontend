@@ -20,7 +20,7 @@ export default function DifficultyFilter({
           <button
             type="button"
             onClick={() => onDifficultyChange(undefined)}
-            className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
+            className="cursor-pointer text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
           >
             Xóa
           </button>
@@ -51,7 +51,7 @@ export default function DifficultyFilter({
                   isSelected ? undefined : (option.value as ProblemDifficulty)
                 )
               }
-              className={`
+              className={`cursor-pointer
                 px-3 py-2 rounded-lg border text-xs font-medium
                 transition-all duration-200 hover:scale-105
                 ${colorMap[option.value]}

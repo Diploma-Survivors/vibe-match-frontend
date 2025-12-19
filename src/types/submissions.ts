@@ -66,6 +66,7 @@ export interface SubmissionListItem {
     lastName: string;
     email: string;
   };
+  problemId?: string;
 }
 
 export interface PageInfo {
@@ -107,6 +108,7 @@ export interface SubmissionDetailData {
     lastName: string;
     email: string;
   };
+  problemId: string;
 }
 
 // Map language names to Highlight.js language keys

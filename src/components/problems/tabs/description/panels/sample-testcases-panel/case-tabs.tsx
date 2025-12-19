@@ -1,5 +1,6 @@
 import { getStatusMeta } from '@/lib/utils/testcase-status';
 import type { SSEResult } from '@/services/sse-service';
+import type { SampleTestcase } from '@/types/testcases';
 import { Plus, X } from 'lucide-react';
 
 type ActiveTab = 'testcase' | 'result';
@@ -7,7 +8,7 @@ type ActiveTab = 'testcase' | 'result';
 interface CaseTabsProps {
   activeTab: ActiveTab;
   hasResults: boolean;
-  testCases: Array<{ id: string }>;
+  testCases: SampleTestcase[];
   activeTestCase: number;
   testResults?: SSEResult | null;
   onActiveTestCaseChange: (index: number) => void;
@@ -58,7 +59,7 @@ export function CaseTabs({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onTestCaseDelete(testCase.id);
+                  onTestCaseDelete(testCase.id ?? '');
                 }}
                 className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-full p-0.5 shadow"
                 aria-label="Delete testcase"

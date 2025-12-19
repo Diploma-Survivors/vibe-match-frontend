@@ -137,12 +137,12 @@ export default function SubmissionsPage({
   const rightContainerWidth = `calc(${100 - listWidth}% - 6px)`;
 
   return (
-    <div className="h-screen">
+    <div className="h-full">
       {/* OUTER CONTAINER */}
       <div
         ref={outerContainerRef}
         className="flex h-full relative bg-slate-50 dark:bg-slate-900"
-        style={{ height: 'calc(100vh - 60px)' }}
+        style={{ height: 'calc(100vh - 65px)' }}
       >
         {/* PANEL 1: Submissions List */}
         <div

@@ -1,0 +1,201 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { SubmissionsService } from '@/services/submissions-service';
+import { TagsService } from '@/services/tags-service';
+import type { Language } from '@/types/submissions';
+import type { Tag } from '@/types/tags';
+import { Plus, Search, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+interface TagLanguageSelectorProps {
+  selectedTags: number[];
+  onTagsChange: (tags: number[]) => void;
+  selectedLanguages: number[];
+  onLanguagesChange: (languages: number[]) => void;
+}
+
+export default function TagLanguageSelector({
+  selectedTags,
+  onTagsChange,
+  selectedLanguages,
+  onLanguagesChange,
+}: TagLanguageSelectorProps) {
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [languages, setLanguages] = useState<Language[]>([]);
+  const [tagSearch, setTagSearch] = useState('');
+  const [langSearch, setLangSearch] = useState('');
+
+  useEffect(() => {
+    TagsService.getAllTags().then(setTags);
+    SubmissionsService.getLanguageList().then((res) =>
+      setLanguages(res.data.data)
+    );
+  }, []);
+
+  const filteredTags = tags.filter((t) =>
+    t.name.toLowerCase().includes(tagSearch.toLowerCase())
+  );
+
+  const filteredLangs = languages.filter((l) =>
+    l.name.toLowerCase().includes(langSearch.toLowerCase())
+  );
+
+  const handleAddTag = (id: number) => {
+    if (!selectedTags.includes(id)) {
+      onTagsChange([...selectedTags, id]);
+    }
+  };
+
+  const handleRemoveTag = (id: number) => {
+    onTagsChange(selectedTags.filter((t) => t !== id));
+  };
+
+  const handleAddLang = (id: number) => {
+    if (!selectedLanguages.includes(id)) {
+      onLanguagesChange([...selectedLanguages, id]);
+    }
+  };
+
+  const handleRemoveLang = (id: number) => {
+    onLanguagesChange(selectedLanguages.filter((l) => l !== id));
+  };
+
+  return (
+    <div className="flex items-center gap-4 mb-2 px-1">
+      {/* Tags */}
+      <div className="flex items-center gap-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-1 rounded-full"
+            >
+              <Plus className="w-3 h-3" />
+              Tag
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56 p-2" align="start">
+            <div className="relative mb-2">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400" />
+              <Input
+                value={tagSearch}
+                onChange={(e) => setTagSearch(e.target.value)}
+                placeholder="Search tags..."
+                className="h-8 pl-7 text-xs"
+              />
+            </div>
+            <div className="max-h-48 overflow-y-auto space-y-1">
+              {filteredTags.map((tag) => (
+                <DropdownMenuItem
+                  key={tag.id}
+                  onClick={() => handleAddTag(tag.id)}
+                  className="text-xs cursor-pointer"
+                >
+                  {tag.name}
+                </DropdownMenuItem>
+              ))}
+              {filteredTags.length === 0 && (
+                <div className="text-xs text-center text-slate-500 py-2">
+                  No tags found
+                </div>
+              )}
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <div className="flex flex-wrap gap-2">
+          {selectedTags.map((id) => {
+            const tag = tags.find((t) => t.id === id);
+            if (!tag) return null;
+            return (
+              <Badge
+                key={id}
+                variant="secondary"
+                className="h-8 px-3 rounded-full gap-1 font-normal bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+              >
+                {tag.name}
+                <X
+                  className="w-3 h-3 cursor-pointer hover:text-red-500"
+                  onClick={() => handleRemoveTag(id)}
+                />
+              </Badge>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
+
+      {/* Languages */}
+      <div className="flex items-center gap-2">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-1 rounded-full"
+            >
+              <Plus className="w-3 h-3" />
+              Language
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56 p-2" align="start">
+            <div className="relative mb-2">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400" />
+              <Input
+                value={langSearch}
+                onChange={(e) => setLangSearch(e.target.value)}
+                placeholder="Search languages..."
+                className="h-8 pl-7 text-xs"
+              />
+            </div>
+            <div className="max-h-48 overflow-y-auto space-y-1">
+              {filteredLangs.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.id}
+                  onClick={() => handleAddLang(lang.id)}
+                  className="text-xs cursor-pointer"
+                >
+                  {lang.name}
+                </DropdownMenuItem>
+              ))}
+              {filteredLangs.length === 0 && (
+                <div className="text-xs text-center text-slate-500 py-2">
+                  No languages found
+                </div>
+              )}
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <div className="flex flex-wrap gap-2">
+          {selectedLanguages.map((id) => {
+            const lang = languages.find((l) => l.id === id);
+            if (!lang) return null;
+            return (
+              <Badge
+                key={id}
+                variant="secondary"
+                className="h-8 px-3 rounded-full gap-1 font-normal bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+              >
+                {lang.name}
+                <X
+                  className="w-3 h-3 cursor-pointer hover:text-red-500"
+                  onClick={() => handleRemoveLang(id)}
+                />
+              </Badge>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}

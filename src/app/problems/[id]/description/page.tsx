@@ -6,14 +6,19 @@ import type { ProblemDescription as ProblemDetailType } from '@/types/problems';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
+import { setProblem } from '@/store/slides/problem-slice';
 import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 
 export default function ProblemDescriptionPage({
   params,
 }: { params: Promise<{ id: string }> }) {
   const [problemId, setProblemId] = useState<string | null>(null);
-  const [problem, setProblem] = useState<ProblemDetailType | null>(null);
+  const [problemData, setProblemData] = useState<ProblemDetailType | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
+  const dispatch = useDispatch();
 
   // Effect 1: Resolve params only once
   useEffect(() => {
@@ -33,7 +38,8 @@ export default function ProblemDescriptionPage({
       try {
         const axiosResponse = await ProblemsService.getProblemById(id);
 
-        setProblem(axiosResponse);
+        setProblemData(axiosResponse);
+        dispatch(setProblem(axiosResponse));
       } catch (error) {
         console.error('Error fetching problem:', error);
       } finally {
@@ -42,15 +48,15 @@ export default function ProblemDescriptionPage({
     }
 
     fetchProblem(problemId);
-  }, [problemId]);
+  }, [problemId, dispatch]);
 
-  if (isLoading || !problem) {
+  if (isLoading || !problemData) {
     return (
       <SkeletonTheme baseColor="#e2e8f0" highlightColor="#f1f5f9">
         <div className="h-full">
           <div
             className="flex h-full gap-0 relative bg-slate-50 dark:bg-slate-900"
-            style={{ height: 'calc(100vh - 60px)' }}
+            style={{ height: 'calc(100vh - 65px)' }}
           >
             {/* Left Panel Skeleton - Problem Description */}
             <div
@@ -226,5 +232,5 @@ export default function ProblemDescriptionPage({
     );
   }
 
-  return <ProblemDescription problem={problem} />;
+  return <ProblemDescription problem={problemData} />;
 }

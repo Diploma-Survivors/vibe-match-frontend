@@ -32,9 +32,9 @@ export default function ProblemsPage() {
   } = useProblems();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 pt-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
+      {/* <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
         <div className="container mx-auto px-6 py-5">
           <div className="flex items-center justify-between">
             <div>
@@ -48,14 +48,14 @@ export default function ProblemsPage() {
             <ProblemStats problems={problems} />
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <div className="container mx-auto px-6 py-4">
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
           {/* Left Sidebar - Filters */}
           <div className="xl:col-span-1">
-            <div className="xl:sticky xl:top-32">
+            <div className="xl:sticky xl:top-20 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <ProblemFilter
                 keyWord={keyword}
                 filters={filters}

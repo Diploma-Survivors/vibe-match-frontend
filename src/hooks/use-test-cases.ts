@@ -1,92 +1,93 @@
+import type { RootState } from '@/store';
+import {
+  updateCurrentSampleTestCases,
+  updateSingleTestCase,
+} from '@/store/slides/workspace-slice';
 import type { ProblemDescription } from '@/types/problems';
-import { useCallback, useState } from 'react';
-
-interface TestCase {
-  id: string;
-  input: string;
-  output: string;
-  isEditing: boolean;
-}
+import type { SampleTestcase } from '@/types/testcases';
+import { useCallback, useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 export function useTestCases(problem: ProblemDescription) {
+  const dispatch = useDispatch();
   const [activeTestCase, setActiveTestCase] = useState(0);
+  const savedTestCases = useSelector(
+    (state: RootState) => state.workspace.currentSampleTestCases[problem.id]
+  );
+  const testCases: SampleTestcase[] =
+    savedTestCases ?? problem.testcaseSamples ?? [];
 
-  // Initialize test cases from problem data
-  const [testCases, setTestCases] = useState<TestCase[]>(() => {
-    if (problem.testcaseSamples && problem.testcaseSamples.length > 0) {
-      return problem.testcaseSamples.map((tc, index) => ({
-        id: tc.id || `testcase-${index}`,
-        input: tc.input || '',
-        output: tc.output || '',
-        isEditing: false,
-      }));
+  useEffect(() => {
+    if (!savedTestCases && problem.testcaseSamples) {
+      dispatch(
+        updateCurrentSampleTestCases({
+          problemId: problem.id,
+          testCases: problem.testcaseSamples,
+        })
+      );
     }
-    return [
-      {
-        id: 'default-1',
-        input: '',
-        output: '',
-        isEditing: true,
-      },
-    ];
-  });
-
-  const handleTestCaseSave = useCallback((id: string) => {
-    setTestCases((prev) =>
-      prev.map((testCase) =>
-        testCase.id === id ? { ...testCase, isEditing: false } : testCase
-      )
-    );
-  }, []);
-
-  const handleTestCaseEdit = useCallback((id: string) => {
-    setTestCases((prev) =>
-      prev.map((testCase) =>
-        testCase.id === id
-          ? { ...testCase, isEditing: !testCase.isEditing }
-          : testCase
-      )
-    );
-  }, []);
+  }, [dispatch, problem.id, problem.testcaseSamples, savedTestCases]);
 
   const handleTestCaseChange = useCallback(
     (id: string, field: 'input' | 'output', value: string) => {
-      setTestCases((prev) =>
-        prev.map((testCase) =>
-          testCase.id === id ? { ...testCase, [field]: value } : testCase
-        )
+      console.log('test case change', id, field, value);
+      dispatch(
+        updateSingleTestCase({
+          problemId: problem.id,
+          index: activeTestCase,
+          field,
+          value,
+        })
       );
     },
-    []
+    [dispatch, problem.id, activeTestCase]
   );
 
   const handleTestCaseAdd = useCallback(() => {
-    const newTestCase: TestCase = {
+    const lastTestCase =
+      testCases.length > 0 ? testCases[testCases.length - 1] : null;
+
+    const newTestCase: SampleTestcase = {
       id: `testcase-${Date.now()}`,
-      input: '',
-      output: '',
-      isEditing: true,
+      input: lastTestCase?.input ?? 'sample text',
+      output: lastTestCase?.output ?? 'sample text',
     };
-    setTestCases((prev) => [...prev, newTestCase]);
-    setActiveTestCase(testCases.length);
-  }, [testCases.length]);
+
+    const newSampleTestcases = [...testCases, newTestCase];
+
+    dispatch(
+      updateCurrentSampleTestCases({
+        problemId: problem.id,
+        testCases: newSampleTestcases,
+      })
+    );
+
+    setActiveTestCase(newSampleTestcases.length - 1);
+  }, [dispatch, problem.id, testCases]);
 
   const handleTestCaseDelete = useCallback(
     (id: string) => {
-      setTestCases((prev) => prev.filter((testCase) => testCase.id !== id));
+      const newSampleTestcases = testCases.filter(
+        (testCase) => testCase.id !== id
+      );
+      dispatch(
+        updateCurrentSampleTestCases({
+          problemId: problem.id,
+          testCases: newSampleTestcases,
+        })
+      );
       if (activeTestCase >= testCases.length - 1) {
         setActiveTestCase(Math.max(0, testCases.length - 2));
       }
     },
-    [activeTestCase, testCases.length]
+    [activeTestCase, testCases.length, dispatch, problem.id, testCases]
   );
 
   return {
     testCases,
     activeTestCase,
     setActiveTestCase,
-    handleTestCaseSave,
-    handleTestCaseEdit,
     handleTestCaseChange,
     handleTestCaseAdd,
     handleTestCaseDelete,

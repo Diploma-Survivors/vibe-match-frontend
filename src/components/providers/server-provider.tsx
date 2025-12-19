@@ -25,7 +25,7 @@ export async function ServerProvider({ children }: ServerProviderProps) {
       const decoded: DecodedAccessToken = jwtDecode(session.accessToken);
 
       initialUser = {
-        userId: decoded.userId,
+        id: decoded.userId,
         email: decoded.email,
         firstName: decoded.firstName,
         lastName: decoded.lastName,

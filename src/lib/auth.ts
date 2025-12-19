@@ -1,5 +1,6 @@
 import type { DecodedAccessToken } from '@/types/states';
 import { jwtDecode } from 'jwt-decode';
+import { Database } from 'lucide-react';
 import NextAuth from 'next-auth';
 import type { NextAuthOptions } from 'next-auth';
 import { getServerSession } from 'next-auth'; // Add this import
@@ -35,10 +36,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     };
   } catch (error) {
     console.error('Error refreshing access token:', error);
-    return {
-      ...token,
-      error: 'RefreshAccessTokenError',
-    };
+    throw error;
   }
 }
 
@@ -66,9 +64,64 @@ export const authOptions: NextAuthOptions = {
         };
       },
     }),
+    CredentialsProvider({
+      id: 'credentials',
+      name: 'Credentials',
+      credentials: {
+        username: { label: 'Username', type: 'text' },
+        password: { label: 'Password', type: 'password' },
+        // deviceId: { label: "Device ID", type: "text" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.username || !credentials?.password) {
+          throw new Error('Missing username or password');
+        }
+
+        try {
+          // Call your backend login API
+          // const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
+          //   method: 'POST',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify({
+          //     username: credentials.username,
+          //     password: credentials.password,
+          //   }),
+          // });
+
+          // mock data here
+          const data = {
+            user: {
+              id: 'user-id',
+            },
+            accessToken:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImNvdXJzZUlkIjoxLCJlbWFpbCI6InN0dWRlbnRAZ21haWwuY29tIiwiZmlyc3ROYW1lIjoic3R1ZGVudCIsImxhc3ROYW1lIjoic3R1ZGVudCIsInJvbGVzIjpbIlNUVURFTlQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODg4OCIsImx0aVNlc3Npb25JZCI6ImU2YmQ2NWZmLWMzMGUtNDA2OS05ZWVmLWRmZGQzNDBmMTYyNyIsImlhdCI6MTc2NTQxOTY3MywiZXhwIjoxNzY1NDE5Njc0LCJhdWQiOiJsb2NhbGhvc3Q6MzAwMCJ9.h5pczel1OPQI-Uiw93IQxX_gnhec_6A2urIl5ykqfUc',
+            refreshToken:
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImNvdXJzZUlkIjoxLCJlbWFpbCI6InN0dWRlbnRAZ21haWwuY29tIiwiZmlyc3ROYW1lIjoic3R1ZGVudCIsImxhc3ROYW1lIjoic3R1ZGVudCIsInJvbGVzIjpbIlNUVURFTlQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODg4OCIsImx0aVNlc3Npb25JZCI6ImU2YmQ2NWZmLWMzMGUtNDA2OS05ZWVmLWRmZGQzNDBmMTYyNyIsImlhdCI6MTc2NTQxOTY3MywiZXhwIjoxNzY1NTA2MDczLCJhdWQiOiJsb2NhbGhvc3Q6MzAwMCJ9.r2L3-b1e21g4ODmdXpOulLc5gZkEVKuCNa_bhuh8JKg',
+            deviceId: 'device-id',
+          };
+
+          // if (!res.ok) {
+          //   // Throw error to be caught by NextAuth frontend
+          //   throw new Error(data.message || 'Authentication failed');
+          // }
+
+          // Return object MUST match the shape used in 'jwt' callback below
+          return {
+            id: data.user?.id || 'user-id',
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+            deviceId: data.deviceId,
+          };
+        } catch (error: any) {
+          console.error('Login logic error:', error);
+          // Return null to display a generic error, or throw to display specific error
+          throw new Error(error.message || 'Login failed');
+        }
+      },
+    }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.accessToken = user.accessToken;
         token.userId = user.id;
@@ -76,31 +129,13 @@ export const authOptions: NextAuthOptions = {
         token.redirect = user.redirect;
         token.callbackUrl = user.callbackUrl;
         token.deviceId = user.deviceId;
-
-        try {
-          const decoded: DecodedAccessToken = jwtDecode(
-            user.accessToken as string
-          );
-          token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
-        } catch (err) {
-          console.error('Failed to decode access token:', err);
-        }
+        return token;
       }
-      if (
-        !token.accessToken ||
-        Date.now() > (token.accessTokenExpires as number)
-      ) {
-        try {
-          const data = await refreshAccessToken(token);
-          token.accessToken = data.accessToken;
-          token.refreshToken = data.refreshToken;
-          const decoded: DecodedAccessToken = jwtDecode(
-            data.accessToken as string
-          );
-          token.accessTokenExpires = decoded.exp * 1000; // convert seconds → ms
-        } catch (err) {
-          console.error('Failed to decode access token:', err);
-        }
+
+      if (trigger === 'update' && session?.action === 'refresh') {
+        const data = await refreshAccessToken(token);
+        token.accessToken = data.accessToken;
+        token.refreshToken = data.refreshToken;
       }
       return token;
     },
@@ -114,7 +149,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: '/auth/signin/abc',
+    signIn: '/login',
     error: '/',
   },
   session: {

@@ -1,13 +1,14 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Wallet } from 'lucide-react';
+import { useApp } from '@/contexts/app-context';
+import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { UserMenu } from './user-menu';
 
 export default function Header() {
-  const [walletConnected, setWalletConnected] = useState(false);
+  const { user, clearUserData } = useApp();
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
@@ -25,10 +26,6 @@ export default function Header() {
     };
   }, []);
 
-  const connectWallet = () => {
-    setWalletConnected(!walletConnected);
-  };
-
   const scrollToSection = (id: string) => {
     if (pathname === '/') {
       const element = document.getElementById(id);
@@ -45,34 +42,43 @@ export default function Header() {
     { name: 'Home', href: '/', onClick: undefined },
     { name: 'Problems', href: '/problems', onClick: undefined },
     { name: 'Contests', href: '/contests', onClick: undefined },
+    { name: 'Ranking', href: '/ranking', onClick: undefined },
   ];
 
+  const handleLogout = async () => {
+    clearUserData();
+    await signOut({
+      callbackUrl: '/login', // Where to go after logout
+      redirect: true,
+    });
+  };
+
   // Prevent hydration mismatch by not rendering until mounted
-  if (!mounted) {
-    return (
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3">
-            <img src="/logo.svg" alt="SolVibe Logo" className="w-8 h-8" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              SolVibe
-            </span>
-          </Link>
-          <div className="hidden md:flex items-center space-x-8">
-            {/* Placeholder for nav items during SSR */}
-          </div>
-          <Button className="flex items-center gap-2 bg-black hover:bg-black/90 text-white">
-            <Wallet size={18} />
-            Connect Wallet
-          </Button>
-        </div>
-      </nav>
-    );
-  }
+  // if (!mounted) {
+  //   return (
+  //     <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
+  //       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+  //         <Link href="/" className="flex items-center gap-3">
+  //           <img src="/logo.svg" alt="SolVibe Logo" className="w-8 h-8" />
+  //           <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+  //             SolVibe
+  //           </span>
+  //         </Link>
+  //         <div className="hidden md:flex items-center space-x-8">
+  //           {/* Placeholder for nav items during SSR */}
+  //         </div>
+  //         <Button className="flex items-center gap-2 bg-black hover:bg-black/90 text-white">
+  //           <Wallet size={18} />
+  //           Connect Wallet
+  //         </Button>
+  //       </div>
+  //     </nav>
+  //   );
+  // }
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white/80 ${
         scrolled ? 'bg-white/80 backdrop-blur-md shadow-md' : 'bg-transparent'
       }`}
     >
@@ -84,49 +90,42 @@ export default function Header() {
           </span>
         </Link>
 
-        <div className="hidden md:flex items-center space-x-8">
-          {navItems.map((item) => (
-            <div key={item.name}>
-              {item.href.startsWith('/#') ? (
-                pathname === '/' ? (
-                  <button
-                    type="button"
-                    onClick={item.onClick}
-                    className="text-black hover:text-green-600 transition-colors"
-                  >
-                    {item.name}
-                  </button>
+        <div className="hidden md:flex items-center space-x-2">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            const commonClasses = `px-4 py-2 rounded-full text-sm font-medium gap-2 transition-all duration-200 ${
+              isActive
+                ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
+                : 'text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400'
+            }`;
+
+            return (
+              <div key={item.name}>
+                {item.href.startsWith('/#') ? (
+                  pathname === '/' ? (
+                    <button
+                      type="button"
+                      onClick={item.onClick}
+                      className={commonClasses}
+                    >
+                      {item.name}
+                    </button>
+                  ) : (
+                    <Link href={item.href} className={commonClasses}>
+                      {item.name}
+                    </Link>
+                  )
                 ) : (
-                  <Link
-                    href={item.href}
-                    className="text-black hover:text-green-600 transition-colors"
-                  >
+                  <Link href={item.href} className={commonClasses}>
                     {item.name}
                   </Link>
-                )
-              ) : (
-                <Link
-                  href={item.href}
-                  className={`transition-colors ${
-                    pathname === item.href
-                      ? 'text-green-600 font-semibold'
-                      : 'text-black hover:text-green-600'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        <Button
-          onClick={connectWallet}
-          className="flex items-center gap-2 bg-black hover:bg-black/90 text-white"
-        >
-          <Wallet size={18} />
-          Vũ Thế Vỹ
-        </Button>
+        <UserMenu user={user} onLogout={handleLogout} />
       </div>
     </nav>
   );
