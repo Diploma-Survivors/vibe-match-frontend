@@ -5,8 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useApp } from '@/contexts/app-context';
-import { SolutionsService } from '@/services/solutions-service';
-import type { SolutionComment } from '@/types/solutions';
+import type { ProblemComment } from '@/types/problems';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import {
@@ -18,21 +17,21 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
-interface CommentItemProps {
-  comment: SolutionComment;
-  solutionId: string;
-  onReplySuccess: (newComment: SolutionComment) => void;
+interface ProblemCommentItemProps {
+  comment: ProblemComment;
+  problemId: string;
+  onReplySuccess: (newComment: ProblemComment) => void;
   onUpdate: (commentId: string, content: string) => void;
   onDelete: (commentId: string) => void;
 }
 
-export default function CommentItem({
+export default function ProblemCommentItem({
   comment: initialComment,
-  solutionId,
+  problemId,
   onReplySuccess,
   onUpdate,
   onDelete,
-}: CommentItemProps) {
+}: ProblemCommentItemProps) {
   const { user } = useApp();
   const { confirm } = useDialog();
   const [comment, setComment] = useState(initialComment);
@@ -48,9 +47,10 @@ export default function CommentItem({
   const isAuthor = user?.id === comment.authorId;
 
   const handleVote = async (type: 'up_vote' | 'down_vote') => {
+    // Mock voting logic
     try {
       if (comment.myVote === type) {
-        await SolutionsService.unreactComment(comment.id);
+        // Unvote
         setComment((prev) => ({
           ...prev,
           myVote: null,
@@ -60,7 +60,7 @@ export default function CommentItem({
             type === 'down_vote' ? prev.downvoteCount - 1 : prev.downvoteCount,
         }));
       } else {
-        await SolutionsService.reactComment(comment.id, type);
+        // Vote
         setComment((prev) => ({
           ...prev,
           myVote: type,
@@ -87,11 +87,24 @@ export default function CommentItem({
     if (!replyContent.trim()) return;
     setIsSubmittingReply(true);
     try {
-      const newReply = await SolutionsService.createComment(
-        solutionId,
-        replyContent,
-        comment.id
-      );
+      // Mock reply creation
+      const newReply: ProblemComment = {
+        id: Math.random().toString(36).substr(2, 9),
+        problemId,
+        authorId: user?.id || 0,
+        content: replyContent,
+        upvoteCount: 0,
+        downvoteCount: 0,
+        myVote: null,
+        parentCommentId: comment.id,
+        replyCounts: 0,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      // Simulate network delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
       onReplySuccess(newReply);
       setIsReplying(false);
       setReplyContent('');
@@ -106,11 +119,14 @@ export default function CommentItem({
     if (!editContent.trim()) return;
     setIsSubmittingEdit(true);
     try {
-      const updatedComment = await SolutionsService.updateComment(
-        comment.id,
-        editContent
-      );
-      setComment(updatedComment);
+      // Mock update
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      setComment((prev) => ({
+        ...prev,
+        content: editContent,
+        updatedAt: new Date().toISOString(),
+      }));
       onUpdate(comment.id, editContent);
       setIsEditing(false);
     } catch (error) {
@@ -131,7 +147,8 @@ export default function CommentItem({
 
     if (result) {
       try {
-        await SolutionsService.deleteComment(comment.id);
+        // Mock delete
+        await new Promise((resolve) => setTimeout(resolve, 500));
         onDelete(comment.id);
       } catch (error) {
         console.error('Error deleting comment:', error);

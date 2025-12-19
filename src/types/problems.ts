@@ -1,6 +1,7 @@
 import type { Tag } from './tags';
 import type { SampleTestcase } from './testcases';
 import type { Topic } from './topics';
+import type { UserProfile } from './user';
 
 export enum ProblemDifficulty {
   EASY = 'easy',
@@ -54,6 +55,8 @@ export interface ProblemDescription {
   testcaseSamples?: SampleTestcase[];
   score?: number; // For contest problems
   status?: ProblemStatus;
+  tags?: Tag[];
+  topics?: Topic[];
 }
 
 export const INITIAL_PROBLEM: ProblemDescription = {
@@ -72,6 +75,8 @@ export const INITIAL_PROBLEM: ProblemDescription = {
   testcaseSamples: [],
   score: 0,
   status: ProblemStatus.UNSOLVED,
+  tags: [],
+  topics: [],
 };
 
 export interface ProblemFilters {
@@ -157,3 +162,23 @@ export const getDifficultyColor = (difficulty: ProblemDifficulty): string => {
 export const getDifficultyLabel = (difficulty: ProblemDifficulty): string => {
   return DIFFICULTY_LABELS.get(difficulty) || difficulty;
 };
+
+export interface ProblemComment {
+  id: string;
+  problemId: string;
+  authorId: number;
+  author?: UserProfile;
+  content: string;
+  upvoteCount: number;
+  downvoteCount: number;
+  myVote: 'up_vote' | 'down_vote' | null;
+  parentCommentId: string | null;
+  replyCounts: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum ProblemCommentSortBy {
+  RECENT = 'recent',
+  MOST_VOTED = 'most_voted',
+}

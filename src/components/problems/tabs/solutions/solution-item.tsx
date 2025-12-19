@@ -38,12 +38,13 @@ export default function SolutionItem({
   return (
     <div
       onClick={onClick}
-      className={`p-4 border-b border-slate-200 dark:border-slate-700 cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50 ${
-        isSelected ? 'bg-slate-50 dark:bg-slate-800/80' : ''
-      }`}
+      className={`p-4 border-b border-slate-200 dark:border-slate-700 cursor-pointer transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50 ${isSelected ? 'bg-slate-200 dark:bg-slate-800/80' : ''}`}
     >
       <div className="flex gap-4">
-        <Avatar className="w-10 h-10 border border-slate-200 dark:border-slate-700">
+        <Avatar
+          userId={solution.authorId}
+          className="w-10 h-10 border border-slate-200 dark:border-slate-700"
+        >
           <AvatarImage src={solution.author?.avatarUrl} />
           <AvatarFallback>
             {solution.author?.firstName?.[0]}

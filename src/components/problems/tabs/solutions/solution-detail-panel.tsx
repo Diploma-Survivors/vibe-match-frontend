@@ -147,7 +147,10 @@ export default function SolutionDetailPanel({
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Avatar className="w-10 h-10 border border-slate-200 dark:border-slate-700">
+            <Avatar
+              userId={solution.authorId}
+              className="w-10 h-10 border border-slate-200 dark:border-slate-700"
+            >
               <AvatarImage src={solution.author?.avatarUrl} />
               <AvatarFallback>
                 {solution.author?.firstName?.[0]}

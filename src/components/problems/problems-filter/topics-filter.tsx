@@ -27,7 +27,7 @@ export default function TopicFilter({
           <button
             type="button"
             onClick={onClearAll}
-            className="text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
+            className="cursor-pointer text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
           >
             Xóa tất cả ({selectedTopicIds.length})
           </button>
@@ -49,7 +49,7 @@ export default function TopicFilter({
                 type="button"
                 onClick={() => onTopicToggle(topic.id, isSelected)}
                 className={`
-                  flex items-center gap-3 px-4 py-2.5 rounded-lg border text-sm
+                  cursor-pointer flex items-center gap-3 px-4 py-2.5 rounded-lg border text-sm
                   transition-all duration-200 hover:scale-[1.02]
                   bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 
                   dark:bg-slate-700/50 dark:text-slate-300 dark:border-slate-600 dark:hover:border-slate-500

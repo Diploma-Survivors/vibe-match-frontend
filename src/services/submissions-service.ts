@@ -61,7 +61,9 @@ async function getSubmissionById(submissionId: string) {
   return await clientApi.get(`/submissions/${submissionId}`);
 }
 
-async function getAllSubmissions(): Promise<SubmissionListItem[]> {
+async function getAllSubmissions(
+  userId: number
+): Promise<SubmissionListItem[]> {
   // Mock data
   return new Promise((resolve) => {
     setTimeout(() => {

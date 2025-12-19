@@ -2,6 +2,7 @@
 
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Solution } from '@/types/solutions';
+import { useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import SolutionItem from './solution-item';
 
@@ -22,6 +23,15 @@ export default function SolutionList({
   onLoadMore,
   isLoading,
 }: SolutionListProps) {
+  useEffect(() => {
+    if (selectedId) {
+      const element = document.getElementById(`solution-item-${selectedId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+  }, [selectedId]);
+
   if (isLoading && solutions.length === 0) {
     return (
       <div className="flex-1 overflow-y-auto min-h-0 p-4 space-y-4">
@@ -83,12 +93,13 @@ export default function SolutionList({
         scrollableTarget="solution-scroll-target"
       >
         {solutions.map((solution) => (
-          <SolutionItem
-            key={solution.id}
-            solution={solution}
-            isSelected={solution.id === selectedId}
-            onClick={() => onSelect(solution.id)}
-          />
+          <div id={`solution-item-${solution.id}`} key={solution.id}>
+            <SolutionItem
+              solution={solution}
+              isSelected={solution.id === selectedId}
+              onClick={() => onSelect(solution.id)}
+            />
+          </div>
         ))}
       </InfiniteScroll>
     </div>

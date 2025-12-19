@@ -2,6 +2,25 @@ import type { UserProfile } from '@/types/user';
 
 async function getUserProfile(userId: number): Promise<UserProfile> {
   // Mock data
+  if (userId === 3) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          id: userId,
+          username: '@nguyenvana',
+          firstName: 'Nguyen Van',
+          lastName: 'A',
+          email: 'nguyenvana@example.com',
+          address: '123 Le Loi, District 1, Ho Chi Minh City',
+          phone: '0901234567',
+          rank: 80,
+          // give another image
+          avatarUrl:
+            'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
+        });
+      }, 500);
+    });
+  }
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({

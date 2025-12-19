@@ -3,8 +3,11 @@
 import { ResizableDivider } from '@/components/problems/tabs/description/dividers/resizable-divider';
 import { useResizable } from '@/hooks/use-resizable';
 import useSolutions from '@/hooks/use-solutions';
+import { SolutionsService } from '@/services/solutions-service';
 import { SubmissionsService } from '@/services/submissions-service';
+import type { Solution } from '@/types/solutions';
 import { SubmissionStatus } from '@/types/submissions';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import SolutionDetailPanel from './solution-detail-panel';
 import SolutionFilter from './solution-filter';
@@ -30,12 +33,23 @@ export default function SolutionsTab({ problemId }: SolutionsTabProps) {
     refresh,
   } = useSolutions(problemId);
 
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const solutionIdParam = searchParams.get('solutionId');
+
   const [selectedSolutionId, setSelectedSolutionId] = useState<string | null>(
-    null
+    solutionIdParam
   );
   const [acceptedSubmissionId, setAcceptedSubmissionId] = useState<
     string | null
   >(null);
+
+  useEffect(() => {
+    if (solutionIdParam) {
+      setSelectedSolutionId(solutionIdParam);
+    }
+  }, [solutionIdParam]);
 
   useEffect(() => {
     const checkACStatus = async () => {
@@ -65,7 +79,31 @@ export default function SolutionsTab({ problemId }: SolutionsTabProps) {
     checkACStatus();
   }, [problemId]);
 
-  const selectedSolution = solutions.find((s) => s.id === selectedSolutionId);
+  const [fetchedSolution, setFetchedSolution] = useState<Solution | null>(null);
+
+  const selectedSolution =
+    solutions.find((s) => s.id === selectedSolutionId) || fetchedSolution;
+
+  useEffect(() => {
+    const fetchMissingSolution = async () => {
+      if (
+        selectedSolutionId &&
+        !solutions.find((s) => s.id === selectedSolutionId)
+      ) {
+        try {
+          const detail =
+            await SolutionsService.getSolutionDetail(selectedSolutionId);
+          setFetchedSolution(detail);
+        } catch (error) {
+          console.error('Failed to fetch solution detail', error);
+        }
+      } else {
+        setFetchedSolution(null);
+      }
+    };
+
+    fetchMissingSolution();
+  }, [selectedSolutionId, solutions]);
 
   // Resizable logic
   const {
@@ -114,7 +152,12 @@ export default function SolutionsTab({ problemId }: SolutionsTabProps) {
           <SolutionList
             solutions={solutions}
             selectedId={selectedSolutionId || undefined}
-            onSelect={setSelectedSolutionId}
+            onSelect={(id) => {
+              setSelectedSolutionId(id);
+              const params = new URLSearchParams(searchParams.toString());
+              params.set('solutionId', id);
+              router.push(`${pathname}?${params.toString()}`);
+            }}
             hasMore={pageInfo?.hasNextPage || false}
             onLoadMore={handleLoadMore}
             isLoading={isLoading}

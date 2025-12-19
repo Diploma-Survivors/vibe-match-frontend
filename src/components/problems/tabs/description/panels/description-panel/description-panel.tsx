@@ -9,6 +9,8 @@ import type { SampleTestcase } from '@/types/testcases';
 import { FileText, MemoryStick, Timer } from 'lucide-react';
 import { Copy } from 'lucide-react';
 import { useContext, useState } from 'react';
+import { ProblemDiscussion } from './problem-discussion';
+import { ProblemTopicsTags } from './problem-topics-tags';
 
 interface DescriptionPanelProps {
   problem: ProblemDescription;
@@ -68,18 +70,18 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
               >
                 {getDifficultyLabel(problem.difficulty)}
               </div>
-              {/* <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
-                  <Timer className="w-4 h-4" />
-                  {timeLimitSeconds}s time limit
-                </div>
-                <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
-                  <MemoryStick className="w-4 h-4" />
-                  {memoryLimitMB}MB memory
-                </div> */}
-              {/* <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
-                  <FileText className="w-4 h-4" />
-                  {problem.maxScore} điểm
-                </div> */}
+              <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
+                <Timer className="w-4 h-4" />
+                {timeLimitSeconds}s time limit
+              </div>
+              <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
+                <MemoryStick className="w-4 h-4" />
+                {memoryLimitMB}MB memory
+              </div>
+              <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
+                <FileText className="w-4 h-4" />
+                {problem.maxScore} điểm
+              </div>
             </div>
           </div>
 
@@ -115,25 +117,23 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
           </section>
 
           {/* Constraints */}
-          {issuer === IssuerType.LOCAL &&
-            problem.timeLimitMs &&
-            problem.memoryLimitKb && (
-              <section>
-                <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-                  Giới hạn
-                </h2>
-                <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                  <p className="text-slate-700 dark:text-slate-300 font-semibold">
-                    <span className="font-semibold">Thời gian</span>:{' '}
-                    {timeLimitSeconds} <span className="font-semibold">s</span>
-                  </p>
-                  <p className="text-slate-700 dark:text-slate-300 font-semibold">
-                    <span className="font-semibold">Bộ nhớ</span>:{' '}
-                    {memoryLimitMB} <span className="font-semibold">MB</span>
-                  </p>
-                </div>
-              </section>
-            )}
+          {problem.timeLimitMs && problem.memoryLimitKb && (
+            <section>
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
+                Giới hạn
+              </h2>
+              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                <p className="text-slate-700 dark:text-slate-300 font-semibold">
+                  <span className="font-semibold">Thời gian</span>:{' '}
+                  {timeLimitSeconds} <span className="font-semibold">s</span>
+                </p>
+                <p className="text-slate-700 dark:text-slate-300 font-semibold">
+                  <span className="font-semibold">Bộ nhớ</span>: {memoryLimitMB}{' '}
+                  <span className="font-semibold">MB</span>
+                </p>
+              </div>
+            </section>
+          )}
 
           {/* Sample Cases - compact view */}
           {sampleCases.length > 0 && (
@@ -216,6 +216,12 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
               )}
             </section>
           )}
+
+          {/* Topics & Tags */}
+          <ProblemTopicsTags topics={problem.topics} tags={problem.tags} />
+
+          {/* Discussion */}
+          <ProblemDiscussion problemId={problem.id} />
         </div>
       </div>
     </div>

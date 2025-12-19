@@ -1,9 +1,11 @@
 'use client';
 
+import SolutionItem from '@/components/problems/tabs/solutions/solution-item';
 import { EditProfileModal } from '@/components/profile/edit-profile-modal';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -22,23 +24,32 @@ import {
 } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip } from '@/components/ui/tooltip';
+import { useApp } from '@/contexts/app-context';
 import { ProblemsService } from '@/services/problems-service';
+import { SolutionsService } from '@/services/solutions-service';
 import { SubmissionsService } from '@/services/submissions-service';
 import { UserService } from '@/services/user-service';
 import { ProblemDifficulty, type ProblemListItem } from '@/types/problems';
+import { type Solution, SolutionSortBy } from '@/types/solutions';
 import { type SubmissionListItem, SubmissionStatus } from '@/types/submissions';
 import type { UserProfile } from '@/types/user';
 import { format } from 'date-fns';
 import {
+  ArrowRight,
   Calendar,
+  Clock,
   Edit,
+  Loader2,
   Mail,
   MapPin,
   Phone,
+  Search,
   Trophy,
   User,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { use, useCallback, useEffect, useMemo, useState } from 'react';
 
 type MonthKey =
   | 'Jan'
@@ -69,7 +80,10 @@ const monthWidths: Record<string, number> = {
   Dec: 65,
 };
 
-export default function ProfilePage() {
+export default function ProfilePage({
+  params,
+}: { params: Promise<{ userId: string }> }) {
+  const { userId: userIdString } = use(params);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -80,20 +94,56 @@ export default function ProfilePage() {
     new Date().getFullYear().toString()
   );
 
+  // Solved Problems Pagination & Sort
+  const [solvedPage, setSolvedPage] = useState(1);
+  const solvedPerPage = 10;
+  const [solvedSortOrder, setSolvedSortOrder] = useState<'newest' | 'oldest'>(
+    'newest'
+  );
+
+  // Solutions Tab State
+  const [userSolutions, setUserSolutions] = useState<Solution[]>([]);
+  const [solutionsLoading, setSolutionsLoading] = useState(false);
+  const [solutionsPage, setSolutionsPage] = useState(1);
+  const solutionsPerPage = 10;
+  const [solutionsSortBy, setSolutionsSortBy] = useState<SolutionSortBy>(
+    SolutionSortBy.RECENT
+  );
+
+  const router = useRouter();
+  const { user: currentUser } = useApp();
+  const isCurrentUser = currentUser?.id === Number(userIdString);
+  const fetchUserSolutions = useCallback(async (userId: number) => {
+    setSolutionsLoading(true);
+    try {
+      const data = await SolutionsService.getAllSolutions(userId);
+      console.log(data);
+      setUserSolutions(data);
+    } catch (error) {
+      console.error('Error fetching user solutions:', error);
+    } finally {
+      setSolutionsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const userId = Number(userIdString);
         const [userData, solvedData, allData, submissionsData] =
           await Promise.all([
-            UserService.getUserProfile(1),
-            ProblemsService.getSolvedProblems(),
+            UserService.getUserProfile(userId),
+            ProblemsService.getSolvedProblems(userId),
             ProblemsService.getAllProblems(),
-            SubmissionsService.getAllSubmissions(),
+            SubmissionsService.getAllSubmissions(userId),
           ]);
         setUser(userData);
         setSolvedProblems(solvedData);
         setAllProblems(allData);
         setSubmissions(submissionsData);
+
+        // Fetch initial user solutions
+        fetchUserSolutions(userId);
       } catch (error) {
         console.error('Error fetching profile data:', error);
       } finally {
@@ -102,7 +152,11 @@ export default function ProfilePage() {
     };
 
     fetchData();
-  }, []);
+  }, [userIdString, fetchUserSolutions]);
+
+  useEffect(() => {
+    fetchUserSolutions(Number(userIdString));
+  }, [fetchUserSolutions, userIdString]);
 
   const handleSaveProfile = (updatedUser: UserProfile) => {
     setUser(updatedUser);
@@ -280,7 +334,110 @@ export default function ProfilePage() {
     });
   };
 
-  const recentAC = getRecentACProblems();
+  // Solved Problems Logic (Merged with Submissions for Time)
+  const solvedProblemsWithTime = useMemo(() => {
+    return solvedProblems
+      .map((problem) => {
+        // Find the latest accepted submission for this problem
+        const latestSubmission = submissions
+          .filter(
+            (s) =>
+              s.problemId === problem.id &&
+              s.status === SubmissionStatus.ACCEPTED
+          )
+          .sort(
+            (a, b) =>
+              new Date(b.createdAt || 0).getTime() -
+              new Date(a.createdAt || 0).getTime()
+          )[0];
+
+        return {
+          ...problem,
+          solvedAt: latestSubmission?.createdAt || null,
+        };
+      })
+      .sort((a, b) => {
+        const timeA = new Date(a.solvedAt || 0).getTime();
+        const timeB = new Date(b.solvedAt || 0).getTime();
+        return solvedSortOrder === 'newest' ? timeB - timeA : timeA - timeB;
+      });
+  }, [solvedProblems, submissions, solvedSortOrder]);
+
+  const paginatedSolvedProblems = useMemo(() => {
+    const startIndex = (solvedPage - 1) * solvedPerPage;
+    return solvedProblemsWithTime.slice(startIndex, startIndex + solvedPerPage);
+  }, [solvedProblemsWithTime, solvedPage]);
+
+  const totalSolvedPages = Math.ceil(
+    solvedProblemsWithTime.length / solvedPerPage
+  );
+
+  // Solutions Pagination & Sort Logic
+  const sortedSolutions = useMemo(() => {
+    const sorted = [...userSolutions];
+    if (solutionsSortBy === SolutionSortBy.MOST_VOTED) {
+      sorted.sort((a, b) => b.upvoteCount - a.upvoteCount);
+    } else {
+      sorted.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+    }
+    return sorted;
+  }, [userSolutions, solutionsSortBy]);
+
+  const paginatedSolutions = useMemo(() => {
+    const startIndex = (solutionsPage - 1) * solutionsPerPage;
+    return sortedSolutions.slice(startIndex, startIndex + solutionsPerPage);
+  }, [sortedSolutions, solutionsPage]);
+
+  const totalSolutionsPages = Math.ceil(
+    userSolutions.length / solutionsPerPage
+  );
+
+  const handleProblemClick = (problemId: string) => {
+    router.push(`/problems/${problemId}/description`);
+  };
+
+  const handleSolutionClick = (solutionId: string) => {
+    // Assuming we want to go to the problem's solution tab with this solution selected
+    // We need the problemId for the URL. The solution object has it?
+    // Wait, Solution type doesn't explicitly have problemId in the interface I saw earlier?
+    // Let's check the Solution type again.
+    // It has `id`, `title`, `content`, `authorId`, etc. It DOES NOT have `problemId` in the interface I saw.
+    // However, in a real app, a solution belongs to a problem.
+    // For now, I'll assume we can navigate to a generic solution page or I need to update the mock/type.
+    // The mock data doesn't seem to have problemId.
+    // But `SolutionListRequest` takes `problemId`.
+    // If I can't get problemId, I can't construct the URL `/problems/[id]/solutions`.
+    // I'll assume for now that I can't easily link to the specific problem context without problemId.
+    // BUT, the user wants "navigate to the solutions tab".
+    // I'll check if I can add `problemId` to the Solution type and mock.
+    // For now, I'll just log it or try to find a workaround.
+    // Actually, looking at `SolutionItem`, it displays tags and languages.
+    // If I don't have problemId, I can't link to the problem.
+    // I will add `problemId` to the `Solution` interface and mock data in a separate step if needed.
+    // For now, I will use a placeholder or assume it's available.
+    // Wait, I can't assume it if it's not in the type.
+    // I'll check `Solution` type again in my thought process.
+    // It was:
+    // export interface Solution { id: string; title: string; authorId: number; ... }
+    // No problemId.
+    // I should add `problemId` to `Solution` type and mock.
+    // I will do that in a separate tool call or just update it here if I can.
+    // I'll assume I'll fix the type/mock in the next step.
+    // For now, I'll use a dummy problem ID '1' or try to extract it from title? No.
+    // I'll just comment the navigation for now and fix it immediately after.
+    // Actually, I can just use `router.push` with a placeholder and fix it.
+    // Or better, I'll add `problemId` to the type in the previous file edit? Too late.
+    // I'll just use a hardcoded '1' for now and fix it.
+    const solution = userSolutions.find((s) => s.id === solutionId);
+    if (solution) {
+      router.push(
+        `/problems/${solution.problemId}/solutions?solutionId=${solutionId}`
+      );
+    }
+  };
 
   if (loading) {
     return (
@@ -414,13 +571,15 @@ export default function ProfilePage() {
                 {`Rank ${user.rank}`}
               </Badge>
 
-              <Button
-                className="w-full bg-green-50 text-green-600 hover:bg-green-100 border border-green-200"
-                onClick={() => setIsEditModalOpen(true)}
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Chỉnh sửa hồ sơ
-              </Button>
+              {isCurrentUser && (
+                <Button
+                  className="w-full bg-green-50 text-green-600 hover:bg-green-100 border border-green-200"
+                  onClick={() => setIsEditModalOpen(true)}
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Chỉnh sửa hồ sơ
+                </Button>
+              )}
 
               <div className="w-full space-y-3 pt-4 text-left">
                 <div className="flex items-center text-gray-600">
@@ -752,11 +911,37 @@ export default function ProfilePage() {
           <Card className="border-none shadow-md">
             <CardHeader>
               <Tabs defaultValue="ac_problems" className="w-full">
-                <TabsList>
-                  <TabsTrigger value="ac_problems">Bài tập đã AC</TabsTrigger>
-                  <TabsTrigger value="solutions">Solution</TabsTrigger>
-                </TabsList>
-                <TabsContent value="ac_problems" className="mt-4">
+                <div className="flex items-center justify-between mb-4">
+                  <TabsList>
+                    <TabsTrigger value="ac_problems">
+                      Bài tập đã giải
+                    </TabsTrigger>
+                    <TabsTrigger value="solutions">Solution</TabsTrigger>
+                  </TabsList>
+                  <Link href={`/profile/${userIdString}/practice`}>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      Đi đến lịch sử luyện tập
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                </div>
+                <TabsContent value="ac_problems" className="mt-4 space-y-4">
+                  <div className="flex justify-end mb-4">
+                    <Select
+                      value={solvedSortOrder}
+                      onValueChange={(v) =>
+                        setSolvedSortOrder(v as 'newest' | 'oldest')
+                      }
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Sắp xếp" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="newest">Mới nhất</SelectItem>
+                        <SelectItem value="oldest">Cũ nhất</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -765,22 +950,26 @@ export default function ProfilePage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {recentAC.map((item) => (
-                        <TableRow key={item.id}>
+                      {paginatedSolvedProblems.map((problem) => (
+                        <TableRow
+                          key={problem.id}
+                          className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
+                          onClick={() => handleProblemClick(problem.id)}
+                        >
                           <TableCell className="font-medium">
-                            {item.problemTitle}
+                            {problem.title}
                           </TableCell>
                           <TableCell className="text-gray-500">
-                            {item.createdAt
+                            {problem.solvedAt
                               ? format(
-                                  new Date(item.createdAt),
+                                  new Date(problem.solvedAt),
                                   'yyyy-MM-dd HH:mm'
                                 )
                               : 'N/A'}
                           </TableCell>
                         </TableRow>
                       ))}
-                      {recentAC.length === 0 && (
+                      {paginatedSolvedProblems.length === 0 && (
                         <TableRow>
                           <TableCell
                             colSpan={2}
@@ -792,11 +981,117 @@ export default function ProfilePage() {
                       )}
                     </TableBody>
                   </Table>
+
+                  {/* Solved Problems Pagination Controls */}
+                  {totalSolvedPages > 1 && (
+                    <div className="flex justify-center space-x-2 mt-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSolvedPage((p) => Math.max(1, p - 1))}
+                        disabled={solvedPage === 1}
+                      >
+                        Trang trước
+                      </Button>
+                      <span className="flex items-center text-sm text-gray-600">
+                        Trang {solvedPage} / {totalSolvedPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setSolvedPage((p) =>
+                            Math.min(totalSolvedPages, p + 1)
+                          )
+                        }
+                        disabled={solvedPage === totalSolvedPages}
+                      >
+                        Trang sau
+                      </Button>
+                    </div>
+                  )}
                 </TabsContent>
-                <TabsContent value="solutions">
-                  <div className="p-4 text-center text-gray-500">
-                    Sắp ra mắt...
+                <TabsContent value="solutions" className="mt-4 space-y-4">
+                  <div className="flex items-center justify-end gap-4">
+                    <Select
+                      value={solutionsSortBy}
+                      onValueChange={(v) =>
+                        setSolutionsSortBy(v as SolutionSortBy)
+                      }
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Sắp xếp" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={SolutionSortBy.RECENT}>
+                          Mới nhất
+                        </SelectItem>
+                        <SelectItem value={SolutionSortBy.MOST_VOTED}>
+                          Được bình chọn nhiều nhất
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
+
+                  {solutionsLoading ? (
+                    <div className="space-y-4">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <Skeleton key={i} className="h-32 w-full" />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {paginatedSolutions.map((solution) => (
+                        <div
+                          key={solution.id}
+                          onClick={() => handleSolutionClick(solution.id)}
+                          className="cursor-pointer"
+                        >
+                          <SolutionItem
+                            solution={solution}
+                            isSelected={false}
+                            onClick={() => handleSolutionClick(solution.id)}
+                          />
+                        </div>
+                      ))}
+                      {paginatedSolutions.length === 0 && (
+                        <div className="text-center py-8 text-gray-500">
+                          Chưa có solution nào.
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Solutions Pagination Controls */}
+                  {totalSolutionsPages > 1 && (
+                    <div className="flex justify-center space-x-2 mt-4">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setSolutionsPage((p) => Math.max(1, p - 1))
+                        }
+                        disabled={solutionsPage === 1}
+                      >
+                        Trang trước
+                      </Button>
+                      <span className="flex items-center text-sm text-gray-600">
+                        Trang {solutionsPage} / {totalSolutionsPages}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setSolutionsPage((p) =>
+                            Math.min(totalSolutionsPages, p + 1)
+                          )
+                        }
+                        disabled={solutionsPage === totalSolutionsPages}
+                      >
+                        Trang sau
+                      </Button>
+                    </div>
+                  )}
                 </TabsContent>
               </Tabs>
             </CardHeader>

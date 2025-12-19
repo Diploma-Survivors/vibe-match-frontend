@@ -89,40 +89,39 @@ export default function Header() {
           </span>
         </Link>
 
-        <div className="hidden md:flex items-center space-x-8">
-          {navItems.map((item) => (
-            <div key={item.name}>
-              {item.href.startsWith('/#') ? (
-                pathname === '/' ? (
-                  <button
-                    type="button"
-                    onClick={item.onClick}
-                    className="text-black hover:text-green-600 transition-colors"
-                  >
-                    {item.name}
-                  </button>
+        <div className="hidden md:flex items-center space-x-2">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href;
+            const commonClasses = `px-4 py-2 rounded-full text-sm font-medium gap-2 transition-all duration-200 ${
+              isActive
+                ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
+                : 'text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400'
+            }`;
+
+            return (
+              <div key={item.name}>
+                {item.href.startsWith('/#') ? (
+                  pathname === '/' ? (
+                    <button
+                      type="button"
+                      onClick={item.onClick}
+                      className={commonClasses}
+                    >
+                      {item.name}
+                    </button>
+                  ) : (
+                    <Link href={item.href} className={commonClasses}>
+                      {item.name}
+                    </Link>
+                  )
                 ) : (
-                  <Link
-                    href={item.href}
-                    className="text-black hover:text-green-600 transition-colors"
-                  >
+                  <Link href={item.href} className={commonClasses}>
                     {item.name}
                   </Link>
-                )
-              ) : (
-                <Link
-                  href={item.href}
-                  className={`transition-colors ${
-                    pathname === item.href
-                      ? 'text-green-600 font-semibold'
-                      : 'text-black hover:text-green-600'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <UserMenu user={user} onLogout={handleLogout} />

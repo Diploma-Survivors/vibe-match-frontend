@@ -180,7 +180,10 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
 
       {/* Input Section */}
       <div className="flex gap-4">
-        <Avatar className="w-10 h-10 border border-slate-200 dark:border-slate-700">
+        <Avatar
+          userId={currentUser?.id}
+          className="w-10 h-10 border border-slate-200 dark:border-slate-700"
+        >
           <AvatarImage src={currentUser?.avatarUrl} />
           <AvatarFallback>
             {currentUser?.firstName?.[0]}

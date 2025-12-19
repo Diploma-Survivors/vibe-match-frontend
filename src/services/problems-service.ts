@@ -60,7 +60,7 @@ async function getAllProblems(): Promise<ProblemListItem[]> {
   });
 }
 
-async function getSolvedProblems(): Promise<ProblemListItem[]> {
+async function getSolvedProblems(userId?: number): Promise<ProblemListItem[]> {
   // Mock data
   return new Promise((resolve) => {
     setTimeout(() => {

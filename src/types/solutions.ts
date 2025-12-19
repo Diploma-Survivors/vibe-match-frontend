@@ -3,6 +3,7 @@ import type { UserProfile } from './user';
 
 export interface Solution {
   id: string;
+  problemId: string;
   title: string;
   authorId: number;
   author?: UserProfile;

@@ -10,6 +10,7 @@ import { UserService } from './user-service';
 // Mock data
 const MOCK_SOLUTIONS: Solution[] = Array.from({ length: 50 }).map((_, i) => ({
   id: `sol-${i + 1}`,
+  problemId: `${(i % 5) + 1}`, // Mock problem IDs 1-5
   title: `Solution ${i + 1}: Optimal Approach with O(n) time complexity`,
   authorId: 2,
   createdAt: new Date(Date.now() - i * 86400000).toISOString(),
@@ -128,6 +129,23 @@ async function getSolutions(
   };
 }
 
+async function getAllSolutions(userId: number): Promise<Solution[]> {
+  // Simulate API delay
+  await new Promise((resolve) => setTimeout(resolve, 500));
+
+  const filtered = [...MOCK_SOLUTIONS];
+
+  // Hydrate authors
+  const hydrated = await Promise.all(
+    filtered.map(async (s) => {
+      const author = await UserService.getUserProfile(s.authorId);
+      return { ...s, author };
+    })
+  );
+
+  return hydrated;
+}
+
 async function getSolutionDetail(id: string): Promise<Solution> {
   await new Promise((resolve) => setTimeout(resolve, 300));
   const solution = MOCK_SOLUTIONS.find((s) => s.id === id);
@@ -156,6 +174,7 @@ async function createSolution(
   await new Promise((resolve) => setTimeout(resolve, 500));
   const newSolution: Solution = {
     id: `sol-${Date.now()}`,
+    problemId: request.problemId,
     title: request.title,
     authorId: 101, // Mock current user
     createdAt: new Date().toISOString(),
@@ -305,4 +324,5 @@ export const SolutionsService = {
   updateComment,
   deleteSolution,
   updateSolution,
+  getAllSolutions,
 };

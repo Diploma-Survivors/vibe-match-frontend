@@ -5,19 +5,35 @@ import * as React from 'react';
 
 import { cn } from '@/lib/utils';
 
+import Link from 'next/link';
+
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root>
->(({ className, ...props }, ref) => (
-  <AvatarPrimitive.Root
-    ref={ref}
-    className={cn(
-      'relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full',
-      className
-    )}
-    {...props}
-  />
-));
+  React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root> & {
+    userId?: number;
+  }
+>(({ className, userId, ...props }, ref) => {
+  const avatar = (
+    <AvatarPrimitive.Root
+      ref={ref}
+      className={cn(
+        'relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full',
+        className
+      )}
+      {...props}
+    />
+  );
+
+  if (userId) {
+    return (
+      <Link href={`/profile/${userId}`} passHref>
+        {avatar}
+      </Link>
+    );
+  }
+
+  return avatar;
+});
 Avatar.displayName = AvatarPrimitive.Root.displayName;
 
 const AvatarImage = React.forwardRef<
