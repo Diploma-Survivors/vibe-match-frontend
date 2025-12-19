@@ -15,7 +15,8 @@
         "useButtonType": "off"
       },
       "complexity": {
-        "noStaticOnlyClass": "warn"
+        "noStaticOnlyClass": "warn",
+        "noForEach": "off"
       },
       "suspicious": {
         "noArrayIndexKey": "warn",
