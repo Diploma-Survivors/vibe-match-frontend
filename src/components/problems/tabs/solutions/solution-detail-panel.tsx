@@ -36,7 +36,7 @@ export default function SolutionDetailPanel({
   const [solution, setSolution] = useState(initialSolution);
   const [languages, setLanguages] = useState<Language[]>([]);
 
-  const isAuthor = user?.userId === solution.authorId;
+  const isAuthor = user?.id === solution.authorId;
 
   useEffect(() => {
     setSolution(initialSolution);
@@ -175,16 +175,14 @@ export default function SolutionDetailPanel({
               variant="outline"
               size="sm"
               onClick={() => handleVote('up_vote')}
-              className={`gap-2 ${
-                solution.myVote === 'up_vote'
+              className={`gap-2 ${solution.myVote === 'up_vote'
                   ? 'bg-green-50 text-green-600 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
                   : ''
-              }`}
+                }`}
             >
               <ArrowBigUp
-                className={`w-5 h-5 ${
-                  solution.myVote === 'up_vote' ? 'fill-current' : ''
-                }`}
+                className={`w-5 h-5 ${solution.myVote === 'up_vote' ? 'fill-current' : ''
+                  }`}
               />
               {solution.upvoteCount}
             </Button>
@@ -192,16 +190,14 @@ export default function SolutionDetailPanel({
               variant="outline"
               size="sm"
               onClick={() => handleVote('down_vote')}
-              className={`gap-2 ${
-                solution.myVote === 'down_vote'
+              className={`gap-2 ${solution.myVote === 'down_vote'
                   ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
                   : ''
-              }`}
+                }`}
             >
               <ArrowBigDown
-                className={`w-5 h-5 ${
-                  solution.myVote === 'down_vote' ? 'fill-current' : ''
-                }`}
+                className={`w-5 h-5 ${solution.myVote === 'down_vote' ? 'fill-current' : ''
+                  }`}
               />
               {solution.downvoteCount}
             </Button>
