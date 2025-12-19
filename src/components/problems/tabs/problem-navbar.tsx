@@ -36,7 +36,6 @@ const navItems = [
   { id: 'description', label: 'Problem', icon: FileText },
   { id: 'submissions', label: 'Submissions', icon: CheckCircle },
   { id: 'solutions', label: 'Solutions', icon: Lightbulb },
-  { id: 'standing', label: 'Standing', icon: Trophy },
 ];
 
 export default function ProblemNavbar({

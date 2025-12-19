@@ -31,31 +31,40 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuContent align="end" className="w-64 p-2">
+          <div className="px-2 py-1.5">
+            <p className="text-sm font-medium leading-none text-slate-900 dark:text-slate-100">
+              {user.firstName} {user.lastName}
+            </p>
+            <p className="text-xs leading-none text-slate-500 dark:text-slate-400 mt-1">
+              {user.email}
+            </p>
+          </div>
+          <DropdownMenuSeparator />
           <DropdownMenuItem asChild>
             <Link
               href={`/profile/${user.id}`}
-              className="cursor-pointer w-full flex items-center"
+              className="cursor-pointer w-full flex items-center py-2.5"
             >
-              <User className="mr-2 h-4 w-4" />
+              <User className="mr-3 h-4 w-4 text-slate-500" />
               <span>Hồ sơ của tôi</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link
               href={`/profile/${user.id}/practice`}
-              className="cursor-pointer w-full flex items-center"
+              className="cursor-pointer w-full flex items-center py-2.5"
             >
-              <History className="mr-2 h-4 w-4" />
+              <History className="mr-3 h-4 w-4 text-slate-500" />
               <span>Lịch sử luyện tập</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={onLogout}
-            className="text-red-600 cursor-pointer w-full flex items-center"
+            className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/10 cursor-pointer w-full flex items-center py-2.5"
           >
-            <LogOut className="mr-2 h-4 w-4" />
+            <LogOut className="mr-3 h-4 w-4" />
             <span>Đăng xuất</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
