@@ -19,7 +19,7 @@
         "noForEach": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "warn",
+        "noArrayIndexKey": "off",
         "noExplicitAny": "off"
       }
     }
