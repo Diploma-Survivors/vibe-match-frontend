@@ -1,11 +1,26 @@
 import type { DecodedAccessToken } from '@/types/states';
 import { jwtDecode } from 'jwt-decode';
-import { Database } from 'lucide-react';
 import NextAuth from 'next-auth';
 import type { NextAuthOptions } from 'next-auth';
 import { getServerSession } from 'next-auth'; // Add this import
 import type { JWT } from 'next-auth/jwt';
 import CredentialsProvider from 'next-auth/providers/credentials';
+
+declare module 'next-auth' {
+  interface Session {
+    deviceId?: string;
+    accessToken?: string;
+    redirect?: string;
+  }
+  interface User {
+    deviceId?: string;
+    accessToken?: string;
+    refreshToken?: string;
+    redirect?: string;
+    callbackUrl?: string;
+    id?: string;
+  }
+}
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
   try {
@@ -15,15 +30,16 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token.refreshToken}`,
         },
         body: JSON.stringify({
-          deviceId: token.deviceId,
+          refreshToken: token.refreshToken,
         }),
       }
     );
 
-    const data = await response.json();
+    const raw = await response.json();
+    const data = raw.data;
+    
 
     if (!response.ok) {
       throw data;
@@ -50,7 +66,6 @@ export const authOptions: NextAuthOptions = {
         refreshToken: { label: 'Refresh Token', type: 'text' },
         redirect: { label: 'Redirect', type: 'text' },
         callbackUrl: { label: 'Callback URL', type: 'text' },
-        deviceId: { label: 'Device ID', type: 'text' },
       },
       async authorize(credentials) {
         if (!credentials?.accessToken) return null;
@@ -60,7 +75,6 @@ export const authOptions: NextAuthOptions = {
           refreshToken: credentials.refreshToken,
           redirect: credentials.redirect,
           callbackUrl: credentials.callbackUrl,
-          deviceId: credentials.deviceId,
         };
       },
     }),
@@ -78,39 +92,33 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          // Call your backend login API
-          // const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`, {
-          //   method: 'POST',
-          //   headers: { 'Content-Type': 'application/json' },
-          //   body: JSON.stringify({
-          //     username: credentials.username,
-          //     password: credentials.password,
-          //   }),
-          // });
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/login`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                emailOrUsername: credentials.username,
+                password: credentials.password,
+              }),
+            }
+          );
 
-          // mock data here
-          const data = {
-            user: {
-              id: 'user-id',
-            },
-            accessToken:
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImNvdXJzZUlkIjoxLCJlbWFpbCI6InN0dWRlbnRAZ21haWwuY29tIiwiZmlyc3ROYW1lIjoic3R1ZGVudCIsImxhc3ROYW1lIjoic3R1ZGVudCIsInJvbGVzIjpbIlNUVURFTlQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODg4OCIsImx0aVNlc3Npb25JZCI6ImU2YmQ2NWZmLWMzMGUtNDA2OS05ZWVmLWRmZGQzNDBmMTYyNyIsImlhdCI6MTc2NTQxOTY3MywiZXhwIjoxNzY1NDE5Njc0LCJhdWQiOiJsb2NhbGhvc3Q6MzAwMCJ9.h5pczel1OPQI-Uiw93IQxX_gnhec_6A2urIl5ykqfUc',
-            refreshToken:
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImNvdXJzZUlkIjoxLCJlbWFpbCI6InN0dWRlbnRAZ21haWwuY29tIiwiZmlyc3ROYW1lIjoic3R1ZGVudCIsImxhc3ROYW1lIjoic3R1ZGVudCIsInJvbGVzIjpbIlNUVURFTlQiXSwic3ViIjoiMyIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3Q6ODg4OCIsImx0aVNlc3Npb25JZCI6ImU2YmQ2NWZmLWMzMGUtNDA2OS05ZWVmLWRmZGQzNDBmMTYyNyIsImlhdCI6MTc2NTQxOTY3MywiZXhwIjoxNzY1NTA2MDczLCJhdWQiOiJsb2NhbGhvc3Q6MzAwMCJ9.r2L3-b1e21g4ODmdXpOulLc5gZkEVKuCNa_bhuh8JKg',
-            deviceId: 'device-id',
-          };
+          if (!res.ok) {
+            // Throw error to be caught by NextAuth frontend
+            throw new Error(res.statusText || 'Authentication failed');
+          }
 
-          // if (!res.ok) {
-          //   // Throw error to be caught by NextAuth frontend
-          //   throw new Error(data.message || 'Authentication failed');
-          // }
+          const raw = await res.json();
+          const data = raw.data;
 
           // Return object MUST match the shape used in 'jwt' callback below
           return {
             id: data.user?.id || 'user-id',
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
-            deviceId: data.deviceId,
+            redirect: data.redirect,
+            callbackUrl: data.callbackUrl,
           };
         } catch (error: any) {
           console.error('Login logic error:', error);
@@ -142,6 +150,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       session.accessToken = token.accessToken as string;
       session.redirect = token.redirect as string;
+      session.deviceId = token.deviceId as string;
       return session;
     },
     async redirect({ url }) {
