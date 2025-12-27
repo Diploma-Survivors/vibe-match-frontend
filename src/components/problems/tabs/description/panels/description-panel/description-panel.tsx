@@ -1,16 +1,17 @@
 import ReadOnlyEditor from '@/components/lexical-editor/lexical-editor';
 import { Button } from '@/components/ui/button';
-import { useApp } from '@/contexts/app-context';
+
 import { toastService } from '@/services/toasts-service';
 import type { ProblemDescription } from '@/types/problems';
 import { ProblemDifficulty } from '@/types/problems';
-import { IssuerType } from '@/types/states';
+
 import type { SampleTestcase } from '@/types/testcases';
 import { FileText, MemoryStick, Timer } from 'lucide-react';
 import { Copy } from 'lucide-react';
 import { useContext, useState } from 'react';
 import { ProblemDiscussion } from './problem-discussion';
 import { ProblemTopicsTags } from './problem-topics-tags';
+import { useTranslation } from 'react-i18next';
 
 interface DescriptionPanelProps {
   problem: ProblemDescription;
@@ -18,22 +19,9 @@ interface DescriptionPanelProps {
 }
 
 export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
-  const { issuer } = useApp();
+  const { t } = useTranslation('problems');
   const sampleCases: SampleTestcase[] = problem.testcaseSamples || [];
   const [activeSampleIndex, setActiveSampleIndex] = useState(0);
-
-  const getDifficultyLabel = (difficulty: string): string => {
-    switch (difficulty) {
-      case ProblemDifficulty.EASY:
-        return 'Easy';
-      case ProblemDifficulty.MEDIUM:
-        return 'Medium';
-      case ProblemDifficulty.HARD:
-        return 'Hard';
-      default:
-        return difficulty;
-    }
-  };
 
   // Format time and memory limit
   const timeLimitSeconds = (problem.timeLimitMs / 1000).toFixed(1);
@@ -54,33 +42,32 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
       <div className="rounded-xl h-full flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
         <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
           {/* Problem Title Header */}
-          <div className="pb-6 border-b border-slate-200 dark:border-slate-700">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 dark:from-slate-100 dark:to-slate-300 bg-clip-text text-transparent mb-4">
+          <div className="pb-6 border-b border-border">
+            <h1 className="text-3xl font-bold text-foreground mb-4">
               {problem.title}
             </h1>
             <div className="flex items-center gap-4 flex-wrap">
               <div
-                className={`px-3 py-1 rounded-full text-sm font-semibold shadow-md ${
-                  problem.difficulty === 'easy'
-                    ? 'bg-gradient-to-r from-green-400 to-green-500 text-white'
-                    : problem.difficulty === 'medium'
-                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white'
-                      : 'bg-gradient-to-r from-red-400 to-red-500 text-white'
-                }`}
+                className={`px-3 py-1 rounded-full text-sm font-semibold border ${problem.difficulty === 'easy'
+                  ? 'bg-green-500/10 text-green-600 border-green-500/20'
+                  : problem.difficulty === 'medium'
+                    ? 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
+                    : 'bg-red-500/10 text-red-600 border-red-500/20'
+                  }`}
               >
-                {getDifficultyLabel(problem.difficulty)}
+                {t(`difficulty_${problem.difficulty}`)}
               </div>
-              <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
+              <div className="flex items-center gap-1 text-sm text-foreground/80 font-semibold">
                 <Timer className="w-4 h-4" />
                 {timeLimitSeconds}s time limit
               </div>
-              <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
+              <div className="flex items-center gap-1 text-sm text-foreground/80 font-semibold">
                 <MemoryStick className="w-4 h-4" />
                 {memoryLimitMB}MB memory
               </div>
-              <div className="flex items-center gap-1 text-sm text-slate-600 dark:text-slate-400 font-semibold">
+              <div className="flex items-center gap-1 text-sm text-foreground/80 font-semibold">
                 <FileText className="w-4 h-4" />
-                {problem.maxScore} điểm
+                {problem.maxScore} {t('points')}
               </div>
             </div>
           </div>
@@ -148,11 +135,10 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
                   <button
                     key={`sample-tab-${sample.id ?? sample.input?.slice(0, 20) ?? index}`}
                     onClick={() => setActiveSampleIndex(index)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
-                      activeSampleIndex === index
-                        ? 'bg-slate-300 dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm'
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
-                    }`}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${activeSampleIndex === index
+                      ? 'bg-slate-300 dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm'
+                      : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+                      }`}
                   >
                     Case {index + 1}
                   </button>

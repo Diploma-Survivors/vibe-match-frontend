@@ -19,12 +19,9 @@ interface SortControlsProps {
   onSortOrderChange: (newSortOrder: SortOrder) => void;
 }
 
-const SORT_OPTIONS = [
-  { value: SortBy.TITLE, label: 'Tên bài' },
-  { value: SortBy.DIFFICULTY, label: 'Độ khó' },
-  { value: SortBy.CREATED_AT, label: 'Ngày tạo' },
-  { value: SortBy.MAX_SCORE, label: 'Điểm tối đa' },
-];
+// Removed static SORT_OPTIONS to use inside component with t()
+
+import { useTranslation } from 'react-i18next';
 
 export default function SortControls({
   sortBy,
@@ -32,6 +29,14 @@ export default function SortControls({
   onSortByChange,
   onSortOrderChange,
 }: SortControlsProps) {
+  const { t } = useTranslation('problems');
+
+  const sortOptions = [
+    { value: SortBy.TITLE, label: t('sort_options.title') },
+    { value: SortBy.DIFFICULTY, label: t('sort_options.difficulty') },
+    { value: SortBy.CREATED_AT, label: t('sort_options.createdAt') },
+    { value: SortBy.MAX_SCORE, label: t('sort_options.maxScore') },
+  ];
   const getSortIcon = () => {
     if (sortOrder === SortOrder.ASC) {
       return <ArrowUp className="w-4 h-4" />;
@@ -42,18 +47,18 @@ export default function SortControls({
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <ArrowUpDown className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-        <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-          Sắp xếp:
+        <ArrowUpDown className="w-5 h-5 text-muted-foreground" />
+        <span className="text-sm font-semibold text-foreground">
+          {t('sort_by')}:
         </span>
       </div>
 
       <Select value={sortBy} onValueChange={onSortByChange}>
-        <SelectTrigger className="w-48 h-10 rounded-xl border-0 bg-slate-100 dark:bg-slate-700/50 focus:ring-2 focus:ring-green-500 transition-all duration-200">
+        <SelectTrigger className="w-48 h-10 rounded-xl bg-background border border-border focus:ring-primary">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-          {SORT_OPTIONS.map((option) => (
+        <SelectContent className="rounded-xl border border-border bg-popover text-popover-foreground shadow-xl">
+          {sortOptions.map((option) => (
             <SelectItem
               key={option.value}
               value={option.value}
@@ -73,11 +78,11 @@ export default function SortControls({
             sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC
           )
         }
-        className="flex items-center gap-2 h-10 px-4 border-0 bg-slate-100 dark:bg-slate-700/50 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-xl transition-all duration-200 hover:scale-105"
+        className="flex items-center gap-2 h-10 px-4 border border-border bg-background hover:bg-muted rounded-xl transition-all duration-200"
       >
         {getSortIcon()}
         <span className="font-medium">
-          {sortOrder === SortOrder.ASC ? 'Tăng dần' : 'Giảm dần'}
+          {sortOrder === SortOrder.ASC ? t('sort_asc') : t('sort_desc')}
         </span>
       </Button>
     </div>

@@ -8,7 +8,10 @@ interface ProblemStatsProps {
   problems: ProblemListItem[];
 }
 
+import { useTranslation } from 'react-i18next';
+
 export default function ProblemStats({ problems }: ProblemStatsProps) {
+  const { t } = useTranslation('problems');
   const stats = useMemo(() => {
     const total = problems.length;
     // const avgAcceptance =
@@ -28,14 +31,14 @@ export default function ProblemStats({ problems }: ProblemStatsProps) {
   const statItems = [
     {
       icon: BookOpen,
-      label: 'Tổng bài',
+      label: t('total_problems'),
       value: stats.total.toLocaleString(),
       bgColor: 'bg-blue-50 dark:bg-blue-900/20',
       iconColor: 'text-green-600 dark:text-emerald-400',
     },
     {
       icon: TrendingUp,
-      label: 'Tỷ lệ AC',
+      label: t('acceptance_rate'),
       // value: `${stats.avgAcceptance.toFixed(1)}%`,
       value: '100%',
       bgColor: 'bg-green-50 dark:bg-green-900/20',
@@ -43,7 +46,7 @@ export default function ProblemStats({ problems }: ProblemStatsProps) {
     },
     {
       icon: Users,
-      label: 'Lượt nộp',
+      label: t('total_submissions'),
       // value: stats.totalSubmissions.toLocaleString(),
       value: '9999',
       bgColor: 'bg-green-50 dark:bg-green-900/20',

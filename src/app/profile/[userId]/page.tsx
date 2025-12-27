@@ -50,6 +50,7 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { use, useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type MonthKey =
   | 'Jan'
@@ -83,6 +84,7 @@ const monthWidths: Record<string, number> = {
 export default function ProfilePage({
   params,
 }: { params: Promise<{ userId: string }> }) {
+  const { t, i18n } = useTranslation('profile');
   const { userId: userIdString } = use(params);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -283,7 +285,7 @@ export default function ProfilePage({
       const dayOfYear =
         Math.floor(
           (firstDayOfMonth.getTime() - startDate.getTime()) /
-            (1000 * 60 * 60 * 24)
+          (1000 * 60 * 60 * 24)
         ) + padding;
       const weekIndex = Math.floor(dayOfYear / 7);
 
@@ -400,37 +402,6 @@ export default function ProfilePage({
   };
 
   const handleSolutionClick = (solutionId: string) => {
-    // Assuming we want to go to the problem's solution tab with this solution selected
-    // We need the problemId for the URL. The solution object has it?
-    // Wait, Solution type doesn't explicitly have problemId in the interface I saw earlier?
-    // Let's check the Solution type again.
-    // It has `id`, `title`, `content`, `authorId`, etc. It DOES NOT have `problemId` in the interface I saw.
-    // However, in a real app, a solution belongs to a problem.
-    // For now, I'll assume we can navigate to a generic solution page or I need to update the mock/type.
-    // The mock data doesn't seem to have problemId.
-    // But `SolutionListRequest` takes `problemId`.
-    // If I can't get problemId, I can't construct the URL `/problems/[id]/solutions`.
-    // I'll assume for now that I can't easily link to the specific problem context without problemId.
-    // BUT, the user wants "navigate to the solutions tab".
-    // I'll check if I can add `problemId` to the Solution type and mock.
-    // For now, I'll just log it or try to find a workaround.
-    // Actually, looking at `SolutionItem`, it displays tags and languages.
-    // If I don't have problemId, I can't link to the problem.
-    // I will add `problemId` to the `Solution` interface and mock data in a separate step if needed.
-    // For now, I will use a placeholder or assume it's available.
-    // Wait, I can't assume it if it's not in the type.
-    // I'll check `Solution` type again in my thought process.
-    // It was:
-    // export interface Solution { id: string; title: string; authorId: number; ... }
-    // No problemId.
-    // I should add `problemId` to `Solution` type and mock.
-    // I will do that in a separate tool call or just update it here if I can.
-    // I'll assume I'll fix the type/mock in the next step.
-    // For now, I'll use a dummy problem ID '1' or try to extract it from title? No.
-    // I'll just comment the navigation for now and fix it immediately after.
-    // Actually, I can just use `router.push` with a placeholder and fix it.
-    // Or better, I'll add `problemId` to the type in the previous file edit? Too late.
-    // I'll just use a hardcoded '1' for now and fix it.
     const solution = userSolutions.find((s) => s.id === solutionId);
     if (solution) {
       router.push(
@@ -548,55 +519,55 @@ export default function ProfilePage({
       <div className="grid grid-cols-12 gap-6">
         {/* Left Column: User Profile Sidebar */}
         <div className="col-span-12 lg:col-span-3 space-y-6">
-          <Card className="shadow-lg border-none">
+          <Card className="shadow-lg border-none bg-card">
             <CardContent className="pt-6 flex flex-col items-center text-center space-y-4">
               <div className="relative">
                 <img
                   src={user.avatarUrl}
                   alt={user.username}
-                  className="w-32 h-32 rounded-xl object-cover border-4 border-white shadow-md"
+                  className="w-32 h-32 rounded-xl object-cover border-4 border-background shadow-md"
                 />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-foreground">
                   {user.firstName} {user.lastName}
                 </h2>
-                <p className="text-gray-500 font-medium">{user.username}</p>
+                <p className="text-muted-foreground font-medium">{user.username}</p>
               </div>
               <Badge
                 variant="secondary"
                 className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200 px-3 py-1"
               >
                 <Trophy className="w-3 h-3 mr-1" />
-                {`Rank ${user.rank}`}
+                {`${t('rank')} ${user.rank}`}
               </Badge>
 
               {isCurrentUser && (
                 <Button
-                  className="w-full bg-green-50 text-green-600 hover:bg-green-100 border border-green-200"
+                  className="w-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20"
                   onClick={() => setIsEditModalOpen(true)}
                 >
                   <Edit className="w-4 h-4 mr-2" />
-                  Chỉnh sửa hồ sơ
+                  {t('edit_profile')}
                 </Button>
               )}
 
               <div className="w-full space-y-3 pt-4 text-left">
-                <div className="flex items-center text-gray-600">
-                  <MapPin className="w-4 h-4 mr-3 text-gray-400" />
+                <div className="flex items-center text-muted-foreground">
+                  <MapPin className="w-4 h-4 mr-3 text-muted-foreground/70" />
                   <span className="text-sm truncate">{user.address}</span>
                 </div>
-                <div className="flex items-center text-gray-600">
-                  <Mail className="w-4 h-4 mr-3 text-gray-400" />
+                <div className="flex items-center text-muted-foreground">
+                  <Mail className="w-4 h-4 mr-3 text-muted-foreground/70" />
                   <span className="text-sm truncate">{user.email}</span>
                 </div>
-                <div className="flex items-center text-gray-600">
-                  <Phone className="w-4 h-4 mr-3 text-gray-400" />
+                <div className="flex items-center text-muted-foreground">
+                  <Phone className="w-4 h-4 mr-3 text-muted-foreground/70" />
                   <span className="text-sm truncate">{user.phone}</span>
                 </div>
-                <div className="flex items-center text-gray-600">
-                  <Calendar className="w-4 h-4 mr-3 text-gray-400" />
-                  <span className="text-sm truncate">Tham gia Dec 2024</span>
+                <div className="flex items-center text-muted-foreground">
+                  <Calendar className="w-4 h-4 mr-3 text-muted-foreground/70" />
+                  <span className="text-sm truncate">{`${t('joined')} Dec 2024`}</span>
                 </div>
               </div>
             </CardContent>
@@ -608,9 +579,9 @@ export default function ProfilePage({
           {/* Stats Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Solved Problems Chart */}
-            <Card className="border-none shadow-md">
+            <Card className="border-none shadow-md bg-card">
               <CardHeader>
-                <CardTitle>Bài tập đã giải</CardTitle>
+                <CardTitle>{t('solved_problems')}</CardTitle>
               </CardHeader>
               <CardContent className="flex items-center justify-center space-x-8">
                 <Tooltip
@@ -618,11 +589,12 @@ export default function ProfilePage({
                 >
                   <div className="relative w-32 h-32 flex items-center justify-center cursor-pointer">
                     <svg viewBox="0 0 36 36" className="w-full h-full">
-                      <title>Biểu đồ bài tập đã giải</title>
+                      <title>{t('solved_problems_chart')}</title>
                       <path
                         d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                         fill="none"
-                        stroke="#eee"
+                        stroke="currentColor"
+                        className="text-muted"
                         strokeWidth="3"
                       />
                       <path
@@ -634,25 +606,25 @@ export default function ProfilePage({
                       />
                     </svg>
                     <div className="absolute flex flex-col items-center">
-                      <span className="text-2xl font-bold text-gray-900">
+                      <span className="text-2xl font-bold text-foreground">
                         {totalSolved}/{totalProblems}
                       </span>
-                      <span className="text-xs text-gray-500">Đã giải</span>
+                      <span className="text-xs text-muted-foreground">{t('solved')}</span>
                     </div>
                   </div>
                 </Tooltip>
 
                 <div className="space-y-2 flex-1">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-green-600 font-medium">Dễ</span>
+                    <span className="text-green-600 font-medium">{t('easy')}</span>
                     <span className="font-bold">
                       {easyStats.solved}
-                      <span className="text-gray-400 font-normal">
+                      <span className="text-muted-foreground font-normal">
                         /{easyStats.total}
                       </span>
                     </span>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div
                       className="bg-green-500 h-2 rounded-full"
                       style={{
@@ -663,16 +635,16 @@ export default function ProfilePage({
 
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-yellow-600 font-medium">
-                      Trung bình
+                      {t('medium')}
                     </span>
                     <span className="font-bold">
                       {mediumStats.solved}
-                      <span className="text-gray-400 font-normal">
+                      <span className="text-muted-foreground font-normal">
                         /{mediumStats.total}
                       </span>
                     </span>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div
                       className="bg-yellow-500 h-2 rounded-full"
                       style={{
@@ -682,15 +654,15 @@ export default function ProfilePage({
                   </div>
 
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-red-600 font-medium">Khó</span>
+                    <span className="text-red-600 font-medium">{t('hard')}</span>
                     <span className="font-bold">
                       {hardStats.solved}
-                      <span className="text-gray-400 font-normal">
+                      <span className="text-muted-foreground font-normal">
                         /{hardStats.total}
                       </span>
                     </span>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
+                  <div className="w-full bg-muted rounded-full h-2">
                     <div
                       className="bg-red-500 h-2 rounded-full"
                       style={{
@@ -703,9 +675,9 @@ export default function ProfilePage({
             </Card>
 
             {/* Submission Status Chart */}
-            <Card className="border-none shadow-md">
+            <Card className="border-none shadow-md bg-card">
               <CardHeader>
-                <CardTitle>Thống kê submissions</CardTitle>
+                <CardTitle>{t('submission_stats')}</CardTitle>
               </CardHeader>
               <CardContent className="flex items-center justify-between">
                 {/* Pie Chart */}
@@ -714,7 +686,7 @@ export default function ProfilePage({
                     viewBox="0 0 32 32"
                     className="w-full h-full transform -rotate-90"
                   >
-                    <title>Biểu đồ trạng thái nộp bài</title>
+                    <title>{t('submission_status_chart')}</title>
                     {(() => {
                       const total = submissions.length || 1;
                       let cumulativePercent = 0;
@@ -739,11 +711,11 @@ export default function ProfilePage({
                         const count =
                           item.status === 'others'
                             ? (submissionStats[
-                                SubmissionStatus.COMPILATION_ERROR
-                              ] || 0) + (submissionStats.others || 0)
+                              SubmissionStatus.COMPILATION_ERROR
+                            ] || 0) + (submissionStats.others || 0)
                             : submissionStats[
-                                item.status as SubmissionStatus
-                              ] || 0;
+                            item.status as SubmissionStatus
+                            ] || 0;
 
                         if (count === 0) return null;
 
@@ -761,18 +733,18 @@ export default function ProfilePage({
                         const x2 =
                           16 +
                           16 *
-                            Math.cos((2 * Math.PI * cumulativePercent) / 100);
+                          Math.cos((2 * Math.PI * cumulativePercent) / 100);
                         const y2 =
                           16 +
                           16 *
-                            Math.sin((2 * Math.PI * cumulativePercent) / 100);
+                          Math.sin((2 * Math.PI * cumulativePercent) / 100);
 
                         const largeArcFlag = percent > 50 ? 1 : 0;
 
                         return (
                           <Tooltip
                             key={item.status}
-                            content={`${item.status}: ${percent.toFixed(1)}%`}
+                            content={`${item.status === 'others' ? t('others') : item.status}: ${percent.toFixed(1)}%`}
                           >
                             <path
                               d={`M 16 16 L ${x1} ${y1} A 16 16 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
@@ -789,21 +761,21 @@ export default function ProfilePage({
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span className="text-gray-600">Accepted:</span>
+                    <span className="text-muted-foreground">{t('accepted')}:</span>
                     <span className="font-bold">
                       {submissionStats[SubmissionStatus.ACCEPTED] || 0}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <span className="text-gray-600">Wrong Answer:</span>
+                    <span className="text-muted-foreground">{t('wrong_answer')}:</span>
                     <span className="font-bold">
                       {submissionStats[SubmissionStatus.WRONG_ANSWER] || 0}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <span className="text-gray-600">Time Limit:</span>
+                    <span className="text-muted-foreground">{t('time_limit')}:</span>
                     <span className="font-bold">
                       {submissionStats[SubmissionStatus.TIME_LIMIT_EXCEEDED] ||
                         0}
@@ -811,14 +783,14 @@ export default function ProfilePage({
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-orange-500" />
-                    <span className="text-gray-600">Runtime Error:</span>
+                    <span className="text-muted-foreground">{t('runtime_error')}:</span>
                     <span className="font-bold">
                       {submissionStats[SubmissionStatus.RUNTIME_ERROR] || 0}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className="w-3 h-3 rounded-full bg-gray-500" />
-                    <span className="text-gray-600">Others:</span>
+                    <span className="text-muted-foreground">{t('others')}:</span>
                     <span className="font-bold">
                       {(submissionStats[SubmissionStatus.COMPILATION_ERROR] ||
                         0) + (submissionStats.others || 0)}
@@ -830,18 +802,18 @@ export default function ProfilePage({
           </div>
 
           {/* Contribution Graph */}
-          <Card className="border-none shadow-md">
+          <Card className="border-none shadow-md bg-card">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-base font-medium">
-                {submissions.length} submissions trong một năm qua
+                {t('submissions_last_year', { count: submissions.length })}
               </CardTitle>
               <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-500">
-                  Số ngày hoạt động: {totalActiveDays}
+                <span className="text-sm text-muted-foreground">
+                  {t('active_days', { count: totalActiveDays })}
                 </span>
                 <Select value={selectedYear} onValueChange={setSelectedYear}>
                   <SelectTrigger className="w-[100px]">
-                    <SelectValue placeholder="Năm" />
+                    <SelectValue placeholder={t('year')} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="2024">2024</SelectItem>
@@ -854,7 +826,7 @@ export default function ProfilePage({
               <div className="overflow-x-auto">
                 <div className="min-w-[820px]">
                   {/* Month Labels */}
-                  <div className="flex text-xs text-gray-500 mb-2 ml-8">
+                  <div className="flex text-xs text-muted-foreground mb-2 ml-8">
                     {heatmapData.months.map((month) => (
                       <div
                         key={month.label}
@@ -867,12 +839,12 @@ export default function ProfilePage({
 
                   <div className="flex">
                     {/* Day Labels */}
-                    <div className="flex flex-col gap-1 mr-2 text-xs text-gray-500 pt-5">
-                      <div className="h-3">Mon</div>
+                    <div className="flex flex-col gap-1 mr-2 text-xs text-muted-foreground pt-5">
+                      <div className="h-3">{t('mon')}</div>
                       <div className="h-3" />
-                      <div className="h-3">Wed</div>
+                      <div className="h-3">{t('wed')}</div>
                       <div className="h-3" />
-                      <div className="h-3">Fri</div>
+                      <div className="h-3">{t('fri')}</div>
                     </div>
 
                     {/* Heatmap Grid */}
@@ -887,15 +859,14 @@ export default function ProfilePage({
                             content={`${day.count} submissions on ${day.date}`}
                           >
                             <div
-                              className={`w-3 h-3 rounded-sm ${
-                                day.count === 0
-                                  ? 'bg-gray-100'
+                              className={`w-3 h-3 rounded-sm ${day.count === 0
+                                  ? 'bg-muted'
                                   : day.count < 3
-                                    ? 'bg-green-200'
+                                    ? 'bg-green-300 dark:bg-green-900'
                                     : day.count < 6
-                                      ? 'bg-green-400'
-                                      : 'bg-green-600'
-                              }`}
+                                      ? 'bg-green-500 dark:bg-green-700'
+                                      : 'bg-green-700 dark:bg-green-500'
+                                }`}
                             />
                           </Tooltip>
                         );
@@ -908,19 +879,19 @@ export default function ProfilePage({
           </Card>
 
           {/* Recent Activity */}
-          <Card className="border-none shadow-md">
+          <Card className="border-none shadow-md bg-card">
             <CardHeader>
               <Tabs defaultValue="ac_problems" className="w-full">
                 <div className="flex items-center justify-between mb-4">
                   <TabsList>
                     <TabsTrigger value="ac_problems">
-                      Bài tập đã giải
+                      {t('solved_problems')}
                     </TabsTrigger>
-                    <TabsTrigger value="solutions">Solution</TabsTrigger>
+                    <TabsTrigger value="solutions">{t('solutions')}</TabsTrigger>
                   </TabsList>
                   <Link href={`/profile/${userIdString}/practice`}>
                     <Button variant="outline" size="sm" className="gap-2">
-                      Đi đến lịch sử luyện tập
+                      {t('go_to_practice_history')}
                       <ArrowRight className="w-4 h-4" />
                     </Button>
                   </Link>
@@ -934,37 +905,37 @@ export default function ProfilePage({
                       }
                     >
                       <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Sắp xếp" />
+                        <SelectValue placeholder={t('sort_by')} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="newest">Mới nhất</SelectItem>
-                        <SelectItem value="oldest">Cũ nhất</SelectItem>
+                        <SelectItem value="newest">{t('newest')}</SelectItem>
+                        <SelectItem value="oldest">{t('oldest')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Bài tập</TableHead>
-                        <TableHead>Thời gian giải</TableHead>
+                        <TableHead>{t('problem')}</TableHead>
+                        <TableHead>{t('solved_at')}</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {paginatedSolvedProblems.map((problem) => (
                         <TableRow
                           key={problem.id}
-                          className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
+                          className="cursor-pointer hover:bg-muted/50"
                           onClick={() => handleProblemClick(problem.id)}
                         >
                           <TableCell className="font-medium">
                             {problem.title}
                           </TableCell>
-                          <TableCell className="text-gray-500">
+                          <TableCell className="text-muted-foreground">
                             {problem.solvedAt
                               ? format(
-                                  new Date(problem.solvedAt),
-                                  'yyyy-MM-dd HH:mm'
-                                )
+                                new Date(problem.solvedAt),
+                                'yyyy-MM-dd HH:mm'
+                              )
                               : 'N/A'}
                           </TableCell>
                         </TableRow>
@@ -973,9 +944,9 @@ export default function ProfilePage({
                         <TableRow>
                           <TableCell
                             colSpan={2}
-                            className="text-center text-gray-500"
+                            className="text-center text-muted-foreground"
                           >
-                            Chưa có bài tập nào được giải.
+                            {t('no_solved_problems')}
                           </TableCell>
                         </TableRow>
                       )}
@@ -991,10 +962,10 @@ export default function ProfilePage({
                         onClick={() => setSolvedPage((p) => Math.max(1, p - 1))}
                         disabled={solvedPage === 1}
                       >
-                        Trang trước
+                        {t('previous_page')}
                       </Button>
-                      <span className="flex items-center text-sm text-gray-600">
-                        Trang {solvedPage} / {totalSolvedPages}
+                      <span className="flex items-center text-sm text-foreground">
+                        {t('page_info', { current: solvedPage, total: totalSolvedPages })}
                       </span>
                       <Button
                         variant="outline"
@@ -1006,7 +977,7 @@ export default function ProfilePage({
                         }
                         disabled={solvedPage === totalSolvedPages}
                       >
-                        Trang sau
+                        {t('next_page')}
                       </Button>
                     </div>
                   )}
@@ -1020,14 +991,14 @@ export default function ProfilePage({
                       }
                     >
                       <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Sắp xếp" />
+                        <SelectValue placeholder={t('sort_by')} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value={SolutionSortBy.RECENT}>
-                          Mới nhất
+                          {t('newest')}
                         </SelectItem>
                         <SelectItem value={SolutionSortBy.MOST_VOTED}>
-                          Được bình chọn nhiều nhất
+                          {t('most_voted')}
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -1055,8 +1026,8 @@ export default function ProfilePage({
                         </div>
                       ))}
                       {paginatedSolutions.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                          Chưa có solution nào.
+                        <div className="text-center py-8 text-muted-foreground">
+                          {t('no_solutions')}
                         </div>
                       )}
                     </div>
@@ -1073,10 +1044,10 @@ export default function ProfilePage({
                         }
                         disabled={solutionsPage === 1}
                       >
-                        Trang trước
+                        {t('previous_page')}
                       </Button>
-                      <span className="flex items-center text-sm text-gray-600">
-                        Trang {solutionsPage} / {totalSolutionsPages}
+                      <span className="flex items-center text-sm text-foreground">
+                        {t('page_info', { current: solutionsPage, total: totalSolutionsPages })}
                       </span>
                       <Button
                         variant="outline"
@@ -1088,7 +1059,7 @@ export default function ProfilePage({
                         }
                         disabled={solutionsPage === totalSolutionsPages}
                       >
-                        Trang sau
+                        {t('next_page')}
                       </Button>
                     </div>
                   )}

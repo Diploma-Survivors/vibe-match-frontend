@@ -1,45 +1,52 @@
 import type { ProblemDifficulty } from '@/types/problems';
-import { DIFFICULTY_OPTIONS } from '@/types/problems';
+
 
 interface DifficultyFilterProps {
   selectedDifficulty?: ProblemDifficulty;
   onDifficultyChange: (difficulty?: ProblemDifficulty) => void;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export default function DifficultyFilter({
   selectedDifficulty,
   onDifficultyChange,
 }: DifficultyFilterProps) {
+  const { t } = useTranslation('problems');
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-          Mức độ:
+        <label className="block text-sm font-semibold text-foreground">
+          {t('difficulty_label')}:
         </label>
         {selectedDifficulty && (
           <button
             type="button"
             onClick={() => onDifficultyChange(undefined)}
-            className="cursor-pointer text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
+            className="cursor-pointer text-xs text-destructive hover:underline font-medium transition-colors"
           >
-            Xóa
+            {t('clear')}
           </button>
         )}
       </div>
 
       <div className="grid grid-cols-3 gap-2">
-        {DIFFICULTY_OPTIONS.map((option) => {
+        {[
+          { value: 'easy', label: t('difficulty_easy') },
+          { value: 'medium', label: t('difficulty_medium') },
+          { value: 'hard', label: t('difficulty_hard') },
+        ].map((option) => {
           const isSelected = selectedDifficulty === option.value;
           const colorMap: Record<string, string> = {
             easy: isSelected
-              ? 'bg-green-50 text-green-700 border-2 border-green-400 dark:bg-green-900/20 dark:text-green-300 dark:border-green-500'
-              : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-green-300 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600',
+              ? 'bg-green-500/10 text-green-600 border-green-200 dark:text-green-400 dark:border-green-800'
+              : 'bg-background text-muted-foreground border-border hover:border-green-300 dark:hover:border-green-700',
             medium: isSelected
-              ? 'bg-yellow-50 text-yellow-700 border-2 border-yellow-400 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-500'
-              : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-yellow-300 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600',
+              ? 'bg-yellow-500/10 text-yellow-600 border-yellow-200 dark:text-yellow-400 dark:border-yellow-800'
+              : 'bg-background text-muted-foreground border-border hover:border-yellow-300 dark:hover:border-yellow-700',
             hard: isSelected
-              ? 'bg-red-50 text-red-700 border-2 border-red-400 dark:bg-red-900/20 dark:text-red-300 dark:border-red-500'
-              : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-red-300 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600',
+              ? 'bg-red-500/10 text-red-600 border-red-200 dark:text-red-400 dark:border-red-800'
+              : 'bg-background text-muted-foreground border-border hover:border-red-300 dark:hover:border-red-700',
           };
 
           return (

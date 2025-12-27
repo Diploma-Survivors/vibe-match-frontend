@@ -2,7 +2,7 @@
 
 import clientApi from '@/lib/apis/axios-client';
 import type { DecodedAccessToken, UserInfo } from '@/types/states';
-import { IssuerType } from '@/types/states';
+
 import { UserProfile } from '@/types/user';
 import { usePathname } from 'next/navigation';
 import {
@@ -45,6 +45,21 @@ export function AppProvider({
   };
 
   useEffect(() => {
+    // Mock user for UI testing
+    if (!decodedAccessToken) {
+      setUser({
+        id: 'mock-user-id',
+        username: 'ui-tester',
+        email: 'tester@sfinx.com',
+        firstName: 'UI',
+        lastName: 'Tester',
+        role: 'USER',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      } as any);
+      return;
+    }
+
     if (decodedAccessToken) {
       setIsLoading(true);
       clientApi
@@ -55,6 +70,17 @@ export function AppProvider({
         })
         .catch((error) => {
           console.error('Failed to fetch user data:', error);
+          // Fallback to mock user on error for UI testing
+          setUser({
+            id: 'mock-user-id',
+            username: 'ui-tester',
+            email: 'tester@sfinx.com',
+            firstName: 'UI',
+            lastName: 'Tester',
+            role: 'USER',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          } as any);
           setIsLoading(false);
         });
     }

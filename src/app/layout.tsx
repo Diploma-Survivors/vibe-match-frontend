@@ -15,9 +15,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Vibe Match - Decentralized Social Media',
+  title: 'SfinX - Ultimate Coding Platform',
   description:
-    'Empowering creators with decentralized ownership, privacy, and fair rewards.',
+    'Improve your coding skills with SfinX. Practice problems, compete in contests, and climb the leaderboard.',
 };
 
 export default function RootLayout({

@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type { UserProfile } from '@/types/user';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface EditProfileModalProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ export function EditProfileModal({
   user,
   onSave,
 }: EditProfileModalProps) {
+  const { t } = useTranslation('profile');
   const [formData, setFormData] = useState<UserProfile>(user);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +44,7 @@ export function EditProfileModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Chỉnh sửa thông tin</DialogTitle>
+          <DialogTitle>{t('edit_info')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="flex flex-col items-center gap-4 mb-4">
@@ -50,7 +52,7 @@ export function EditProfileModal({
               <img
                 src={formData.avatarUrl || 'https://github.com/shadcn.png'}
                 alt="Avatar"
-                className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
+                className="w-24 h-24 rounded-full object-cover border-2 border-border"
               />
               <input
                 type="file"
@@ -72,13 +74,13 @@ export function EditProfileModal({
               size="sm"
               onClick={() => document.getElementById('avatar-upload')?.click()}
             >
-              Thay đổi ảnh đại diện
+              {t('change_avatar')}
             </Button>
           </div>
 
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="firstName" className="text-right">
-              Họ
+              {t('first_name')}
             </Label>
             <Input
               id="firstName"
@@ -90,7 +92,7 @@ export function EditProfileModal({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="lastName" className="text-right">
-              Tên
+              {t('last_name')}
             </Label>
             <Input
               id="lastName"
@@ -102,7 +104,7 @@ export function EditProfileModal({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="address" className="text-right">
-              Địa chỉ
+              {t('address')}
             </Label>
             <Input
               id="address"
@@ -114,7 +116,7 @@ export function EditProfileModal({
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="phone" className="text-right">
-              Số điện thoại
+              {t('phone')}
             </Label>
             <Input
               id="phone"
@@ -127,13 +129,13 @@ export function EditProfileModal({
 
           <div className="flex justify-end gap-2 mt-4">
             <Button type="button" variant="outline" onClick={onClose}>
-              Hủy
+              {t('cancel')}
             </Button>
             <Button
-              className="bg-green-600 hover:bg-green-700 text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
               type="submit"
             >
-              Lưu thay đổi
+              {t('save_changes')}
             </Button>
           </div>
         </form>

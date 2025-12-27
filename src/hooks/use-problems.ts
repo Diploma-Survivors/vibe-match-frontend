@@ -1,4 +1,6 @@
 import { ProblemsService } from '@/services/problems-service';
+import { TagsService } from '@/services/tags-service';
+import { TopicsService } from '@/services/topics-service';
 import {
   type GetProblemListRequest,
   MatchMode,
@@ -9,7 +11,10 @@ import {
   SortBy,
   SortOrder,
 } from '@/types/problems';
+import type { Tag } from '@/types/tags';
+import type { Topic } from '@/types/topics';
 import { useCallback, useEffect, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 
 const ITEMS_PER_PAGE = 20;
 
@@ -26,7 +31,6 @@ interface UseProblemsActions {
   handleKeywordChange: (newKeyword: string) => void;
   handleSortByChange: (newSortBy: SortBy) => void;
   handleSortOrderChange: (newSortOrder: SortOrder) => void;
-  handleSearch: () => void;
   handleReset: () => void;
   handleLoadMore: () => void;
 }
@@ -37,6 +41,10 @@ interface UseProblemsReturn extends UseProblemsState, UseProblemsActions {
   keyword: string;
   sortBy: SortBy;
   sortOrder: SortOrder;
+  // Metadata
+  tags: Tag[];
+  topics: Topic[];
+  isMetadataLoading: boolean;
 }
 
 export default function useProblems(): UseProblemsReturn {
@@ -48,6 +56,11 @@ export default function useProblems(): UseProblemsReturn {
     isLoading: false,
     error: null,
   });
+
+  // Metadata state
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [isMetadataLoading, setIsMetadataLoading] = useState(false);
 
   // states for filters and keyword to manage input values
   const [filters, setFilters] = useState<ProblemFilters>({});
@@ -67,6 +80,27 @@ export default function useProblems(): UseProblemsReturn {
       ...filters,
     },
   });
+
+  // Fetch Metadata
+  const fetchMetadata = useCallback(async () => {
+    setIsMetadataLoading(true);
+    try {
+      const [tagsData, topicsData] = await Promise.all([
+        TagsService.getAllTags(),
+        TopicsService.getAllTopics(),
+      ]);
+      setTags(tagsData);
+      setTopics(topicsData);
+    } catch (error) {
+      console.error('Error fetching tags or topics:', error);
+    } finally {
+      setIsMetadataLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchMetadata();
+  }, [fetchMetadata]);
 
   // Fetch problems function
   const fetchProblems = useCallback(
@@ -124,14 +158,40 @@ export default function useProblems(): UseProblemsReturn {
     []
   );
 
-  // handle filter, keyword changes
+  // Debounced search for keyword
+  const debouncedSearch = useDebouncedCallback((searchKeyword: string, currentFilters: ProblemFilters) => {
+     updateRequest(
+      {
+        keyword: searchKeyword.trim() || undefined,
+        filters: currentFilters,
+        after: undefined,
+        before: undefined,
+        first: ITEMS_PER_PAGE,
+      },
+      true
+    );
+  }, 500);
+
+  // handle filter changes - Instant update
   const handleFiltersChange = useCallback((newFilters: ProblemFilters) => {
     setFilters(newFilters);
-  }, []);
+    updateRequest(
+      {
+        filters: newFilters,
+        keyword: keyword.trim() || undefined,
+        after: undefined,
+        before: undefined,
+        first: ITEMS_PER_PAGE,
+      },
+      true
+    );
+  }, [keyword, updateRequest]);
 
+  // handle keyword changes - Debounced update
   const handleKeywordChange = useCallback((newKeyword: string) => {
     setKeyword(newKeyword);
-  }, []);
+    debouncedSearch(newKeyword, filters);
+  }, [filters, debouncedSearch]);
 
   // handle sorting changes
   const handleSortByChange = useCallback(
@@ -166,25 +226,6 @@ export default function useProblems(): UseProblemsReturn {
     );
   }, [state.isLoading, state.pageInfo, updateRequest]);
 
-  // handle search
-  const handleSearch = useCallback(() => {
-    const trimmedKeyword = keyword.trim();
-
-    updateRequest(
-      {
-        keyword: trimmedKeyword || undefined,
-        filters: {
-          ...filters,
-        },
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      true
-    );
-  }, [keyword, filters, updateRequest]);
-
   // handle reset
   const handleReset = useCallback(() => {
     setFilters({});
@@ -211,6 +252,11 @@ export default function useProblems(): UseProblemsReturn {
     isLoading: state.isLoading,
     error: state.error,
 
+    // Metadata
+    tags,
+    topics,
+    isMetadataLoading,
+
     // Request params (exposed for UI)
     filters,
     keyword,
@@ -222,7 +268,6 @@ export default function useProblems(): UseProblemsReturn {
     handleKeywordChange,
     handleSortByChange,
     handleSortOrderChange,
-    handleSearch,
     handleReset,
     handleLoadMore,
   };

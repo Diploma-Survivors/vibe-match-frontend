@@ -8,7 +8,7 @@ export default function ConditionalLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { shouldHideNavigation, isLoading, isInDedicatedPages } = useApp();
+  const { shouldHideNavigation, isLoading } = useApp();
 
   if (isLoading) {
     return (

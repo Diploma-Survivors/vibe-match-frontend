@@ -12,6 +12,8 @@ interface TagFilterProps {
   displayLimit?: number;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export default function TagFilter({
   tags,
   selectedTagIds,
@@ -20,6 +22,7 @@ export default function TagFilter({
   onClearAll,
   displayLimit = 3,
 }: TagFilterProps) {
+  const { t } = useTranslation('problems');
   const [showAll, setShowAll] = useState(false);
 
   const displayedTags = showAll ? tags : tags.slice(0, displayLimit);
@@ -27,23 +30,23 @@ export default function TagFilter({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-          Lựa chọn tag:
+        <label className="block text-sm font-semibold text-foreground">
+          {t('select_tags')}:
         </label>
         {selectedTagIds.length > 0 && (
           <button
             type="button"
             onClick={onClearAll}
-            className="cursor-pointer text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
+            className="cursor-pointer text-xs text-destructive hover:underline font-medium transition-colors"
           >
-            Xóa tất cả ({selectedTagIds.length})
+            {t('clear_all')} ({selectedTagIds.length})
           </button>
         )}
       </div>
 
       {isLoading ? (
-        <div className="p-4 text-center text-sm text-slate-500">
-          Đang tải...
+        <div className="p-4 text-center text-sm text-muted-foreground">
+          {t('loading')}
         </div>
       ) : (
         <>
@@ -59,10 +62,9 @@ export default function TagFilter({
                   className={`
                     cursor-pointer font-medium px-3 py-1 rounded-lg border text-xs inline-block
                     transition-all duration-200 hover:scale-105 hover:shadow-md
-                    ${
-                      isSelected
-                        ? 'bg-green-100 text-slate-700 border-2 border-slate-400 dark:bg-slate-600 dark:text-slate-200 dark:border-slate-500 shadow-sm'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600 dark:hover:border-slate-500'
+                    ${isSelected
+                      ? 'bg-primary/10 text-primary border-primary/50 shadow-sm font-semibold'
+                      : 'bg-background text-muted-foreground border-border hover:border-primary/50'
                     }
                   `}
                 >
@@ -76,10 +78,9 @@ export default function TagFilter({
             <div className="flex justify-center pt-2">
               <button
                 type="button"
-                onClick={() => setShowAll(!showAll)}
-                className="cursor-pointer px-4 py-2 text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all duration-200"
+                className="cursor-pointer px-4 py-2 text-sm font-medium text-primary hover:bg-primary/10 rounded-lg transition-all duration-200"
               >
-                {showAll ? 'Thu gọn' : 'Xem thêm'}
+                {showAll ? t('show_less') : t('show_more')}
               </button>
             </div>
           )}

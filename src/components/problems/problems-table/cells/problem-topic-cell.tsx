@@ -7,13 +7,13 @@ interface ProblemTopicCellProps {
 export default function ProblemTopicCell({ topics }: ProblemTopicCellProps) {
   return (
     <div className="space-y-2">
-      <div className="font-semibold text-slate-900 dark:text-slate-100 text-sm break-words">
-        {topics?.at(0)?.name || 'N/A'}
+      <div className="font-semibold text-foreground text-sm break-words">
+        {topics?.at(0)?.name || '---'}
       </div>
       {topics?.slice(1)?.map((topic) => (
         <div
           key={topic.id}
-          className="text-xs text-slate-600 dark:text-slate-400 break-words"
+          className="text-xs text-muted-foreground break-words"
         >
           {topic.name}
         </div>

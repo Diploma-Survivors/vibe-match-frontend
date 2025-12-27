@@ -10,6 +10,8 @@ interface TopicFilterProps {
   onClearAll: () => void;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export default function TopicFilter({
   topics,
   selectedTopicIds,
@@ -17,26 +19,27 @@ export default function TopicFilter({
   onTopicToggle,
   onClearAll,
 }: TopicFilterProps) {
+  const { t } = useTranslation('problems');
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-          Topic:
+        <label className="block text-sm font-semibold text-foreground">
+          {t('topic_label')}:
         </label>
         {selectedTopicIds.length > 0 && (
           <button
             type="button"
             onClick={onClearAll}
-            className="cursor-pointer text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
+            className="cursor-pointer text-xs text-destructive hover:underline font-medium transition-colors"
           >
-            Xóa tất cả ({selectedTopicIds.length})
+            {t('clear_all')} ({selectedTopicIds.length})
           </button>
         )}
       </div>
 
       {isLoading ? (
-        <div className="p-4 text-center text-sm text-slate-500">
-          Đang tải...
+        <div className="p-4 text-center text-sm text-muted-foreground">
+          {t('loading')}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto pr-1">
@@ -51,17 +54,18 @@ export default function TopicFilter({
                 className={`
                   cursor-pointer flex items-center gap-3 px-4 py-2.5 rounded-lg border text-sm
                   transition-all duration-200 hover:scale-[1.02]
-                  bg-slate-50 text-slate-700 border-slate-200 hover:border-slate-300 
-                  dark:bg-slate-700/50 dark:text-slate-300 dark:border-slate-600 dark:hover:border-slate-500
+                  ${isSelected
+                    ? 'bg-primary/5 border-primary/50 shadow-sm'
+                    : 'bg-background text-muted-foreground border-border hover:border-border/80'
+                  }
                 `}
               >
                 <div
                   className={`
                     w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0
-                    ${
-                      isSelected
-                        ? 'bg-green-500 border-green-500'
-                        : 'bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-500'
+                    ${isSelected
+                      ? 'bg-primary border-primary'
+                      : 'bg-background border-muted-foreground/30'
                     }
                   `}
                 >
@@ -72,7 +76,7 @@ export default function TopicFilter({
                       viewBox="0 0 24 24"
                       stroke="currentColor"
                       role="img"
-                      aria-label="Đã chọn"
+                      aria-label={t('selected')}
                     >
                       <path
                         strokeLinecap="round"

@@ -12,6 +12,7 @@ import {
 import type { UserProfile } from '@/types/user';
 import { History, LogIn, LogOut, User } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 
 interface UserMenuProps {
   user?: UserProfile;
@@ -20,13 +21,15 @@ interface UserMenuProps {
 const PLACEHOLDER_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
 
 export function UserMenu({ user, onLogout }: UserMenuProps) {
+  const { t } = useTranslation('common');
+
   if (user) {
     return (
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Avatar className="cursor-pointer hover:opacity-80 transition-opacity">
+          <Avatar className="cursor-pointer hover:opacity-80 transition-opacity border border-border">
             <AvatarImage src={user.avatarUrl || PLACEHOLDER_AVATAR} alt={user.firstName} />
-            <AvatarFallback className="bg-transparent p-0 overflow-hidden">
+            <AvatarFallback className="bg-muted p-0 overflow-hidden">
               <img
                 src={PLACEHOLDER_AVATAR}
                 alt="Fallback Profile"
@@ -37,10 +40,10 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64 p-2">
           <div className="px-2 py-1.5">
-            <p className="text-sm font-medium leading-none text-slate-900 dark:text-slate-100">
+            <p className="text-sm font-medium leading-none text-foreground truncate">
               {user.firstName} {user.lastName}
             </p>
-            <p className="text-xs leading-none text-slate-500 dark:text-slate-400 mt-1">
+            <p className="text-xs leading-none text-muted-foreground mt-1 truncate">
               {user.email}
             </p>
           </div>
@@ -50,8 +53,8 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
               href={`/profile/${user.id}`}
               className="cursor-pointer w-full flex items-center py-2.5"
             >
-              <User className="mr-3 h-4 w-4 text-slate-500" />
-              <span>Hồ sơ của tôi</span>
+              <User className="mr-3 h-4 w-4 text-muted-foreground" />
+              <span>{t('my_profile')}</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
@@ -59,17 +62,17 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
               href={`/profile/${user.id}/practice`}
               className="cursor-pointer w-full flex items-center py-2.5"
             >
-              <History className="mr-3 h-4 w-4 text-slate-500" />
-              <span>Lịch sử luyện tập</span>
+              <History className="mr-3 h-4 w-4 text-muted-foreground" />
+              <span>{t('practice_history')}</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={onLogout}
-            className="text-red-600 focus:text-red-600 focus:bg-red-50 dark:focus:bg-red-900/10 cursor-pointer w-full flex items-center py-2.5"
+            className="text-destructive focus:text-destructive focus:bg-destructive/10 cursor-pointer w-full flex items-center py-2.5"
           >
             <LogOut className="mr-3 h-4 w-4" />
-            <span>Đăng xuất</span>
+            <span>{t('logout')}</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -78,9 +81,9 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
 
   return (
     <Link href="/login">
-      <Button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white">
-        <LogIn size={18} />
-        Go to login
+      <Button className="flex items-center gap-2 rounded-lg" variant="default" size="sm">
+        <LogIn size={16} />
+        {t('go_to_login')}
       </Button>
     </Link>
   );

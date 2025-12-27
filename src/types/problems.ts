@@ -84,6 +84,7 @@ export interface ProblemFilters {
   type?: ProblemType;
   topicIds?: number[];
   tagIds?: number[];
+  status?: ProblemStatus;
 }
 
 export interface GetProblemListRequest {
@@ -104,6 +105,8 @@ export interface ProblemListItem {
   difficulty: ProblemDifficulty;
   tags: Tag[];
   topics: Topic[];
+  status?: ProblemStatus;
+  acceptanceRate?: number;
 }
 
 export interface ProblemEdge {
@@ -124,44 +127,7 @@ export interface ProblemListResponse {
   totalCount: number;
 }
 
-export const DIFFICULTY_OPTIONS = [
-  { value: 'easy', label: 'Dễ' },
-  { value: 'medium', label: 'Trung bình' },
-  { value: 'hard', label: 'Khó' },
-];
-
-export const TYPE_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'standalone', label: 'Độc lập' },
-  { value: 'contest', label: 'Thi đấu' },
-  { value: 'hybrid', label: 'Linh hoạt' },
-];
-
-export const DIFFICULTY_LABELS = new Map([
-  [ProblemDifficulty.EASY, 'Dễ'],
-  [ProblemDifficulty.MEDIUM, 'Trung bình'],
-  [ProblemDifficulty.HARD, 'Khó'],
-]);
-
-export const DIFFICULTY_COLORS = new Map([
-  [ProblemDifficulty.EASY, 'bg-green-100 text-green-800 hover:bg-green-200'],
-  [
-    ProblemDifficulty.MEDIUM,
-    'bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
-  ],
-  [ProblemDifficulty.HARD, 'bg-red-100 text-red-800 hover:bg-red-200'],
-]);
-
-export const DEFAULT_DIFFICULTY_COLOR =
-  'bg-gray-100 text-gray-800 hover:bg-gray-200';
-
-export const getDifficultyColor = (difficulty: ProblemDifficulty): string => {
-  return DIFFICULTY_COLORS.get(difficulty) || DEFAULT_DIFFICULTY_COLOR;
-};
-
-export const getDifficultyLabel = (difficulty: ProblemDifficulty): string => {
-  return DIFFICULTY_LABELS.get(difficulty) || difficulty;
-};
+// UI helpers removed in favor of component-level i18n and design system tokens
 
 export interface ProblemComment {
   id: string;

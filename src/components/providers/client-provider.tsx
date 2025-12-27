@@ -1,5 +1,7 @@
 'use client';
 
+import '@/lib/i18n';
+
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { AppProvider } from '@/contexts/app-context';
 import { persistor, store } from '@/store';

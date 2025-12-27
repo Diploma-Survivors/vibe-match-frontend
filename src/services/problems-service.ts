@@ -9,6 +9,7 @@ import {
 } from '@/types/problems';
 import type { AxiosResponse } from 'axios';
 import qs from 'qs';
+import { MOCK_PROBLEMS } from '@/data/mock-problems';
 
 async function getProblemListForTraining(
   getProblemListRequest: GetProblemListRequest
@@ -21,7 +22,33 @@ async function getProblemListForTraining(
   const url = queryString
     ? `/problems/training?${queryString}`
     : '/problems/training';
-  return await clientApi.get(url);
+    
+  try {
+      return await clientApi.get(url);
+  } catch (error) {
+      console.warn('API failed, returning mock data', error);
+      // Return mock data structure matching AxiosResponse<ApiResponse<ProblemListResponse>>
+      return {
+          data: {
+              data: {
+                  edges: MOCK_PROBLEMS.slice(0, getProblemListRequest.first || 20).map(node => ({ node, cursor: node.id })),
+                  pageInfos: {
+                      hasNextPage: false,
+                      hasPreviousPage: false,
+                      startCursor: '1',
+                      endCursor: '20'
+                  },
+                  totalCount: MOCK_PROBLEMS.length
+              },
+              status: 200,
+              message: 'Mock Data'
+          },
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: {} as any
+      };
+  }
 }
 
 async function getProblemById(problemId: string): Promise<ProblemDescription> {
@@ -36,27 +63,8 @@ async function getAllProblems(): Promise<ProblemListItem[]> {
   // Mock data
   return new Promise((resolve) => {
     setTimeout(() => {
-      const problems: ProblemListItem[] = Array.from({ length: 100 }).map(
-        (_, i) => {
-          const id = (i + 1).toString();
-          const difficulties = [
-            ProblemDifficulty.EASY,
-            ProblemDifficulty.MEDIUM,
-            ProblemDifficulty.HARD,
-          ];
-          const difficulty =
-            difficulties[Math.floor(Math.random() * difficulties.length)];
-          return {
-            id,
-            title: `Bài tập ${id}`,
-            difficulty,
-            tags: [],
-            topics: [],
-          };
-        }
-      );
-      resolve(problems);
-    }, 5000);
+        resolve(MOCK_PROBLEMS);
+    }, 1000);
   });
 }
 
@@ -64,27 +72,8 @@ async function getSolvedProblems(userId?: number): Promise<ProblemListItem[]> {
   // Mock data
   return new Promise((resolve) => {
     setTimeout(() => {
-      const problems: ProblemListItem[] = Array.from({ length: 40 }).map(
-        (_, i) => {
-          const id = (i + 1).toString();
-          const difficulties = [
-            ProblemDifficulty.EASY,
-            ProblemDifficulty.MEDIUM,
-            ProblemDifficulty.HARD,
-          ];
-          const difficulty =
-            difficulties[Math.floor(Math.random() * difficulties.length)];
-          return {
-            id,
-            title: `Bài tập ${id}`,
-            difficulty,
-            tags: [],
-            topics: [],
-          };
-        }
-      );
-      resolve(problems);
-    }, 5000);
+      resolve(MOCK_PROBLEMS.filter(p => p.difficulty === ProblemDifficulty.EASY));
+    }, 1000);
   });
 }
 
