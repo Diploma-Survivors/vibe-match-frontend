@@ -14,9 +14,10 @@ import { History, LogIn, LogOut, User } from 'lucide-react';
 import Link from 'next/link';
 
 interface UserMenuProps {
-  user: UserProfile | null;
+  user?: UserProfile;
   onLogout: () => void;
 }
+const PLACEHOLDER_AVATAR = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png";
 
 export function UserMenu({ user, onLogout }: UserMenuProps) {
   if (user) {
@@ -24,10 +25,13 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Avatar className="cursor-pointer hover:opacity-80 transition-opacity">
-            <AvatarImage src={user.avatarUrl} alt={user.firstName} />
-            <AvatarFallback className="bg-green-600 text-white font-medium">
-              {user.firstName?.[0]}
-              {user.lastName?.[0]}
+            <AvatarImage src={user.avatarUrl || PLACEHOLDER_AVATAR} alt={user.firstName} />
+            <AvatarFallback className="bg-transparent p-0 overflow-hidden">
+              <img
+                src={PLACEHOLDER_AVATAR}
+                alt="Fallback Profile"
+                className="h-full w-full object-cover"
+              />
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>

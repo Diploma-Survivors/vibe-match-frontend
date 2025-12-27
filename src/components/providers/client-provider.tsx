@@ -4,7 +4,7 @@ import { ThemeProvider } from '@/components/providers/theme-provider';
 import { AppProvider } from '@/contexts/app-context';
 import { persistor, store } from '@/store';
 import { ReduxProvider } from '@/store/providers';
-import type { IssuerType, UserInfo } from '@/types/states';
+import type { DecodedAccessToken, IssuerType, UserInfo } from '@/types/states';
 import { SessionProvider } from 'next-auth/react';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -13,14 +13,12 @@ import { ToastProvider } from './toast-provider';
 
 interface ClientProviderProps {
   children: React.ReactNode;
-  initialUser: UserInfo | null;
-  initialIssuer: IssuerType;
+  decodedAccessToken: DecodedAccessToken | null;
 }
 
 export function ClientProvider({
   children,
-  initialUser,
-  initialIssuer,
+  decodedAccessToken,
 }: ClientProviderProps) {
   return (
     <SessionProvider>
@@ -33,10 +31,7 @@ export function ClientProvider({
           <ToastProvider>
             <ReduxProvider>
               <PersistGate loading={null} persistor={persistor}>
-                <AppProvider
-                  initialUser={initialUser}
-                  initialIssuer={initialIssuer}
-                >
+                <AppProvider decodedAccessToken={decodedAccessToken}>
                   {children}
                 </AppProvider>
               </PersistGate>

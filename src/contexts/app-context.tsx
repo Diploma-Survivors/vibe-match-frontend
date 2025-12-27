@@ -1,8 +1,9 @@
 'use client';
 
-import { persistor } from '@/store';
-import { IssuerType, type UserInfo } from '@/types/states';
-import type { UserProfile } from '@/types/user';
+import clientApi from '@/lib/apis/axios-client';
+import type { DecodedAccessToken, UserInfo } from '@/types/states';
+import { IssuerType } from '@/types/states';
+import { UserProfile } from '@/types/user';
 import { usePathname } from 'next/navigation';
 import {
   type ReactNode,
@@ -11,20 +12,14 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { useDispatch } from 'react-redux';
-
-import { UserService } from '@/services/user-service';
 
 interface AppProviderProps {
   children: ReactNode;
-  initialUser: UserInfo | null;
-  initialIssuer: IssuerType;
+  decodedAccessToken: DecodedAccessToken | null;
 }
 
 interface AppContextType {
-  user: UserProfile | null;
-  issuer: IssuerType;
-  isInDedicatedPages: boolean;
+  user?: UserProfile;
   shouldHideNavigation: boolean;
   isLoading: boolean;
   clearUserData: () => void;
@@ -33,66 +28,40 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 const dedicatedPagesPattern =
   process.env.NEXT_PUBLIC_DEDICATED_PAGES_PATTERN ||
-  '^/(problems|contests)/.+$';
-const DEDICATED_PAGES_REGEX = new RegExp(`${dedicatedPagesPattern}`);
+  '^(?:/problems/(?:create|[^/]+(?:/(create|edit))?)|/contests/(?:create|[^/]+(?:/(?:edit|stats|standing|submissions)))|/options)$';
 
 export function AppProvider({
   children,
-  initialUser,
-  initialIssuer,
+  decodedAccessToken,
 }: AppProviderProps) {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [issuer, setIssuer] = useState<IssuerType>(initialIssuer);
+  const [user, setUser] = useState<UserProfile>();
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (initialUser?.id) {
-        try {
-          // Initialize with basic info while fetching
-          // setUser({
-          //   id: initialUser.userId,
-          //   email: initialUser.email || '',
-          //   firstName: initialUser.firstName || '',
-          //   lastName: initialUser.lastName || '',
-          //   username: '', // Placeholder
-          //   // ... other required fields with defaults
-          // } as UserProfile);
-
-          // Actually, let's just fetch it.
-          const profile = await UserService.getUserProfile(initialUser.id);
-          setUser(profile);
-        } catch (error) {
-          console.error('Failed to fetch user profile:', error);
-          // Fallback to initialUser data if fetch fails?
-          // For now, let's just log error.
-          // We might want to construct a partial profile from initialUser if fetch fails.
-        }
-      } else {
-        setUser(null);
-      }
-    };
-
-    fetchUserProfile();
-  }, [initialUser]);
-
   const pathname = usePathname();
-  const dispatch = useDispatch();
+  const shouldHideNavigation = pathname === '/login';
 
-  const isInDedicatedPages = DEDICATED_PAGES_REGEX.test(pathname);
-  const shouldHideNavigation = isInDedicatedPages;
-
-  const clearUserData = async () => {
-    setUser(null);
-    setIssuer(IssuerType.LOCAL);
-    dispatch({ type: 'USER_LOGOUT' });
-    await persistor.purge();
+  const clearUserData = () => {
+    setUser(undefined);
   };
+
+  useEffect(() => {
+    if (decodedAccessToken) {
+      setIsLoading(true);
+      clientApi
+        .get('/auth/me')
+        .then((response) => {
+          setUser(response.data.data);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error('Failed to fetch user data:', error);
+          setIsLoading(false);
+        });
+    }
+  }, [decodedAccessToken]);
 
   const value: AppContextType = {
     user,
-    issuer,
-    isInDedicatedPages,
     shouldHideNavigation,
     isLoading,
     clearUserData,

@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import clientApi from '@/lib/apis/axios-client';
 import { toastService } from '@/services/toasts-service';
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
@@ -18,6 +19,8 @@ import { FcGoogle } from 'react-icons/fc';
 
 export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState('');
+  const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -35,18 +38,56 @@ export default function LoginPage() {
     const finalUsername = (formData.get('username') as string) || username;
     const finalPassword = (formData.get('password') as string) || password;
 
-    const result = await signIn('credentials', {
-      username: finalUsername,
-      password: finalPassword,
-      redirect: true,
-      callbackUrl,
-    });
+    if (isSignUp) {
+      if (password !== confirmPassword) {
+        toastService.error('Passwords do not match');
+        return;
+      }
 
-    if (result?.error) {
-      toastService.error(result.error);
+      try {
+        await clientApi.post('/auth/register', {
+          email,
+          username,
+          password,
+          fullName,
+        });
+        toastService.success('Registration successful! Logging in...');
+
+        // Auto login after successful registration
+        const result = await signIn('credentials', {
+          username: finalUsername,
+          password: finalPassword,
+          redirect: true,
+          callbackUrl,
+        });
+
+        if (result?.error) {
+          toastService.error(result.error);
+        }
+      } catch (error: any) {
+        toastService.error(
+          error.response?.data?.message || 'Registration failed'
+        );
+      }
     } else {
-      window.location.href = callbackUrl;
+      const result = await signIn('credentials', {
+        username: finalUsername,
+        password: finalPassword,
+        redirect: true,
+        callbackUrl,
+      });
+
+      if (result?.error) {
+        toastService.error(result.error);
+      } else {
+        window.location.href = callbackUrl;
+      }
     }
+  };
+
+  const handleGoogleLogin = async () => {
+    const url = process.env.NEXT_PUBLIC_API_BASE_URL + '/auth/google';
+    window.open(url, '_blank');
   };
 
   return (
@@ -54,39 +95,70 @@ export default function LoginPage() {
       <Card className="w-full max-w-lg shadow-lg">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold tracking-tight text-green-600">
-            Chào mừng đến với Vibematch
+            Welcome to sFinx
           </CardTitle>
           <CardDescription>
             {isSignUp
-              ? 'Tạo tài khoản để bắt đầu'
-              : 'Nhập thông tin đăng nhập để truy cập tài khoản'}
+              ? 'Create an account to get started'
+              : 'Enter your login information to access your account'}
           </CardDescription>
         </CardHeader>
 
         {/* 3. Wrap inputs in a <form> tag */}
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {isSignUp && (
+              <>
+                <div className="space-y-2">
+                  <Input
+                    id="email"
+                    name="email"
+                    placeholder="Email"
+                    type="email"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Input
+                    id="fullName"
+                    name="fullName"
+                    placeholder="Full Name"
+                    type="text"
+                    autoComplete="name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
+                </div>
+              </>
+            )}
             <div className="space-y-2">
               <Input
                 id="username"
                 name="username" // 4. Add 'name' attribute for autofill
-                placeholder="Tên đăng nhập"
+                placeholder="Username"
                 type="text"
                 autoCapitalize="none"
                 autoComplete="username" // 5. Help browser identify field
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                required
               />
             </div>
             <div className="space-y-2">
               <Input
                 id="password"
                 name="password" // 4. Add 'name' attribute
-                placeholder="Mật khẩu"
+                placeholder="Password"
                 type="password"
                 autoComplete={isSignUp ? 'new-password' : 'current-password'} // 5. Help browser
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
             {isSignUp && (
@@ -94,11 +166,12 @@ export default function LoginPage() {
                 <Input
                   id="confirm-password"
                   name="confirmPassword"
-                  placeholder="Xác nhận mật khẩu"
+                  placeholder="Confirm Password"
                   type="password"
                   autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
                 />
               </div>
             )}
@@ -108,7 +181,7 @@ export default function LoginPage() {
               className="w-full bg-green-600 hover:bg-green-700 text-white"
               type="submit"
             >
-              {isSignUp ? 'Đăng ký' : 'Đăng nhập'}
+              {isSignUp ? 'Sign Up' : 'Login'}
             </Button>
           </form>
 
@@ -118,12 +191,17 @@ export default function LoginPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-background px-2 text-muted-foreground">
-                Hoặc đăng nhập với
+                Or login with
               </span>
             </div>
           </div>
 
-          <Button variant="outline" className="w-full mt-4" type="button">
+          <Button
+            onClick={() => handleGoogleLogin()}
+            variant="outline"
+            className="w-full mt-4"
+            type="button"
+          >
             <FcGoogle className="mr-2 h-4 w-4" />
             Google
           </Button>
@@ -131,12 +209,12 @@ export default function LoginPage() {
 
         <CardFooter className="flex flex-col space-y-2 text-center text-sm text-muted-foreground">
           <div>
-            {isSignUp ? 'Đã có tài khoản? ' : 'Chưa có tài khoản? '}
+            {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
             <span
               onClick={toggleMode}
               className="underline underline-offset-4 hover:text-primary cursor-pointer font-medium"
             >
-              {isSignUp ? 'Đăng nhập' : 'Đăng ký'}
+              {isSignUp ? 'Login' : 'Sign Up'}
             </span>
           </div>
         </CardFooter>
