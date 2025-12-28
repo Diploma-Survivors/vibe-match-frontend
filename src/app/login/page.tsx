@@ -93,6 +93,8 @@ export default function LoginPage() {
         toastService.error(
           error.response?.data?.message || "Registration failed"
         );
+      } finally {
+        setLoading(false);
       }
     } else {
       const result = await signIn("credentials", {
@@ -127,7 +129,7 @@ export default function LoginPage() {
         >
           <Image
             src="/images/login-texture.png"
-            alt="Cinematic Background"
+            alt=""
             fill
             className="object-cover"
             priority
@@ -203,26 +205,34 @@ export default function LoginPage() {
                   {isSignUp && (
                     <motion.div variants={itemVariants} className="space-y-5">
                       <div className="relative group">
-                        <HiMail className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-green-500 transition-colors w-6 h-6" />
+                        <HiMail
+                          aria-hidden="true"
+                          className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-green-500 transition-colors w-6 h-6"
+                        />
                         <Input
                           id="email"
                           name="email"
                           placeholder="Email address"
                           type="email"
                           className="pl-14 h-16 bg-zinc-900/50 border-zinc-800 text-white text-lg placeholder:text-zinc-600 focus:border-green-500/50 focus:ring-green-500/10 transition-all rounded-2xl"
+                          autoComplete="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           required
                         />
                       </div>
                       <div className="relative group">
-                        <HiUser className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-green-500 transition-colors w-6 h-6" />
+                        <HiUser
+                          aria-hidden="true"
+                          className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-green-500 transition-colors w-6 h-6"
+                        />
                         <Input
                           id="fullName"
                           name="fullName"
                           placeholder="Full name"
                           type="text"
                           className="pl-14 h-16 bg-zinc-900/50 border-zinc-800 text-white text-lg placeholder:text-zinc-600 focus:border-green-500/50 focus:ring-green-500/10 transition-all rounded-2xl"
+                          autoComplete="name"
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           required
@@ -235,13 +245,17 @@ export default function LoginPage() {
                     variants={itemVariants}
                     className="relative group"
                   >
-                    <HiUser className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-green-500 transition-colors w-6 h-6" />
+                    <HiUser
+                      aria-hidden="true"
+                      className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-green-500 transition-colors w-6 h-6"
+                    />
                     <Input
                       id="username"
                       name="username"
                       placeholder="Username"
                       type="text"
                       className="pl-14 h-16 bg-zinc-900/50 border-zinc-800 text-white text-lg placeholder:text-zinc-600 focus:border-green-500/50 focus:ring-green-500/10 transition-all rounded-2xl"
+                      autoComplete="username"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
@@ -252,13 +266,19 @@ export default function LoginPage() {
                     variants={itemVariants}
                     className="relative group"
                   >
-                    <HiLockClosed className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-green-500 transition-colors w-6 h-6" />
+                    <HiLockClosed
+                      aria-hidden="true"
+                      className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-green-500 transition-colors w-6 h-6"
+                    />
                     <Input
                       id="password"
                       name="password"
                       placeholder="Password"
                       type="password"
                       className="pl-14 h-16 bg-zinc-900/50 border-zinc-800 text-white text-lg placeholder:text-zinc-600 focus:border-green-500/50 focus:ring-green-500/10 transition-all rounded-2xl"
+                      autoComplete={
+                        isSignUp ? "new-password" : "current-password"
+                      }
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
@@ -270,13 +290,17 @@ export default function LoginPage() {
                       variants={itemVariants}
                       className="relative group"
                     >
-                      <HiLockClosed className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-green-500 transition-colors w-6 h-6" />
+                      <HiLockClosed
+                        aria-hidden="true"
+                        className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-green-500 transition-colors w-6 h-6"
+                      />
                       <Input
                         id="confirm-password"
                         name="confirmPassword"
                         placeholder="Confirm password"
                         type="password"
                         className="pl-14 h-16 bg-zinc-900/50 border-zinc-800 text-white text-lg placeholder:text-zinc-600 focus:border-green-500/50 focus:ring-green-500/10 transition-all rounded-2xl"
+                        autoComplete="new-password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         required
@@ -290,7 +314,9 @@ export default function LoginPage() {
                 <div className="flex justify-end">
                   <button
                     type="button"
-                    className="text-sm font-semibold text-zinc-500 hover:text-green-500 transition-colors"
+                    disabled
+                    aria-label="Feature coming soon"
+                    className="text-sm font-semibold text-zinc-500 cursor-not-allowed opacity-50"
                   >
                     Forgot your password?
                   </button>
@@ -347,6 +373,7 @@ export default function LoginPage() {
             <div className="text-zinc-500 font-medium">
               {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
               <button
+                type="button"
                 onClick={toggleMode}
                 className="text-white font-black hover:text-green-500 transition-colors decoration-green-500/50 hover:underline underline-offset-8"
               >
