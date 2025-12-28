@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { useApp } from '@/contexts/app-context';
-import { ArrowLeft, BarChart2, FileText, Trophy, UserPlus } from 'lucide-react';
-import { signOut } from 'next-auth/react';
-import Link from 'next/link';
-import { UserMenu } from '../layout/user-menu';
+import { Button } from "@/components/ui/button";
+import { useApp } from "@/contexts/app-context";
+import { ArrowLeft, BarChart2, FileText, Trophy, UserPlus } from "lucide-react";
+import { signOut } from "next-auth/react";
+import Link from "next/link";
+import { UserMenu } from "../layout/user-menu";
 
 interface ContestNavbarProps {
   activeTab: string;
@@ -14,9 +14,9 @@ interface ContestNavbarProps {
 }
 
 const navItems = [
-  { id: 'description', label: 'Mô tả', icon: FileText },
+  { id: "description", label: "Mô tả", icon: FileText },
   // { id: 'stats', label: 'Thống kê', icon: BarChart2 },
-  { id: 'ranking', label: 'Bảng xếp hạng', icon: Trophy },
+  { id: "ranking", label: "Bảng xếp hạng", icon: Trophy },
   // { id: 'join', label: 'Tham gia', icon: UserPlus },
 ];
 
@@ -25,12 +25,12 @@ export default function ContestNavbar({
   onTabChange,
   hideNavigation = false,
 }: ContestNavbarProps) {
-  const { issuer, user, clearUserData } = useApp();
+  const { user, clearUserData } = useApp();
 
   const handleLogout = async () => {
     clearUserData();
     await signOut({
-      callbackUrl: '/login', // Where to go after logout
+      callbackUrl: "/login", // Where to go after logout
       redirect: true,
     });
   };
@@ -59,13 +59,13 @@ export default function ContestNavbar({
               return (
                 <Button
                   key={item.id}
-                  variant={isActive ? 'default' : 'ghost'}
+                  variant={isActive ? "default" : "ghost"}
                   size="sm"
                   onClick={() => onTabChange(item.id)}
                   className={`gap-2 transition-all duration-200 ${
                     isActive
-                      ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
-                      : 'text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400'
+                      ? "bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg"
+                      : "text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400"
                   }`}
                 >
                   <IconComponent className="w-4 h-4" />

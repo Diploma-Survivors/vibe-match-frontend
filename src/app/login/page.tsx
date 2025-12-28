@@ -111,7 +111,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = () => {
-    const url = process.env.NEXT_PUBLIC_API_BASE_URL + "/auth/google";
+    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google`;
     window.open(url, "_blank");
   };
 
@@ -145,7 +145,11 @@ export default function LoginPage() {
         animate={{
           opacity: [0.1, 0.2, 0.1],
         }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        transition={{
+          duration: 4,
+          repeat: Number.POSITIVE_INFINITY,
+          ease: "easeInOut",
+        }}
         className="absolute inset-0 z-10 pointer-events-none bg-emerald-500/5 mix-blend-overlay"
       />
 

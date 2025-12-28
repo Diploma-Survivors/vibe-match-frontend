@@ -3,7 +3,7 @@ import {
   type Reducer,
   combineReducers,
   configureStore,
-} from '@reduxjs/toolkit';
+} from "@reduxjs/toolkit";
 import {
   FLUSH,
   PAUSE,
@@ -13,21 +13,21 @@ import {
   REHYDRATE,
   persistReducer,
   persistStore,
-} from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+} from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
 // Import your slices
-import aiReviewReducer from './slides/ai-review-slice';
-import contestReducer from './slides/contest-slice';
-import createSolutionReducer from './slides/create-solution-slice';
-import problemReducer from './slides/problem-slice';
-import workspaceReducer from './slides/workspace-slice';
+import aiReviewReducer from "./slides/ai-review-slice";
+import contestReducer from "./slides/contest-slice";
+import createSolutionReducer from "./slides/create-solution-slice";
+import problemReducer from "./slides/problem-slice";
+import workspaceReducer from "./slides/workspace-slice";
 
 // 1. Create the configuration
 const persistConfig = {
-  key: 'root',
+  key: "root",
   storage,
-  whitelist: ['workspace', 'aiReview', 'createSolution'],
+  whitelist: ["workspace", "aiReview", "createSolution"],
 };
 
 // 2. Combine your reducers into one "App Reducer"
@@ -43,14 +43,11 @@ const appReducer = combineReducers({
 type AppState = ReturnType<typeof appReducer>;
 
 // 4. Create the Root Reducer (Wrapper to handle Reset)
-const rootReducer: Reducer<AppState | undefined, AnyAction> = (
-  state,
-  action
-) => {
-  if (action.type === 'USER_LOGOUT') {
+const rootReducer: Reducer<AppState, AnyAction> = (state, action) => {
+  if (action.type === "USER_LOGOUT") {
     // We pass undefined to appReducer to force it to return Initial State
     // Note: We don't modify 'state' variable directly, we return the result of the reducer
-    storage.removeItem('persist:root'); // Optional: force clear storage key
+    storage.removeItem("persist:root"); // Optional: force clear storage key
     return appReducer(undefined, action);
   }
 

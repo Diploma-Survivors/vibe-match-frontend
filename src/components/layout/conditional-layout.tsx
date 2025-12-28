@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { Footer, Header } from '@/components/layout';
-import { useApp } from '@/contexts/app-context';
+import { Footer, Header } from "@/components/layout";
+import { useApp } from "@/contexts/app-context";
 
 export default function ConditionalLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { shouldHideNavigation, isLoading, isInDedicatedPages } = useApp();
+  const { shouldHideNavigation, isLoading } = useApp();
 
   if (isLoading) {
     return (
