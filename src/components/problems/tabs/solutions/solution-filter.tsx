@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SolutionFilterProps {
   keyword: string;
@@ -53,6 +54,7 @@ export default function SolutionFilter({
   submissionId,
   problemId,
 }: SolutionFilterProps) {
+  const { t } = useTranslation('problems');
   const [showFilters, setShowFilters] = useState(false);
   const [tags, setTags] = useState<Tag[]>([]);
   const [languages, setLanguages] = useState<Language[]>([]);
@@ -97,13 +99,13 @@ export default function SolutionFilter({
             value={keyword}
             onChange={(e) => onKeywordChange(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && onSearch()}
-            placeholder="Tìm kiếm solution..."
+            placeholder={t('search_solutions')}
             className="pl-9 h-9 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
           />
         </div>
 
         {submissionId && problemId && (
-          <Tooltip content="Chia sẻ solution">
+          <Tooltip content={t('share_solution')}>
             <Link
               href={`/problems/${problemId}/solutions/create/${submissionId}`}
               target="_blank"
@@ -115,7 +117,7 @@ export default function SolutionFilter({
           </Tooltip>
         )}
 
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="h-9 gap-2">
               <ArrowDownWideNarrow className="w-4 h-4" />
@@ -126,12 +128,12 @@ export default function SolutionFilter({
             <DropdownMenuItem
               onClick={() => onSortChange(SolutionSortBy.RECENT)}
             >
-              Gần đây nhất
+              {t('sort_newest')}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => onSortChange(SolutionSortBy.MOST_VOTED)}
             >
-              Nhiều vote nhất
+              {t('sort_most_voted')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -151,7 +153,7 @@ export default function SolutionFilter({
           {/* Languages */}
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Ngôn ngữ
+              {t('language')}
             </h4>
             <div className="flex flex-wrap gap-2">
               {displayedLangs.map((lang) => (

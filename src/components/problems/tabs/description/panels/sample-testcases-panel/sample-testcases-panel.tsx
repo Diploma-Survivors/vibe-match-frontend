@@ -57,41 +57,41 @@ export function SampleTestCasesPanel({
 
   return (
     <div
-      className="flex flex-col overflow-y-auto rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+      className="flex flex-col h-full overflow-hidden rounded-xl border border-border bg-card shadow-sm"
       style={{ height: `${height}%` }}
     >
       {/* Header Tabs */}
-      <div className="px-6 pt-4">
-        <div className="inline-flex items-center gap-2 rounded-xl p-1 bg-slate-100/70 dark:bg-slate-700/40">
-          {/* Tescase tab */}
+      <div className="flex items-center h-12 px-2 border-b border-border bg-background/50 backdrop-blur-sm shrink-0 gap-2">
+        <div className="flex items-center gap-1">
+          {/* Testcase tab */}
           <button
             onClick={() => setActiveTab('testcase')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${
+            className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-all duration-200 ${
               activeTab === 'testcase'
-                ? 'bg-white dark:bg-slate-800 shadow text-slate-900 dark:text-white'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
           >
-            <CheckCircle className="w-4 h-4" />
+            <CheckCircle className="w-3.5 h-3.5" />
             Testcase
           </button>
 
           {/* Result tab */}
           <button
             onClick={() => setActiveTab('result')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 transition-all ${
+            className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-all duration-200 ${
               activeTab === 'result'
-                ? 'bg-white dark:bg-slate-800 shadow text-slate-900 dark:text-white'
-                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
             }`}
           >
-            <Code className="w-4 h-4" />
+            <Code className="w-3.5 h-3.5" />
             Test Result
           </button>
         </div>
       </div>
 
-      <div className="p-6 pt-4 flex-1">
+      <div className="flex-1 flex flex-col p-4 relative overflow-y-auto min-h-0">
         {/* Show CaseTabs in all cases except when on the 'result' tab with no results yet */}
         {!(activeTab === 'result' && !hasResults) && (
           <CaseTabs
@@ -108,7 +108,7 @@ export function SampleTestCasesPanel({
 
         {/* Content */}
         {testCases[activeTestCase] && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-in fade-in-50 duration-300">
             {activeTab === 'result' ? (
               <ResultTab
                 testCases={testCases}

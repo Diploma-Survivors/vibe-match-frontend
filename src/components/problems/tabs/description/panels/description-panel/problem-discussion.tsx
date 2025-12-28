@@ -24,6 +24,7 @@ import {
   TrendingUp,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ProblemCommentItem from './problem-comment-item';
 
 interface ProblemDiscussionProps {
@@ -63,6 +64,7 @@ const generateMockComments = (
 };
 
 export function ProblemDiscussion({ problemId }: ProblemDiscussionProps) {
+  const { t } = useTranslation('problems');
   const [isOpen, setIsOpen] = useState(false);
   const [comments, setComments] = useState<ProblemComment[]>([]);
   const [sortBy, setSortBy] = useState<ProblemCommentSortBy>(
@@ -150,17 +152,17 @@ export function ProblemDiscussion({ problemId }: ProblemDiscussionProps) {
     <Collapsible
       open={isOpen}
       onOpenChange={setIsOpen}
-      className="border-t border-slate-200 dark:border-slate-700"
+      className="border-t border-border"
     >
-      <CollapsibleTrigger className="flex items-center justify-between w-full py-4 text-left hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors px-1">
-        <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200 font-semibold">
+      <CollapsibleTrigger className="flex items-center justify-between w-full py-4 text-left hover:bg-muted/50 transition-colors px-1 rounded-lg">
+        <div className="flex items-center gap-2 text-foreground font-semibold">
           <MessageSquare className="w-4 h-4" />
           <span>
-            Thảo luận ({comments.length > 0 ? comments.length : '1K'})
+             {t('discussion_title')} ({comments.length > 0 ? comments.length : '1K'})
           </span>
         </div>
         <ChevronDown
-          className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${
+          className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
             isOpen ? 'transform rotate-180' : ''
           }`}
         />
@@ -168,18 +170,18 @@ export function ProblemDiscussion({ problemId }: ProblemDiscussionProps) {
       <CollapsibleContent>
         <div className="pb-4 pt-2 px-1 space-y-4">
           <div className="flex justify-end mb-4">
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="gap-2 text-slate-600 dark:text-slate-400"
+                  className="gap-2 text-muted-foreground"
                 >
                   <ArrowUpDown className="w-4 h-4" />
                   <span>
                     {sortBy === ProblemCommentSortBy.RECENT
-                      ? 'Mới nhất'
-                      : 'Được bình chọn nhiều nhất'}
+                      ? t('sort_newest')
+                      : t('sort_most_voted')}
                   </span>
                 </Button>
               </DropdownMenuTrigger>
@@ -190,7 +192,7 @@ export function ProblemDiscussion({ problemId }: ProblemDiscussionProps) {
                 >
                   <div className="flex items-center gap-2">
                     <TrendingUp className="w-4 h-4" />
-                    <span>Được bình chọn nhiều nhất</span>
+                    <span>{t('sort_most_voted')}</span>
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -199,7 +201,7 @@ export function ProblemDiscussion({ problemId }: ProblemDiscussionProps) {
                 >
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4" />
-                    <span>Mới nhất</span>
+                    <span>{t('sort_newest')}</span>
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -224,7 +226,7 @@ export function ProblemDiscussion({ problemId }: ProblemDiscussionProps) {
               {topLevelComments.map((comment) => (
                 <div
                   key={comment.id}
-                  className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg space-y-4"
+                  className="bg-muted/30 p-4 rounded-lg space-y-4 border border-border/50"
                 >
                   <ProblemCommentItem
                     comment={comment}
@@ -243,12 +245,10 @@ export function ProblemDiscussion({ problemId }: ProblemDiscussionProps) {
                           variant="ghost"
                           size="sm"
                           onClick={() => toggleReplies(comment.id)}
-                          className="text-slate-500 h-auto p-0 hover:bg-transparent hover:text-slate-800 dark:hover:text-slate-300"
+                          className="text-muted-foreground h-auto p-0 hover:bg-transparent hover:text-foreground"
                         >
                           <ChevronDown className="w-4 h-4 mr-1" />
-                          Xem{' '}
-                          {comment.replyCounts || getReplies(comment.id).length}{' '}
-                          câu trả lời
+                          {t('view_replies', { count: comment.replyCounts || getReplies(comment.id).length })}
                         </Button>
                       ) : (
                         <>
@@ -256,16 +256,16 @@ export function ProblemDiscussion({ problemId }: ProblemDiscussionProps) {
                             variant="ghost"
                             size="sm"
                             onClick={() => toggleReplies(comment.id)}
-                            className="text-slate-500 h-auto p-0 hover:bg-transparent hover:text-slate-800 dark:hover:text-slate-300 mb-2"
+                            className="text-muted-foreground h-auto p-0 hover:bg-transparent hover:text-foreground mb-2"
                           >
                             <ChevronUp className="w-4 h-4 mr-1" />
-                            Ẩn câu trả lời
+                            {t('hide_replies')}
                           </Button>
 
                           {getReplies(comment.id).map((reply) => (
                             <div
                               key={reply.id}
-                              className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg"
+                              className="bg-muted/50 p-3 rounded-lg border border-border/50"
                             >
                               <ProblemCommentItem
                                 comment={reply}
@@ -283,8 +283,8 @@ export function ProblemDiscussion({ problemId }: ProblemDiscussionProps) {
                 </div>
               ))}
               {comments.length === 0 && (
-                <div className="text-center text-slate-500 py-8">
-                  Chưa có bình luận nào. Hãy là người đầu tiên bình luận!
+                <div className="text-center text-muted-foreground py-8">
+                  {t('no_comments')}
                 </div>
               )}
             </div>

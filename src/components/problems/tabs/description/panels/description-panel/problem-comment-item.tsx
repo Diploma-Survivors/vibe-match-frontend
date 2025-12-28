@@ -16,6 +16,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ProblemCommentItemProps {
   comment: ProblemComment;
@@ -34,6 +35,7 @@ export default function ProblemCommentItem({
 }: ProblemCommentItemProps) {
   const { user } = useApp();
   const { confirm } = useDialog();
+  const { t } = useTranslation('problems');
   const [comment, setComment] = useState(initialComment);
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState('');
@@ -138,10 +140,10 @@ export default function ProblemCommentItem({
 
   const handleDelete = async () => {
     const result = await confirm({
-      title: 'Xóa bình luận',
-      message: 'Bạn có chắc chắn muốn xóa bình luận này không?',
-      confirmText: 'Xóa',
-      cancelText: 'Hủy',
+      title: t('delete_comment'),
+      message: t('confirm_delete_comment'),
+      confirmText: t('delete'),
+      cancelText: t('cancel'),
       color: 'red',
     });
 
@@ -182,7 +184,7 @@ export default function ProblemCommentItem({
               })}
             </span>
             {comment.updatedAt !== comment.createdAt && (
-              <span className="text-slate-400 italic">(đã chỉnh sửa)</span>
+              <span className="text-slate-400 italic">({t('edited')})</span>
             )}
           </div>
         </div>
@@ -203,7 +205,7 @@ export default function ProblemCommentItem({
                   setEditContent(comment.content);
                 }}
               >
-                Hủy
+                {t('cancel')}
               </Button>
               <Button
                 size="sm"
@@ -211,7 +213,7 @@ export default function ProblemCommentItem({
                 disabled={!editContent.trim() || isSubmittingEdit}
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
-                {isSubmittingEdit ? 'Đang lưu...' : 'Lưu'}
+                {isSubmittingEdit ? t('saving') : t('save')}
               </Button>
             </div>
           </div>
@@ -259,7 +261,7 @@ export default function ProblemCommentItem({
             className="cursor-pointer flex items-center gap-1 hover:text-blue-600 transition-colors"
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            <span>Reply</span>
+            <span>{t('reply')}</span>
           </button>
 
           {isAuthor && !isEditing && (
@@ -269,14 +271,14 @@ export default function ProblemCommentItem({
                 className="cursor-pointer flex items-center gap-1 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
               >
                 <Pencil className="w-3.5 h-3.5" />
-                <span>Chỉnh sửa</span>
+                <span>{t('edit')}</span>
               </button>
               <button
                 onClick={handleDelete}
                 className="cursor-pointer flex items-center gap-1 hover:text-red-600 transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>Xóa</span>
+                <span>{t('delete')}</span>
               </button>
             </>
           )}
@@ -289,7 +291,7 @@ export default function ProblemCommentItem({
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setReplyContent(e.target.value)
               }
-              placeholder="Viết câu trả lời..."
+              placeholder={t('write_reply')}
               className="min-h-[80px] text-sm"
             />
             <div className="flex justify-end gap-2">
@@ -298,7 +300,7 @@ export default function ProblemCommentItem({
                 size="sm"
                 onClick={() => setIsReplying(false)}
               >
-                Hủy
+                {t('cancel')}
               </Button>
               <Button
                 className="bg-green-600 hover:bg-green-700 text-white"
@@ -306,7 +308,7 @@ export default function ProblemCommentItem({
                 onClick={handleReplySubmit}
                 disabled={!replyContent.trim() || isSubmittingReply}
               >
-                {isSubmittingReply ? 'Đang gửi...' : 'Trả lời'}
+                {isSubmittingReply ? t('sending') : t('reply')}
               </Button>
             </div>
           </div>

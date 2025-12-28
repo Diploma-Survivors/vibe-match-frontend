@@ -23,7 +23,7 @@ import {
 import { Tooltip } from '@/components/ui/tooltip';
 import { ProblemsService } from '@/services/problems-service';
 import { SubmissionsService } from '@/services/submissions-service';
-import { ProblemDifficulty, type ProblemListItem } from '@/types/problems';
+import { ProblemDifficulty, type ProblemListItem, ProblemStatus } from '@/types/problems';
 import { type SubmissionListItem, SubmissionStatus } from '@/types/submissions';
 import { format } from 'date-fns';
 import {
@@ -43,10 +43,10 @@ import { useRouter } from 'next/navigation';
 import { Fragment, use, useEffect, useMemo, useState } from 'react';
 
 // Types for the view
-interface ProblemWithSubmissions extends ProblemListItem {
+interface ProblemWithSubmissions extends Omit<ProblemListItem, 'status'> {
   submissions: SubmissionListItem[];
   lastSubmittedAt: string | null;
-  status: 'solved' | 'attempted';
+  status: ProblemStatus;
   lastResult: SubmissionStatus | null;
   submissionCount: number;
 }
@@ -66,9 +66,9 @@ export default function PracticeHistoryPage({
   const [problems, setProblems] = useState<ProblemWithSubmissions[]>([]);
 
   // Filtering
-  const [statusFilter, setStatusFilter] = useState<('solved' | 'attempted')[]>([
-    'solved',
-    'attempted',
+  const [statusFilter, setStatusFilter] = useState<ProblemStatus[]>([
+    ProblemStatus.SOLVED,
+    ProblemStatus.ATTEMPTED,
   ]);
   const [difficultyFilter, setDifficultyFilter] = useState<ProblemDifficulty[]>(
     [ProblemDifficulty.EASY, ProblemDifficulty.MEDIUM, ProblemDifficulty.HARD]
@@ -135,7 +135,7 @@ export default function PracticeHistoryPage({
             ...problemDef,
             submissions: subs,
             lastSubmittedAt: lastSubmission.createdAt || null,
-            status: isSolved ? 'solved' : 'attempted',
+            status: isSolved ? ProblemStatus.SOLVED : ProblemStatus.ATTEMPTED,
             lastResult: lastSubmission.status,
             submissionCount: subs.length,
           });
@@ -192,7 +192,7 @@ export default function PracticeHistoryPage({
 
   // Stats
   const stats = useMemo(() => {
-    const totalSolved = problems.filter((p) => p.status === 'solved').length;
+    const totalSolved = problems.filter((p) => p.status === ProblemStatus.SOLVED).length;
     const totalSubmissions = problems.reduce(
       (acc, curr) => acc + curr.submissionCount,
       0
@@ -214,13 +214,13 @@ export default function PracticeHistoryPage({
         : '0.0';
 
     const easySolved = problems.filter(
-      (p) => p.status === 'solved' && p.difficulty === ProblemDifficulty.EASY
+      (p) => p.status === ProblemStatus.SOLVED && p.difficulty === ProblemDifficulty.EASY
     ).length;
     const mediumSolved = problems.filter(
-      (p) => p.status === 'solved' && p.difficulty === ProblemDifficulty.MEDIUM
+      (p) => p.status === ProblemStatus.SOLVED && p.difficulty === ProblemDifficulty.MEDIUM
     ).length;
     const hardSolved = problems.filter(
-      (p) => p.status === 'solved' && p.difficulty === ProblemDifficulty.HARD
+      (p) => p.status === ProblemStatus.SOLVED && p.difficulty === ProblemDifficulty.HARD
     ).length;
 
     return {
@@ -422,17 +422,17 @@ export default function PracticeHistoryPage({
                     <div className="grid grid-cols-2 gap-2">
                       <div
                         className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-colors ${
-                          statusFilter.includes('solved') &&
-                          !statusFilter.includes('attempted')
+                          statusFilter.includes(ProblemStatus.SOLVED) &&
+                          !statusFilter.includes(ProblemStatus.ATTEMPTED)
                             ? 'bg-green-50 border-green-200 text-green-700'
                             : 'hover:bg-gray-50 border-gray-200 text-gray-600'
                         }`}
-                        onClick={() => setStatusFilter(['solved'])}
+                        onClick={() => setStatusFilter([ProblemStatus.SOLVED])}
                       >
                         <CheckCircle
                           className={`w-4 h-4 ${
-                            statusFilter.includes('solved') &&
-                            !statusFilter.includes('attempted')
+                            statusFilter.includes(ProblemStatus.SOLVED) &&
+                            !statusFilter.includes(ProblemStatus.ATTEMPTED)
                               ? 'text-green-600'
                               : 'text-gray-400'
                           }`}
@@ -441,17 +441,17 @@ export default function PracticeHistoryPage({
                       </div>
                       <div
                         className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-colors ${
-                          statusFilter.includes('attempted') &&
-                          !statusFilter.includes('solved')
+                          statusFilter.includes(ProblemStatus.ATTEMPTED) &&
+                          !statusFilter.includes(ProblemStatus.SOLVED)
                             ? 'bg-gray-100 border-gray-300 text-gray-900'
                             : 'hover:bg-gray-50 border-gray-200 text-gray-600'
                         }`}
-                        onClick={() => setStatusFilter(['attempted'])}
+                        onClick={() => setStatusFilter([ProblemStatus.ATTEMPTED])}
                       >
                         <Circle
                           className={`w-4 h-4 ${
-                            statusFilter.includes('attempted') &&
-                            !statusFilter.includes('solved')
+                            statusFilter.includes(ProblemStatus.ATTEMPTED) &&
+                            !statusFilter.includes(ProblemStatus.SOLVED)
                               ? 'text-gray-900'
                               : 'text-gray-400'
                           }`}
@@ -531,7 +531,7 @@ export default function PracticeHistoryPage({
                     variant="ghost"
                     className="w-full text-gray-500 hover:text-gray-900"
                     onClick={() => {
-                      setStatusFilter(['solved', 'attempted']);
+                      setStatusFilter([ProblemStatus.SOLVED, ProblemStatus.ATTEMPTED]);
                       setDifficultyFilter([
                         ProblemDifficulty.EASY,
                         ProblemDifficulty.MEDIUM,
@@ -589,7 +589,7 @@ export default function PracticeHistoryPage({
                           className="flex items-start gap-3 cursor-pointer"
                           onClick={() => handleProblemClick(problem.id)}
                         >
-                          {problem.status === 'solved' ? (
+                          {problem.status === ProblemStatus.SOLVED ? (
                             <Tooltip content="Solved">
                               <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
                             </Tooltip>

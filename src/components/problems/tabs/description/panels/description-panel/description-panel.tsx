@@ -1,17 +1,16 @@
-import ReadOnlyEditor from '@/components/lexical-editor/lexical-editor';
+import MarkdownRenderer from '@/components/ui/markdown-renderer';
 import { Button } from '@/components/ui/button';
 
 import { toastService } from '@/services/toasts-service';
 import type { ProblemDescription } from '@/types/problems';
-import { ProblemDifficulty } from '@/types/problems';
 
 import type { SampleTestcase } from '@/types/testcases';
 import { FileText, MemoryStick, Timer } from 'lucide-react';
 import { Copy } from 'lucide-react';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ProblemDiscussion } from './problem-discussion';
 import { ProblemTopicsTags } from './problem-topics-tags';
-import { useTranslation } from 'react-i18next';
 
 interface DescriptionPanelProps {
   problem: ProblemDescription;
@@ -34,12 +33,12 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
   const copyToClipboard = (text?: string) => {
     if (!text) return;
     navigator.clipboard.writeText(text);
-    toastService.success('Đã sao chép vào clipboard!');
+    toastService.success(t('copied_to_clipboard'));
   };
 
   return (
     <div className="h-full pb-4 pr-1" style={{ width: `${width}%` }}>
-      <div className="rounded-xl h-full flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+      <div className="rounded-xl h-full flex flex-col overflow-hidden border border-border bg-card">
         <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
           {/* Problem Title Header */}
           <div className="pb-6 border-b border-border">
@@ -57,15 +56,15 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
               >
                 {t(`difficulty_${problem.difficulty}`)}
               </div>
-              <div className="flex items-center gap-1 text-sm text-foreground/80 font-semibold">
+              <div className="flex items-center gap-1 text-sm text-muted-foreground font-semibold">
                 <Timer className="w-4 h-4" />
-                {timeLimitSeconds}s time limit
+                {timeLimitSeconds}s {t('time_limit')}
               </div>
-              <div className="flex items-center gap-1 text-sm text-foreground/80 font-semibold">
+              <div className="flex items-center gap-1 text-sm text-muted-foreground font-semibold">
                 <MemoryStick className="w-4 h-4" />
-                {memoryLimitMB}MB memory
+                {memoryLimitMB}MB {t('memory_limit')}
               </div>
-              <div className="flex items-center gap-1 text-sm text-foreground/80 font-semibold">
+              <div className="flex items-center gap-1 text-sm text-muted-foreground font-semibold">
                 <FileText className="w-4 h-4" />
                 {problem.maxScore} {t('points')}
               </div>
@@ -74,48 +73,47 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
 
           {/* Problem Description */}
           <section>
-            <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-              Mô tả bài toán
+            <h2 className="text-xl font-semibold text-foreground mb-4">
+              {t('description_title')}
             </h2>
-            {/* Added text-color classes here so Lexical content inherits them */}
-            <div className="prose prose-slate dark:prose-invert max-w-none text-slate-700 dark:text-slate-300">
-              <ReadOnlyEditor value={problem.description} />
+            <div className="prose dark:prose-invert max-w-none text-muted-foreground">
+              <MarkdownRenderer content={problem.description || ''} />
             </div>
           </section>
 
           {/* Input Format */}
           <section>
-            <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-              Đầu vào
+            <h2 className="text-xl font-semibold text-foreground mb-4">
+              {t('input_title')}
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-              <ReadOnlyEditor value={problem.inputDescription} />
+            <div className="bg-muted/50 rounded-lg p-4 border border-border text-muted-foreground">
+              <MarkdownRenderer content={problem.inputDescription || ''} />
             </div>
           </section>
 
           {/* Output Format */}
           <section>
-            <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-              Đầu ra
+            <h2 className="text-xl font-semibold text-foreground mb-4">
+              {t('output_title')}
             </h2>
-            <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
-              <ReadOnlyEditor value={problem.outputDescription} />
+            <div className="bg-muted/50 rounded-lg p-4 border border-border text-muted-foreground">
+              <MarkdownRenderer content={problem.outputDescription || ''} />
             </div>
           </section>
 
           {/* Constraints */}
           {problem.timeLimitMs && problem.memoryLimitKb && (
             <section>
-              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-                Giới hạn
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                {t('constraints_title')}
               </h2>
-              <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-                <p className="text-slate-700 dark:text-slate-300 font-semibold">
-                  <span className="font-semibold">Thời gian</span>:{' '}
+              <div className="bg-muted/50 rounded-lg p-4 border border-border">
+                <p className="text-muted-foreground font-semibold">
+                  <span className="font-semibold">{t('time_limit')}</span>:{' '}
                   {timeLimitSeconds} <span className="font-semibold">s</span>
                 </p>
-                <p className="text-slate-700 dark:text-slate-300 font-semibold">
-                  <span className="font-semibold">Bộ nhớ</span>: {memoryLimitMB}{' '}
+                <p className="text-muted-foreground font-semibold">
+                  <span className="font-semibold">{t('memory_limit')}</span>: {memoryLimitMB}{' '}
                   <span className="font-semibold">MB</span>
                 </p>
               </div>
@@ -125,8 +123,8 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
           {/* Sample Cases - compact view */}
           {sampleCases.length > 0 && (
             <section>
-              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100 mb-4">
-                Ví dụ
+              <h2 className="text-xl font-semibold text-foreground mb-4">
+                {t('examples_title')}
               </h2>
 
               {/* Case selector tabs */}
@@ -136,11 +134,11 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
                     key={`sample-tab-${sample.id ?? sample.input?.slice(0, 20) ?? index}`}
                     onClick={() => setActiveSampleIndex(index)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${activeSampleIndex === index
-                      ? 'bg-slate-300 dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm'
-                      : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+                      ? 'bg-secondary text-secondary-foreground shadow-sm'
+                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
                       }`}
                   >
-                    Case {index + 1}
+                    {t('case')} {index + 1}
                   </button>
                 ))}
               </div>
@@ -151,8 +149,8 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
                   {/* Input */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                        Input
+                      <h4 className="text-sm font-semibold text-muted-foreground">
+                        {t('input')}
                       </h4>
                       <Button
                         variant="ghost"
@@ -160,11 +158,11 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
                         className="h-7 px-2 text-xs"
                         onClick={() => copyToClipboard(activeSample.input)}
                       >
-                        <Copy className="w-3 h-3 mr-1" /> Copy
+                        <Copy className="w-3 h-3 mr-1" /> {t('copy')}
                       </Button>
                     </div>
-                    <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                      <pre className="text-slate-800 dark:text-slate-200 font-mono text-sm whitespace-pre-wrap">
+                    <div className="bg-muted/50 rounded-lg p-3 border border-border">
+                      <pre className="text-foreground font-mono text-sm whitespace-pre-wrap">
                         {activeSample.input || ''}
                       </pre>
                     </div>
@@ -173,8 +171,8 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
                   {/* Output */}
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                        Output
+                      <h4 className="text-sm font-semibold text-muted-foreground">
+                        {t('output')}
                       </h4>
                       <Button
                         variant="ghost"
@@ -182,11 +180,11 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
                         className="h-7 px-2 text-xs"
                         onClick={() => copyToClipboard(activeSample.output)}
                       >
-                        <Copy className="w-3 h-3 mr-1" /> Copy
+                        <Copy className="w-3 h-3 mr-1" /> {t('copy')}
                       </Button>
                     </div>
-                    <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
-                      <pre className="text-slate-800 dark:text-slate-200 font-mono text-sm whitespace-pre-wrap">
+                    <div className="bg-muted/50 rounded-lg p-3 border border-border">
+                      <pre className="text-foreground font-mono text-sm whitespace-pre-wrap">
                         {activeSample.output || ''}
                       </pre>
                     </div>
@@ -194,7 +192,8 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
 
                   {/* Explanation */}
                   {activeSample.explanation && (
-                    <div className="text-sm text-slate-600 dark:text-slate-400 italic">
+                    <div className="text-sm text-muted-foreground italic">
+                      <span className="font-semibold not-italic mr-1">{t('explanation')}:</span>
                       {activeSample.explanation}
                     </div>
                   )}

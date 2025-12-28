@@ -17,6 +17,7 @@ export const MOCK_PROBLEMS: ProblemListItem[] = Array.from({ length: 50 }).map((
   const difficulty = difficulties[Math.floor(Math.random() * difficulties.length)];
   const status = statuses[Math.floor(Math.random() * statuses.length)];
   const acceptanceRate = Math.floor(Math.random() * 60) + 20;
+  const now = new Date();
 
   return {
     id,
@@ -36,14 +37,13 @@ export const MOCK_PROBLEMS: ProblemListItem[] = Array.from({ length: 50 }).map((
     }`,
     difficulty,
     tags: [
-      { id: 1, name: 'Array', slug: 'array' },
-      { id: 2, name: 'Hash Table', slug: 'hash-table' },
+      { id: 1, name: 'Array', slug: 'array', createdAt: now, updatedAt: now },
+      { id: 2, name: 'Hash Table', slug: 'hash-table', createdAt: now, updatedAt: now },
     ].slice(0, Math.floor(Math.random() * 2) + 1),
     topics: [
-       { id: 1, name: 'Algorithms', slug: 'algorithms' } 
+       { id: 1, name: 'Algorithms', slug: 'algorithms', description: 'Algorithms', createdAt: now, updatedAt: now } 
     ],
     status,
     acceptanceRate,
   };
 });
-

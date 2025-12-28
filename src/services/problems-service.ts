@@ -40,8 +40,8 @@ async function getProblemListForTraining(
                   },
                   totalCount: MOCK_PROBLEMS.length
               },
-              status: 200,
-              message: 'Mock Data'
+              status: 'OK',
+              apiVersion: '1.0.0',
           },
           status: 200,
           statusText: 'OK',
@@ -51,12 +51,23 @@ async function getProblemListForTraining(
   }
 }
 
-async function getProblemById(problemId: string): Promise<ProblemDescription> {
-  const response = await clientApi.get<ApiResponse<ProblemDescription>>(
-    `/problems/${problemId}`
-  );
+import { MOCK_PROBLEM_DETAIL } from '@/data/mock-problem-detail';
 
-  return response.data.data;
+async function getProblemById(problemId: string): Promise<ProblemDescription> {
+  // Use mock data for ID "1" or as fallback
+  if (problemId === '1') {
+    return MOCK_PROBLEM_DETAIL as unknown as ProblemDescription;
+  }
+
+  try {
+    const response = await clientApi.get<ApiResponse<ProblemDescription>>(
+      `/problems/${problemId}`
+    );
+    return response.data.data;
+  } catch (error) {
+    console.warn(`Failed to fetch problem ${problemId}, using mock data.`, error);
+    return MOCK_PROBLEM_DETAIL as unknown as ProblemDescription;
+  }
 }
 
 async function getAllProblems(): Promise<ProblemListItem[]> {

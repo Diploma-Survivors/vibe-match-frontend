@@ -4,8 +4,10 @@ import { selectContest } from '@/store/slides/contest-slice';
 import type { SubmissionRequest } from '@/types/submissions';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 export function useCodeExecution() {
+  const { t } = useTranslation('problems');
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [testResults, setTestResults] = useState<SSEResult | null>(null);
@@ -61,18 +63,18 @@ export function useCodeExecution() {
             },
             (error) => {
               console.error('SSE error:', error);
-              setRunError('Đã có lỗi xảy ra, vui lòng thử lại sau');
+              setRunError(t('error_occurred'));
               setIsRunning(false);
             }
           );
           sseConnectedRef.current = true;
         } else {
-          setRunError('Đã có lỗi xảy ra, vui lòng thử lại sau');
+          setRunError(t('error_occurred'));
           setIsRunning(false);
         }
       } catch (error) {
         console.error('Error running code:', error);
-        setRunError('Đã có lỗi xảy ra, vui lòng thử lại sau');
+        setRunError(t('error_occurred'));
         setIsRunning(false);
       }
     },
@@ -124,7 +126,7 @@ export function useCodeExecution() {
         }
       } catch (error) {
         console.error('Error submitting code:', error);
-        let errorMessage = 'Error: Failed to submit code. Please try again.';
+        let errorMessage = t('error_submitting_code');
 
         if (error instanceof Error) {
           errorMessage = `Error: ${error.message}`;

@@ -9,6 +9,7 @@ import { SolutionsService } from '@/services/solutions-service';
 import type { SolutionComment } from '@/types/solutions';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowBigDown,
   ArrowBigUp,
@@ -35,6 +36,7 @@ export default function CommentItem({
 }: CommentItemProps) {
   const { user } = useApp();
   const { confirm } = useDialog();
+  const { t } = useTranslation('problems');
   const [comment, setComment] = useState(initialComment);
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState('');
@@ -122,10 +124,10 @@ export default function CommentItem({
 
   const handleDelete = async () => {
     const result = await confirm({
-      title: 'Xóa bình luận',
-      message: 'Bạn có chắc chắn muốn xóa bình luận này không?',
-      confirmText: 'Xóa',
-      cancelText: 'Hủy',
+      title: t('delete_comment'),
+      message: t('confirm_delete_comment'),
+      confirmText: t('delete'),
+      cancelText: t('cancel'),
       color: 'red',
     });
 
@@ -242,7 +244,7 @@ export default function CommentItem({
             className="cursor-pointer flex items-center gap-1 hover:text-blue-600 transition-colors"
           >
             <MessageSquare className="w-3.5 h-3.5" />
-            <span>Reply</span>
+            <span>{t('reply')}</span>
           </button>
 
           {isAuthor && !isEditing && (
@@ -252,14 +254,14 @@ export default function CommentItem({
                 className="cursor-pointer flex items-center gap-1 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
               >
                 <Pencil className="w-3.5 h-3.5" />
-                <span>Chỉnh sửa</span>
+                <span>{t('edit')}</span>
               </button>
               <button
                 onClick={handleDelete}
                 className="cursor-pointer flex items-center gap-1 hover:text-red-600 transition-colors"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span>Xóa</span>
+                <span>{t('delete')}</span>
               </button>
             </>
           )}
@@ -272,7 +274,7 @@ export default function CommentItem({
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                 setReplyContent(e.target.value)
               }
-              placeholder="Viết câu trả lời..."
+              placeholder={t('write_reply')}
               className="min-h-[80px] text-sm"
             />
             <div className="flex justify-end gap-2">
@@ -281,7 +283,7 @@ export default function CommentItem({
                 size="sm"
                 onClick={() => setIsReplying(false)}
               >
-                Hủy
+                {t('cancel')}
               </Button>
               <Button
                 className="bg-green-600 hover:bg-green-700 text-white"
@@ -289,7 +291,7 @@ export default function CommentItem({
                 onClick={handleReplySubmit}
                 disabled={!replyContent.trim() || isSubmittingReply}
               >
-                {isSubmittingReply ? 'Đang gửi...' : 'Trả lời'}
+                {isSubmittingReply ? t('sending') : t('reply')}
               </Button>
             </div>
           </div>

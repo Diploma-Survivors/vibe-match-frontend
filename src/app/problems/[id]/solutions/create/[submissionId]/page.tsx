@@ -20,26 +20,28 @@ import {
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 const DEFAULT_MARKDOWN = `# Intuition
 
 # Approach
-<!-- Mô tả phương pháp giải quyết bài toán của bạn. -->
+<!-- {t('description')} -->
 
 # Complexity
 - Time complexity:
-<!-- Điền độ phức tạp thời gian tại đây, ví dụ $$O(n)$$ -->
+<!-- {t('time_complexity')} -->
 
 - Space complexity:
-<!-- Điền độ phức tạp không gian tại đây, ví dụ $$O(n)$$ -->
+<!-- {t('space_complexity')} -->
 
 # Code
 \`\`\`cpp []
-// Code will be inserted here
+// {t('code_placeholder')}
 \`\`\`
 `;
 
 export default function CreateSolutionPage() {
+  const { t } = useTranslation('problems');
   const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();

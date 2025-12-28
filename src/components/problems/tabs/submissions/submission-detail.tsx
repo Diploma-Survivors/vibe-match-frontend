@@ -13,6 +13,7 @@ import { Copy, Loader2, PenSquare, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/default-highlight';
@@ -38,7 +39,7 @@ export default function SubmissionDetail({
   const dispatch = useDispatch();
   const params = useParams();
   const problemId = params.id as string;
-
+  const { t } = useTranslation('problems');
   const [isCodeExpanded, setIsCodeExpanded] = useState(true);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -137,7 +138,7 @@ export default function SubmissionDetail({
                 className="gap-2 text-yellow-600 border-yellow-200 hover:bg-yellow-50 dark:text-yellow-400 dark:border-yellow-900 dark:hover:bg-yellow-900/20"
               >
                 <Sparkles className="w-4 h-4" />
-                Nhận xét với AI
+                {t('ai_review_button')}
               </Button>
             </div>
 

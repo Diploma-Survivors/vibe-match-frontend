@@ -128,6 +128,16 @@ export interface ProblemListResponse {
 }
 
 // UI helpers removed in favor of component-level i18n and design system tokens
+export const DIFFICULTY_COLORS = {
+  [ProblemDifficulty.EASY]: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800',
+  [ProblemDifficulty.MEDIUM]: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800',
+  [ProblemDifficulty.HARD]: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800',
+};
+
+export const getDifficultyColor = (difficulty: ProblemDifficulty | string) => {
+  const normalized = (difficulty || '').toLowerCase() as ProblemDifficulty;
+  return DIFFICULTY_COLORS[normalized] || 'bg-slate-100 text-slate-700 border-slate-200';
+};
 
 export interface ProblemComment {
   id: string;

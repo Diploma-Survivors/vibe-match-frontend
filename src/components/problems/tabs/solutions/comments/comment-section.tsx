@@ -23,13 +23,14 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import CommentItem from './comment-item';
-
+import { useTranslation } from 'react-i18next';
 interface CommentSectionProps {
   solutionId: string;
 }
 
 export default function CommentSection({ solutionId }: CommentSectionProps) {
   const { user } = useApp();
+  const { t } = useTranslation('problems');
   const [comments, setComments] = useState<SolutionComment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState<SolutionCommentSortBy>(
@@ -148,7 +149,7 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
           <MessageSquare className="w-5 h-5" />
-          <span className="font-semibold">{comments.length} Bình luận</span>
+          <span className="font-semibold">{comments.length} {t('comments')}</span>
         </div>
 
         <DropdownMenu>
@@ -161,8 +162,8 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
               <ArrowUpDown className="w-4 h-4" />
               <span>
                 {sortBy === SolutionCommentSortBy.RECENT
-                  ? 'Gần đây nhất'
-                  : 'Nhiều vote nhất'}
+                  ? t('sort_newest')
+                  : t('sort_most_voted')}
               </span>
             </Button>
           </DropdownMenuTrigger>
@@ -170,12 +171,12 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
             <DropdownMenuItem
               onClick={() => handleSortChange(SolutionCommentSortBy.RECENT)}
             >
-              Gần đây nhất
+              {t('sort_newest')}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => handleSortChange(SolutionCommentSortBy.MOST_VOTED)}
             >
-              Nhiều vote nhất
+              {t('sort_most_voted')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -195,7 +196,7 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
         </Avatar>
         <div className="flex-1 space-y-2">
           <Textarea
-            placeholder="Viết bình luận của bạn..."
+            placeholder={t('write_reply')}
             value={newCommentContent}
             onChange={(e) => setNewCommentContent(e.target.value)}
             className="min-h-[100px]"
@@ -206,7 +207,7 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
               onClick={handleSubmitComment}
               disabled={!newCommentContent.trim() || isSubmitting}
             >
-              {isSubmitting ? 'Đang gửi...' : 'Bình luận'}
+              {isSubmitting ? t('sending') : t('reply')}
             </Button>
           </div>
         </div>
@@ -250,9 +251,7 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
                         className="text-slate-500 h-auto p-0 hover:bg-transparent hover:text-slate-800 dark:hover:text-slate-300"
                       >
                         <ChevronDown className="w-4 h-4 mr-1" />
-                        Xem{' '}
-                        {comment.replyCounts || getReplies(comment.id).length}{' '}
-                        câu trả lời
+                        {t('view_replies', { count: comment.replyCounts || getReplies(comment.id).length })}
                       </Button>
                     ) : (
                       <>
@@ -263,7 +262,7 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
                           className="text-slate-500 h-auto p-0 hover:bg-transparent hover:text-slate-800 dark:hover:text-slate-300 mb-2"
                         >
                           <ChevronUp className="w-4 h-4 mr-1" />
-                          Ẩn câu trả lời
+                          {t('hide_replies')}
                         </Button>
 
                         {getReplies(comment.id).map((reply) => (

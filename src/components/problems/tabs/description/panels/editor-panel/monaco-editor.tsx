@@ -2,20 +2,20 @@
 
 import { Button } from '@/components/ui/button';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 import { SubmissionsService } from '@/services/submissions-service';
 import { toastService } from '@/services/toasts-service';
 import { LANGUAGE_DEFINITIONS, type Language } from '@/types/submissions';
 import Editor from '@monaco-editor/react';
-import { Copy, Moon, Sun, Wand2 } from 'lucide-react';
+import { ChevronDown, Copy, Wand2 } from 'lucide-react';
 import type { editor } from 'monaco-editor';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface MonacoEditorProps {
   currentLanguageId: number;
@@ -50,17 +50,12 @@ export default function MonacoEditor({
 }: MonacoEditorProps) {
   const [languageList, setLanguageList] = useState<Language[]>([]);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-  const [editorTheme, setEditorTheme] = useState('light');
-
+  const { t } = useTranslation('problems');
   // handle editor mount when editor is mounted (just call once when editor is mounted)
   const handleEditorDidMount = (
     editorInstance: editor.IStandaloneCodeEditor
   ) => {
     editorRef.current = editorInstance;
-  };
-
-  const toggleTheme = () => {
-    setEditorTheme((prev) => (prev === 'vs-dark' ? 'light' : 'vs-dark'));
   };
 
   // Get language list
@@ -74,9 +69,7 @@ export default function MonacoEditor({
   }, []);
 
   // handle language change when user changes the language in the dropdown
-  const handleLanguageChange = (languageName: string) => {
-    const languageId =
-      languageList.find((lang) => lang.name === languageName)?.id || 1;
+  const handleLanguageChange = (languageId: number) => {
     setCurrentLanguageId(languageId);
   };
 
@@ -93,7 +86,7 @@ export default function MonacoEditor({
   // Copy to clipboard
   const copyToClipboard = () => {
     navigator.clipboard.writeText(currentCode);
-    toastService.success('Đã copy vào clipboard!');
+    toastService.success(t('copied_to_clipboard'));
   };
 
   // Format code using Monaco editor ref (unsupported for python/cpp/java)
@@ -106,83 +99,82 @@ export default function MonacoEditor({
   };
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-slate-900 rounded-lg overflow-hidden">
+    <div className="h-full flex flex-col bg-card rounded-lg overflow-hidden">
       {/* Header - LeetCode style */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
         <div className="flex items-center gap-3">
-          {/* Language Selector */}
-          <Select
-            value={currentLanguageName}
-            onValueChange={handleLanguageChange}
-          >
-            <SelectTrigger className="w-36 h-8 text-sm border-slate-300 dark:border-slate-600">
-              <SelectValue placeholder="Select language" />
-            </SelectTrigger>
-            <SelectContent>
+          {/* Language Selector (using DropdownMenu to prevent layout shift/scroll locking) */}
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-36 justify-between text-sm font-normal"
+              >
+                {currentLanguageName || 'Select language'}
+                <ChevronDown className="h-4 w-4 opacity-50" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="max-h-[300px] overflow-y-auto">
               {languageList.map((lang) => (
-                <SelectItem key={lang.id} value={lang.name}>
+                <DropdownMenuItem
+                  key={lang.id}
+                  onClick={() => handleLanguageChange(lang.id)}
+                  className="cursor-pointer"
+                >
                   {lang.name}
-                </SelectItem>
+                </DropdownMenuItem>
               ))}
-            </SelectContent>
-          </Select>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Theme Toggle Button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={toggleTheme}
-            className="h-8 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
-          >
-            {editorTheme === 'vs-dark' ? (
-              <Sun className="w-4 h-4 mr-1" />
-            ) : (
-              <Moon className="w-4 h-4 mr-1" />
-            )}
-            Theme
-          </Button>
           {/* Format Button */}
           <Button
             variant="ghost"
             size="sm"
             onClick={handleFormatCode}
-            className="h-8 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+            className="h-8 text-muted-foreground hover:text-foreground"
+            title="Format Code"
           >
-            <Wand2 className="w-4 h-4 mr-1" />
+            <Wand2 className="w-4 h-4 mr-1.5" />
             Format
           </Button>
+          
+          <div className="w-px h-4 bg-border mx-1" />
+
           {/* Copy Button */}
           <Button
             variant="ghost"
             size="sm"
             onClick={copyToClipboard}
-            className="h-8 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100"
+            className="h-8 text-muted-foreground hover:text-foreground"
+            title="Copy Code"
           >
-            <Copy className="w-4 h-4 mr-1" />
+            <Copy className="w-4 h-4 mr-1.5" />
             Copy
           </Button>
         </div>
       </div>
 
       {/* Monaco Editor */}
-      <div className="flex-1">
+      <div className="flex-1 relative">
         <Editor
           height="100%"
           language={getMonacoLanguageId(currentLanguageName)}
           value={currentCode}
           onChange={handleEditorChange}
-          theme={editorTheme}
+          theme="light"
           onMount={handleEditorDidMount}
           loading={
             <div className="w-full h-full flex items-center justify-center">
-              <div className="w-6 h-6 border-2 border-slate-300 border-t-slate-600 rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-muted border-t-primary rounded-full animate-spin" />
             </div>
           }
           options={{
             fontSize: 14,
-            fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
+            fontFamily: "'Geist Mono', 'Consolas', 'Monaco', monospace",
             minimap: { enabled: false },
             scrollBeyondLastLine: false,
             wordWrap: 'on',
@@ -192,7 +184,11 @@ export default function MonacoEditor({
             scrollbar: {
               verticalScrollbarSize: 10,
               horizontalScrollbarSize: 10,
+              useShadows: false,
             },
+            padding: { top: 16, bottom: 16 },
+            overviewRulerBorder: false,
+            renderLineHighlight: 'none',
           }}
         />
       </div>

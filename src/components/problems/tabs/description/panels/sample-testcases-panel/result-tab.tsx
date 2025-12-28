@@ -1,6 +1,7 @@
 import { getStatusMeta } from '@/lib/utils/testcase-status';
 import type { SSEResult } from '@/services/sse-service';
 import type { SampleTestcase } from '@/types/testcases';
+import { useTranslation } from 'react-i18next';
 
 interface ResultTabProps {
   testCases: SampleTestcase[];
@@ -18,7 +19,7 @@ export function ResultTab({
   runError = null,
 }: ResultTabProps) {
   const hasResults = (testResults?.results?.length ?? 0) > 0;
-
+  const { t } = useTranslation('problems');
   if (!testCases[activeTestCase]) return null;
 
   if (!hasResults) {
@@ -31,8 +32,8 @@ export function ResultTab({
         )}
         <span>
           {isRunning
-            ? 'Đang chạy sample testcases...'
-            : runError || 'Bạn phải bấm run để xem kết quả testcase sample'}
+            ? t('running_sample_testcases')
+            : runError || t('must_run_to_see_results')}
         </span>
       </div>
     );
