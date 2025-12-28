@@ -1,16 +1,16 @@
-import ReadOnlyEditor from '@/components/lexical-editor/lexical-editor';
-import { Button } from '@/components/ui/button';
-import { useApp } from '@/contexts/app-context';
-import { toastService } from '@/services/toasts-service';
-import type { ProblemDescription } from '@/types/problems';
-import { ProblemDifficulty } from '@/types/problems';
-import { IssuerType } from '@/types/states';
-import type { SampleTestcase } from '@/types/testcases';
-import { FileText, MemoryStick, Timer } from 'lucide-react';
-import { Copy } from 'lucide-react';
-import { useContext, useState } from 'react';
-import { ProblemDiscussion } from './problem-discussion';
-import { ProblemTopicsTags } from './problem-topics-tags';
+import ReadOnlyEditor from "@/components/lexical-editor/lexical-editor";
+import { Button } from "@/components/ui/button";
+import { useApp } from "@/contexts/app-context";
+import { toastService } from "@/services/toasts-service";
+import type { ProblemDescription } from "@/types/problems";
+import { ProblemDifficulty } from "@/types/problems";
+import { IssuerType } from "@/types/states";
+import type { SampleTestcase } from "@/types/testcases";
+import { FileText, MemoryStick, Timer } from "lucide-react";
+import { Copy } from "lucide-react";
+import { useContext, useState } from "react";
+import { ProblemDiscussion } from "./problem-discussion";
+import { ProblemTopicsTags } from "./problem-topics-tags";
 
 interface DescriptionPanelProps {
   problem: ProblemDescription;
@@ -18,18 +18,18 @@ interface DescriptionPanelProps {
 }
 
 export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
-  const { issuer } = useApp();
+  const { user } = useApp();
   const sampleCases: SampleTestcase[] = problem.testcaseSamples || [];
   const [activeSampleIndex, setActiveSampleIndex] = useState(0);
 
   const getDifficultyLabel = (difficulty: string): string => {
     switch (difficulty) {
       case ProblemDifficulty.EASY:
-        return 'Easy';
+        return "Easy";
       case ProblemDifficulty.MEDIUM:
-        return 'Medium';
+        return "Medium";
       case ProblemDifficulty.HARD:
-        return 'Hard';
+        return "Hard";
       default:
         return difficulty;
     }
@@ -46,7 +46,7 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
   const copyToClipboard = (text?: string) => {
     if (!text) return;
     navigator.clipboard.writeText(text);
-    toastService.success('Đã sao chép vào clipboard!');
+    toastService.success("Đã sao chép vào clipboard!");
   };
 
   return (
@@ -61,11 +61,11 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
             <div className="flex items-center gap-4 flex-wrap">
               <div
                 className={`px-3 py-1 rounded-full text-sm font-semibold shadow-md ${
-                  problem.difficulty === 'easy'
-                    ? 'bg-gradient-to-r from-green-400 to-green-500 text-white'
-                    : problem.difficulty === 'medium'
-                      ? 'bg-gradient-to-r from-yellow-400 to-orange-500 text-white'
-                      : 'bg-gradient-to-r from-red-400 to-red-500 text-white'
+                  problem.difficulty === "easy"
+                    ? "bg-gradient-to-r from-green-400 to-green-500 text-white"
+                    : problem.difficulty === "medium"
+                    ? "bg-gradient-to-r from-yellow-400 to-orange-500 text-white"
+                    : "bg-gradient-to-r from-red-400 to-red-500 text-white"
                 }`}
               >
                 {getDifficultyLabel(problem.difficulty)}
@@ -124,11 +124,11 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
               </h2>
               <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
                 <p className="text-slate-700 dark:text-slate-300 font-semibold">
-                  <span className="font-semibold">Thời gian</span>:{' '}
+                  <span className="font-semibold">Thời gian</span>:{" "}
                   {timeLimitSeconds} <span className="font-semibold">s</span>
                 </p>
                 <p className="text-slate-700 dark:text-slate-300 font-semibold">
-                  <span className="font-semibold">Bộ nhớ</span>: {memoryLimitMB}{' '}
+                  <span className="font-semibold">Bộ nhớ</span>: {memoryLimitMB}{" "}
                   <span className="font-semibold">MB</span>
                 </p>
               </div>
@@ -146,12 +146,14 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
               <div className="flex items-center gap-2 mb-4 overflow-x-auto">
                 {sampleCases.map((sample, index) => (
                   <button
-                    key={`sample-tab-${sample.id ?? sample.input?.slice(0, 20) ?? index}`}
+                    key={`sample-tab-${
+                      sample.id ?? sample.input?.slice(0, 20) ?? index
+                    }`}
                     onClick={() => setActiveSampleIndex(index)}
                     className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                       activeSampleIndex === index
-                        ? 'bg-slate-300 dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm'
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600'
+                        ? "bg-slate-300 dark:bg-slate-600 text-slate-900 dark:text-white shadow-sm"
+                        : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-600"
                     }`}
                   >
                     Case {index + 1}
@@ -179,7 +181,7 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
                     </div>
                     <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
                       <pre className="text-slate-800 dark:text-slate-200 font-mono text-sm whitespace-pre-wrap">
-                        {activeSample.input || ''}
+                        {activeSample.input || ""}
                       </pre>
                     </div>
                   </div>
@@ -201,7 +203,7 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
                     </div>
                     <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
                       <pre className="text-slate-800 dark:text-slate-200 font-mono text-sm whitespace-pre-wrap">
-                        {activeSample.output || ''}
+                        {activeSample.output || ""}
                       </pre>
                     </div>
                   </div>
