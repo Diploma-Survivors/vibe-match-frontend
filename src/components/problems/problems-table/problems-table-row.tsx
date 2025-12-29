@@ -34,7 +34,7 @@ export default function ProblemTableRow({ problem }: ProblemTableRowProps) {
   return (
     <TableRow
       className="cursor-pointer hover:bg-muted/50 transition-colors group border-border/50 h-14"
-      onClick={() => router.push(`/problems/${problem.id}`)}
+      onClick={() => router.push(`/problems/${problem.id}/description`)}
     >
       {/* Status */}
       <TableCell className="text-center p-0 w-12">

@@ -1,222 +1,85 @@
 'use client';
 
 import ContestDrawer from '@/components/contest/contest-drawer';
-import ContestSolvePageSkeleton from '@/components/contest/contest-solve-skeleton';
-import ContestTopBar from '@/components/contest/contest-topbar';
+import ContestNavbar from '@/components/contest/solve/contest-navbar';
 import ContestProblemWrapper from '@/components/problems/tabs/description/contest-problem-wrapper';
-import SubmissionsPage from '@/components/problems/tabs/submissions/submissions-page';
-import { useDialog } from '@/components/providers/dialog-provider';
-import { useToast } from '@/components/providers/toast-provider';
-import { ContestsService } from '@/services/contests-service';
-import { ProblemsService } from '@/services/problems-service';
-import { toastService } from '@/services/toasts-service';
-import { setContest } from '@/store/slides/contest-slice';
-import { setProblem } from '@/store/slides/problem-slice';
-import { type Contest, ContestNavTabs } from '@/types/contests';
+import {
+  MOCK_CONTEST_DETAIL,
+  MOCK_PROBLEM_DESCRIPTION,
+  MOCK_RANKING_LIST,
+} from '@/data/contest-detail';
 import type { ProblemDescription } from '@/types/problems';
-import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-
-// Mock ranking data - replace with actual API call
-const MOCK_RANKING = [
-  {
-    rank: 1,
-    username: 'alice_coder',
-    score: 900,
-    timeSpent: '45:23',
-    problemsSolved: 5,
-  },
-  {
-    rank: 2,
-    username: 'bob_dev',
-    score: 700,
-    timeSpent: '52:15',
-    problemsSolved: 4,
-  },
-  {
-    rank: 3,
-    username: 'charlie_prog',
-    score: 600,
-    timeSpent: '48:30',
-    problemsSolved: 3,
-  },
-  {
-    rank: 4,
-    username: 'you',
-    score: 100,
-    timeSpent: '15:42',
-    problemsSolved: 1,
-    isCurrentUser: true,
-  },
-  {
-    rank: 5,
-    username: 'dave_algo',
-    score: 100,
-    timeSpent: '20:11',
-    problemsSolved: 1,
-  },
-];
+import { useMemo, useState } from 'react';
 
 export default function ContestSolvePage() {
-  const params = useParams();
-  const contestId = params.id as string;
-  const dispatch = useDispatch();
-  const { confirm, alert } = useDialog();
-
-  const [contestData, setContestData] = useState<Contest | null>(null);
-  const [currentProblem, setCurrentProblem] =
-    useState<ProblemDescription | null>(null);
-  const [currentProblemIndex, setCurrentProblemIndex] = useState(0);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const [activeTab, setActiveTab] = useState<ContestNavTabs>(
-    ContestNavTabs.DESCRIPTION
+  const [currentProblemId, setCurrentProblemId] = useState(
+    MOCK_CONTEST_DETAIL.problems[0].id
   );
 
-  const fetchContestData = useCallback(async () => {
-    try {
-      // do not set loading to true here to avoid causing rerender as we would like to update contest data in background
-      const response = await ContestsService.getContestDetail(contestId);
-      const contestData = response?.data?.data as Contest;
-      setContestData(contestData);
-      dispatch(setContest(contestData));
+  // Use Mock Data
+  const contestData = MOCK_CONTEST_DETAIL;
 
-      // Load first problem
-      if (!currentProblem && contestData?.problems?.[0]) {
-        const problemData = await ProblemsService.getProblemById(
-          contestData.problems[0].id
-        );
-        setCurrentProblem(problemData);
-        dispatch(setProblem(problemData));
-        setCurrentProblemIndex(0);
-      }
-    } catch (error) {
-      console.error('Error fetching contest:', error);
-    } finally {
-      setLoading(false);
+  // Navigation Logic
+  const currentIndex = useMemo(() =>
+    contestData.problems.findIndex(p => p.id === currentProblemId),
+    [contestData.problems, currentProblemId]);
+
+  const handleNext = () => {
+    if (currentIndex < contestData.problems.length - 1) {
+      setCurrentProblemId(contestData.problems[currentIndex + 1].id);
     }
-  }, [contestId, currentProblem, dispatch]);
-
-  // Fetch contest data
-  useEffect(() => {
-    fetchContestData();
-  }, [fetchContestData]);
-
-  const handleProblemChange = useCallback(
-    async (problemId: string) => {
-      if (!contestData) return;
-
-      const problemIndex = contestData.problems.findIndex(
-        (p) => p.id === problemId
-      );
-      if (problemIndex === -1) return;
-
-      try {
-        const problemData = await ProblemsService.getProblemById(problemId);
-        setCurrentProblem(problemData);
-        setCurrentProblemIndex(problemIndex);
-        dispatch(setProblem(problemData));
-      } catch (error) {
-        console.error('Error fetching problem:', error);
-      }
-    },
-    [contestData, dispatch]
-  );
-
-  const handleTabChange = (tab: ContestNavTabs) => {
-    setActiveTab(tab);
   };
 
-  const handleEndContest = useCallback(async () => {
-    try {
-      const result = await confirm({
-        title: 'Kết thúc',
-        message: 'Bạn có muốn nộp bài và kết thúc không?',
-        confirmText: 'Kết thúc',
-        cancelText: 'Hủy',
-        color: 'red',
-      });
-      if (!result) return;
-
-      await ContestsService.finishContest(contestId);
-      await alert({
-        title: 'Đã kết thúc',
-        message: 'Cuộc thi đã được kết thúc thành công.',
-        buttonText: 'OK',
-        color: 'green',
-      });
-
-      window.location.reload();
-    } catch (error) {}
-  }, [contestId, confirm, alert]);
-
-  const handleMoveToNextProblem = useCallback(() => {
-    if (!contestData || !contestData.problems) return;
-
-    if (currentProblemIndex < contestData.problems.length - 1) {
-      const nextProblem = contestData.problems[currentProblemIndex + 1];
-      handleProblemChange(nextProblem.id);
+  const handlePrev = () => {
+    if (currentIndex > 0) {
+      setCurrentProblemId(contestData.problems[currentIndex - 1].id);
     }
-  }, [contestData, currentProblemIndex, handleProblemChange]);
+  };
 
-  const handleMoveToPreviousProblem = useCallback(() => {
-    if (!contestData || !contestData.problems) return;
+  // Transform Mock Description
+  const currentProblem: ProblemDescription = {
+    ...MOCK_PROBLEM_DESCRIPTION,
+    id: currentProblemId,
+    title:
+      contestData.problems.find((p) => p.id === currentProblemId)?.title ||
+      MOCK_PROBLEM_DESCRIPTION.title,
+  } as unknown as ProblemDescription;
 
-    if (currentProblemIndex > 0) {
-      const prevProblem = contestData.problems[currentProblemIndex - 1];
-      handleProblemChange(prevProblem.id);
-    }
-  }, [contestData, currentProblemIndex, handleProblemChange]);
-
-  if (loading || !contestData || !currentProblem) {
-    return <ContestSolvePageSkeleton />;
-  }
+  const handleProblemChange = (problemId: string) => {
+    setCurrentProblemId(problemId);
+  };
 
   return (
-    <div className="h-screen flex flex-col bg-slate-900">
-      {/* Top Bar */}
-      <ContestTopBar
-        onNextProblem={handleMoveToNextProblem}
-        onPreviousProblem={handleMoveToPreviousProblem}
-        onEndContest={handleEndContest}
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
+    <div className="h-screen flex flex-col bg-background overflow-hidden font-sans">
+      {/* 1. Global Header */}
+      <ContestNavbar
         onMenuClick={() => setIsDrawerOpen(true)}
-        disableNext={
-          !contestData?.problems ||
-          currentProblemIndex >= contestData.problems.length - 1
-        }
-        disablePrevious={!contestData?.problems || currentProblemIndex <= 0}
+        onNextProblem={handleNext}
+        onPrevProblem={handlePrev}
+        hasNext={currentIndex < contestData.problems.length - 1}
+        hasPrev={currentIndex > 0}
       />
 
-      {/* Main Content - Problem Solving Interface */}
-      <div className="flex-1 overflow-hidden">
-        {activeTab === ContestNavTabs.DESCRIPTION ? (
-          <ContestProblemWrapper
-            problem={currentProblem}
-            contestMode={true}
-            onSubmitSuccess={() => {
-              fetchContestData();
-            }}
-          />
-        ) : (
-          <SubmissionsPage
-            problemId={currentProblem.id}
-            contestParticipationId={contestData.participation?.participationId}
-          />
-        )}
+      {/* 2. Main Split Layout */}
+      <div className="flex-1 overflow-hidden relative">
+        <ContestProblemWrapper
+          problem={currentProblem}
+          contestMode={true}
+          onSubmitSuccess={() => {
+            console.log('Submitted successfully');
+          }}
+        />
       </div>
 
-      {/* Drawer */}
+      {/* 3. Contest Drawer (Ranking) */}
       <ContestDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
-        contestName={contestData.name}
+        contestName={contestData.title}
         problems={contestData.problems}
-        ranking={MOCK_RANKING}
-        currentProblemId={currentProblem.id}
+        ranking={MOCK_RANKING_LIST}
+        currentProblemId={currentProblemId}
         onProblemClick={handleProblemChange}
       />
     </div>

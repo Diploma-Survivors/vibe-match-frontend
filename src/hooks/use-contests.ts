@@ -1,4 +1,5 @@
-import { ContestsService } from '@/services/contests-service';
+// import { ContestsService } from '@/services/contests-service';
+import { MOCK_CONTESTS } from '@/data/mock-contests';
 import {
   type ContestFilters,
   type ContestListItem,
@@ -66,12 +67,56 @@ export default function useContests(): UseContestsReturn {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-        const axiosResponse =
-          await ContestsService.getContestList(requestParams);
+        // const axiosResponse =
+        //   await ContestsService.getContestList(requestParams);
 
-        const response: ContestListResponse = axiosResponse?.data?.data;
+        // const response: ContestListResponse = axiosResponse?.data?.data;
+
+        // SIMULATE API CALL WITH MOCK DATA
+        await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delay
+
+        let filteredContests = [...MOCK_CONTESTS];
+
+        // Apply keyword filter
+        if (requestParams.keyword) {
+          const lowerKeyword = requestParams.keyword.toLowerCase();
+          filteredContests = filteredContests.filter(c =>
+            c.name.toLowerCase().includes(lowerKeyword)
+          );
+        }
+
+        // Apply status filter
+        if (
+          requestParams.filters?.status &&
+          requestParams.filters.status.length > 0
+        ) {
+          filteredContests = filteredContests.filter((contest) =>
+            requestParams.filters?.status?.includes(contest.status)
+          );
+        }
+
+        const totalCount = filteredContests.length;
+
+        // Mock pagination
+        const itemsPerPage = requestParams.first || ITEMS_PER_PAGE;
+        let startIndex = 0;
+
+        if (requestParams.after) {
+          const lastIndex = filteredContests.findIndex(c => c.id === requestParams.after);
+          if (lastIndex !== -1) {
+            startIndex = lastIndex + 1;
+          }
+        }
+
+        const slicedContests = filteredContests.slice(startIndex, startIndex + itemsPerPage);
+
+        const hasNextPage = startIndex + itemsPerPage < totalCount;
+        const endCursor = slicedContests.length > 0 ? slicedContests[slicedContests.length - 1].id : '';
 
         // Extract contests from edges
+        let contestsData: ContestListItem[] = slicedContests;
+
+        /*
         let contestsData: ContestListItem[] =
           response?.edges?.map((edge) => ({
             ...edge.node,
@@ -86,14 +131,20 @@ export default function useContests(): UseContestsReturn {
             requestParams.filters?.status?.includes(contest.status)
           );
         }
+        */
 
         setState((prev) => ({
           ...prev,
           contests: requestParams.after
             ? [...prev.contests, ...contestsData]
             : contestsData,
-          pageInfo: response?.pageInfos,
-          totalCount: response?.totalCount,
+          pageInfo: {
+            hasNextPage,
+            hasPreviousPage: false, // Not implementing previous page for infinite scroll usually
+            startCursor: '',
+            endCursor
+          },
+          totalCount: totalCount,
           isLoading: false,
         }));
       } catch (err) {

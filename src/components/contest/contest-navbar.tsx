@@ -1,11 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { useApp } from '@/contexts/app-context';
-import { ArrowLeft, BarChart2, FileText, Trophy, UserPlus } from 'lucide-react';
-import { signOut } from 'next-auth/react';
+import { cn } from '@/lib/utils';
+import { ArrowLeft, FileText, Trophy } from 'lucide-react';
 import Link from 'next/link';
-import { UserMenu } from '../layout/user-menu';
+import { useTranslation } from 'react-i18next';
 
 interface ContestNavbarProps {
   activeTab: string;
@@ -14,71 +13,61 @@ interface ContestNavbarProps {
 }
 
 const navItems = [
-  { id: 'description', label: 'Mô tả', icon: FileText },
-  // { id: 'stats', label: 'Thống kê', icon: BarChart2 },
-  { id: 'ranking', label: 'Bảng xếp hạng', icon: Trophy },
-  // { id: 'join', label: 'Tham gia', icon: UserPlus },
+  { id: 'description', label: 'description', icon: FileText },
+  { id: 'ranking', label: 'ranking', icon: Trophy },
 ];
 
 export default function ContestNavbar({
   activeTab,
   onTabChange,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   hideNavigation = false,
 }: ContestNavbarProps) {
-  const { user, clearUserData } = useApp();
+  const { t } = useTranslation('contests');
 
-  const handleLogout = async () => {
-    clearUserData();
-    await signOut({
-      callbackUrl: '/login', // Where to go after logout
-      redirect: true,
-    });
-  };
   return (
-    <nav className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-white/20 dark:border-slate-700/50 sticky top-0 z-40">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Back Button - only show if hideNavigation is false */}
-          <Link href="/contests">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="gap-2 text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden md:inline">Trở về danh sách</span>
-            </Button>
-          </Link>
+    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/80">
+      <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        {/* Left Side: Back Button */}
+        <Link href="/contests">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="gap-2 text-muted-foreground hover:text-foreground hover:bg-muted"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">{t('back')}</span>
+          </Button>
+        </Link>
 
-          {/* Navigation Tabs */}
-          <div className="flex items-center gap-2">
-            {navItems.map((item) => {
-              const IconComponent = item.icon;
-              const isActive = activeTab === item.id;
+        {/* Center: Navigation Tabs */}
+        <div className="flex items-center gap-2">
+          {navItems.map((item) => {
+            const IconComponent = item.icon;
+            const isActive = activeTab === item.id;
 
-              return (
-                <Button
-                  key={item.id}
-                  variant={isActive ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => onTabChange(item.id)}
-                  className={`gap-2 transition-all duration-200 ${isActive
-                      ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg'
-                      : 'text-slate-600 hover:text-green-600 dark:text-slate-400 dark:hover:text-emerald-400'
-                    }`}
-                >
-                  <IconComponent className="w-4 h-4" />
-                  <span className="hidden sm:inline">{item.label}</span>
-                </Button>
-              );
-            })}
-          </div>
-
-          {/* Placeholder for future actions */}
-          <div>
-            <UserMenu user={user} onLogout={handleLogout} />
-          </div>
+            return (
+              <Button
+                key={item.id}
+                variant={isActive ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => onTabChange(item.id)}
+                className={cn(
+                  "gap-2 h-9 px-4 rounded-lg text-sm font-medium transition-all duration-200",
+                  isActive
+                    ? "bg-primary/10 text-primary shadow-none hover:bg-primary/20"
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                )}
+              >
+                <IconComponent className="w-4 h-4" />
+                <span className="hidden sm:inline">{t(item.label)}</span>
+              </Button>
+            );
+          })}
         </div>
+
+        {/* Right Side: Empty Placeholder to balance layout (width of back button approx) */}
+        <div className="w-[88px] hidden sm:block"></div>
       </div>
     </nav>
   );
