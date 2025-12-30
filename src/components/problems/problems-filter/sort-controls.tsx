@@ -32,10 +32,9 @@ export default function SortControls({
   const { t } = useTranslation('problems');
 
   const sortOptions = [
-    { value: SortBy.TITLE, label: t('sort_options.title') },
+    { value: SortBy.ID, label: t('sort_options.id') },
     { value: SortBy.DIFFICULTY, label: t('sort_options.difficulty') },
-    { value: SortBy.CREATED_AT, label: t('sort_options.createdAt') },
-    { value: SortBy.MAX_SCORE, label: t('sort_options.maxScore') },
+    { value: SortBy.ACCEPTANCE_RATE, label: t('sort_options.acceptanceRate') },
   ];
   const getSortIcon = () => {
     if (sortOrder === SortOrder.ASC) {

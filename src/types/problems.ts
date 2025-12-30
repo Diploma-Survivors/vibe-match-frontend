@@ -10,121 +10,50 @@ export enum ProblemDifficulty {
 }
 
 export enum SortBy {
-  CREATED_AT = 'createdAt',
-  TITLE = 'title',
+  ID = 'id',
   DIFFICULTY = 'difficulty',
-  MAX_SCORE = 'maxScore',
+  ACCEPTANCE_RATE = 'acceptanceRate',
 }
+
 
 export enum SortOrder {
-  ASC = 'asc',
-  DESC = 'desc',
+  ASC = 'ASC',
+  DESC = 'DESC',
 }
 
-export enum MatchMode {
-  ANY = 'any',
-  ALL = 'all',
-}
-
-export enum ProblemType {
-  STANDALONE = 'standalone',
-  CONTEST = 'contest',
-  HYBRID = 'hybrid',
-}
 
 export enum ProblemStatus {
-  UNSOLVED = 'unsolved',
+  NOT_STARTED = 'not-started',
   ATTEMPTED = 'attempted',
-  UN_ATTEMPTED = 'un_attempted',
   SOLVED = 'solved',
 }
 
-export interface ProblemDescription {
-  id: string;
-  title: string;
-  description: string;
-  inputDescription: string;
-  outputDescription: string;
-  maxScore: number;
-  timeLimitMs: number;
-  memoryLimitKb: number;
-  difficulty: ProblemDifficulty | string;
-  type?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  testcaseSamples?: SampleTestcase[];
-  score?: number; // For contest problems
-  status?: ProblemStatus;
-  tags?: Tag[];
-  topics?: Topic[];
-}
-
-export const INITIAL_PROBLEM: ProblemDescription = {
-  id: '',
-  title: '',
-  description: '',
-  inputDescription: '',
-  outputDescription: '',
-  maxScore: 0,
-  timeLimitMs: 0,
-  memoryLimitKb: 0,
-  difficulty: ProblemDifficulty.EASY,
-  type: ProblemType.STANDALONE,
-  createdAt: '',
-  updatedAt: '',
-  testcaseSamples: [],
-  score: 0,
-  status: ProblemStatus.UNSOLVED,
-  tags: [],
-  topics: [],
-};
-
 export interface ProblemFilters {
   difficulty?: ProblemDifficulty;
-  type?: ProblemType;
+  isActive?: boolean;
+  isPremium?: boolean;
+  status?: ProblemStatus;
   topicIds?: number[];
   tagIds?: number[];
-  status?: ProblemStatus;
 }
 
 export interface GetProblemListRequest {
-  keyword?: string;
-  after?: string;
-  before?: string;
-  first?: number;
-  last?: number;
+  page?: number;
+  limit?: number;
   sortOrder?: SortOrder;
-  matchMode?: MatchMode;
   sortBy?: SortBy;
   filters?: ProblemFilters;
+  search?: string;
 }
 
 export interface ProblemListItem {
-  id: string;
+  id: number;
   title: string;
   difficulty: ProblemDifficulty;
   tags: Tag[];
   topics: Topic[];
   status?: ProblemStatus;
   acceptanceRate?: number;
-}
-
-export interface ProblemEdge {
-  node: ProblemListItem;
-  cursor: string;
-}
-
-export interface PageInfo {
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-  startCursor: string;
-  endCursor: string;
-}
-
-export interface ProblemListResponse {
-  edges: ProblemEdge[];
-  pageInfos: PageInfo;
-  totalCount: number;
 }
 
 // UI helpers removed in favor of component-level i18n and design system tokens
@@ -158,3 +87,117 @@ export enum ProblemCommentSortBy {
   RECENT = 'recent',
   MOST_VOTED = 'most_voted',
 }
+
+export interface SampleTestCase {
+  id?: number;
+  problem?: string;
+  input: string;
+  expectedOutput: string;
+  orderIndex?: number;
+  explanation?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Hint {
+  order: number;
+  content: string;
+}
+
+
+export interface Problem {
+  id: number;
+  title: string;
+  slug?: string;
+  description: string;
+  constraints: string;
+  difficulty: ProblemDifficulty;
+  isPremium: boolean;
+  isPublished?: boolean;
+  isActive: boolean;
+  status: ProblemStatus;
+  totalSubmissions?: number;
+  totalAccepted?: number;
+  acceptanceRate?: string;
+  totalAttempts?: number;
+  totalSolved?: number;
+  averageTimeToSolve?: number;
+  difficultyRating?: number;
+  testcaseFileKey?: any;
+  testcaseCount?: number;
+  timeLimitMs: number;
+  memoryLimitKb: number;
+  sampleTestcases: SampleTestCase[];
+  hints?: Hint[];
+  hasOfficialSolution?: boolean;
+  officialSolutionContent?: string;
+  createdBy?: UserProfile;
+  updatedBy?: UserProfile;
+  similarProblems?: number[];
+  topics: Topic[];
+  tags: Tag[];
+  createdAt?: string;
+  updatedAt?: string;
+
+  // Legacy/Form fields (optional to avoid breaking UI immediately)
+  inputDescription?: string;
+  outputDescription?: string;
+  testcase?: File | null;
+  testcaseSamples?: SampleTestCase[]; // Alias for sampleTestcases?
+  testcaseFileUrl?: string;
+}
+
+export interface ProblemMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
+}
+
+export interface ProblemListResponse {
+  data: Problem[];
+  meta: ProblemMeta;
+}
+
+export const initialProblemData: Problem = {
+  id: 0,
+  title: '',
+  slug: '',
+  description: '',
+  constraints: '',
+  difficulty: ProblemDifficulty.EASY,
+  isPremium: false,
+  isPublished: true,
+  isActive: true,
+  status: ProblemStatus.NOT_STARTED,
+  totalSubmissions: 0,
+  totalAccepted: 0,
+  acceptanceRate: '0',
+  totalAttempts: 0,
+  totalSolved: 0,
+  averageTimeToSolve: 0,
+  difficultyRating: 0,
+  testcaseFileKey: {},
+  testcaseCount: 0,
+  timeLimitMs: 1000,
+  memoryLimitKb: 256000,
+  sampleTestcases: [],
+  hints: [],
+  hasOfficialSolution: false,
+  officialSolutionContent: '',
+  createdBy: {} as UserProfile, // Placeholder
+  updatedBy: {} as UserProfile, // Placeholder
+  similarProblems: [],
+  topics: [],
+  tags: [],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+
+  // Legacy
+  inputDescription: '',
+  outputDescription: '',
+  testcase: null,
+  testcaseSamples: [],
+};

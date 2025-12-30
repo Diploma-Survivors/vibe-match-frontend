@@ -3,6 +3,8 @@
     "reset": "Reset",
     "search": "Search",
     "search_problems": "Search problems...",
+    "search_tags": "Search tags...",
+    "search_topics": "Search topics...",
     "keyword": "Keyword",
     "keyword_placeholder": "Enter keyword...",
     "difficulty": "Difficulty",
@@ -16,7 +18,8 @@
     "status": "Status",
     "all_status": "All Status",
     "status_solved": "Solved",
-    "status_unsolved": "Unsolved",
+    "status_attempted": "Attempted",
+    "status_not_started": "Not Started",
     "all_problems_loaded": "You have viewed all problems!",
     "loading_data": "Loading data...",
     "problems_list": "Problems List",
@@ -31,10 +34,9 @@
     "sort_asc": "Ascending",
     "sort_desc": "Descending",
     "sort_options": {
-        "title": "Title",
+        "id": "ID",
         "difficulty": "Difficulty",
-        "createdAt": "Date Created",
-        "maxScore": "Max Score"
+        "acceptanceRate": "Acceptance Rate"
     },
     "difficulty_label": "Difficulty",
     "clear": "Clear",

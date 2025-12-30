@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-import type { ProblemListItem } from '@/types/problems';
+import type { Problem } from '@/types/problems';
 import { SortBy, SortOrder } from '@/types/problems';
 import { ArrowDown, ArrowUp, ArrowUpDown } from 'lucide-react';
 import React from 'react';
@@ -17,15 +17,12 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import ProblemTableRow from './problems-table-row';
 
 interface ProblemTableProps {
-  problems: ProblemListItem[];
+  problems: Problem[];
   hasMore: boolean;
   onLoadMore: () => void;
   isLoading?: boolean;
   totalCount?: number;
-  sortBy: SortBy;
-  sortOrder: SortOrder;
-  onSortByChange: (newSortBy: SortBy) => void;
-  onSortOrderChange: (newSortOrder: SortOrder) => void;
+  scrollableTarget?: string;
 }
 
 export default function ProblemTable({
@@ -34,30 +31,9 @@ export default function ProblemTable({
   onLoadMore,
   isLoading = false,
   totalCount = 0,
-  sortBy,
-  sortOrder,
-  onSortByChange,
-  onSortOrderChange,
+  scrollableTarget,
 }: ProblemTableProps) {
   const { t } = useTranslation('problems');
-
-  const handleHeaderClick = (columnSortBy: SortBy) => {
-    if (sortBy === columnSortBy) {
-      onSortOrderChange(sortOrder === SortOrder.ASC ? SortOrder.DESC : SortOrder.ASC);
-    } else {
-      onSortByChange(columnSortBy);
-      onSortOrderChange(SortOrder.ASC);
-    }
-  };
-
-  const getSortIcon = (columnSortBy: SortBy) => {
-    if (sortBy !== columnSortBy) return <ArrowUpDown className="w-3 h-3 ml-1 text-muted-foreground/30" />;
-    return sortOrder === SortOrder.ASC ? (
-      <ArrowUp className="w-3 h-3 ml-1 text-primary" />
-    ) : (
-      <ArrowDown className="w-3 h-3 ml-1 text-primary" />
-    );
-  };
 
   return (
     <div className="w-full">
@@ -81,35 +57,32 @@ export default function ProblemTable({
         }
         scrollThreshold={0.9}
         style={{ overflow: 'visible' }}
+        scrollableTarget={scrollableTarget}
       >
         <div className="overflow-x-auto">
           <Table className="w-full">
             <TableHeader>
               <TableRow className="border-b border-border/50 hover:bg-transparent">
                 <TableHead className="w-12 text-center py-3">
-                   {/* Status */}
+                  {/* Status */}
                 </TableHead>
                 <TableHead className="w-16 font-medium text-muted-foreground text-center py-3">
                   #
                 </TableHead>
-                
-                <TableHead 
-                  className="font-medium text-muted-foreground cursor-pointer select-none hover:text-foreground transition-colors py-3"
-                  onClick={() => handleHeaderClick(SortBy.TITLE)}
+
+                <TableHead
+                  className="font-medium text-muted-foreground py-3"
                 >
                   <div className="flex items-center">
                     {t('title')}
-                    {getSortIcon(SortBy.TITLE)}
                   </div>
                 </TableHead>
 
-                <TableHead 
-                  className="w-32 font-medium text-muted-foreground cursor-pointer select-none hover:text-foreground transition-colors py-3"
-                  onClick={() => handleHeaderClick(SortBy.DIFFICULTY)}
+                <TableHead
+                  className="w-32 font-medium text-muted-foreground py-3"
                 >
                   <div className="flex items-center">
                     {t('difficulty')}
-                    {getSortIcon(SortBy.DIFFICULTY)}
                   </div>
                 </TableHead>
 

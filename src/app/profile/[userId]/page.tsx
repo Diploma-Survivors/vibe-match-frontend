@@ -519,7 +519,7 @@ export default function ProfilePage({
       <div className="grid grid-cols-12 gap-6">
         {/* Left Column: User Profile Sidebar */}
         <div className="col-span-12 lg:col-span-3 space-y-6">
-          <Card className="shadow-lg border-none bg-card">
+          <Card className="shadow-lg border border-border bg-card">
             <CardContent className="pt-6 flex flex-col items-center text-center space-y-4">
               <div className="relative">
                 <img
@@ -579,7 +579,7 @@ export default function ProfilePage({
           {/* Stats Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Solved Problems Chart */}
-            <Card className="border-none shadow-md bg-card">
+            <Card className="border border-border shadow-md bg-card">
               <CardHeader>
                 <CardTitle>{t('solved_problems')}</CardTitle>
               </CardHeader>
@@ -675,7 +675,7 @@ export default function ProfilePage({
             </Card>
 
             {/* Submission Status Chart */}
-            <Card className="border-none shadow-md bg-card">
+            <Card className="border border-border shadow-md bg-card">
               <CardHeader>
                 <CardTitle>{t('submission_stats')}</CardTitle>
               </CardHeader>
@@ -802,7 +802,7 @@ export default function ProfilePage({
           </div>
 
           {/* Contribution Graph */}
-          <Card className="border-none shadow-md bg-card">
+          <Card className="border border-border shadow-md bg-card">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-base font-medium">
                 {t('submissions_last_year', { count: submissions.length })}
@@ -860,12 +860,12 @@ export default function ProfilePage({
                           >
                             <div
                               className={`w-3 h-3 rounded-sm ${day.count === 0
-                                  ? 'bg-muted'
-                                  : day.count < 3
-                                    ? 'bg-green-300 dark:bg-green-900'
-                                    : day.count < 6
-                                      ? 'bg-green-500 dark:bg-green-700'
-                                      : 'bg-green-700 dark:bg-green-500'
+                                ? 'bg-muted'
+                                : day.count < 3
+                                  ? 'bg-green-300 dark:bg-green-900'
+                                  : day.count < 6
+                                    ? 'bg-green-500 dark:bg-green-700'
+                                    : 'bg-green-700 dark:bg-green-500'
                                 }`}
                             />
                           </Tooltip>
@@ -879,7 +879,7 @@ export default function ProfilePage({
           </Card>
 
           {/* Recent Activity */}
-          <Card className="border-none shadow-md bg-card">
+          <Card className="border border-border shadow-md bg-card">
             <CardHeader>
               <Tabs defaultValue="ac_problems" className="w-full">
                 <div className="flex items-center justify-between mb-4">

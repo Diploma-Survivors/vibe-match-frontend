@@ -20,7 +20,7 @@ export async function POST(
       const formData = await request.formData();
       const accessToken = formData.get('accessToken')?.toString() || '';
       const refreshToken = formData.get('refreshToken')?.toString() || '';
-      const redirectPath = formData.get('redirect')?.toString() || '/dashboard';
+      const redirectPath = formData.get('redirect')?.toString() || '/problems';
       const deviceId = formData.get('deviceId')?.toString() || '';
 
       const htmlContent = generateAuthForm(

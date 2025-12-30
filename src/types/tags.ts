@@ -1,8 +1,14 @@
 export interface Tag {
-  id: number;
+    id: number;
   name: string;
-  createdAt: Date;
-  updatedAt: Date;
+  slug: string;
+  type: string;
+  description: string;
+  color: string;
+  createdAt: string;
+  updatedAt?: string;
+  postCount?: number; // Added for UI
+  isActive?: boolean; // Added for UI
 }
 
 export interface CreateTagRequest {

@@ -1,13 +1,14 @@
+'use client';
 import { TableCell, TableRow } from '@/components/ui/table';
-import type { ProblemListItem } from '@/types/problems';
 import { ProblemDifficulty, ProblemStatus } from '@/types/problems';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, Circle, Clock } from 'lucide-react';
+import type { Problem } from '@/types/problems';
 
 interface ProblemTableRowProps {
-  problem: ProblemListItem;
+  problem: Problem;
 }
 
 export default function ProblemTableRow({ problem }: ProblemTableRowProps) {
@@ -39,13 +40,13 @@ export default function ProblemTableRow({ problem }: ProblemTableRowProps) {
       {/* Status */}
       <TableCell className="text-center p-0 w-12">
         <div className="flex justify-center items-center">
-             {problem.status === ProblemStatus.SOLVED ? (
-                <CheckCircle2 className="w-4 h-4 text-green-500" />
-             ) : problem.status === ProblemStatus.ATTEMPTED ? (
-                <Clock className="w-4 h-4 text-yellow-500" />
-             ) : (
-                <Circle className="w-4 h-4 text-muted-foreground/30" />
-             )}
+          {problem.status === ProblemStatus.SOLVED ? (
+            <CheckCircle2 className="w-4 h-4 text-green-500" />
+          ) : problem.status === ProblemStatus.ATTEMPTED ? (
+            <Circle className="w-4 h-4 text-muted-foreground/30" />
+          ) : (
+            <div className="w-4 h-4" />
+          )}
         </div>
       </TableCell>
 
@@ -55,37 +56,37 @@ export default function ProblemTableRow({ problem }: ProblemTableRowProps) {
       </TableCell>
 
       {/* Title */}
-      <TableCell className="font-medium text-foreground text-base">
-        <div className="flex items-center gap-2">
-            <span className="truncate max-w-[200px] sm:max-w-[300px] lg:max-w-[400px]">
-                {problem.title}
-            </span>
-             {problem.tags && problem.tags.length > 0 && (
-                 <div className="hidden xl:flex gap-1 ml-2">
-                    {problem.tags.slice(0, 2).map(tag => (
-                        <span key={tag.id} className="text-[10px] px-1.5 py-0.5 bg-muted text-muted-foreground rounded-full border border-border/50">
-                            {tag.name}
-                        </span>
-                    ))}
-                 </div>
-             )}
+      <TableCell className="font-medium text-foreground text-base w-full">
+        <div className="flex items-center flex-wrap gap-2">
+          <span className="truncate max-w-[200px] sm:max-w-[300px] lg:max-w-[400px]">
+            {problem.title}
+          </span>
+          {problem.tags && problem.tags.length > 0 && (
+            <div className="flex gap-1.5 flex-wrap">
+              {problem.tags.slice(0, 3).map(tag => (
+                <span key={tag.id} className="text-[10px] px-2 py-0.5 bg-muted text-muted-foreground rounded-full border border-border/50 whitespace-nowrap">
+                  {tag.name}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       </TableCell>
 
       {/* Difficulty */}
       <TableCell className="w-32">
         <span className={cn(
-            "inline-flex items-center justify-center rounded-full border px-2.5 py-0.5 text-xs font-medium w-20",
-            getDifficultyColor(problem.difficulty)
+          "inline-flex items-center justify-center rounded-full border px-2.5 py-0.5 text-xs font-medium w-20",
+          getDifficultyColor(problem.difficulty)
         )}>
-           {getDifficultyLabel(problem.difficulty)}
+          {getDifficultyLabel(problem.difficulty)}
         </span>
       </TableCell>
 
       {/* Acceptance */}
       <TableCell className="text-center w-28">
         <span className="text-muted-foreground text-sm font-mono">
-            {problem.acceptanceRate !== undefined ? `${problem.acceptanceRate.toFixed(1)}%` : '-'}
+          {problem.acceptanceRate !== undefined ? `${Number(problem.acceptanceRate).toFixed(1)}%` : '-'}
         </span>
       </TableCell>
     </TableRow>

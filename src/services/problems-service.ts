@@ -2,7 +2,7 @@ import clientApi from '@/lib/apis/axios-client';
 import type { ApiResponse } from '@/types/api';
 import {
   type GetProblemListRequest,
-  type ProblemDescription,
+  Problem,
   ProblemDifficulty,
   type ProblemListItem,
   type ProblemListResponse,
@@ -11,63 +11,42 @@ import type { AxiosResponse } from 'axios';
 import qs from 'qs';
 import { MOCK_PROBLEMS } from '@/data/mock-problems';
 
-async function getProblemListForTraining(
+async function getProblemList(
   getProblemListRequest: GetProblemListRequest
 ): Promise<AxiosResponse<ApiResponse<ProblemListResponse>>> {
-  const queryString = qs.stringify(getProblemListRequest, {
-    allowDots: true,
-    skipNulls: true,
-  });
-
-  const url = queryString
-    ? `/problems/training?${queryString}`
-    : '/problems/training';
-    
-  try {
-      return await clientApi.get(url);
-  } catch (error) {
-      console.warn('API failed, returning mock data', error);
-      // Return mock data structure matching AxiosResponse<ApiResponse<ProblemListResponse>>
-      return {
-          data: {
-              data: {
-                  edges: MOCK_PROBLEMS.slice(0, getProblemListRequest.first || 20).map(node => ({ node, cursor: node.id })),
-                  pageInfos: {
-                      hasNextPage: false,
-                      hasPreviousPage: false,
-                      startCursor: '1',
-                      endCursor: '20'
-                  },
-                  totalCount: MOCK_PROBLEMS.length
-              },
-              status: 'OK',
-              apiVersion: '1.0.0',
-          },
-          status: 200,
-          statusText: 'OK',
-          headers: {},
-          config: {} as any
-      };
-  }
+  const { filters, ...rest } = getProblemListRequest;
+  const params = qs.stringify(
+    { ...rest, ...filters },
+    {
+      allowDots: true,
+      skipNulls: true,
+    }
+  );
+  const endpoint = '/problems';
+  const url = params ? `${endpoint}?${params}` : endpoint;
+  return await clientApi.get<ApiResponse<ProblemListResponse>>(url);
 }
+
 
 import { MOCK_PROBLEM_DETAIL } from '@/data/mock-problem-detail';
 
-async function getProblemById(problemId: string): Promise<ProblemDescription> {
-  // Use mock data for ID "1" or as fallback
-  if (problemId === '1') {
-    return MOCK_PROBLEM_DETAIL as unknown as ProblemDescription;
+async function getProblemById(
+  problemId: number
+): Promise<AxiosResponse<ApiResponse<Problem>>> {
+
+  const [problemResponse, samplesResponse] = await Promise.all([
+    clientApi.get<ApiResponse<Problem>>(`/problems/${problemId}`),
+    clientApi.get<ApiResponse<SampleTestCase[]>>(`/problems/${problemId}/samples`).catch(() => null),
+  ]);
+
+  if (problemResponse.data?.data && samplesResponse?.data?.data) {
+    problemResponse.data.data.sampleTestcases = samplesResponse.data.data;
+  }
+  if(problemResponse.data?.data){
+    problemResponse.data.data.hasOfficialSolution = !!problemResponse.data.data.officialSolutionContent;
   }
 
-  try {
-    const response = await clientApi.get<ApiResponse<ProblemDescription>>(
-      `/problems/${problemId}`
-    );
-    return response.data.data;
-  } catch (error) {
-    console.warn(`Failed to fetch problem ${problemId}, using mock data.`, error);
-    return MOCK_PROBLEM_DETAIL as unknown as ProblemDescription;
-  }
+  return problemResponse;
 }
 
 async function getAllProblems(): Promise<ProblemListItem[]> {
@@ -89,7 +68,7 @@ async function getSolvedProblems(userId?: number): Promise<ProblemListItem[]> {
 }
 
 export const ProblemsService = {
-  getProblemListForTraining,
+  getProblemList,
   getProblemById,
   getAllProblems,
   getSolvedProblems,

@@ -89,7 +89,7 @@ export default function LoginPage() {
 
   const handleGoogleLogin = async () => {
     const url = process.env.NEXT_PUBLIC_API_BASE_URL + '/auth/google';
-    window.open(url, '_blank');
+    window.location.href = url;
   };
 
   return (

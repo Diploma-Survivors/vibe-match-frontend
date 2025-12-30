@@ -3,25 +3,22 @@ import { TagsService } from '@/services/tags-service';
 import { TopicsService } from '@/services/topics-service';
 import {
   type GetProblemListRequest,
-  MatchMode,
-  type PageInfo,
+  type Problem,
   type ProblemFilters,
-  type ProblemListItem,
-  type ProblemListResponse,
+  type ProblemMeta,
+  ProblemStatus,
   SortBy,
   SortOrder,
 } from '@/types/problems';
 import type { Tag } from '@/types/tags';
 import type { Topic } from '@/types/topics';
 import { useCallback, useEffect, useState } from 'react';
-import { useDebouncedCallback } from 'use-debounce';
 
 const ITEMS_PER_PAGE = 20;
 
 interface UseProblemsState {
-  problems: ProblemListItem[];
-  pageInfo: PageInfo | null;
-  totalCount: number;
+  problems: Problem[];
+  meta: ProblemMeta | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -31,28 +28,40 @@ interface UseProblemsActions {
   handleKeywordChange: (newKeyword: string) => void;
   handleSortByChange: (newSortBy: SortBy) => void;
   handleSortOrderChange: (newSortOrder: SortOrder) => void;
+  handleSearch: () => void;
   handleReset: () => void;
+  handlePageChange: (page: number) => void;
   handleLoadMore: () => void;
+  refresh: () => void;
 }
 
 interface UseProblemsReturn extends UseProblemsState, UseProblemsActions {
+  totalCount: number;
   // Request params (exposed for UI)
   filters: ProblemFilters;
   keyword: string;
   sortBy: SortBy;
   sortOrder: SortOrder;
+  
   // Metadata
   tags: Tag[];
   topics: Topic[];
   isMetadataLoading: boolean;
+  
+  // Page Info
+  pageInfo: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    startCursor?: string;
+    endCursor?: string;
+  };
 }
 
 export default function useProblems(): UseProblemsReturn {
   // Main state to manage problems and loading/error states
   const [state, setState] = useState<UseProblemsState>({
     problems: [],
-    pageInfo: null,
-    totalCount: 0,
+    meta: null,
     isLoading: false,
     error: null,
   });
@@ -63,69 +72,62 @@ export default function useProblems(): UseProblemsReturn {
   const [isMetadataLoading, setIsMetadataLoading] = useState(false);
 
   // states for filters and keyword to manage input values
-  const [filters, setFilters] = useState<ProblemFilters>({});
+  const [filters, setFilters] = useState<ProblemFilters>({ isActive: true });
   const [keyword, setKeyword] = useState<string>('');
 
   // state for sorting
-  const [sortBy, setSortBy] = useState<SortBy>(SortBy.TITLE);
+  const [sortBy, setSortBy] = useState<SortBy>(SortBy.ID);
   const [sortOrder, setSortOrder] = useState<SortOrder>(SortOrder.ASC);
 
   // Request state to manage API request parameters
   const [request, setRequest] = useState<GetProblemListRequest>({
-    first: ITEMS_PER_PAGE,
-    sortBy: sortBy || SortBy.TITLE,
+    page: 1,
+    limit: ITEMS_PER_PAGE,
+    sortBy: sortBy || SortBy.ID,
     sortOrder: sortOrder || SortOrder.ASC,
-    matchMode: MatchMode.ANY,
     filters: {
       ...filters,
+      isActive: true,
     },
   });
 
-  // Fetch Metadata
-  const fetchMetadata = useCallback(async () => {
-    setIsMetadataLoading(true);
-    try {
-      const [tagsData, topicsData] = await Promise.all([
-        TagsService.getAllTags(),
-        TopicsService.getAllTopics(),
-      ]);
-      setTags(tagsData);
-      setTopics(topicsData);
-    } catch (error) {
-      console.error('Error fetching tags or topics:', error);
-    } finally {
-      setIsMetadataLoading(false);
-    }
-  }, []);
-
+  // Fetch metadata
   useEffect(() => {
+    const fetchMetadata = async () => {
+      setIsMetadataLoading(true);
+      try {
+        const [tagsData, topicsData] = await Promise.all([
+          TagsService.getAllTags(),
+          TopicsService.getAllTopics(),
+        ]);
+        setTags(tagsData || []);
+        setTopics(topicsData || []);
+      } catch (error) {
+        console.error('Failed to fetch metadata:', error);
+      } finally {
+        setIsMetadataLoading(false);
+      }
+    };
     fetchMetadata();
-  }, [fetchMetadata]);
+  }, []);
 
   // Fetch problems function
   const fetchProblems = useCallback(
     async (requestParams: GetProblemListRequest) => {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
-        const axiosResponse =
-          await ProblemsService.getProblemListForTraining(requestParams);
-        const response: ProblemListResponse = axiosResponse?.data?.data;
-
-        // Extract problems from edges
-        const problemsData: ProblemListItem[] =
-          response?.edges?.map((edge) => ({
-            ...edge.node,
-          })) || [];
-
+        
+        const response = await ProblemsService.getProblemList(
+          requestParams,
+        );
         setState((prev) => ({
-          ...prev,
-          problems: requestParams.after
-            ? [...prev.problems, ...problemsData]
-            : problemsData,
-          pageInfo: response?.pageInfos,
-          totalCount: response?.totalCount,
-          isLoading: false,
-        }));
+            ...prev,
+            problems: requestParams.page === 1 
+              ? response?.data?.data?.data || []
+              : [...prev.problems, ...(response?.data?.data?.data || [])],
+            meta: response?.data?.data?.meta,
+            isLoading: false,
+          }));
       } catch (err) {
         console.error('Error fetching problems:', err);
         setState((prev) => ({
@@ -145,11 +147,7 @@ export default function useProblems(): UseProblemsReturn {
 
   // Helper function to update request
   const updateRequest = useCallback(
-    (updates: Partial<GetProblemListRequest>, clearProblems = false) => {
-      if (clearProblems) {
-        setState((prev) => ({ ...prev, problems: [] }));
-      }
-
+    (updates: Partial<GetProblemListRequest>) => {
       setRequest((prev) => ({
         ...prev,
         ...updates,
@@ -158,46 +156,36 @@ export default function useProblems(): UseProblemsReturn {
     []
   );
 
-  // Debounced search for keyword
-  const debouncedSearch = useDebouncedCallback((searchKeyword: string, currentFilters: ProblemFilters) => {
-     updateRequest(
-      {
-        keyword: searchKeyword.trim() || undefined,
-        filters: currentFilters,
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-      },
-      true
-    );
-  }, 500);
-
-  // handle filter changes - Instant update
+  // handle filter, keyword changes
   const handleFiltersChange = useCallback((newFilters: ProblemFilters) => {
-    setFilters(newFilters);
-    updateRequest(
-      {
-        filters: newFilters,
-        keyword: keyword.trim() || undefined,
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-      },
-      true
-    );
-  }, [keyword, updateRequest]);
+    const filtersWithActive = { ...newFilters, isActive: true };
+    setFilters(filtersWithActive);
 
-  // handle keyword changes - Debounced update
+    // When filters change, reset to page 1
+    updateRequest({ filters: filtersWithActive, page: 1 });
+  }, [updateRequest]);
+
   const handleKeywordChange = useCallback((newKeyword: string) => {
     setKeyword(newKeyword);
-    debouncedSearch(newKeyword, filters);
-  }, [filters, debouncedSearch]);
+  }, []);
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      updateRequest({
+        search: keyword.trim() || undefined,
+        page: 1,
+      });
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timer);
+  }, [keyword, updateRequest]);
 
   // handle sorting changes
   const handleSortByChange = useCallback(
     (newSortBy: SortBy) => {
       setSortBy(newSortBy);
-      updateRequest({ sortBy: newSortBy }, false);
+      updateRequest({ sortBy: newSortBy, page: 1 });
     },
     [updateRequest]
   );
@@ -205,57 +193,58 @@ export default function useProblems(): UseProblemsReturn {
   const handleSortOrderChange = useCallback(
     (newSortOrder: SortOrder) => {
       setSortOrder(newSortOrder);
-      updateRequest({ sortOrder: newSortOrder }, false);
+      updateRequest({ sortOrder: newSortOrder, page: 1 });
     },
     [updateRequest]
   );
 
-  // handle load more for pagination
-  const handleLoadMore = useCallback(() => {
-    if (state.isLoading || !state.pageInfo?.hasNextPage) {
-      return;
-    }
-    updateRequest(
-      {
-        after: state.pageInfo.endCursor,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      false
-    );
-  }, [state.isLoading, state.pageInfo, updateRequest]);
-
-  // handle reset
-  const handleReset = useCallback(() => {
-    setFilters({});
-    setKeyword('');
-
-    updateRequest(
-      {
-        keyword: undefined,
-        filters: {},
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      true
-    );
+  // handle page change
+  const handlePageChange = useCallback((page: number) => {
+    updateRequest({ page });
   }, [updateRequest]);
+
+  const handleLoadMore = useCallback(() => {
+    if (state.meta?.hasNextPage) {
+      updateRequest({ page: (state.meta.page || 0) + 1 });
+    }
+  }, [state.meta, updateRequest]);
+
+  // handle search (now just forces a refresh if needed, but debounce handles typing)
+  const handleSearch = useCallback(() => {
+    const trimmedKeyword = keyword.trim();
+    updateRequest({
+      search: trimmedKeyword || undefined,
+      filters: { ...filters },
+      page: 1,
+    });
+  }, [keyword, filters, updateRequest]);
+
+  const handleReset = useCallback(() => {
+    setFilters({ isActive: true });
+    setKeyword('');
+    setSortBy(SortBy.ID);
+    setSortOrder(SortOrder.ASC);
+
+    updateRequest({
+      search: undefined,
+      filters: { isActive: true },
+      page: 1,
+      sortBy: SortBy.ID,
+      sortOrder: SortOrder.ASC,
+    });
+  }, [updateRequest]);
+
+  const refresh = useCallback(() => {
+    fetchProblems(request);
+  }, [fetchProblems, request]);
 
   return {
     // State
     problems: state.problems,
-    pageInfo: state.pageInfo,
-    totalCount: state.totalCount,
+    meta: state.meta,
+    totalCount: state.meta?.total || 0,
     isLoading: state.isLoading,
     error: state.error,
-
-    // Metadata
-    tags,
-    topics,
-    isMetadataLoading,
 
     // Request params (exposed for UI)
     filters,
@@ -263,12 +252,26 @@ export default function useProblems(): UseProblemsReturn {
     sortBy,
     sortOrder,
 
+    // Metadata
+    tags,
+    topics,
+    isMetadataLoading,
+
+    // Page Info
+    pageInfo: {
+      hasNextPage: state.meta?.hasNextPage || false,
+      hasPreviousPage: state.meta?.hasPreviousPage || false,
+    },
+
     // Handlers
     handleFiltersChange,
     handleKeywordChange,
     handleSortByChange,
     handleSortOrderChange,
+    handleSearch,
     handleReset,
+    handlePageChange,
     handleLoadMore,
+    refresh,
   };
 }

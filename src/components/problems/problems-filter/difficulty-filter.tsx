@@ -30,7 +30,7 @@ export default function DifficultyFilter({
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="flex flex-col gap-2">
         {[
           { value: 'easy', label: t('difficulty_easy') },
           { value: 'medium', label: t('difficulty_medium') },
@@ -40,13 +40,13 @@ export default function DifficultyFilter({
           const colorMap: Record<string, string> = {
             easy: isSelected
               ? 'bg-green-500/10 text-green-600 border-green-200 dark:text-green-400 dark:border-green-800'
-              : 'bg-background text-muted-foreground border-border hover:border-green-300 dark:hover:border-green-700',
+              : 'bg-background text-muted-foreground border-transparent hover:bg-muted',
             medium: isSelected
               ? 'bg-yellow-500/10 text-yellow-600 border-yellow-200 dark:text-yellow-400 dark:border-yellow-800'
-              : 'bg-background text-muted-foreground border-border hover:border-yellow-300 dark:hover:border-yellow-700',
+              : 'bg-background text-muted-foreground border-transparent hover:bg-muted',
             hard: isSelected
               ? 'bg-red-500/10 text-red-600 border-red-200 dark:text-red-400 dark:border-red-800'
-              : 'bg-background text-muted-foreground border-border hover:border-red-300 dark:hover:border-red-700',
+              : 'bg-background text-muted-foreground border-transparent hover:bg-muted',
           };
 
           return (
@@ -58,9 +58,8 @@ export default function DifficultyFilter({
                   isSelected ? undefined : (option.value as ProblemDifficulty)
                 )
               }
-              className={`cursor-pointer
-                px-3 py-2 rounded-lg border text-xs font-medium
-                transition-all duration-200 hover:scale-105
+              className={`
+                flex items-center w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors border
                 ${colorMap[option.value]}
               `}
             >

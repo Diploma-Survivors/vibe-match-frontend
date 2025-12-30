@@ -3,6 +3,8 @@
     "reset": "Đặt lại",
     "search": "Tìm kiếm",
     "search_problems": "Tìm kiếm bài tập...",
+    "search_tags": "Tìm kiếm tags...",
+    "search_topics": "Tìm kiếm topics...",
     "keyword": "Từ khóa",
     "keyword_placeholder": "Nhập từ khóa...",
     "difficulty": "Độ khó",
@@ -16,7 +18,8 @@
     "status": "Trạng thái",
     "all_status": "Tất cả trạng thái",
     "status_solved": "Đã giải",
-    "status_unsolved": "Chưa giải",
+    "status_attempted": "Đã thử",
+    "status_not_started": "Chưa bắt đầu",
     "all_problems_loaded": "Bạn đã xem hết tất cả bài tập!",
     "loading_data": "Đang tải dữ liệu...",
     "problems_list": "Danh sách bài tập",
@@ -32,10 +35,9 @@
     "sort_asc": "Tăng dần",
     "sort_desc": "Giảm dần",
     "sort_options": {
-        "title": "Tên bài",
+        "id": "ID",
         "difficulty": "Độ khó",
-        "createdAt": "Ngày tạo",
-        "maxScore": "Điểm tối đa"
+        "acceptanceRate": "Tỷ lệ chấp nhận"
     },
     "difficulty_label": "Mức độ",
     "clear": "Xóa",
