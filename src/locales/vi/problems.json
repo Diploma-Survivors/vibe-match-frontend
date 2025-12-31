@@ -118,5 +118,12 @@
     "harassment": "Quấy rối",
     "hate_speech": "Ngôn từ thù ghét",
     "inappropriate_content": "Nội dung không phù hợp",
-    "other": "Khác"
+    "other": "Khác",
+    "submit_result_title": "Kết Quả Chấm Bài",
+    "runtime": "Thời gian chạy",
+    "memory": "Bộ nhớ",
+    "failed_description": "Chi tiết lỗi",
+    "expected_output": "Đầu ra mong đợi",
+    "your_output": "Đầu ra của bạn",
+    "test_cases_passed": "{{passed}}/{{total}} test cases đã vượt qua"
 }

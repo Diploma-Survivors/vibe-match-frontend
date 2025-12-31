@@ -119,5 +119,12 @@
     "harassment": "Harassment",
     "hate_speech": "Hate Speech",
     "inappropriate_content": "Inappropriate Content",
-    "other": "Other"
+    "other": "Other",
+    "submit_result_title": "Submit Result",
+    "runtime": "Runtime",
+    "memory": "Memory",
+    "failed_description": "Failed Description",
+    "expected_output": "Expected Output",
+    "your_output": "Your Output",
+    "test_cases_passed": "{{passed}}/{{total}} test cases passed"
 }

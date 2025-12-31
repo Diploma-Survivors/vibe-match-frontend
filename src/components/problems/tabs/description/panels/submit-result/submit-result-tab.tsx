@@ -1,7 +1,7 @@
 import { getStatusMeta } from '@/lib/utils/testcase-status';
 import type { SSEResult } from '@/services/sse-service';
 import { MemoryStick, Timer, X, XCircle } from 'lucide-react';
-import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
@@ -18,6 +18,7 @@ export function SubmitResultTab({
   isSubmitting,
   onClose,
 }: SubmitResultTabProps) {
+  const { t } = useTranslation('problems');
   const statusInfo = result ? getStatusMeta(result.status) : null;
 
   if (isSubmitting) {
@@ -114,7 +115,7 @@ export function SubmitResultTab({
             {/* Header */}
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-100">
-                Kết Quả Chấm Bài
+                {t('submit_result_title')}
               </h2>
               <button
                 onClick={onClose}
@@ -133,7 +134,10 @@ export function SubmitResultTab({
                   <span>{statusInfo.label}</span>
                 </div>
                 <div className="text-slate-600 dark:text-slate-400 mt-2">
-                  {result?.passedTests}/{result?.totalTests} test cases passed
+                  {t('test_cases_passed', {
+                    passed: result?.passedTests,
+                    total: result?.totalTests,
+                  })}
                 </div>
               </div>
             )}
@@ -147,14 +151,14 @@ export function SubmitResultTab({
                 </div>
               </div> */}
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">
-                <div className="text-xs text-slate-500">RUNTIME</div>
+                <div className="text-xs text-slate-500">{t('runtime').toUpperCase()}</div>
                 <div className="text-xl font-semibold">
                   {result?.runtime ? Number(result.runtime).toFixed(2) : '0.00'}{' '}
                   ms
                 </div>
               </div>
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">
-                <div className="text-xs text-slate-500">MEMORY</div>
+                <div className="text-xs text-slate-500">{t('memory').toUpperCase()}</div>
                 <div className="text-xl font-semibold">
                   {result?.memory ?? 0} KB
                 </div>
@@ -166,7 +170,7 @@ export function SubmitResultTab({
               <div className="space-y-2">
                 <div className="flex items-center gap-2 font-semibold text-slate-700 dark:text-slate-300">
                   <XCircle className="w-5 h-5 text-red-500" />
-                  <span>Failed Description</span>
+                  <span>{t('failed_description')}</span>
                 </div>
 
                 <div className="border border-slate-200 dark:border-slate-700 rounded-lg p-4 space-y-3">
@@ -176,13 +180,13 @@ export function SubmitResultTab({
                     </div>
                   </div>
 
-                  {result.resultDescription.input && (
+                  {result.resultDescription.stdin && (
                     <div>
                       <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                        Input
+                        {t('input')}
                       </div>
                       <pre className="bg-slate-50 dark:bg-slate-900 rounded p-3 text-sm whitespace-pre-wrap">
-                        {result.resultDescription.input}
+                        {result.resultDescription.stdin}
                       </pre>
                     </div>
                   )}
@@ -190,7 +194,7 @@ export function SubmitResultTab({
                   {result.resultDescription.expectedOutput && (
                     <div>
                       <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                        Expected Output
+                        {t('expected_output')}
                       </div>
                       <pre className="bg-green-50 dark:bg-green-900 rounded p-3 text-sm whitespace-pre-wrap">
                         {result.resultDescription.expectedOutput}
@@ -198,13 +202,13 @@ export function SubmitResultTab({
                     </div>
                   )}
 
-                  {result.resultDescription.actualOutput && (
+                  {result.resultDescription.stdout && (
                     <div>
                       <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                        Your Output
+                        {t('your_output')}
                       </div>
                       <pre className="bg-red-50 dark:bg-red-900 rounded p-3 text-sm whitespace-pre-wrap">
-                        {result.resultDescription.actualOutput}
+                        {result.resultDescription.stdout}
                       </pre>
                     </div>
                   )}
