@@ -8,4 +8,5 @@ export interface UserProfile {
   phone: string;
   rank: number;
   avatarUrl: string;
+  isPremium?: boolean;
 }

@@ -68,25 +68,6 @@ export const getDifficultyColor = (difficulty: ProblemDifficulty | string) => {
   return DIFFICULTY_COLORS[normalized] || 'bg-slate-100 text-slate-700 border-slate-200';
 };
 
-export interface ProblemComment {
-  id: string;
-  problemId: string;
-  authorId: number;
-  author?: UserProfile;
-  content: string;
-  upvoteCount: number;
-  downvoteCount: number;
-  myVote: 'up_vote' | 'down_vote' | null;
-  parentCommentId: string | null;
-  replyCounts: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export enum ProblemCommentSortBy {
-  RECENT = 'recent',
-  MOST_VOTED = 'most_voted',
-}
 
 
 export interface Hint {

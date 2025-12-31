@@ -19,15 +19,15 @@ function ProblemLayoutInner({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const params = useParams();
   const problemId = params.id as string;
-  
+
   // Determine active tab based on URL path
   const segments = pathname.split('/');
   const lastSegment = segments.pop();
   const secondLastSegment = segments.pop();
-  
+
   const validTabs = ['description', 'submissions', 'solutions'];
   let activeTab = 'description';
-  
+
   if (validTabs.includes(lastSegment || '')) {
     activeTab = lastSegment || 'description';
   } else if (validTabs.includes(secondLastSegment || '')) {
@@ -68,27 +68,27 @@ function ProblemLayoutInner({ children }: { children: React.ReactNode }) {
   ];
 
   if (isLoading && !problem) {
-      return (
-          <div className="h-screen flex flex-col bg-background overflow-hidden">
-             <div className="flex-1 flex gap-0">
-                 <div className="w-1/2 p-4 space-y-6 border-r border-border">
-                     <div className="flex items-center gap-4">
-                        <Skeleton className="h-8 w-8 rounded-md" />
-                        <Skeleton className="h-8 w-64 rounded-md" />
-                     </div>
-                     <Skeleton className="h-8 w-3/4 rounded-md" />
-                     <div className="space-y-2">
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-full" />
-                        <Skeleton className="h-4 w-2/3" />
-                     </div>
-                 </div>
-                 <div className="w-1/2 p-4 space-y-4">
-                     <Skeleton className="h-full w-full rounded-lg" />
-                 </div>
-             </div>
+    return (
+      <div className="h-screen flex flex-col bg-background overflow-hidden">
+        <div className="flex-1 flex gap-0">
+          <div className="w-1/2 p-4 space-y-6 border-r border-border">
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-8 w-8 rounded-md" />
+              <Skeleton className="h-8 w-64 rounded-md" />
+            </div>
+            <Skeleton className="h-8 w-3/4 rounded-md" />
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
           </div>
-      )
+          <div className="w-1/2 p-4 space-y-4">
+            <Skeleton className="h-full w-full rounded-lg" />
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -105,40 +105,40 @@ function ProblemLayoutInner({ children }: { children: React.ReactNode }) {
           {/* Left Panel Header - Concise Navigation */}
           <div className="flex items-center h-12 px-2 border-b border-border bg-background/50 backdrop-blur-sm shrink-0 gap-2">
             <Link href="/problems">
-              <Button 
-                variant="ghost" 
-                size="icon" 
+              <Button
+                variant="ghost"
+                size="icon"
                 className="h-8 w-8 text-muted-foreground hover:text-foreground"
                 title={t('back_to_list')}
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
             </Link>
-            
+
             <div className="h-4 w-px bg-border mx-1" />
 
             <div className="flex items-center gap-1">
-                {navItems.map((item) => {
+              {navItems.map((item) => {
                 const isActive = activeTab === item.id;
 
                 return (
-                    <Button
+                  <Button
                     key={item.id}
                     variant={isActive ? 'secondary' : 'ghost'}
                     size="sm"
                     onClick={() => router.push(`/problems/${problemId}/${item.id}`)}
                     className={cn(
                       "h-8 text-xs font-medium gap-2 px-3",
-                      isActive 
-                        ? "bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary" 
+                      isActive
+                        ? "bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary"
                         : "text-muted-foreground hover:text-foreground"
                     )}
-                    >
+                  >
                     <item.icon className="w-3.5 h-3.5" />
                     {item.label}
-                    </Button>
+                  </Button>
                 );
-                })}
+              })}
             </div>
           </div>
 
