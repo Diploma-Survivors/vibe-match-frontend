@@ -28,13 +28,108 @@ export function useComments(problemId: string | number) {
         page,
         limit,
         sortBy,
-      })
+      }),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
   );
+
+  // Helper to recursively find and update a comment in the tree
+  const updateCommentInTree = (
+    comments: any[],
+    targetId: number,
+    updateFn: (comment: any) => any
+  ): any[] => {
+    return comments.map((comment) => {
+      if (comment.id === targetId) {
+        return updateFn(comment);
+      }
+      if (comment.replies) {
+        return {
+          ...comment,
+          replies: updateCommentInTree(comment.replies, targetId, updateFn),
+        };
+      }
+      return comment;
+    });
+  };
+
+  // Helper to recursively find a parent and add a reply
+  const addReplyInTree = (
+    comments: any[],
+    parentId: number,
+    newReply: any
+  ): any[] => {
+    return comments.map((comment) => {
+      if (comment.id === parentId) {
+        return {
+          ...comment,
+          replies: [...(comment.replies || []), newReply],
+          replyCount: comment.replyCount + 1,
+        };
+      }
+      if (comment.replies) {
+        return {
+          ...comment,
+          replies: addReplyInTree(comment.replies, parentId, newReply),
+        };
+      }
+      return comment;
+    });
+  };
+
+  // Helper to recursively find a parent and remove a reply
+  const removeReplyInTree = (
+    comments: any[],
+    replyId: number
+  ): any[] => {
+    return comments.map((comment) => {
+      // Check if this comment has the reply in its children
+      if (comment.replies?.some((r: any) => r.id === replyId)) {
+        return {
+          ...comment,
+          replies: comment.replies.filter((r: any) => r.id !== replyId),
+          replyCount: Math.max(0, comment.replyCount - 1),
+        };
+      }
+      // Recursively check deeper
+      if (comment.replies) {
+        return {
+          ...comment,
+          replies: removeReplyInTree(comment.replies, replyId),
+        };
+      }
+      return comment;
+    });
+  };
 
   const createComment = async (data: CreateProblemCommentRequest) => {
     try {
       const newComment = await commentService.createComment(problemId, data);
-      await mutate(); // Revalidate comments
+      
+      await mutate((currentData: any) => {
+        if (!currentData) return currentData;
+
+        // If it's a reply
+        if (data.parentId) {
+          return {
+            ...currentData,
+            data: addReplyInTree(currentData.data, data.parentId, newComment),
+          };
+        }
+
+        // If it's a top-level comment
+        return {
+          ...currentData,
+          data: [newComment, ...currentData.data],
+          meta: {
+            ...currentData.meta,
+            total: currentData.meta.total + 1,
+          },
+        };
+      }, false);
+
       return newComment;
     } catch (error) {
       console.error('Failed to create comment:', error);
@@ -48,7 +143,19 @@ export function useComments(problemId: string | number) {
   ) => {
     try {
       const updatedComment = await commentService.updateComment(id, data);
-      await mutate();
+      
+      await mutate((currentData: any) => {
+        if (!currentData) return currentData;
+
+        return {
+          ...currentData,
+          data: updateCommentInTree(currentData.data, id, (comment) => ({
+            ...comment,
+            ...updatedComment,
+          })),
+        };
+      }, false);
+
       return updatedComment;
     } catch (error) {
       console.error('Failed to update comment:', error);
@@ -60,35 +167,30 @@ export function useComments(problemId: string | number) {
     try {
       await commentService.deleteComment(id);
       
-      // Optimistic update
-      await mutate((currentData) => {
+      await mutate((currentData: any) => {
         if (!currentData) return currentData;
 
-        // If it's a top-level comment
+        // If it's a top-level comment (no parentId provided or explicitly null)
+        // Note: The UI passes parentId if it exists.
         if (!parentId) {
-          return {
-            ...currentData,
-            data: currentData.data.filter((c) => c.id !== id),
-            meta: {
-              ...currentData.meta,
-              total: currentData.meta.total - 1,
-            },
-          };
+          // Check if it's actually in the top level list
+          const isTopLevel = currentData.data.some((c: any) => c.id === id);
+          if (isTopLevel) {
+             return {
+              ...currentData,
+              data: currentData.data.filter((c: any) => c.id !== id),
+              meta: {
+                ...currentData.meta,
+                total: currentData.meta.total - 1,
+              },
+            };
+          }
         }
 
-        // If it's a reply, find the parent and remove the reply
+        // If we have a parentId, or if it wasn't found at top level, try to remove from tree
         return {
           ...currentData,
-          data: currentData.data.map((comment) => {
-            if (comment.id === parentId) {
-              return {
-                ...comment,
-                replies: comment.replies?.filter((r) => r.id !== id),
-                replyCount: Math.max(0, comment.replyCount - 1),
-              };
-            }
-            return comment;
-          }),
+          data: removeReplyInTree(currentData.data, id),
         };
       }, false);
     } catch (error) {
@@ -99,21 +201,76 @@ export function useComments(problemId: string | number) {
 
   const voteComment = async (id: number, data: VoteProblemCommentRequest) => {
     try {
-      // Optimistic update could be implemented here, but for now we'll just revalidate
+      // Optimistic update
+      await mutate((currentData: any) => {
+        if (!currentData) return currentData;
+
+        return {
+          ...currentData,
+          data: updateCommentInTree(currentData.data, id, (comment) => {
+            const currentVote = comment.userVote;
+            const newVote = data.voteType;
+            let upvoteCount = comment.upvoteCount;
+            let downvoteCount = comment.downvoteCount;
+
+            if (currentVote === newVote) return comment;
+
+            if (currentVote === 1) upvoteCount--;
+            if (currentVote === -1) downvoteCount--;
+
+            if (newVote === 1) upvoteCount++;
+            if (newVote === -1) downvoteCount++;
+
+            return {
+              ...comment,
+              userVote: newVote,
+              upvoteCount,
+              downvoteCount,
+              voteScore: upvoteCount - downvoteCount,
+            };
+          }),
+        };
+      }, false);
+
       await commentService.voteComment(id, data);
-      await mutate();
     } catch (error) {
       console.error('Failed to vote comment:', error);
+      await mutate(); // Revert on error
       throw error;
     }
   };
 
   const unvoteComment = async (id: number) => {
     try {
+      // Optimistic update
+      await mutate((currentData: any) => {
+        if (!currentData) return currentData;
+
+        return {
+          ...currentData,
+          data: updateCommentInTree(currentData.data, id, (comment) => {
+            const currentVote = comment.userVote;
+            let upvoteCount = comment.upvoteCount;
+            let downvoteCount = comment.downvoteCount;
+
+            if (currentVote === 1) upvoteCount--;
+            if (currentVote === -1) downvoteCount--;
+
+            return {
+              ...comment,
+              userVote: null,
+              upvoteCount,
+              downvoteCount,
+              voteScore: upvoteCount - downvoteCount,
+            };
+          }),
+        };
+      }, false);
+
       await commentService.unvoteComment(id);
-      await mutate();
     } catch (error) {
       console.error('Failed to unvote comment:', error);
+      await mutate(); // Revert on error
       throw error;
     }
   };
@@ -133,13 +290,12 @@ export function useComments(problemId: string | number) {
   const fetchReplies = async (id: number) => {
     try {
       const commentWithReplies = await commentService.getComment(id);
-      await mutate((currentData) => {
+      await mutate((currentData: any) => {
         if (!currentData) return currentData;
+        
         return {
           ...currentData,
-          data: currentData.data.map((c) =>
-            c.id === id ? commentWithReplies : c
-          ),
+          data: updateCommentInTree(currentData.data, id, () => commentWithReplies),
         };
       }, false);
     } catch (error) {

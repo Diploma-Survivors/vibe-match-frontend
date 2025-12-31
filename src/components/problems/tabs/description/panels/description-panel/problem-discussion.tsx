@@ -174,47 +174,8 @@ export function ProblemDiscussion({ problemId }: ProblemDiscussionProps) {
                     onVote={(id, voteType) => voteComment(id, { voteType })}
                     onUnvote={unvoteComment}
                     onReport={setReportCommentId}
+                    fetchReplies={fetchReplies}
                   />
-
-                  {/* Replies */}
-                  {(comment.replyCount > 0 ||
-                    (comment.replies && comment.replies.length > 0)) && (
-                      <div className="pl-11 space-y-4">
-                        {(!comment.replies || comment.replies.length === 0) ? (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => fetchReplies(comment.id)}
-                            className="text-muted-foreground h-auto p-0 hover:bg-transparent hover:text-foreground"
-                          >
-                            <ChevronDown className="w-4 h-4 mr-1" />
-                            {t('view_replies', { count: comment.replyCount })}
-                          </Button>
-                        ) : (
-                          <>
-                            {comment.replies.map((reply) => (
-                              <div
-                                key={reply.id}
-                                className="bg-muted/50 p-3 rounded-lg border border-border/50"
-                              >
-                                <ProblemCommentItem
-                                  comment={reply}
-                                  problemId={problemId}
-                                  onReply={createComment}
-                                  onUpdate={updateComment}
-                                  onDelete={deleteComment}
-                                  onVote={(id, voteType) =>
-                                    voteComment(id, { voteType })
-                                  }
-                                  onUnvote={unvoteComment}
-                                  onReport={setReportCommentId}
-                                />
-                              </div>
-                            ))}
-                          </>
-                        )}
-                      </div>
-                    )}
                 </div>
               ))}
               {comments.length === 0 && (
