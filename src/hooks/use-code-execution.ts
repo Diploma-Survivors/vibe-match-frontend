@@ -31,7 +31,7 @@ export function useCodeExecution() {
     async (
       sourceCode: string,
       languageId: number,
-      problemId: string,
+      problemId: number,
       testCases: Array<{ input: string; output: string }>
     ) => {
       setIsRunning(true);
@@ -85,7 +85,7 @@ export function useCodeExecution() {
     async (
       sourceCode: string,
       languageId: number,
-      problemId: string,
+      problemId: number,
       contestId?: number
     ) => {
       setIsSubmitting(true);

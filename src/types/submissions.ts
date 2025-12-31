@@ -19,6 +19,14 @@ export enum SubmissionStatus {
 export interface Language {
   id: number;
   name: string;
+  slug?: string;
+  judge0Id?: number;
+  monacoLanguage?: string;
+  isActive: boolean;
+  orderIndex?: number;
+  starterCode?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface TestCaseSubmission {
@@ -29,7 +37,7 @@ export interface TestCaseSubmission {
 export interface SubmissionRequest {
   languageId: number;
   sourceCode: string;
-  problemId: string;
+  problemId: number;
   contestId?: number;
   contestParticipationId?: number;
   testCases?: TestCaseSubmission[];

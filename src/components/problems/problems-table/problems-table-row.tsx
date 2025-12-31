@@ -4,8 +4,9 @@ import { ProblemDifficulty, ProblemStatus } from '@/types/problems';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Circle, Clock } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, Lock } from 'lucide-react';
 import type { Problem } from '@/types/problems';
+import { Tooltip } from '@/components/ui/tooltip';
 
 interface ProblemTableRowProps {
   problem: Problem;
@@ -50,10 +51,14 @@ export default function ProblemTableRow({ problem }: ProblemTableRowProps) {
         </div>
       </TableCell>
 
+
+
       {/* Index */}
       <TableCell className="font-mono text-muted-foreground w-16 text-center text-sm">
         {problem.id}
       </TableCell>
+
+
 
       {/* Title */}
       <TableCell className="font-medium text-foreground text-base w-full">
@@ -71,6 +76,17 @@ export default function ProblemTableRow({ problem }: ProblemTableRowProps) {
             </div>
           )}
         </div>
+      </TableCell>
+
+      {/* Premium Status */}
+      <TableCell className="p-0 w-4 text-center">
+        {problem.isPremium && (
+          <Tooltip content="Premium Problem">
+            <div className="flex justify-center items-center">
+              <Lock className="w-3.5 h-3.5 text-yellow-500" />
+            </div>
+          </Tooltip>
+        )}
       </TableCell>
 
       {/* Difficulty */}

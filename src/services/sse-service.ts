@@ -2,10 +2,10 @@ export interface SSEResult {
   status: string;
   totalTests: number;
   passedTests: number;
-  score: number;
+  // score: number;
   runtime: string;
   memory: number;
-  results?: Array<{
+  testResults?: Array<{
     stdout: string;
     stderr?: string;
     time: string;

@@ -1,5 +1,5 @@
 import type { Tag } from './tags';
-import type { SampleTestcase } from './testcases';
+import type { SampleTestCase } from './testcases';
 import type { Topic } from './topics';
 import type { UserProfile } from './user';
 
@@ -88,16 +88,6 @@ export enum ProblemCommentSortBy {
   MOST_VOTED = 'most_voted',
 }
 
-export interface SampleTestCase {
-  id?: number;
-  problem?: string;
-  input: string;
-  expectedOutput: string;
-  orderIndex?: number;
-  explanation?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
 
 export interface Hint {
   order: number;

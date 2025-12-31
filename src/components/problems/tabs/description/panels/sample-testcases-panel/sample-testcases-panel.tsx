@@ -1,6 +1,6 @@
 // import removed: getStatusMeta is handled inside child components now
 import type { SSEResult } from '@/services/sse-service';
-import type { SampleTestcase } from '@/types/testcases';
+import type { SampleTestCase } from '@/types/testcases';
 import { CheckCircle, Code } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { CaseTabs } from './case-tabs';
@@ -9,16 +9,16 @@ import { TestcaseTab } from './testcase-tab';
 
 interface SampleTestCasesPanelProps {
   height: number;
-  testCases: SampleTestcase[];
+  testCases: SampleTestCase[];
   activeTestCase: number;
   testResults?: SSEResult | null;
   isRunning?: boolean;
   runError?: string | null;
   onTestCaseAdd: () => void;
-  onTestCaseDelete: (id: string) => void;
+  onTestCaseDelete: (id: number) => void;
   onTestCaseChange: (
-    id: string,
-    field: 'input' | 'output',
+    id: number,
+    field: 'input' | 'expectedOutput',
     value: string
   ) => void;
   onActiveTestCaseChange: (index: number) => void;
@@ -40,7 +40,7 @@ export function SampleTestCasesPanel({
 
   // Auto switch to Result tab when results arrive
   useEffect(() => {
-    if (testResults?.results && testResults.results.length > 0) {
+    if (testResults?.testResults && testResults.testResults.length > 0) {
       setActiveTab('result');
     }
   }, [testResults]);
@@ -53,7 +53,7 @@ export function SampleTestCasesPanel({
   }, [isRunning]);
 
   // True when there is at least one testcase result (used to control rendering)
-  const hasResults = (testResults?.results?.length ?? 0) > 0;
+  const hasResults = (testResults?.testResults?.length ?? 0) > 0;
 
   return (
     <div
@@ -66,11 +66,10 @@ export function SampleTestCasesPanel({
           {/* Testcase tab */}
           <button
             onClick={() => setActiveTab('testcase')}
-            className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-all duration-200 ${
-              activeTab === 'testcase'
-                ? 'bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-            }`}
+            className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-all duration-200 cursor-pointer ${activeTab === 'testcase'
+              ? 'bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
           >
             <CheckCircle className="w-3.5 h-3.5" />
             Testcase
@@ -79,11 +78,10 @@ export function SampleTestCasesPanel({
           {/* Result tab */}
           <button
             onClick={() => setActiveTab('result')}
-            className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-all duration-200 ${
-              activeTab === 'result'
-                ? 'bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-            }`}
+            className={`h-8 px-3 rounded-md text-xs font-medium flex items-center gap-2 transition-all duration-200 cursor-pointer ${activeTab === 'result'
+              ? 'bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              }`}
           >
             <Code className="w-3.5 h-3.5" />
             Test Result

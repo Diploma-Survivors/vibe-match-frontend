@@ -39,7 +39,7 @@ export default function SubmissionsFilter({
   useEffect(() => {
     const fetchLanguageList = async () => {
       const response = await SubmissionsService.getLanguageList();
-      setLanguageList(response.data.data);
+      setLanguageList(response);
     };
 
     fetchLanguageList();

@@ -49,10 +49,10 @@ export function EditorPanel({
   const workspace = useSelector(selectWorkspace);
   const problem = useSelector(selectProblem);
 
-  const currentLanguageId = workspace?.currentLanguage?.[problem.id] ?? 52;
+  const currentLanguageId = workspace?.currentLanguage?.[problem.id] ?? 46;
   const currentCode =
     workspace?.currentCode?.[problem.id]?.[currentLanguageId] ??
-    getDefaultCode(currentLanguageId);
+    workspace?.languages?.find((lang) => lang.id === currentLanguageId)?.starterCode ?? 'Write your code here';
 
   const handleRunClick = () => {
     onRun(currentCode, currentLanguageId);
@@ -69,13 +69,13 @@ export function EditorPanel({
     : true;
 
   const onLanguageIdChange = (languageId: number) => {
-    dispatch(updateCurrentLanguage({ problemId: problem.id, languageId }));
+    dispatch(updateCurrentLanguage({ problemId: problem.id.toString(), languageId }));
   };
 
   const onCurrentCodeChange = (code: string) => {
     dispatch(
       updateCurrentCode({
-        problemId: problem.id,
+        problemId: problem.id.toString(),
         languageId: currentLanguageId,
         code,
       })
@@ -98,18 +98,6 @@ export function EditorPanel({
         </div>
 
         <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30 flex-shrink-0">
-          {contestMode && (
-            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-              <AlertCircle className="w-3.5 h-3.5 text-yellow-600 dark:text-yellow-500" />
-              <span className="text-yellow-600 dark:text-yellow-500">
-                {
-                  CONTEST_SUBMISSION_STRATEGY_DESCRIPTION[
-                    contest.submissionStrategy
-                  ]
-                }
-              </span>
-            </div>
-          )}
 
           <div className="flex ml-auto items-center gap-3">
             <Button

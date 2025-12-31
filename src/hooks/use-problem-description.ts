@@ -1,11 +1,11 @@
-import type { ProblemDescription } from '@/types/problems';
+import type { Problem } from '@/types/problems';
 import { useCallback, useState } from 'react';
 import { useCodeExecution } from './use-code-execution';
 import { useResizable } from './use-resizable';
 import { useTestCases } from './use-test-cases';
 
 interface UseProblemDescriptionOptions {
-  problem: ProblemDescription;
+  problem: Problem;
 }
 
 export function useProblemDescription({
@@ -35,7 +35,7 @@ export function useProblemDescription({
     async (sourceCode: string, languageId: number) => {
       const testCasesForSubmission = testCases.testCases.map((tc) => ({
         input: tc.input,
-        output: tc.output,
+        output: tc.expectedOutput,
       }));
 
       await executeRun(
@@ -52,15 +52,10 @@ export function useProblemDescription({
 
   const handleSubmit = useCallback(
     async (sourceCode: string, languageId: number, contestId?: number) => {
-      const testCasesForSubmission = testCases.testCases.map((tc) => ({
-        input: tc.input,
-        output: tc.output,
-      }));
-
       await executeSubmit(sourceCode, languageId, problem.id, contestId);
       setRefreshKey((prev) => prev + 1);
     },
-    [executeSubmit, testCases.testCases, problem.id]
+    [executeSubmit, problem.id]
   );
 
   return {

@@ -2,29 +2,28 @@ import MarkdownRenderer from '@/components/ui/markdown-renderer';
 import { Button } from '@/components/ui/button';
 
 import { toastService } from '@/services/toasts-service';
-import type { ProblemDescription } from '@/types/problems';
+import { ProblemStatus, type Problem } from '@/types/problems';
 
-import type { SampleTestcase } from '@/types/testcases';
-import { FileText, MemoryStick, Timer } from 'lucide-react';
-import { Copy } from 'lucide-react';
-import { useState } from 'react';
+import { SampleTestCase } from '@/types/testcases';
+import { CheckCircle2, Copy, Lightbulb, Lock, Tag as TagIcon } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProblemDiscussion } from './problem-discussion';
+import { ProblemHints } from './problem-hints';
 import { ProblemTopicsTags } from './problem-topics-tags';
 
 interface DescriptionPanelProps {
-  problem: ProblemDescription;
+  problem: Problem;
   width: number;
 }
 
 export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
   const { t } = useTranslation('problems');
-  const sampleCases: SampleTestcase[] = problem.testcaseSamples || [];
+  const sampleCases: SampleTestCase[] = problem.sampleTestcases || [];
   const [activeSampleIndex, setActiveSampleIndex] = useState(0);
 
-  // Format time and memory limit
-  const timeLimitSeconds = (problem.timeLimitMs / 1000).toFixed(1);
-  const memoryLimitMB = (problem.memoryLimitKb / 1024).toFixed(0);
+  const hintsRef = useRef<HTMLDivElement>(null);
+  const topicsRef = useRef<HTMLDivElement>(null);
 
   // Choose sample case
   const activeSample = sampleCases[activeSampleIndex];
@@ -36,15 +35,30 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
     toastService.success(t('copied_to_clipboard'));
   };
 
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement | null>) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
     <div className="h-full pb-4 pr-1" style={{ width: `${width}%` }}>
       <div className="rounded-xl h-full flex flex-col overflow-hidden border border-border bg-card">
         <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
           {/* Problem Title Header */}
-          <div className="pb-6 border-b border-border">
-            <h1 className="text-3xl font-bold text-foreground mb-4">
-              {problem.title}
-            </h1>
+          <div className="pb-6 border-b border-border space-y-4">
+            {/* Row 1: Title & Solved Status */}
+            <div className="flex justify-between items-start gap-4">
+              <h1 className="text-3xl font-bold text-foreground">
+                {problem.title}
+              </h1>
+              {problem.status === ProblemStatus.SOLVED && (
+                <div className="flex items-center gap-2 text-green-600 font-medium whitespace-nowrap">
+                  <CheckCircle2 className="w-5 h-5" />
+                  <span>{t('status_solved')}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Row 2: Meta & Actions */}
             <div className="flex items-center gap-4 flex-wrap">
               <div
                 className={`px-3 py-1 rounded-full text-sm font-semibold border ${problem.difficulty === 'easy'
@@ -56,18 +70,33 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
               >
                 {t(`difficulty_${problem.difficulty}`)}
               </div>
-              <div className="flex items-center gap-1 text-sm text-muted-foreground font-semibold">
-                <Timer className="w-4 h-4" />
-                {timeLimitSeconds}s {t('time_limit')}
-              </div>
-              <div className="flex items-center gap-1 text-sm text-muted-foreground font-semibold">
-                <MemoryStick className="w-4 h-4" />
-                {memoryLimitMB}MB {t('memory_limit')}
-              </div>
-              <div className="flex items-center gap-1 text-sm text-muted-foreground font-semibold">
-                <FileText className="w-4 h-4" />
-                {problem.maxScore} {t('points')}
-              </div>
+
+              {problem.isPremium && (
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold bg-yellow-500/10 text-yellow-600 border border-yellow-500/20">
+                  <Lock className="w-3.5 h-3.5" />
+                  <span>Premium</span>
+                </div>
+              )}
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:text-foreground gap-2"
+                onClick={() => scrollToSection(hintsRef)}
+              >
+                <Lightbulb className="w-4 h-4" />
+                {t('hint')}
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:text-foreground gap-2"
+                onClick={() => scrollToSection(topicsRef)}
+              >
+                <TagIcon className="w-4 h-4" />
+                {t('topics_tags_title')}
+              </Button>
             </div>
           </div>
 
@@ -80,45 +109,6 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
               <MarkdownRenderer content={problem.description || ''} />
             </div>
           </section>
-
-          {/* Input Format */}
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mb-4">
-              {t('input_title')}
-            </h2>
-            <div className="bg-muted/50 rounded-lg p-4 border border-border text-muted-foreground">
-              <MarkdownRenderer content={problem.inputDescription || ''} />
-            </div>
-          </section>
-
-          {/* Output Format */}
-          <section>
-            <h2 className="text-xl font-semibold text-foreground mb-4">
-              {t('output_title')}
-            </h2>
-            <div className="bg-muted/50 rounded-lg p-4 border border-border text-muted-foreground">
-              <MarkdownRenderer content={problem.outputDescription || ''} />
-            </div>
-          </section>
-
-          {/* Constraints */}
-          {problem.timeLimitMs && problem.memoryLimitKb && (
-            <section>
-              <h2 className="text-xl font-semibold text-foreground mb-4">
-                {t('constraints_title')}
-              </h2>
-              <div className="bg-muted/50 rounded-lg p-4 border border-border">
-                <p className="text-muted-foreground font-semibold">
-                  <span className="font-semibold">{t('time_limit')}</span>:{' '}
-                  {timeLimitSeconds} <span className="font-semibold">s</span>
-                </p>
-                <p className="text-muted-foreground font-semibold">
-                  <span className="font-semibold">{t('memory_limit')}</span>: {memoryLimitMB}{' '}
-                  <span className="font-semibold">MB</span>
-                </p>
-              </div>
-            </section>
-          )}
 
           {/* Sample Cases - compact view */}
           {sampleCases.length > 0 && (
@@ -178,14 +168,14 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
                         variant="ghost"
                         size="sm"
                         className="h-7 px-2 text-xs"
-                        onClick={() => copyToClipboard(activeSample.output)}
+                        onClick={() => copyToClipboard(activeSample.expectedOutput)}
                       >
                         <Copy className="w-3 h-3 mr-1" /> {t('copy')}
                       </Button>
                     </div>
                     <div className="bg-muted/50 rounded-lg p-3 border border-border">
                       <pre className="text-foreground font-mono text-sm whitespace-pre-wrap">
-                        {activeSample.output || ''}
+                        {activeSample.expectedOutput || ''}
                       </pre>
                     </div>
                   </div>
@@ -202,11 +192,35 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
             </section>
           )}
 
+
+          {/* Constraints */}
+          <section>
+            <h3 className="text-xl font-semibold text-foreground mb-4">
+              {t('constraints_title')}
+            </h3>
+            <div className="prose dark:prose-invert max-w-none text-muted-foreground">
+              <MarkdownRenderer content={problem.constraints || ''} />
+            </div>
+          </section>
+
+          {/* Hints Section */}
+          {problem.hints && problem.hints.length > 0 && (
+            <section ref={hintsRef} className="scroll-mt-4">
+              <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-yellow-500" />
+                {t('hint')}
+              </h3>
+              <ProblemHints hints={problem.hints} />
+            </section>
+          )}
+
           {/* Topics & Tags */}
-          <ProblemTopicsTags topics={problem.topics} tags={problem.tags} />
+          <div ref={topicsRef} className="scroll-mt-4">
+            <ProblemTopicsTags topics={problem.topics} tags={problem.tags} />
+          </div>
 
           {/* Discussion */}
-          <ProblemDiscussion problemId={problem.id} />
+          <ProblemDiscussion problemId={problem.id.toString()} />
         </div>
       </div>
     </div>

@@ -66,16 +66,20 @@ export default function ProblemTable({
                 <TableHead className="w-12 text-center py-3">
                   {/* Status */}
                 </TableHead>
+
                 <TableHead className="w-16 font-medium text-muted-foreground text-center py-3">
                   #
                 </TableHead>
-
                 <TableHead
                   className="font-medium text-muted-foreground py-3"
                 >
                   <div className="flex items-center">
                     {t('title')}
                   </div>
+                </TableHead>
+
+                <TableHead className="w-4 py-1">
+                  {/* Premium Status */}
                 </TableHead>
 
                 <TableHead

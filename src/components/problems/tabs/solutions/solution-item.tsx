@@ -26,7 +26,7 @@ export default function SolutionItem({
   useEffect(() => {
     const fetchLanguageList = async () => {
       const response = await SubmissionsService.getLanguageList();
-      setLanguages(response.data.data);
+      setLanguages(response);
     };
     fetchLanguageList();
   }, []);
@@ -93,21 +93,19 @@ export default function SolutionItem({
           <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 pt-1">
             <div className="flex items-center gap-1">
               <ArrowBigUp
-                className={`w-4 h-4 ${
-                  solution.myVote === 'up_vote'
+                className={`w-4 h-4 ${solution.myVote === 'up_vote'
                     ? 'fill-green-500 text-green-500'
                     : ''
-                }`}
+                  }`}
               />
               <span>{solution.upvoteCount}</span>
             </div>
             <div className="flex items-center gap-1">
               <ArrowBigDown
-                className={`w-4 h-4 ${
-                  solution.myVote === 'down_vote'
+                className={`w-4 h-4 ${solution.myVote === 'down_vote'
                     ? 'fill-red-500 text-red-500'
                     : ''
-                }`}
+                  }`}
               />
               <span>{solution.downvoteCount}</span>
             </div>

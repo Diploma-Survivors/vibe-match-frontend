@@ -34,9 +34,8 @@ export function ProblemTopicsTags({
           <span>{t('topics_tags_title')}</span>
         </div>
         <ChevronDown
-          className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
-            isOpen ? 'transform rotate-180' : ''
-          }`}
+          className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''
+            }`}
         />
       </CollapsibleTrigger>
       <CollapsibleContent>
@@ -50,8 +49,8 @@ export function ProblemTopicsTags({
                 {topics.map((topic) => (
                   <Badge
                     key={topic.id}
-                    variant="secondary"
-                    className="bg-accent/10 text-accent hover:bg-accent/20 border-transparent"
+                    variant="outline"
+                    className="text-muted-foreground border-border hover:bg-muted/50"
                   >
                     {topic.name}
                   </Badge>

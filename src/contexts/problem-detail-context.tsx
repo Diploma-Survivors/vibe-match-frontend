@@ -2,10 +2,12 @@
 
 import { useProblemDescription } from '@/hooks/use-problem-description';
 import { ProblemsService } from '@/services/problems-service';
+import { sseService, type SSEResult } from '@/services/sse-service';
 import { SubmissionsService } from '@/services/submissions-service';
 import { setProblem } from '@/store/slides/problem-slice';
-import type { ProblemDescription } from '@/types/problems';
+import type { Problem } from '@/types/problems';
 import type { Language } from '@/types/submissions';
+import { SampleTestCase } from '@/types/testcases';
 import { useParams } from 'next/navigation';
 import {
   createContext,
@@ -17,10 +19,10 @@ import {
 import { useDispatch } from 'react-redux';
 
 interface ProblemDetailContextType {
-  problem: ProblemDescription | null;
+  problem: Problem | null;
   isLoading: boolean;
   languages: Language[];
-  
+
   // From useProblemDescription
   containerRef: React.RefObject<HTMLDivElement | null>;
   rightPanelRef: React.RefObject<HTMLDivElement | null>;
@@ -30,21 +32,30 @@ interface ProblemDetailContextType {
   isVerticalDragging: boolean;
   handleHorizontalMouseDown: (e: React.MouseEvent) => void;
   handleVerticalMouseDown: (e: React.MouseEvent) => void;
-  
-  testCases: any[]; // Replace with specific type if available
+
+  testCases: SampleTestCase[];
   activeTestCase: number;
   setActiveTestCase: (index: number) => void;
-  handleTestCaseChange: (id: string, field: 'input' | 'output', value: string) => void;
+  handleTestCaseChange: (
+    id: number,
+    field: 'input' | 'expectedOutput',
+    value: string
+  ) => void;
   handleTestCaseAdd: () => void;
-  handleTestCaseDelete: (id: string) => void;
-  
+  handleTestCaseDelete: (id: number) => void;
+
   isRunning: boolean;
   isSubmitting: boolean;
-  testResults: any;
-  submitResults: any;
-  runError: any;
+  testResults: SSEResult | null;
+  submitResults: SSEResult | null;
+  runError: string | null;
+  refreshKey: number;
   handleRun: (sourceCode: string, languageId: number) => Promise<void>;
-  handleSubmit: (sourceCode: string, languageId: number, contestId?: number) => Promise<void>;
+  handleSubmit: (
+    sourceCode: string,
+    languageId: number,
+    contestId?: number
+  ) => Promise<void>;
   clearSubmitResults: () => void;
 }
 
@@ -54,10 +65,11 @@ const ProblemDetailContext = createContext<ProblemDetailContextType | undefined>
 
 export function ProblemDetailProvider({ children }: { children: ReactNode }) {
   const params = useParams();
-  const problemId = params.id as string;
+  const problemIdString = params.id as string;
+  const problemId = Number(problemIdString);
   const dispatch = useDispatch();
 
-  const [problem, setProblemState] = useState<ProblemDescription | null>(null);
+  const [problem, setProblemState] = useState<Problem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [languages, setLanguages] = useState<Language[]>([]);
 
@@ -73,9 +85,9 @@ export function ProblemDetailProvider({ children }: { children: ReactNode }) {
           SubmissionsService.getLanguageList(),
         ]);
 
-        setProblemState(problemData);
-        dispatch(setProblem(problemData)); // Keep redux sync for now
-        setLanguages(langResponse.data.data || []);
+        setProblemState(problemData.data.data);
+        dispatch(setProblem(problemData.data.data)); // Keep redux sync for now
+        setLanguages(langResponse);
       } catch (error) {
         console.error('Error fetching problem details:', error);
       } finally {
@@ -87,33 +99,28 @@ export function ProblemDetailProvider({ children }: { children: ReactNode }) {
   }, [problemId, dispatch]);
 
   // 2. Initialize Logic Hook (only when problem is loaded)
-  // We need a dummy problem object if it's null to call the hook unconditionally,
-  // or we can conditionally render the provider's content.
-  // Better to conditionally render the children that need the hook data.
-  // However, useProblemDescription calls hooks inside, so we must call it at top level.
-  // We'll pass a partial/dummy object if loading, but real usage will wait for !isLoading.
-  
+  // We need a dummy problem object if it's null to call the hook unconditionally.
+  // The hook expects a ProblemDescription (which Problem satisfies).
   const problemDescriptionState = useProblemDescription({
     problem: problem || ({ id: problemId } as any),
   });
 
   if (isLoading || !problem) {
     return (
-       // We can return a loading state here or just render children 
-       // but children might fail if they expect context.
-       // Let's return a skeleton or null, but ProblemLayout might want to show Skeleton.
-       // Actually, we can return a partial context or handle nulls.
-       // For simplicity, let's expose isLoading and let consumers handle skeletons.
-       <ProblemDetailContext.Provider
-         value={{
-            isLoading: true,
-            languages: [],
-            ...problemDescriptionState, // This contains the dummy problem
-            problem: null, // Override with null for consumers
-         }}
-       >
-         {children}
-       </ProblemDetailContext.Provider>
+      <ProblemDetailContext.Provider
+        value={{
+          isLoading: true,
+          languages: [],
+          ...problemDescriptionState, // This contains the dummy problem state
+          problem: null, // Override with null for consumers
+          testCases: problemDescriptionState.testCases as unknown as SampleTestCase[],
+          testResults: problemDescriptionState.testResults,
+          submitResults: problemDescriptionState.submitResults,
+          runError: problemDescriptionState.runError,
+        }}
+      >
+        {children}
+      </ProblemDetailContext.Provider>
     );
   }
 
@@ -123,6 +130,8 @@ export function ProblemDetailProvider({ children }: { children: ReactNode }) {
         isLoading: false,
         languages,
         ...problemDescriptionState,
+        problem,
+        testCases: problemDescriptionState.testCases as unknown as SampleTestCase[],
       }}
     >
       {children}
@@ -139,4 +148,3 @@ export function useProblemDetail() {
   }
   return context;
 }
-

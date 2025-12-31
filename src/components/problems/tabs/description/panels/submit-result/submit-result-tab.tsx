@@ -140,12 +140,12 @@ export function SubmitResultTab({
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">
+              {/* <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">
                 <div className="text-xs text-slate-500">SCORE</div>
                 <div className="text-xl font-semibold">
                   {result?.score ?? 0} / 100
                 </div>
-              </div>
+              </div> */}
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">
                 <div className="text-xs text-slate-500">RUNTIME</div>
                 <div className="text-xl font-semibold">

@@ -1,8 +1,10 @@
 import clientApi from '@/lib/apis/axios-client';
 import { store } from '@/store';
 import { setLanguages } from '@/store/slides/workspace-slice';
+import { ApiResponse } from '@/types/api';
 import {
   type GetSubmissionListRequest,
+  type Language,
   type SubmissionListItem,
   type SubmissionRequest,
   SubmissionStatus,
@@ -22,36 +24,28 @@ async function submit(submissionRequest: SubmissionRequest) {
   return await clientApi.post(path, payload);
 }
 
-let languageListPromise: Promise<any> | null = null;
+let languageListPromise: Promise<Language[]> | null = null;
 
 async function getLanguageList() {
   const state = store.getState();
   const cachedLanguages = state.workspace.languages;
 
   if (cachedLanguages && cachedLanguages.length > 0) {
-    return { data: { data: cachedLanguages } };
+    return cachedLanguages;
   }
 
   if (languageListPromise) {
     return languageListPromise;
   }
 
-  languageListPromise = clientApi.get('/languages').then((response) => {
+  languageListPromise = clientApi.get<ApiResponse<Language[]>>('/programming-languages/active').then((response) => {
     store.dispatch(setLanguages(response.data.data));
     languageListPromise = null;
-    return response;
+    return response.data.data;
   }).catch((error) => {
     console.warn('API failed, using mock languages', error);
     languageListPromise = null;
-    const mockLanguages = [
-      { id: 71, name: 'Python' },
-      { id: 54, name: 'C++' },
-      { id: 62, name: 'Java' },
-      { id: 63, name: 'JavaScript' },
-      { id: 50, name: 'C' },
-    ];
-    store.dispatch(setLanguages(mockLanguages));
-    return { data: { data: mockLanguages } };
+    return [];
   });
 
   return languageListPromise;
@@ -78,7 +72,7 @@ async function getSubmissionList(
   }
   
   try {
-    return await clientApi.get(url);
+    return await clientApi.get<ApiResponse<SubmissionListItem[]>>(url);
   } catch (error) {
     // Return mock data
     console.warn("API failed, using mock submissions");

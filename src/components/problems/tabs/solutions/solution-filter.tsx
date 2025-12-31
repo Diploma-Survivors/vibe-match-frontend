@@ -65,7 +65,7 @@ export default function SolutionFilter({
     TagsService.getAllTags().then(setTags);
     const getLanguageList = async () => {
       const response = await SubmissionsService.getLanguageList();
-      setLanguages(response.data.data);
+      setLanguages(response);
     };
     getLanguageList();
   }, []);
@@ -160,11 +160,10 @@ export default function SolutionFilter({
                 <button
                   key={lang.id}
                   onClick={() => toggleLang(lang.id)}
-                  className={`px-3 py-1 cursor-pointer rounded-full text-xs font-medium transition-colors border ${
-                    selectedLanguages.includes(lang.id)
+                  className={`px-3 py-1 cursor-pointer rounded-full text-xs font-medium transition-colors border ${selectedLanguages.includes(lang.id)
                       ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
                       : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
-                  }`}
+                    }`}
                 >
                   {lang.name}
                 </button>
@@ -192,11 +191,10 @@ export default function SolutionFilter({
                 <button
                   key={tag.id}
                   onClick={() => toggleTag(tag.id)}
-                  className={`px-3 cursor-pointer py-1 rounded-full text-xs font-medium transition-colors border ${
-                    selectedTags.includes(tag.id)
+                  className={`px-3 cursor-pointer py-1 rounded-full text-xs font-medium transition-colors border ${selectedTags.includes(tag.id)
                       ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800'
                       : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
-                  }`}
+                    }`}
                 >
                   {tag.name}
                 </button>

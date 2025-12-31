@@ -62,7 +62,7 @@ export default function MonacoEditor({
   useEffect(() => {
     const fetchLanguageList = async () => {
       const response = await SubmissionsService.getLanguageList();
-      setLanguageList(response.data.data);
+      setLanguageList(response);
     };
 
     fetchLanguageList();
@@ -79,9 +79,9 @@ export default function MonacoEditor({
     setCurrentCode(newSourceCode);
   };
 
-  const currentLanguageName = languageList.find(
+  const currLanguage = languageList.find(
     (lang) => lang.id === currentLanguageId
-  )?.name;
+  );
 
   // Copy to clipboard
   const copyToClipboard = () => {
@@ -109,10 +109,10 @@ export default function MonacoEditor({
               <Button
                 variant="outline"
                 size="sm"
-                className="w-36 justify-between text-sm font-normal"
+                className="min-w-[150px] w-auto justify-between text-sm font-normal"
               >
-                {currentLanguageName || 'Select language'}
-                <ChevronDown className="h-4 w-4 opacity-50" />
+                {currLanguage?.name || 'Select language'}
+                <ChevronDown className="h-4 w-4 opacity-50 ml-2" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="max-h-[300px] overflow-y-auto">
@@ -141,7 +141,7 @@ export default function MonacoEditor({
             <Wand2 className="w-4 h-4 mr-1.5" />
             Format
           </Button>
-          
+
           <div className="w-px h-4 bg-border mx-1" />
 
           {/* Copy Button */}
@@ -162,7 +162,7 @@ export default function MonacoEditor({
       <div className="flex-1 relative">
         <Editor
           height="100%"
-          language={getMonacoLanguageId(currentLanguageName)}
+          language={currLanguage?.monacoLanguage}
           value={currentCode}
           onChange={handleEditorChange}
           theme="light"

@@ -35,7 +35,7 @@ export default function TagLanguageSelector({
   useEffect(() => {
     TagsService.getAllTags().then(setTags);
     SubmissionsService.getLanguageList().then((res) =>
-      setLanguages(res.data.data)
+      setLanguages(res)
     );
   }, []);
 

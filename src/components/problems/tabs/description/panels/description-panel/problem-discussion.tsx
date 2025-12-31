@@ -158,13 +158,12 @@ export function ProblemDiscussion({ problemId }: ProblemDiscussionProps) {
         <div className="flex items-center gap-2 text-foreground font-semibold">
           <MessageSquare className="w-4 h-4" />
           <span>
-             {t('discussion_title')} ({comments.length > 0 ? comments.length : '1K'})
+            {t('discussion_title')} ({comments.length > 0 ? comments.length : '1K'})
           </span>
         </div>
         <ChevronDown
-          className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${
-            isOpen ? 'transform rotate-180' : ''
-          }`}
+          className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''
+            }`}
         />
       </CollapsibleTrigger>
       <CollapsibleContent>
@@ -239,47 +238,47 @@ export function ProblemDiscussion({ problemId }: ProblemDiscussionProps) {
                   {/* Replies */}
                   {(comment.replyCounts > 0 ||
                     getReplies(comment.id).length > 0) && (
-                    <div className="pl-11 space-y-4">
-                      {!expandedReplies.has(comment.id) ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleReplies(comment.id)}
-                          className="text-muted-foreground h-auto p-0 hover:bg-transparent hover:text-foreground"
-                        >
-                          <ChevronDown className="w-4 h-4 mr-1" />
-                          {t('view_replies', { count: comment.replyCounts || getReplies(comment.id).length })}
-                        </Button>
-                      ) : (
-                        <>
+                      <div className="pl-11 space-y-4">
+                        {!expandedReplies.has(comment.id) ? (
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => toggleReplies(comment.id)}
-                            className="text-muted-foreground h-auto p-0 hover:bg-transparent hover:text-foreground mb-2"
+                            className="text-muted-foreground h-auto p-0 hover:bg-transparent hover:text-foreground"
                           >
-                            <ChevronUp className="w-4 h-4 mr-1" />
-                            {t('hide_replies')}
+                            <ChevronDown className="w-4 h-4 mr-1" />
+                            {t('view_replies', { count: comment.replyCounts || getReplies(comment.id).length })}
                           </Button>
-
-                          {getReplies(comment.id).map((reply) => (
-                            <div
-                              key={reply.id}
-                              className="bg-muted/50 p-3 rounded-lg border border-border/50"
+                        ) : (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => toggleReplies(comment.id)}
+                              className="text-muted-foreground h-auto p-0 hover:bg-transparent hover:text-foreground mb-2"
                             >
-                              <ProblemCommentItem
-                                comment={reply}
-                                problemId={problemId}
-                                onReplySuccess={handleReplySuccess}
-                                onUpdate={handleUpdate}
-                                onDelete={handleDelete}
-                              />
-                            </div>
-                          ))}
-                        </>
-                      )}
-                    </div>
-                  )}
+                              <ChevronUp className="w-4 h-4 mr-1" />
+                              {t('hide_replies')}
+                            </Button>
+
+                            {getReplies(comment.id).map((reply) => (
+                              <div
+                                key={reply.id}
+                                className="bg-muted/50 p-3 rounded-lg border border-border/50"
+                              >
+                                <ProblemCommentItem
+                                  comment={reply}
+                                  problemId={problemId}
+                                  onReplySuccess={handleReplySuccess}
+                                  onUpdate={handleUpdate}
+                                  onDelete={handleDelete}
+                                />
+                              </div>
+                            ))}
+                          </>
+                        )}
+                      </div>
+                    )}
                 </div>
               ))}
               {comments.length === 0 && (

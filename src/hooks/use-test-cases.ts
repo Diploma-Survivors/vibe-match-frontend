@@ -3,40 +3,45 @@ import {
   updateCurrentSampleTestCases,
   updateSingleTestCase,
 } from '@/store/slides/workspace-slice';
-import type { ProblemDescription } from '@/types/problems';
-import type { SampleTestcase } from '@/types/testcases';
+import type { Problem } from '@/types/problems';
+import { SampleTestCase } from '@/types/testcases';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 
-export function useTestCases(problem: ProblemDescription) {
+export function useTestCases(problem: Problem) {
   const dispatch = useDispatch();
   const [activeTestCase, setActiveTestCase] = useState(0);
   const savedTestCases = useSelector(
     (state: RootState) => state.workspace.currentSampleTestCases[problem.id]
   );
-  const testCases: SampleTestcase[] =
-    savedTestCases ?? problem.testcaseSamples ?? [];
+
+  
+  // Map saved/sample test cases to the UI format
+  const testCases: SampleTestCase[] = (savedTestCases ?? problem.sampleTestcases ?? []).map(tc => ({
+    id: tc.id,
+    input: tc.input,
+    expectedOutput: tc.expectedOutput,
+  }));
 
   useEffect(() => {
-    if (!savedTestCases && problem.testcaseSamples) {
+    if (!savedTestCases && problem.sampleTestcases) {
       dispatch(
         updateCurrentSampleTestCases({
           problemId: problem.id,
-          testCases: problem.testcaseSamples,
+          testCases: problem.sampleTestcases,
         })
       );
     }
-  }, [dispatch, problem.id, problem.testcaseSamples, savedTestCases]);
+  }, [dispatch, problem.id, problem.sampleTestcases, savedTestCases]);
 
   const handleTestCaseChange = useCallback(
-    (id: string, field: 'input' | 'output', value: string) => {
-      console.log('test case change', id, field, value);
+    (id: number, field: 'input' | 'expectedOutput', value: string) => {
       dispatch(
         updateSingleTestCase({
           problemId: problem.id,
           index: activeTestCase,
-          field,
+          field: field === 'expectedOutput' ? 'expectedOutput' : field, // Map back to store format if needed
           value,
         })
       );
@@ -48,18 +53,27 @@ export function useTestCases(problem: ProblemDescription) {
     const lastTestCase =
       testCases.length > 0 ? testCases[testCases.length - 1] : null;
 
-    const newTestCase: SampleTestcase = {
-      id: `testcase-${Date.now()}`,
+    const newTestCase = {
+      id: Date.now(),
       input: lastTestCase?.input ?? 'sample text',
-      output: lastTestCase?.output ?? 'sample text',
+      expectedOutput: lastTestCase?.expectedOutput ?? 'sample text',
     };
 
-    const newSampleTestcases = [...testCases, newTestCase];
+    // We need to construct the full array for the store
+    // We can't just append to the derived `testCases` because it's a transformation
+    // But we can use the current `testCases` as a base and map back
+    const currentStoreTestCases = testCases.map(tc => ({
+      id: tc.id,
+      input: tc.input,
+      expectedOutput: tc.expectedOutput
+    }));
+    
+    const newSampleTestcases = [...currentStoreTestCases, newTestCase];
 
     dispatch(
       updateCurrentSampleTestCases({
         problemId: problem.id,
-        testCases: newSampleTestcases,
+        testCases: newSampleTestcases as any, // Type assertion might be needed depending on store types
       })
     );
 
@@ -67,21 +81,26 @@ export function useTestCases(problem: ProblemDescription) {
   }, [dispatch, problem.id, testCases]);
 
   const handleTestCaseDelete = useCallback(
-    (id: string) => {
-      const newSampleTestcases = testCases.filter(
-        (testCase) => testCase.id !== id
-      );
+    (id: number) => {
+      const newSampleTestcases = testCases
+        .filter((testCase) => testCase.id !== id)
+        .map(tc => ({
+          id: tc.id,
+          input: tc.input,
+          expectedOutput: tc.expectedOutput
+        }));
+
       dispatch(
         updateCurrentSampleTestCases({
           problemId: problem.id,
-          testCases: newSampleTestcases,
+          testCases: newSampleTestcases as any,
         })
       );
       if (activeTestCase >= testCases.length - 1) {
         setActiveTestCase(Math.max(0, testCases.length - 2));
       }
     },
-    [activeTestCase, testCases.length, dispatch, problem.id, testCases]
+    [activeTestCase, testCases, dispatch, problem.id]
   );
 
   return {

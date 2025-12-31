@@ -10,6 +10,7 @@ import {
 import type { AxiosResponse } from 'axios';
 import qs from 'qs';
 import { MOCK_PROBLEMS } from '@/data/mock-problems';
+import { SampleTestCase } from '@/types/testcases';
 
 async function getProblemList(
   getProblemListRequest: GetProblemListRequest
@@ -26,9 +27,6 @@ async function getProblemList(
   const url = params ? `${endpoint}?${params}` : endpoint;
   return await clientApi.get<ApiResponse<ProblemListResponse>>(url);
 }
-
-
-import { MOCK_PROBLEM_DETAIL } from '@/data/mock-problem-detail';
 
 async function getProblemById(
   problemId: number

@@ -45,7 +45,7 @@ export default function SolutionDetailPanel({
   useEffect(() => {
     const fetchLanguageList = async () => {
       const response = await SubmissionsService.getLanguageList();
-      setLanguages(response.data.data);
+      setLanguages(response);
     };
     fetchLanguageList();
   }, []);
@@ -176,8 +176,8 @@ export default function SolutionDetailPanel({
               size="sm"
               onClick={() => handleVote('up_vote')}
               className={`gap-2 ${solution.myVote === 'up_vote'
-                  ? 'bg-green-50 text-green-600 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
-                  : ''
+                ? 'bg-green-50 text-green-600 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
+                : ''
                 }`}
             >
               <ArrowBigUp
@@ -191,8 +191,8 @@ export default function SolutionDetailPanel({
               size="sm"
               onClick={() => handleVote('down_vote')}
               className={`gap-2 ${solution.myVote === 'down_vote'
-                  ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
-                  : ''
+                ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
+                : ''
                 }`}
             >
               <ArrowBigDown

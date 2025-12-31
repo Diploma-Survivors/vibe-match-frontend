@@ -1,10 +1,10 @@
 import { getStatusMeta } from '@/lib/utils/testcase-status';
 import type { SSEResult } from '@/services/sse-service';
-import type { SampleTestcase } from '@/types/testcases';
+import type { SampleTestCase } from '@/types/testcases';
 import { useTranslation } from 'react-i18next';
 
 interface ResultTabProps {
-  testCases: SampleTestcase[];
+  testCases: SampleTestCase[];
   activeTestCase: number;
   testResults?: SSEResult | null;
   isRunning?: boolean;
@@ -18,7 +18,7 @@ export function ResultTab({
   isRunning = false,
   runError = null,
 }: ResultTabProps) {
-  const hasResults = (testResults?.results?.length ?? 0) > 0;
+  const hasResults = (testResults?.testResults?.length ?? 0) > 0;
   const { t } = useTranslation('problems');
   if (!testCases[activeTestCase]) return null;
 
@@ -45,12 +45,12 @@ export function ResultTab({
   ) => {
     if (
       !testResults ||
-      !testResults.results ||
-      index >= testResults.results.length
+      !testResults.testResults ||
+      index >= testResults.testResults.length
     ) {
       return null;
     }
-    return testResults.results[index];
+    return testResults.testResults[index];
   };
 
   const testResult = getTestResult(testResults, activeTestCase);
@@ -99,7 +99,7 @@ export function ResultTab({
         <div className="bg-slate-50 dark:bg-slate-800 rounded-lg p-3 border border-slate-200 dark:border-slate-700">
           <pre className="text-slate-800 dark:text-slate-200 font-mono text-sm whitespace-pre-wrap">
             {testResult?.expectedOutput ??
-              (testCases[activeTestCase].output || 'No expected output')}
+              (testCases[activeTestCase].expectedOutput || 'No expected output')}
           </pre>
         </div>
       </div>
