@@ -1,19 +1,16 @@
-import { TestCase } from './testcases';
+import { Problem } from "./problems";
+import { UserProfile } from "./user";
 
 export enum SubmissionStatus {
-  PENDING = 'Pending',
-  RUNNING = 'Running',
-  ACCEPTED = 'Accepted',
-  WRONG_ANSWER = 'Wrong Answer',
-  TIME_LIMIT_EXCEEDED = 'Time Limit Exceeded',
-  SIGSEGV = 'SIGSEGV',
-  SIGXFSZ = 'SIGXFSZ',
-  SIGFPE = 'SIGFPE',
-  SIGABRT = 'SIGABRT',
-  NZEC = 'NZEC',
-  RUNTIME_ERROR = 'Runtime Error',
-  COMPILATION_ERROR = 'Compilation Error',
-  UNKNOWN_ERROR = 'Unknown Error',
+  PENDING = "PENDING",
+  RUNNING = "RUNNING",
+  ACCEPTED = "ACCEPTED",
+  WRONG_ANSWER = "WRONG_ANSWER",
+  TIME_LIMIT_EXCEEDED = "TIME_LIMIT_EXCEEDED",
+  MEMORY_LIMIT_EXCEEDED = "MEMORY_LIMIT_EXCEEDED",
+  RUNTIME_ERROR = "RUNTIME_ERROR",
+  COMPILATION_ERROR = "COMPILATION_ERROR",
+  UNKNOWN_ERROR = "UNKNOWN_ERROR"
 }
 
 export interface Language {
@@ -49,75 +46,69 @@ export interface SubmissionFilters {
 }
 
 export interface GetSubmissionListRequest {
-  after?: string;
-  before?: string;
-  first?: number;
-  last?: number;
+  page?: number;
+  limit?: number;
   sortBy?: string;
   sortOrder?: string;
   matchMode?: string;
   filters?: SubmissionFilters;
 }
 
-export interface SubmissionListItem {
-  id: number;
-  language: Language;
-  memory: number;
-  note: string | null;
-  runtime: number;
-  score: number | null;
-  status: SubmissionStatus;
-  createdAt?: string;
-  user: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  problemId?: string;
-}
-
-export interface PageInfo {
-  hasNextPage: boolean;
+export interface SubmissionMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
   hasPreviousPage: boolean;
-  startCursor: string;
-  endCursor: string;
-}
-
-export interface SubmissionEdge {
-  node: SubmissionListItem;
-  cursor: string;
+  hasNextPage: boolean;
 }
 
 export interface SubmissionListResponse {
-  edges: SubmissionEdge[];
-  pageInfos: PageInfo;
-  totalCount: number;
+  data: Submission[];
+  meta: SubmissionMeta;
 }
 
-export interface SubmissionDetailData {
-  id: number;
+export interface TestCaseResult {
+  testcaseId: number;
   status: string;
-  score: number;
-  maxScore: number;
-  runtime: number;
-  memory: number;
-  sourceCode: string;
-  createdAt: string;
-  totalTests: number;
-  passedTests: number;
-  language: Language;
-  resultDescription: {
-    message: string;
-  };
-  user: {
-    id: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  problemId: string;
+  input: string;
+  actualOutput: string;
+  expectedOutput: string;
+  executionTime: number;
+  memoryUsed: number;
+  error: string;
+  stderr: string;
 }
+
+export interface FailedResult {
+  message: string;
+  input: string;
+  expectedOutput: string;
+  actualOutput: string;
+  stderr: string;
+  compileOutput: string;
+}
+
+export interface Submission {
+  id: number;
+  status: SubmissionStatus;
+  executionTime: number;
+  memoryUsed: number;
+  testcasesPassed: number;
+  totalTestcases: number;
+  testcaseResults: TestCaseResult[];
+  failedResult: FailedResult;
+  user: Partial<UserProfile>;
+  problem: Partial<Problem>;
+  compileError: string;
+  runtimeError: string;
+  submittedAt: string;
+  problemId: number;
+  languageId: number;
+  sourceCode?: string;
+  contestId?: number;
+}
+
 
 // Map language names to Highlight.js language keys
 export const languageMap: Record<string, string> = {

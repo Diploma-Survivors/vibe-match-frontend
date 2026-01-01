@@ -14,7 +14,7 @@ import { toastService } from '@/services/toasts-service';
 import type { RootState } from '@/store/index';
 import { resetDraft, setDraft } from '@/store/slides/create-solution-slice';
 import {
-  type SubmissionDetailData,
+  type Submission,
   SubmissionStatus,
 } from '@/types/submissions';
 import { useParams, useRouter } from 'next/navigation';
@@ -58,14 +58,14 @@ export default function CreateSolutionPage() {
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<number[]>([]);
   const [content, setContent] = useState(DEFAULT_MARKDOWN);
-  const [submission, setSubmission] = useState<SubmissionDetailData | null>(
+  const [submission, setSubmission] = useState<Submission | null>(
     null
   );
   const [isLoading, setIsLoading] = useState(true);
 
   const drafts = useSelector((state: RootState) => state.createSolution.drafts);
 
-  const loadDefaultContent = useCallback(async (sub: SubmissionDetailData) => {
+  const loadDefaultContent = useCallback(async (sub: Submission) => {
     try {
       // If we already have the full detail from getSubmissionById, we might not need to call it again?
       // Actually getSubmissionById returns SubmissionDetailData, but setSubmission expects SubmissionListItem.

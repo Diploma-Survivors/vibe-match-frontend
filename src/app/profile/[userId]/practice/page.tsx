@@ -24,7 +24,7 @@ import { Tooltip } from '@/components/ui/tooltip';
 import { ProblemsService } from '@/services/problems-service';
 import { SubmissionsService } from '@/services/submissions-service';
 import { ProblemDifficulty, type ProblemListItem, ProblemStatus } from '@/types/problems';
-import { type SubmissionListItem, SubmissionStatus } from '@/types/submissions';
+import { type Submission, SubmissionStatus } from '@/types/submissions';
 import { format } from 'date-fns';
 import {
   ArrowDown,
@@ -44,7 +44,7 @@ import { Fragment, use, useEffect, useMemo, useState } from 'react';
 
 // Types for the view
 interface ProblemWithSubmissions extends Omit<ProblemListItem, 'status'> {
-  submissions: SubmissionListItem[];
+  submissions: Submission[];
   lastSubmittedAt: string | null;
   status: ProblemStatus;
   lastResult: SubmissionStatus | null;
@@ -104,7 +104,7 @@ export default function PracticeHistoryPage({
         // Iterating through submissions is better if we only want problems with submissions.
 
         // Group submissions by problemId
-        const submissionsByProblem = new Map<string, SubmissionListItem[]>();
+        const submissionsByProblem = new Map<string, Submission[]>();
         for (const sub of allSubmissions) {
           if (sub.problemId) {
             const existing = submissionsByProblem.get(sub.problemId) || [];
@@ -421,40 +421,36 @@ export default function PracticeHistoryPage({
                     </DropdownMenuLabel>
                     <div className="grid grid-cols-2 gap-2">
                       <div
-                        className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-colors ${
-                          statusFilter.includes(ProblemStatus.SOLVED) &&
-                          !statusFilter.includes(ProblemStatus.ATTEMPTED)
+                        className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-colors ${statusFilter.includes(ProblemStatus.SOLVED) &&
+                            !statusFilter.includes(ProblemStatus.ATTEMPTED)
                             ? 'bg-green-50 border-green-200 text-green-700'
                             : 'hover:bg-gray-50 border-gray-200 text-gray-600'
-                        }`}
+                          }`}
                         onClick={() => setStatusFilter([ProblemStatus.SOLVED])}
                       >
                         <CheckCircle
-                          className={`w-4 h-4 ${
-                            statusFilter.includes(ProblemStatus.SOLVED) &&
-                            !statusFilter.includes(ProblemStatus.ATTEMPTED)
+                          className={`w-4 h-4 ${statusFilter.includes(ProblemStatus.SOLVED) &&
+                              !statusFilter.includes(ProblemStatus.ATTEMPTED)
                               ? 'text-green-600'
                               : 'text-gray-400'
-                          }`}
+                            }`}
                         />
                         <span className="text-sm font-medium">Solved</span>
                       </div>
                       <div
-                        className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-colors ${
-                          statusFilter.includes(ProblemStatus.ATTEMPTED) &&
-                          !statusFilter.includes(ProblemStatus.SOLVED)
+                        className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-colors ${statusFilter.includes(ProblemStatus.ATTEMPTED) &&
+                            !statusFilter.includes(ProblemStatus.SOLVED)
                             ? 'bg-gray-100 border-gray-300 text-gray-900'
                             : 'hover:bg-gray-50 border-gray-200 text-gray-600'
-                        }`}
+                          }`}
                         onClick={() => setStatusFilter([ProblemStatus.ATTEMPTED])}
                       >
                         <Circle
-                          className={`w-4 h-4 ${
-                            statusFilter.includes(ProblemStatus.ATTEMPTED) &&
-                            !statusFilter.includes(ProblemStatus.SOLVED)
+                          className={`w-4 h-4 ${statusFilter.includes(ProblemStatus.ATTEMPTED) &&
+                              !statusFilter.includes(ProblemStatus.SOLVED)
                               ? 'text-gray-900'
                               : 'text-gray-400'
-                          }`}
+                            }`}
                         />
                         <span className="text-sm font-medium">Attempted</span>
                       </div>
@@ -495,11 +491,10 @@ export default function PracticeHistoryPage({
                         return (
                           <div
                             key={diff.value}
-                            className={`flex items-center justify-center p-2 rounded-md border cursor-pointer transition-all ${
-                              isSelected
+                            className={`flex items-center justify-center p-2 rounded-md border cursor-pointer transition-all ${isSelected
                                 ? diff.color
                                 : `border-gray-200 text-gray-500 ${diff.hover}`
-                            }`}
+                              }`}
                             onClick={() => {
                               if (isSelected) {
                                 setDifficultyFilter(
@@ -579,9 +574,9 @@ export default function PracticeHistoryPage({
                       <TableCell className="text-gray-500 font-medium">
                         {problem.lastSubmittedAt
                           ? format(
-                              new Date(problem.lastSubmittedAt),
-                              'MMM d, yyyy'
-                            )
+                            new Date(problem.lastSubmittedAt),
+                            'MMM d, yyyy'
+                          )
                           : '-'}
                       </TableCell>
                       <TableCell>
@@ -609,7 +604,7 @@ export default function PracticeHistoryPage({
                               {problem.difficulty === ProblemDifficulty.EASY
                                 ? 'Easy'
                                 : problem.difficulty ===
-                                    ProblemDifficulty.MEDIUM
+                                  ProblemDifficulty.MEDIUM
                                   ? 'Med.'
                                   : 'Hard'}
                             </Badge>
@@ -672,9 +667,9 @@ export default function PracticeHistoryPage({
                                     <TableCell className="text-gray-500">
                                       {sub.createdAt
                                         ? format(
-                                            new Date(sub.createdAt),
-                                            'yyyy.MM.dd'
-                                          )
+                                          new Date(sub.createdAt),
+                                          'yyyy.MM.dd'
+                                        )
                                         : '-'}
                                     </TableCell>
                                     <TableCell

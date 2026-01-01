@@ -1,15 +1,22 @@
-'use client';
-
+import { useLanguage } from '@/hooks/use-language';
 import { getStatusMeta } from '@/lib/utils/testcase-status';
-import type { SubmissionListItem } from '@/types/submissions';
+import type { Submission } from '@/types/submissions';
+import { formatDistanceToNow } from 'date-fns';
+import { enUS, vi } from 'date-fns/locale';
 import { Clock, Cpu } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface SubmissionRowProps {
-  submission: SubmissionListItem;
+  submission: Submission;
   index: number;
   isSelected: boolean;
-  onSelect: (submission: SubmissionListItem) => void;
+  onSelect: (submission: Submission) => void;
 }
+
+const locales: Record<string, any> = {
+  en: enUS,
+  vi: vi,
+};
 
 const formatRuntime = (runtime: number) => {
   if (runtime === 0) return 'CE';
@@ -29,11 +36,13 @@ export default function SubmissionRow({
   isSelected,
   onSelect,
 }: SubmissionRowProps) {
+  const { getLanguageName } = useLanguage();
+  const { i18n } = useTranslation();
+
   return (
     <tr
-      className={`cursor-pointer transition-all duration-200 group ${
-        isSelected ? 'bg-gray-200' : 'hover:bg-gray-100'
-      }`}
+      className={`cursor-pointer transition-all duration-200 group ${isSelected ? 'bg-gray-200' : 'hover:bg-gray-100'
+        }`}
       onClick={() => onSelect(submission)}
       style={{
         animationDelay: `${index * 50}ms`,
@@ -55,6 +64,12 @@ export default function SubmissionRow({
                 >
                   {statusInfo.label}
                 </span>
+                <span className="text-[10px] text-gray-500">
+                  {formatDistanceToNow(new Date(submission.submittedAt), {
+                    addSuffix: true,
+                    locale: locales[i18n.language] || enUS,
+                  })}
+                </span>
               </div>
             </div>
           );
@@ -66,10 +81,7 @@ export default function SubmissionRow({
         <div className="flex items-center gap-2">
           <div className="text-xs flex items-baseline gap-1">
             <span className="font-semibold text-gray-900">
-              {submission.language.name.split(' ')[0]}
-            </span>
-            <span className="text-gray-500 text-[11px]">
-              {submission.language.name.split(' ').slice(1).join(' ')}
+              {getLanguageName(submission.languageId)}
             </span>
           </div>
         </div>
@@ -80,7 +92,7 @@ export default function SubmissionRow({
         <div className="flex items-center gap-1">
           <Clock className="h-4 w-4 text-gray-400" />
           <span className="text-xs font-medium text-gray-900">
-            {formatRuntime(submission.runtime)}
+            {formatRuntime(submission.executionTime)}
           </span>
         </div>
       </td>
@@ -90,7 +102,7 @@ export default function SubmissionRow({
         <div className="flex items-center gap-1">
           <Cpu className="h-4 w-4 text-gray-400" />
           <span className="text-xs font-medium text-gray-900">
-            {formatMemory(submission.memory)}
+            {formatMemory(submission.memoryUsed)}
           </span>
         </div>
       </td>

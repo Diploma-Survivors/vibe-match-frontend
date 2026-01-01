@@ -2,21 +2,22 @@
 
 import type {
   SubmissionFilters,
-  SubmissionListItem,
+  Submission,
 } from '@/types/submissions';
 import type {
   GetSubmissionListRequest,
-  SubmissionEdge,
 } from '@/types/submissions';
 import { Loader2, Search } from 'lucide-react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import SubmissionRow from './submission-row';
 import SubmissionsFilter from './submissions-filter';
 
+import { useTranslation } from 'react-i18next';
+
 interface SubmissionsListProps {
-  submissions: SubmissionEdge[];
+  submissions: Submission[];
   selectedSubmissionId: number | null;
-  onSelectSubmission: (submission: SubmissionListItem) => void;
+  onSelectSubmission: (submission: Submission) => void;
   filters: SubmissionFilters;
   onFilterChange: (filters: SubmissionFilters) => void;
   hasMore?: boolean;
@@ -36,6 +37,8 @@ export default function SubmissionsList({
   isLoading = false,
   totalCount = 0,
 }: SubmissionsListProps) {
+  const { t } = useTranslation('problems');
+
   return (
     <div className="h-full flex flex-col bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden pl-2">
       {/* Search Filters */}
@@ -52,16 +55,16 @@ export default function SubmissionsList({
               <Search className="h-8 w-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Không tìm thấy submission nào
+              {t('no_submissions_found')}
             </h3>
             <p className="text-gray-500 text-center max-w-sm">
-              Hãy thử thay đổi bộ lọc hoặc tạo submission mới để xem kết quả.
+              {t('no_submissions_description')}
             </p>
           </div>
         ) : (
           <InfiniteScroll
             dataLength={submissions.length}
-            next={onLoadMore || (() => {})}
+            next={onLoadMore || (() => { })}
             hasMore={hasMore}
             loader={
               <div className="flex flex-col items-center justify-center py-12 px-4">
@@ -75,26 +78,26 @@ export default function SubmissionsList({
               <thead className="bg-white border-b border-gray-200 sticky top-0 z-10 text-xs">
                 <tr>
                   <th className="px-4 py-3 text-left font-semibold text-gray-700 tracking-wider">
-                    Status
+                    {t('status')}
                   </th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-700 tracking-wider">
-                    Language
+                    {t('language')}
                   </th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-700 tracking-wider">
-                    Runtime
+                    {t('runtime')}
                   </th>
                   <th className="px-4 py-3 text-left font-semibold text-gray-700 tracking-wider">
-                    Memory
+                    {t('memory')}
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {submissions.map((submission, index) => (
                   <SubmissionRow
-                    key={submission.node.id}
-                    submission={submission.node}
+                    key={submission.id}
+                    submission={submission}
                     index={index}
-                    isSelected={selectedSubmissionId === submission.node.id}
+                    isSelected={selectedSubmissionId === submission.id}
                     onSelect={onSelectSubmission}
                   />
                 ))}

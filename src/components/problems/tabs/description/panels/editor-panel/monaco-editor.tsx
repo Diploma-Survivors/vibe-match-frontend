@@ -24,23 +24,6 @@ interface MonacoEditorProps {
   onCurrentCodeChange: (code: string) => void;
 }
 
-const getMonacoLanguageId = (backendName?: string): string => {
-  if (!backendName) return 'plaintext';
-
-  const name = backendName.toLowerCase();
-
-  // Find the first configuration where:
-  // 1. None of the 'exclude' keywords are present
-  // 2. At least one of the 'keywords' is present
-  const matchedLang = LANGUAGE_DEFINITIONS.find((config) => {
-    const isExcluded = config.exclude?.some((term) => name.includes(term));
-    if (isExcluded) return false;
-
-    return config.keywords.some((term) => name.includes(term));
-  });
-
-  return matchedLang ? matchedLang.monacoId : 'plaintext';
-};
 
 export default function MonacoEditor({
   currentLanguageId,

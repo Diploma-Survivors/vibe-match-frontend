@@ -7,13 +7,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import { SubmissionsService } from '@/services/submissions-service';
 import { SubmissionStatus } from '@/types/submissions';
 import type {
   Language,
   SubmissionFilters,
 } from '@/types/submissions';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -34,6 +35,11 @@ export default function SubmissionsFilter({
     filters.languageId?.toString() || 'ALL'
   );
   const [languageList, setLanguageList] = useState<Language[]>([]);
+  const [languageSearch, setLanguageSearch] = useState('');
+
+  const filteredLanguages = languageList.filter((lang) =>
+    lang.name.toLowerCase().includes(languageSearch.toLowerCase())
+  );
 
   // Get language list
   useEffect(() => {
@@ -65,7 +71,7 @@ export default function SubmissionsFilter({
 
   const getStatusLabel = () => {
     if (statusFilter === 'ALL') return t('all_status');
-    return SubmissionStatus[statusFilter as keyof typeof SubmissionStatus];
+    return t(`status_${statusFilter}`);
   };
 
   const getLanguageLabel = () => {
@@ -77,7 +83,7 @@ export default function SubmissionsFilter({
   return (
     <div className="p-3 border-b border-border bg-muted/20">
       <div className="flex gap-2">
-        <div className="flex-1">
+        <div className="w-[180px]">
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button
@@ -88,7 +94,7 @@ export default function SubmissionsFilter({
                 <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+            <DropdownMenuContent className="w-[180px]">
               <DropdownMenuItem
                 onClick={() => handleStatusChange('ALL')}
                 className="text-xs"
@@ -101,13 +107,13 @@ export default function SubmissionsFilter({
                   onClick={() => handleStatusChange(key)}
                   className="text-xs"
                 >
-                  {value}
+                  {t(`status_${key}`)}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="flex-1">
+        <div className="w-[180px]">
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
               <Button
@@ -118,14 +124,26 @@ export default function SubmissionsFilter({
                 <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]">
+            <DropdownMenuContent className="w-[180px] max-h-[300px] overflow-y-auto">
+              <div className="p-2 sticky top-0 bg-popover z-10">
+                <div className="relative">
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+                  <Input
+                    placeholder={t('search_language')}
+                    className="h-7 text-xs pl-7"
+                    value={languageSearch}
+                    onChange={(e) => setLanguageSearch(e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                </div>
+              </div>
               <DropdownMenuItem
                 onClick={() => handleLanguageChange('ALL')}
                 className="text-xs"
               >
                 {t('all_languages')}
               </DropdownMenuItem>
-              {languageList.map((lang) => (
+              {filteredLanguages.map((lang) => (
                 <DropdownMenuItem
                   key={lang.id}
                   onClick={() => handleLanguageChange(lang.id.toString())}
@@ -134,6 +152,11 @@ export default function SubmissionsFilter({
                   {lang.name}
                 </DropdownMenuItem>
               ))}
+              {filteredLanguages.length === 0 && (
+                <div className="p-2 text-xs text-muted-foreground text-center">
+                  {t('no_languages_found')}
+                </div>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

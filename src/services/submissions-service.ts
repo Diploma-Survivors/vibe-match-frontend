@@ -5,7 +5,8 @@ import { ApiResponse } from '@/types/api';
 import {
   type GetSubmissionListRequest,
   type Language,
-  type SubmissionListItem,
+  type Submission,
+  SubmissionListResponse,
   type SubmissionRequest,
   SubmissionStatus,
 } from '@/types/submissions';
@@ -56,10 +57,14 @@ async function getSubmissionList(
   problemId: string,
   contestParticipationId?: number
 ) {
-  const queryString = qs.stringify(submissionListRequest, {
-    allowDots: true,
-    skipNulls: true,
-  });
+  const { filters, ...rest } = submissionListRequest;
+    const queryString = qs.stringify(
+      { ...rest, ...filters },
+      {
+        allowDots: true,
+        skipNulls: true,
+      }
+    );
   let url = '';
   if (contestParticipationId) {
     url = queryString
@@ -72,58 +77,23 @@ async function getSubmissionList(
   }
   
   try {
-    return await clientApi.get<ApiResponse<SubmissionListItem[]>>(url);
+    return await clientApi.get<ApiResponse<SubmissionListResponse>>(url);
   } catch (error) {
-    // Return mock data
-    console.warn("API failed, using mock submissions");
-    const mockData = await getAllSubmissions(101); // Mock user ID
-    
-    // Transform mock list items to paginated response structure
-    const edges = mockData.map(item => ({
-        node: item,
-        cursor: item.id.toString()
-    }));
-    
-    return {
-        data: {
-            data: {
-                edges,
-                pageInfos: {
-                    hasNextPage: false,
-                    hasPreviousPage: false,
-                    startCursor: edges[0]?.cursor || '',
-                    endCursor: edges[edges.length - 1]?.cursor || ''
-                },
-                totalCount: mockData.length
-            }
-        }
-    };
+    console.error('Error fetching submissions:', error);
   }
 }
 
 async function getSubmissionById(submissionId: string) {
   try {
-    return await clientApi.get(`/submissions/${submissionId}`);
+    return await clientApi.get<ApiResponse<Submission>>(`/submissions/${submissionId}`);
   } catch (error) {
-    // Return mock detail
-    const mockList = await getAllSubmissions(101);
-    const mockItem = mockList.find(s => s.id.toString() === submissionId) || mockList[0];
-    
-    return {
-        data: {
-            data: {
-                ...mockItem,
-                sourceCode: `print("Hello World from submission ${submissionId}")`,
-                status: mockItem?.status || SubmissionStatus.ACCEPTED
-            }
-        }
-    };
+    console.error('Error fetching submission:', error);
   }
 }
 
 async function getAllSubmissions(
   userId: number
-): Promise<SubmissionListItem[]> {
+): Promise<Submission[]> {
   // Mock data
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -137,7 +107,7 @@ async function getAllSubmissions(
 
       const submissionCount = Math.floor(Math.random() * 50) + 10; // 10 to 60 submissions
 
-      const submissions: SubmissionListItem[] = Array.from({
+      const submissions: Submission[] = Array.from({
         length: submissionCount,
       }).map((_, i) => {
         const statuses = [
@@ -167,20 +137,37 @@ async function getAllSubmissions(
 
         return {
           id: i + 1,
-          language: { id: 1, name: 'Python' },
-          memory: Math.floor(Math.random() * 10000),
-          note: null,
-          runtime: Math.floor(Math.random() * 1000),
-          score: status === SubmissionStatus.ACCEPTED ? 100 : 0,
           status,
-          createdAt,
+          executionTime: Math.floor(Math.random() * 1000),
+          memoryUsed: Math.floor(Math.random() * 10000),
+          testcasesPassed: status === SubmissionStatus.ACCEPTED ? 10 : Math.floor(Math.random() * 10),
+          totalTestcases: 10,
+          testcaseResults: [],
+          failedResult: {
+            message: 'Wrong Answer',
+            input: '1 2',
+            expectedOutput: '3',
+            actualOutput: '4',
+            stderr: '',
+            compileOutput: '',
+          },
           user: {
             id: userId,
             firstName: 'User',
             lastName: `${userId}`,
             email: `user${userId}@example.com`,
           },
-          problemId: Math.floor(Math.random() * 100 + 1).toString(),
+          problem: {
+            id: Math.floor(Math.random() * 100 + 1),
+            title: `Problem ${Math.floor(Math.random() * 100 + 1)}`,
+            slug: `problem-${Math.floor(Math.random() * 100 + 1)}`,
+          },
+          compileError: '',
+          runtimeError: '',
+          submittedAt: createdAt,
+          problemId: Math.floor(Math.random() * 100 + 1),
+          languageId: 1,
+          sourceCode: 'print("Hello World")',
         };
       });
       resolve(submissions);
@@ -191,7 +178,7 @@ async function getAllSubmissions(
 async function getAllContestSubmissions(
   contestId: string,
   userId: number
-): Promise<SubmissionListItem[]> {
+): Promise<Submission[]> {
   // Mock data - similar to getAllSubmissions but conceptually for a specific contest
   return getAllSubmissions(userId);
 }

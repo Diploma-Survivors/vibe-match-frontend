@@ -31,7 +31,7 @@ import { SubmissionsService } from '@/services/submissions-service';
 import { UserService } from '@/services/user-service';
 import { ProblemDifficulty, type ProblemListItem } from '@/types/problems';
 import { type Solution, SolutionSortBy } from '@/types/solutions';
-import { type SubmissionListItem, SubmissionStatus } from '@/types/submissions';
+import { type Submission, SubmissionStatus } from '@/types/submissions';
 import type { UserProfile } from '@/types/user';
 import { format } from 'date-fns';
 import {
@@ -91,7 +91,7 @@ export default function ProfilePage({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [solvedProblems, setSolvedProblems] = useState<ProblemListItem[]>([]);
   const [allProblems, setAllProblems] = useState<ProblemListItem[]>([]);
-  const [submissions, setSubmissions] = useState<SubmissionListItem[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [selectedYear, setSelectedYear] = useState<string>(
     new Date().getFullYear().toString()
   );
@@ -320,7 +320,7 @@ export default function ProfilePage({
       });
 
     // Deduplicate by problemId, keeping the latest
-    const uniqueAC = new Map<string, SubmissionListItem>();
+    const uniqueAC = new Map<string, Submission>();
     for (const s of acSubmissions) {
       if (s.problemId && !uniqueAC.has(s.problemId)) {
         uniqueAC.set(s.problemId, s);
