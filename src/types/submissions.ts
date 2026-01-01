@@ -105,6 +105,7 @@ export interface Submission {
   submittedAt: string;
   problemId: number;
   languageId: number;
+  language?: Language;
   sourceCode?: string;
   contestId?: number;
 }

@@ -34,6 +34,10 @@ function ProblemLayoutInner({ children }: { children: React.ReactNode }) {
     activeTab = secondLastSegment || 'description';
   }
 
+  const isCreateSolution = pathname.includes('/solutions/create');
+  const isEditSolution = pathname.includes('/solutions/edit');
+  const isFullPage = isCreateSolution || isEditSolution;
+
   const {
     containerRef,
     rightPanelRef,
@@ -99,48 +103,53 @@ function ProblemLayoutInner({ children }: { children: React.ReactNode }) {
       >
         {/* Left Panel */}
         <div
-          className="flex flex-col h-full bg-card border-r border-border"
-          style={{ width: `${leftWidth}%` }}
+          className={cn(
+            "flex flex-col h-full bg-card",
+            !isFullPage && "border-r border-border"
+          )}
+          style={{ width: isFullPage ? '100%' : `${leftWidth}%` }}
         >
           {/* Left Panel Header - Concise Navigation */}
-          <div className="flex items-center h-12 px-2 border-b border-border bg-background/50 backdrop-blur-sm shrink-0 gap-2">
-            <Link href="/problems">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                title={t('back_to_list')}
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-            </Link>
+          {!isFullPage && (
+            <div className="flex items-center h-12 px-2 border-b border-border bg-background/50 backdrop-blur-sm shrink-0 gap-2">
+              <Link href="/problems">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                  title={t('back_to_list')}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+              </Link>
 
-            <div className="h-4 w-px bg-border mx-1" />
+              <div className="h-4 w-px bg-border mx-1" />
 
-            <div className="flex items-center gap-1">
-              {navItems.map((item) => {
-                const isActive = activeTab === item.id;
+              <div className="flex items-center gap-1">
+                {navItems.map((item) => {
+                  const isActive = activeTab === item.id;
 
-                return (
-                  <Button
-                    key={item.id}
-                    variant={isActive ? 'secondary' : 'ghost'}
-                    size="sm"
-                    onClick={() => router.push(`/problems/${problemId}/${item.id}`)}
-                    className={cn(
-                      "h-8 text-xs font-medium gap-2 px-3",
-                      isActive
-                        ? "bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    <item.icon className="w-3.5 h-3.5" />
-                    {item.label}
-                  </Button>
-                );
-              })}
+                  return (
+                    <Button
+                      key={item.id}
+                      variant={isActive ? 'secondary' : 'ghost'}
+                      size="sm"
+                      onClick={() => router.push(`/problems/${problemId}/${item.id}`)}
+                      className={cn(
+                        "h-8 text-xs font-medium gap-2 px-3",
+                        isActive
+                          ? "bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <item.icon className="w-3.5 h-3.5" />
+                      {item.label}
+                    </Button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Left Panel Content */}
           <div className="flex-1 overflow-hidden relative">
@@ -158,51 +167,55 @@ function ProblemLayoutInner({ children }: { children: React.ReactNode }) {
         </div>
 
         {/* Horizontal Resizer */}
-        <ResizableDivider
-          direction="horizontal"
-          isDragging={isHorizontalDragging}
-          onMouseDown={handleHorizontalMouseDown}
-        />
+        {!isFullPage && (
+          <ResizableDivider
+            direction="horizontal"
+            isDragging={isHorizontalDragging}
+            onMouseDown={handleHorizontalMouseDown}
+          />
+        )}
 
         {/* Right Panel - Editor and Test Cases */}
-        <div
-          ref={rightPanelRef}
-          className="flex flex-col overflow-hidden pb-4 bg-card"
-          style={{ width: `${100 - leftWidth}%` }}
-        >
-          <div className="flex flex-col h-full gap-0">
-            {/* Editor Section */}
-            <EditorPanel
-              contestMode={false}
-              height={editorHeight}
-              isRunning={isRunning}
-              isSubmitting={isSubmitting}
-              onRun={handleRun}
-              onSubmit={(code, langId, contestId) => handleSubmit(code, langId, contestId)}
-            />
+        {!isFullPage && (
+          <div
+            ref={rightPanelRef}
+            className="flex flex-col overflow-hidden pb-4 bg-card"
+            style={{ width: `${100 - leftWidth}%` }}
+          >
+            <div className="flex flex-col h-full gap-0">
+              {/* Editor Section */}
+              <EditorPanel
+                contestMode={false}
+                height={editorHeight}
+                isRunning={isRunning}
+                isSubmitting={isSubmitting}
+                onRun={handleRun}
+                onSubmit={(code, langId, contestId) => handleSubmit(code, langId, contestId)}
+              />
 
-            {/* Vertical Resizer */}
-            <ResizableDivider
-              direction="vertical"
-              isDragging={isVerticalDragging}
-              onMouseDown={handleVerticalMouseDown}
-            />
+              {/* Vertical Resizer */}
+              <ResizableDivider
+                direction="vertical"
+                isDragging={isVerticalDragging}
+                onMouseDown={handleVerticalMouseDown}
+              />
 
-            {/* Test Cases Section */}
-            <SampleTestCasesPanel
-              height={100 - editorHeight}
-              testCases={testCases}
-              activeTestCase={activeTestCase}
-              testResults={testResults}
-              runError={runError}
-              isRunning={isRunning}
-              onTestCaseAdd={handleTestCaseAdd}
-              onTestCaseDelete={handleTestCaseDelete}
-              onTestCaseChange={handleTestCaseChange}
-              onActiveTestCaseChange={setActiveTestCase}
-            />
+              {/* Test Cases Section */}
+              <SampleTestCasesPanel
+                height={100 - editorHeight}
+                testCases={testCases}
+                activeTestCase={activeTestCase}
+                testResults={testResults}
+                runError={runError}
+                isRunning={isRunning}
+                onTestCaseAdd={handleTestCaseAdd}
+                onTestCaseDelete={handleTestCaseDelete}
+                onTestCaseChange={handleTestCaseChange}
+                onActiveTestCaseChange={setActiveTestCase}
+              />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

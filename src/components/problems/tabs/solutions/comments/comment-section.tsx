@@ -17,13 +17,11 @@ import { type SolutionComment, SolutionCommentSortBy } from '@/types/solutions';
 import type { UserProfile } from '@/types/user';
 import {
   ArrowUpDown,
-  ChevronDown,
-  ChevronUp,
   MessageSquare,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import CommentItem from './comment-item';
 import { useTranslation } from 'react-i18next';
+import CommentNode from './comment-node';
 interface CommentSectionProps {
   solutionId: string;
 }
@@ -43,51 +41,73 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
     new Set()
   );
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 5;
+
   useEffect(() => {
     // Fetch current user for the avatar in the input
     if (!user) return;
     UserService.getUserProfile(user.id).then((res) => setCurrentUser(res));
   }, [user]);
 
+  const fetchComments = async () => {
+    setIsLoading(true);
+    try {
+      const response = await SolutionsService.getComments(solutionId);
+      // Deduplicate comments based on ID
+      const uniqueComments = Array.from(
+        new Map(response.data.data.map((c) => [c.id, c])).values()
+      );
+
+      // Apply current sort
+      const sorted = sortComments(uniqueComments, sortBy);
+      setComments(sorted);
+    } catch (error) {
+      console.error('Error fetching comments:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchComments = async () => {
-      setIsLoading(true);
-      try {
-        const data = await SolutionsService.getComments(solutionId);
-        setComments(data);
-      } catch (error) {
-        console.error('Error fetching comments:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
     fetchComments();
   }, [solutionId]);
 
-  const handleSortChange = (newSort: SolutionCommentSortBy) => {
-    setSortBy(newSort);
-    // Client-side sort
-    const sorted = [...comments].sort((a, b) => {
-      if (newSort === SolutionCommentSortBy.RECENT) {
+  const sortComments = (items: SolutionComment[], sortOption: SolutionCommentSortBy) => {
+    return [...items].sort((a, b) => {
+      if (sortOption === SolutionCommentSortBy.RECENT) {
         return (
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
       }
       return b.upvoteCount - a.upvoteCount;
     });
+  };
+
+  const handleSortChange = (newSort: SolutionCommentSortBy) => {
+    setSortBy(newSort);
+    const sorted = sortComments(comments, newSort);
     setComments(sorted);
+    setCurrentPage(1); // Reset to first page on sort
   };
 
   const handleSubmitComment = async () => {
     if (!newCommentContent.trim()) return;
     setIsSubmitting(true);
     try {
-      const newComment = await SolutionsService.createComment(
+      const response = await SolutionsService.createComment(
         solutionId,
         newCommentContent
       );
-      setComments((prev) => [newComment, ...prev]);
+      setComments((prev) => {
+        const newComment = response.data.data;
+        if (prev.some((c) => c.id === newComment.id)) return prev;
+        // Add new comment and re-sort
+        const newComments = [newComment, ...prev];
+        return sortComments(newComments, sortBy);
+      });
       setNewCommentContent('');
+      setCurrentPage(1); // Go to first page to see new comment
     } catch (error) {
       console.error('Error submitting comment:', error);
     } finally {
@@ -96,10 +116,14 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
   };
 
   const handleReplySuccess = (newReply: SolutionComment) => {
-    setComments((prev) => [...prev, newReply]);
+    setComments((prev) => {
+      if (prev.some((c) => c.id === newReply.id)) return prev;
+      const newComments = [...prev, newReply];
+      return sortComments(newComments, sortBy);
+    });
     // Auto expand the parent to show the new reply
-    if (newReply.parentCommentId) {
-      const parentId = newReply.parentCommentId;
+    if (newReply.parentId) {
+      const parentId = newReply.parentId;
       setExpandedReplies((prev) => {
         const next = new Set(prev);
         next.add(parentId);
@@ -136,11 +160,16 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
 
   // Filter top-level comments for the main list
   // In a real app with nested comments, we'd likely have a recursive structure or filter by parentId === null
-  const topLevelComments = comments.filter((c) => !c.parentCommentId);
+  const topLevelComments = comments.filter((c) => !c.parentId);
+  const totalPages = Math.ceil(topLevelComments.length / ITEMS_PER_PAGE);
+  const displayedComments = topLevelComments.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   // Helper to get replies for a comment
   const getReplies = (parentId: string) => {
-    return comments.filter((c) => c.parentCommentId === parentId);
+    return comments.filter((c) => c.parentId === parentId);
   };
 
   return (
@@ -190,13 +219,16 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
         >
           <AvatarImage src={currentUser?.avatarUrl} />
           <AvatarFallback>
-            {currentUser?.firstName?.[0]}
-            {currentUser?.lastName?.[0]}
+            <img
+              src="/avatars/placeholder.png"
+              alt={currentUser?.username || t('user_fallback')}
+              className="w-full h-full object-cover"
+            />
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 space-y-2">
           <Textarea
-            placeholder={t('write_reply')}
+            placeholder={t('write_comment')}
             value={newCommentContent}
             onChange={(e) => setNewCommentContent(e.target.value)}
             className="min-h-[100px]"
@@ -207,7 +239,7 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
               onClick={handleSubmitComment}
               disabled={!newCommentContent.trim() || isSubmitting}
             >
-              {isSubmitting ? t('sending') : t('reply')}
+              {isSubmitting ? t('sending') : t('post_comment')}
             </Button>
           </div>
         </div>
@@ -217,74 +249,52 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
       <div className="space-y-6">
         {isLoading
           ? // Skeleton
-            Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="flex gap-4">
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-2/3" />
-                </div>
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="flex gap-4">
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-2/3" />
               </div>
-            ))
-          : topLevelComments.map((comment) => (
-              <div
-                key={comment.id}
-                className="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg space-y-4"
-              >
-                <CommentItem
-                  comment={comment}
-                  solutionId={solutionId}
-                  onReplySuccess={handleReplySuccess}
-                  onUpdate={handleUpdateComment}
-                  onDelete={handleDeleteComment}
-                />
+            </div>
+          ))
+          : displayedComments.map((comment) => (
+            <CommentNode
+              key={comment.id}
+              comment={comment}
+              getReplies={getReplies}
+              solutionId={solutionId}
+              onReplySuccess={handleReplySuccess}
+              onUpdate={handleUpdateComment}
+              onDelete={handleDeleteComment}
+              expandedReplies={expandedReplies}
+              toggleReplies={toggleReplies}
+            />
+          ))}
 
-                {/* Replies */}
-                {(comment.replyCounts > 0 ||
-                  getReplies(comment.id).length > 0) && (
-                  <div className="pl-11 space-y-4">
-                    {!expandedReplies.has(comment.id) ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleReplies(comment.id)}
-                        className="text-slate-500 h-auto p-0 hover:bg-transparent hover:text-slate-800 dark:hover:text-slate-300"
-                      >
-                        <ChevronDown className="w-4 h-4 mr-1" />
-                        {t('view_replies', { count: comment.replyCounts || getReplies(comment.id).length })}
-                      </Button>
-                    ) : (
-                      <>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleReplies(comment.id)}
-                          className="text-slate-500 h-auto p-0 hover:bg-transparent hover:text-slate-800 dark:hover:text-slate-300 mb-2"
-                        >
-                          <ChevronUp className="w-4 h-4 mr-1" />
-                          {t('hide_replies')}
-                        </Button>
-
-                        {getReplies(comment.id).map((reply) => (
-                          <div
-                            key={reply.id}
-                            className="bg-slate-100 dark:bg-slate-800 p-3 rounded-lg"
-                          >
-                            <CommentItem
-                              comment={reply}
-                              solutionId={solutionId}
-                              onReplySuccess={handleReplySuccess}
-                              onUpdate={handleUpdateComment}
-                              onDelete={handleDeleteComment}
-                            />
-                          </div>
-                        ))}
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              {t('previous')}
+            </Button>
+            <span className="text-sm text-slate-600 dark:text-slate-400">
+              {t('page_of', { current: currentPage, total: totalPages })}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+            >
+              {t('next')}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

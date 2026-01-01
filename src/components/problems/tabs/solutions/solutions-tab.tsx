@@ -14,7 +14,7 @@ export default function SolutionsTab({ problemId }: SolutionsTabProps) {
   const {
     solutions,
     isLoading,
-    pageInfo,
+    meta,
     filters,
     keyword,
     sortBy,
@@ -52,7 +52,7 @@ export default function SolutionsTab({ problemId }: SolutionsTabProps) {
         onSelect={(id) => {
           router.push(`${pathname}/${id}`);
         }}
-        hasMore={pageInfo?.hasNextPage || false}
+        hasMore={meta?.hasNextPage || false}
         onLoadMore={handleLoadMore}
         isLoading={isLoading}
       />

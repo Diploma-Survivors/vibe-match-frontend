@@ -191,7 +191,7 @@ export default function SubmissionDetail({
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">
                 <div className="text-xs text-slate-500 uppercase">{t('runtime')}</div>
                 <div className="text-xl font-semibold">
-                  {formatRuntime(submission.executionTime / 1000)}
+                  {formatRuntime(submission.executionTime)}
                 </div>
               </div>
               <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-5">

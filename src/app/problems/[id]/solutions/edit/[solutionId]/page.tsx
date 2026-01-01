@@ -13,11 +13,14 @@ import { toastService } from '@/services/toasts-service';
 import type { Solution } from '@/types/solutions';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function EditSolutionPage() {
+  const { t } = useTranslation('problems');
   const params = useParams();
   const router = useRouter();
-  const problemId = params.id as string;
+  const problemIdString = params.id as string;
+  const problemId = parseInt(problemIdString);
   const solutionId = params.solutionId as string;
 
   const { confirm } = useDialog();
@@ -38,7 +41,8 @@ export default function EditSolutionPage() {
       if (!solutionId) return;
 
       try {
-        const solution = await SolutionsService.getSolutionDetail(solutionId);
+        const response = await SolutionsService.getSolutionDetail(solutionId);
+        const solution = response.data.data;
         setOriginalSolution(solution);
         setTitle(solution.title);
         setContent(solution.content);
@@ -46,7 +50,7 @@ export default function EditSolutionPage() {
         setSelectedLanguages(solution.languageIds);
       } catch (error) {
         console.error('Error fetching solution:', error);
-        toastService.error('Không thể tải thông tin giải pháp');
+        toastService.error(t('load_solution_failed'));
         router.push(`/problems/${problemId}/solutions`);
       } finally {
         setIsLoading(false);
@@ -54,15 +58,15 @@ export default function EditSolutionPage() {
     };
 
     fetchSolution();
-  }, [problemId, solutionId, router]);
+  }, [problemId, solutionId, router, t]);
 
   const handleReset = async () => {
     if (originalSolution) {
       const result = await confirm({
-        title: 'Reset thay đổi',
-        message: 'Bạn có muốn reset về nội dung ban đầu không?',
-        confirmText: 'Tiếp tục',
-        cancelText: 'Hủy',
+        title: t('reset_changes_title'),
+        message: t('reset_changes_message'),
+        confirmText: t('continue'),
+        cancelText: t('cancel'),
         color: 'red',
       });
       if (!result) return;
@@ -76,11 +80,11 @@ export default function EditSolutionPage() {
 
   const handleUpdate = async () => {
     if (!title.trim()) {
-      toastService.error('Hãy nhập tiêu đề cho solution');
+      toastService.error(t('enter_solution_title_error'));
       return;
     }
     if (!content.trim()) {
-      toastService.error('Hãy nhập nội dung cho solution');
+      toastService.error(t('enter_solution_content_error'));
       return;
     }
     if (!originalSolution) return;
@@ -94,22 +98,21 @@ export default function EditSolutionPage() {
         languageIds: selectedLanguages,
       });
 
-      toastService.success('Cập nhật solution thành công');
+      toastService.success(t('update_solution_success'));
       // Navigate back to solutions tab
       router.push(`/problems/${problemId}/solutions`);
     } catch (error) {
       console.error('Error updating solution:', error);
-      toastService.error('Cập nhật solution thất bại');
+      toastService.error(t('update_solution_failed'));
     }
   };
 
   const handleCancel = async () => {
     const result = await confirm({
-      title: 'Hủy chỉnh sửa',
-      message:
-        'Bạn có muốn hủy chỉnh sửa không? Các thay đổi sẽ không được lưu.',
-      confirmText: 'Tiếp tục',
-      cancelText: 'Hủy',
+      title: t('cancel_edit_title'),
+      message: t('cancel_edit_message'),
+      confirmText: t('continue'),
+      cancelText: t('cancel'),
       color: 'red',
     });
     if (!result) return;
@@ -123,14 +126,14 @@ export default function EditSolutionPage() {
 
   return (
     <div className="h-[calc(100vh-65px)] bg-white dark:bg-slate-950 flex flex-col overflow-hidden">
-      <div className="max-w-screen-2xl mx-auto w-full px-4 flex flex-col h-full">
+      <div className="max-w-screen-2xl mx-auto w-full px-20 flex flex-col h-full">
         <CreateSolutionHeader
           title={title}
           setTitle={setTitle}
           onPost={handleUpdate}
           onCancel={handleCancel}
           onReset={handleReset}
-          submitLabel="Cập nhật solution"
+          submitLabel={t('update_solution')}
         />
 
         <div className="py-2 space-y-4 flex-1 flex flex-col overflow-hidden">

@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Tooltip } from '@/components/ui/tooltip';
+import { useProblemDetail } from '@/contexts/problem-detail-context';
 import { LanguagesService } from '@/services/languages';
 import { SubmissionsService } from '@/services/submissions-service';
 import { TagsService } from '@/services/tags-service';
@@ -26,6 +27,8 @@ import {
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ProblemStats from '../../problems-stats/problem-stats';
+import { ProblemStatus } from '@/types/problems';
 
 interface SolutionFilterProps {
   keyword: string;
@@ -60,6 +63,7 @@ export default function SolutionFilter({
   const [languages, setLanguages] = useState<Language[]>([]);
   const [showAllTags, setShowAllTags] = useState(false);
   const [showAllLangs, setShowAllLangs] = useState(false);
+  const { problem } = useProblemDetail();
 
   useEffect(() => {
     TagsService.getAllTags().then(setTags);
@@ -104,7 +108,7 @@ export default function SolutionFilter({
           />
         </div>
 
-        {submissionId && problemId && (
+        {problem?.status === ProblemStatus.SOLVED && (
           <Tooltip content={t('share_solution')}>
             <Link
               href={`/problems/${problemId}/solutions/create/${submissionId}`}
@@ -161,8 +165,8 @@ export default function SolutionFilter({
                   key={lang.id}
                   onClick={() => toggleLang(lang.id)}
                   className={`px-3 py-1 cursor-pointer rounded-full text-xs font-medium transition-colors border ${selectedLanguages.includes(lang.id)
-                      ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
-                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                    ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
+                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
                     }`}
                 >
                   {lang.name}
@@ -173,7 +177,7 @@ export default function SolutionFilter({
                   onClick={() => setShowAllLangs(!showAllLangs)}
                   className="text-xs cursor-pointer text-blue-600 dark:text-blue-400 hover:underline px-2"
                 >
-                  {showAllLangs ? 'Thu gọn' : 'Xem thêm'}
+                  {showAllLangs ? t('show_less') : t('show_more')}
                 </button>
               )}
             </div>
@@ -184,7 +188,7 @@ export default function SolutionFilter({
           {/* Tags */}
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Tags
+              {t('tags')}
             </h4>
             <div className="flex flex-wrap gap-2">
               {displayedTags.map((tag) => (
@@ -192,8 +196,8 @@ export default function SolutionFilter({
                   key={tag.id}
                   onClick={() => toggleTag(tag.id)}
                   className={`px-3 cursor-pointer py-1 rounded-full text-xs font-medium transition-colors border ${selectedTags.includes(tag.id)
-                      ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800'
-                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                    ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800'
+                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
                     }`}
                 >
                   {tag.name}
@@ -204,7 +208,7 @@ export default function SolutionFilter({
                   onClick={() => setShowAllTags(!showAllTags)}
                   className="text-xs text-blue-600 dark:text-blue-400 hover:underline px-2"
                 >
-                  {showAllTags ? 'Thu gọn' : 'Xem thêm'}
+                  {showAllTags ? t('show_less') : t('show_more')}
                 </button>
               )}
             </div>

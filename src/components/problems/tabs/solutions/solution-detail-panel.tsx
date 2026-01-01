@@ -11,13 +11,14 @@ import { LanguagesService } from '@/services/languages';
 import { SolutionsService } from '@/services/solutions-service';
 import { SubmissionsService } from '@/services/submissions-service';
 import type { Solution } from '@/types/solutions';
+import { SolutionVoteType } from '@/types/solutions';
 import type { Language } from '@/types/submissions';
-import { formatDistanceToNow } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import { format } from 'date-fns';
 import { ArrowBigDown, ArrowBigUp, Pencil, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import CommentSection from './comments/comment-section';
 
 interface SolutionDetailPanelProps {
@@ -29,6 +30,7 @@ export default function SolutionDetailPanel({
   solution: initialSolution,
   onDelete,
 }: SolutionDetailPanelProps) {
+  const { t } = useTranslation('problems');
   const { user } = useApp();
   const { confirm } = useDialog();
   const router = useRouter();
@@ -54,33 +56,33 @@ export default function SolutionDetailPanel({
     solution.languageIds.includes(l.id)
   );
 
-  const handleVote = async (type: 'up_vote' | 'down_vote') => {
+  const handleVote = async (type: SolutionVoteType) => {
     try {
-      if (solution.myVote === type) {
+      if (solution.userVote === type) {
         await SolutionsService.unreactSolution(solution.id);
         setSolution((prev) => ({
           ...prev,
-          myVote: null,
+          userVote: null,
           upvoteCount:
-            type === 'up_vote' ? prev.upvoteCount - 1 : prev.upvoteCount,
+            type === SolutionVoteType.UPVOTE ? prev.upvoteCount - 1 : prev.upvoteCount,
           downvoteCount:
-            type === 'down_vote' ? prev.downvoteCount - 1 : prev.downvoteCount,
+            type === SolutionVoteType.DOWNVOTE ? prev.downvoteCount - 1 : prev.downvoteCount,
         }));
       } else {
         await SolutionsService.reactSolution(solution.id, type);
         setSolution((prev) => ({
           ...prev,
-          myVote: type,
+          userVote: type,
           upvoteCount:
-            type === 'up_vote'
+            type === SolutionVoteType.UPVOTE
               ? prev.upvoteCount + 1
-              : prev.myVote === 'up_vote'
+              : prev.userVote === SolutionVoteType.UPVOTE
                 ? prev.upvoteCount - 1
                 : prev.upvoteCount,
           downvoteCount:
-            type === 'down_vote'
+            type === SolutionVoteType.DOWNVOTE
               ? prev.downvoteCount + 1
-              : prev.myVote === 'down_vote'
+              : prev.userVote === SolutionVoteType.DOWNVOTE
                 ? prev.downvoteCount - 1
                 : prev.downvoteCount,
         }));
@@ -92,11 +94,10 @@ export default function SolutionDetailPanel({
 
   const handleDelete = async () => {
     const result = await confirm({
-      title: 'Xóa giải pháp',
-      message:
-        'Bạn có chắc chắn muốn xóa giải pháp này không? Hành động này không thể hoàn tác.',
-      confirmText: 'Xóa',
-      cancelText: 'Hủy',
+      title: t('delete_solution_confirm_title'),
+      message: t('delete_solution_confirm_message'),
+      confirmText: t('delete_solution'),
+      cancelText: t('cancel_action'),
       color: 'red',
     });
 
@@ -114,36 +115,7 @@ export default function SolutionDetailPanel({
     <div className="h-full overflow-y-auto p-6 space-y-6">
       {/* Header */}
       <div className="space-y-4">
-        <div className="flex items-start justify-between gap-4">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            {solution.title}
-          </h1>
 
-          {isAuthor && (
-            <div className="flex items-center gap-2 shrink-0">
-              <Tooltip content="Sửa">
-                <Link
-                  href={`/problems/${params.id}/solutions/edit/${solution.id}`}
-                  target="_blank"
-                >
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                </Link>
-              </Tooltip>
-              <Tooltip content="Xóa">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleDelete}
-                  className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </Tooltip>
-            </div>
-          )}
-        </div>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -153,35 +125,61 @@ export default function SolutionDetailPanel({
             >
               <AvatarImage src={solution.author?.avatarUrl} />
               <AvatarFallback>
-                {solution.author?.firstName?.[0]}
-                {solution.author?.lastName?.[0]}
+                <img
+                  src="/avatars/placeholder.png"
+                  alt={solution.author?.username || t('user_fallback')}
+                  className="w-full h-full object-cover"
+                />
               </AvatarFallback>
             </Avatar>
             <div>
               <div className="font-semibold text-slate-900 dark:text-slate-200">
-                {solution.author?.firstName} {solution.author?.lastName}
+                {solution.author?.username}
               </div>
               <div className="text-xs text-slate-500 dark:text-slate-400">
-                {formatDistanceToNow(new Date(solution.createdAt), {
-                  addSuffix: true,
-                  locale: vi,
-                })}
+                {solution.createdAt
+                  ? format(new Date(solution.createdAt), 'dd/MM/yyyy HH:mm')
+                  : ''}
               </div>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
+            {isAuthor && (
+              <div className="flex items-center gap-2 shrink-0 mr-2">
+                <Tooltip content={t('edit_solution')}>
+                  <Link
+                    href={`/problems/${params.id}/solutions/edit/${solution.id}`}
+                    target="_blank"
+                  >
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                </Tooltip>
+                <Tooltip content={t('delete_solution')}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleDelete}
+                    className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </Tooltip>
+              </div>
+            )}
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleVote('up_vote')}
-              className={`gap-2 ${solution.myVote === 'up_vote'
+              onClick={() => handleVote(SolutionVoteType.UPVOTE)}
+              className={`gap-2 ${solution.userVote === SolutionVoteType.UPVOTE
                 ? 'bg-green-50 text-green-600 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800'
                 : ''
                 }`}
             >
               <ArrowBigUp
-                className={`w-5 h-5 ${solution.myVote === 'up_vote' ? 'fill-current' : ''
+                className={`w-5 h-5 ${solution.userVote === SolutionVoteType.UPVOTE ? 'fill-current' : ''
                   }`}
               />
               {solution.upvoteCount}
@@ -189,14 +187,14 @@ export default function SolutionDetailPanel({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => handleVote('down_vote')}
-              className={`gap-2 ${solution.myVote === 'down_vote'
+              onClick={() => handleVote(SolutionVoteType.DOWNVOTE)}
+              className={`gap-2 ${solution.userVote === SolutionVoteType.DOWNVOTE
                 ? 'bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800'
                 : ''
                 }`}
             >
               <ArrowBigDown
-                className={`w-5 h-5 ${solution.myVote === 'down_vote' ? 'fill-current' : ''
+                className={`w-5 h-5 ${solution.userVote === SolutionVoteType.DOWNVOTE ? 'fill-current' : ''
                   }`}
               />
               {solution.downvoteCount}

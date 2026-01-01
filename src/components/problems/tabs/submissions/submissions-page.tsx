@@ -20,7 +20,6 @@ export default function SubmissionsPage({
   // Data fetching hook
   const {
     submissions,
-    pageInfo,
     totalCount,
     isLoading,
     error,
@@ -53,7 +52,7 @@ export default function SubmissionsPage({
         onSelectSubmission={(s) => handleSelectSubmission(s)}
         filters={filters}
         onFilterChange={handleFiltersChange}
-        hasMore={pageInfo?.hasNextPage ?? false}
+        hasMore={false}
         onLoadMore={handleLoadMore}
         isLoading={isLoading}
         totalCount={totalCount}

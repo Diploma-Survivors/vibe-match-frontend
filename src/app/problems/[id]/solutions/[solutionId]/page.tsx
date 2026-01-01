@@ -16,15 +16,15 @@ export default function SolutionDetailPage() {
   const router = useRouter();
   const solutionId = params.solutionId as string;
   const problemId = params.id as string;
-  
+
   const [solution, setSolution] = useState<Solution | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSolution = async () => {
       try {
-        const data = await SolutionsService.getSolutionDetail(solutionId);
-        setSolution(data);
+        const response = await SolutionsService.getSolutionDetail(solutionId);
+        setSolution(response.data.data);
       } catch (error) {
         console.error('Failed to fetch solution', error);
       } finally {
@@ -51,9 +51,9 @@ export default function SolutionDetailPage() {
   return (
     <div className="flex flex-col h-full bg-card">
       <div className="p-4 border-b border-border flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => router.push(`/problems/${problemId}/solutions`)}
           className="gap-2 text-muted-foreground hover:text-foreground"
         >
@@ -63,9 +63,9 @@ export default function SolutionDetailPage() {
         <h2 className="font-semibold text-foreground truncate">{solution.title}</h2>
       </div>
       <div className="flex-1 overflow-y-auto">
-        <SolutionDetailPanel 
-          solution={solution} 
-          onDelete={() => router.push(`/problems/${problemId}/solutions`)} 
+        <SolutionDetailPanel
+          solution={solution}
+          onDelete={() => router.push(`/problems/${problemId}/solutions`)}
         />
       </div>
     </div>

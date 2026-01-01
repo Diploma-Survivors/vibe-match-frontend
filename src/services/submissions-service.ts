@@ -58,13 +58,13 @@ async function getSubmissionList(
   contestParticipationId?: number
 ) {
   const { filters, ...rest } = submissionListRequest;
-    const queryString = qs.stringify(
-      { ...rest, ...filters },
-      {
-        allowDots: true,
-        skipNulls: true,
-      }
-    );
+  const queryString = qs.stringify(
+    { ...rest, ...filters },
+    {
+      allowDots: true,
+      skipNulls: true,
+    }
+  );
   let url = '';
   if (contestParticipationId) {
     url = queryString
@@ -75,20 +75,12 @@ async function getSubmissionList(
       ? `/submissions/problem/${problemId}?${queryString}`
       : `/submissions/problem/${problemId}`;
   }
-  
-  try {
-    return await clientApi.get<ApiResponse<SubmissionListResponse>>(url);
-  } catch (error) {
-    console.error('Error fetching submissions:', error);
-  }
+
+  return await clientApi.get<ApiResponse<SubmissionListResponse>>(url);
 }
 
 async function getSubmissionById(submissionId: string) {
-  try {
-    return await clientApi.get<ApiResponse<Submission>>(`/submissions/${submissionId}`);
-  } catch (error) {
-    console.error('Error fetching submission:', error);
-  }
+  return await clientApi.get<ApiResponse<Submission>>(`/submissions/${submissionId}`);
 }
 
 async function getAllSubmissions(

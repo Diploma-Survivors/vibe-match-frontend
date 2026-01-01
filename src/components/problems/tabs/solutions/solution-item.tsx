@@ -3,12 +3,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LanguagesService } from '@/services/languages';
 import { SubmissionsService } from '@/services/submissions-service';
-import type { Solution } from '@/types/solutions';
+import { type Solution, SolutionVoteType } from '@/types/solutions';
 import type { Language } from '@/types/submissions';
 import { formatDistanceToNow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { ArrowBigDown, ArrowBigUp, MessageSquare } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SolutionItemProps {
   solution: Solution;
@@ -21,6 +22,7 @@ export default function SolutionItem({
   isSelected,
   onClick,
 }: SolutionItemProps) {
+  const { t } = useTranslation('problems');
   const [languages, setLanguages] = useState<Language[]>([]);
 
   useEffect(() => {
@@ -47,15 +49,18 @@ export default function SolutionItem({
         >
           <AvatarImage src={solution.author?.avatarUrl} />
           <AvatarFallback>
-            {solution.author?.firstName?.[0]}
-            {solution.author?.lastName?.[0]}
+            <img
+              src="/avatars/placeholder.png"
+              alt={solution.author?.username || t('user_fallback')}
+              className="w-full h-full object-cover"
+            />
           </AvatarFallback>
         </Avatar>
 
         <div className="flex-1 min-w-0 space-y-1">
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
             <span className="font-medium text-slate-900 dark:text-slate-200">
-              {solution.author?.firstName} {solution.author?.lastName}
+              {solution.author?.username}
             </span>
             <span>•</span>
             <span>
@@ -93,18 +98,18 @@ export default function SolutionItem({
           <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 pt-1">
             <div className="flex items-center gap-1">
               <ArrowBigUp
-                className={`w-4 h-4 ${solution.myVote === 'up_vote'
-                    ? 'fill-green-500 text-green-500'
-                    : ''
+                className={`w-4 h-4 ${solution.userVote === SolutionVoteType.UPVOTE
+                  ? 'fill-green-500 text-green-500'
+                  : ''
                   }`}
               />
               <span>{solution.upvoteCount}</span>
             </div>
             <div className="flex items-center gap-1">
               <ArrowBigDown
-                className={`w-4 h-4 ${solution.myVote === 'down_vote'
-                    ? 'fill-red-500 text-red-500'
-                    : ''
+                className={`w-4 h-4 ${solution.userVote === SolutionVoteType.DOWNVOTE
+                  ? 'fill-red-500 text-red-500'
+                  : ''
                   }`}
               />
               <span>{solution.downvoteCount}</span>
