@@ -10,6 +10,7 @@ import { ContestsService } from '@/services/contests-service';
 import { LanguagesService } from '@/services/languages';
 import { SolutionsService } from '@/services/solutions-service';
 import { SubmissionsService } from '@/services/submissions-service';
+import { toastService } from '@/services/toasts-service';
 import type { Solution } from '@/types/solutions';
 import { SolutionVoteType } from '@/types/solutions';
 import type { Language } from '@/types/submissions';
@@ -56,7 +57,19 @@ export default function SolutionDetailPanel({
     solution.languageIds.includes(l.id)
   );
 
+  const { isLoggedin, isEmailVerified } = useApp();
+  const { t: tCommon } = useTranslation('common');
+
   const handleVote = async (type: SolutionVoteType) => {
+    if (!isLoggedin) {
+      toastService.error(tCommon('login_required_action'));
+      return;
+    }
+    if (!isEmailVerified) {
+      toastService.error(tCommon('email_verification_required_action'));
+      return;
+    }
+
     try {
       if (solution.userVote === type) {
         await SolutionsService.unreactSolution(solution.id);

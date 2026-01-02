@@ -102,5 +102,22 @@
     "MEMORY_LIMIT_EXCEEDED": "Quá giới hạn bộ nhớ",
     "OUTPUT_LIMIT_EXCEEDED": "Quá giới hạn đầu ra",
     "ascending": "Tăng dần",
-    "descending": "Giảm dần"
+    "descending": "Giảm dần",
+    "basic_info": "Thông tin cơ bản",
+    "email_not_verified": "Email chưa được xác nhận",
+    "resend_verification_email": "Gửi lại email xác nhận",
+    "username": "Tên người dùng",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "confirm_password": "Xác nhận mật khẩu",
+    "change_password": "Thay đổi mật khẩu",
+    "email_not_verified_warning": "Email của bạn chưa được xác nhận. Vui lòng xác nhận email của bạn để tiếp tục.",
+    "current_password": "Mật khẩu hiện tại",
+    "change_password_description": "Thay đổi mật khẩu của bạn tại đây. Nhấn lưu khi bạn hoàn tất.",
+    "passwords_do_not_match": "Mật khẩu không khớp",
+    "password_changed_successfully": "Đổi mật khẩu thành công",
+    "failed_to_change_password": "Đổi mật khẩu thất bại",
+    "new_password": "Mật khẩu mới",
+    "confirm_new_password": "Xác nhận mật khẩu mới",
+    "password_requirements": "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt."
 }

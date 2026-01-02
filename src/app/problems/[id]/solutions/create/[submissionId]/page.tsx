@@ -8,6 +8,7 @@ import EditorSplitPane, {
 import MarkdownToolbar from '@/components/problems/tabs/solutions/create/markdown-toolbar';
 import TagLanguageSelector from '@/components/problems/tabs/solutions/create/tag-language-selector';
 import { useDialog } from '@/components/providers/dialog-provider';
+import { useApp } from '@/contexts/app-context';
 import { SolutionsService } from '@/services/solutions-service';
 import { SubmissionsService } from '@/services/submissions-service';
 import { toastService } from '@/services/toasts-service';
@@ -142,7 +143,19 @@ export default function CreateSolutionPage() {
     }
   };
 
+  const { isLoggedin, isEmailVerified } = useApp();
+  const { t: tCommon } = useTranslation('common');
+
   const handlePost = async () => {
+    if (!isLoggedin) {
+      toastService.error(tCommon('login_required_action'));
+      return;
+    }
+    if (!isEmailVerified) {
+      toastService.error(tCommon('email_verification_required_action'));
+      return;
+    }
+
     if (!title.trim()) {
       toastService.error(t('enter_solution_title_error'));
       return;

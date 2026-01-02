@@ -1,6 +1,7 @@
 import type React from 'react';
 import './globals.css';
 import './styles/editor-theme.css';
+import { EmailVerificationBanner } from '@/components/email-verification-banner';
 import { ConditionalLayout } from '@/components/layout';
 import { ServerProvider } from '@/components/providers/server-provider';
 import { AppProvider } from '@/contexts/app-context';
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans`}>
         <ServerProvider>
+          <EmailVerificationBanner />
           <ConditionalLayout>{children}</ConditionalLayout>
         </ServerProvider>
       </body>

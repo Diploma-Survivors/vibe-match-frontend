@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { ForgotPasswordModal } from '@/components/auth/forgot-password-modal';
 import {
   Card,
   CardContent,
@@ -10,6 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/ui/password-input';
 import clientApi from '@/lib/apis/axios-client';
 import { toastService } from '@/services/toasts-service';
 import { signIn } from 'next-auth/react';
@@ -21,6 +23,7 @@ import { FcGoogle } from 'react-icons/fc';
 export default function LoginPage() {
   const { t } = useTranslation('auth');
   const [isSignUp, setIsSignUp] = useState(false);
+  const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
@@ -149,24 +152,33 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Input
+              <PasswordInput
                 id="password"
                 name="password"
                 placeholder={t('password')}
-                type="password"
                 autoComplete={isSignUp ? 'new-password' : 'current-password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
+            {!isSignUp && (
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setIsForgotPasswordModalOpen(true)}
+                  className="text-sm text-primary hover:underline"
+                >
+                  {t('forgot_password')}?
+                </button>
+              </div>
+            )}
             {isSignUp && (
               <div className="space-y-2">
-                <Input
+                <PasswordInput
                   id="confirm-password"
                   name="confirmPassword"
                   placeholder={t('confirm_password')}
-                  type="password"
                   autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
@@ -214,6 +226,10 @@ export default function LoginPage() {
           </div>
         </CardFooter>
       </Card>
+      <ForgotPasswordModal
+        isOpen={isForgotPasswordModalOpen}
+        onClose={() => setIsForgotPasswordModalOpen(false)}
+      />
     </div>
   );
 }

@@ -16,6 +16,8 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
+import { useApp } from '@/contexts/app-context';
+import { useTranslation } from 'react-i18next';
 
 interface EditorPanelProps {
   height: number;
@@ -48,6 +50,8 @@ export function EditorPanel({
   const dispatch = useDispatch();
   const workspace = useSelector(selectWorkspace);
   const problem = useSelector(selectProblem);
+  const { isLoggedin, isEmailVerified } = useApp();
+  const { t: tCommon } = useTranslation('common');
 
   const currentLanguageId = workspace?.currentLanguage?.[problem.id] ?? 46;
   const currentCode =
@@ -75,7 +79,7 @@ export function EditorPanel({
   const onCurrentCodeChange = (code: string) => {
     dispatch(
       updateCurrentCode({
-        problemId: problem.id.toString(),
+        problemId: problem.id,
         languageId: currentLanguageId,
         code,
       })
@@ -98,6 +102,18 @@ export function EditorPanel({
         </div>
 
         <div className="flex items-center justify-between px-4 py-3 border-t border-border bg-muted/30 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            {(!isLoggedin || !isEmailVerified) && (
+              <div className="flex items-center gap-2 text-xs text-yellow-600 dark:text-yellow-500 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded border border-yellow-200 dark:border-yellow-800">
+                <AlertCircle className="w-3.5 h-3.5" />
+                <span>
+                  {!isLoggedin
+                    ? tCommon('login_required_action')
+                    : tCommon('email_verification_required_action')}
+                </span>
+              </div>
+            )}
+          </div>
 
           <div className="flex ml-auto items-center gap-3">
             <Button

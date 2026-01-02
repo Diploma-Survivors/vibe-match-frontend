@@ -9,10 +9,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Tooltip } from '@/components/ui/tooltip';
+import { useApp } from '@/contexts/app-context';
 import { useProblemDetail } from '@/contexts/problem-detail-context';
 import { LanguagesService } from '@/services/languages';
 import { SubmissionsService } from '@/services/submissions-service';
 import { TagsService } from '@/services/tags-service';
+import { toastService } from '@/services/toasts-service';
 import { SolutionSortBy } from '@/types/solutions';
 import type { Language } from '@/types/submissions';
 import type { Tag } from '@/types/tags';
@@ -64,6 +66,8 @@ export default function SolutionFilter({
   const [showAllTags, setShowAllTags] = useState(false);
   const [showAllLangs, setShowAllLangs] = useState(false);
   const { problem } = useProblemDetail();
+  const { isLoggedin, isEmailVerified } = useApp();
+  const { t: tCommon } = useTranslation('common');
 
   useEffect(() => {
     TagsService.getAllTags().then(setTags);
@@ -110,14 +114,27 @@ export default function SolutionFilter({
 
         {problem?.status === ProblemStatus.SOLVED && (
           <Tooltip content={t('share_solution')}>
-            <Link
-              href={`/problems/${problemId}/solutions/create/${submissionId}`}
-              target="_blank"
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 w-9 p-0"
+              onClick={() => {
+                if (!isLoggedin) {
+                  toastService.error(tCommon('login_required_action'));
+                  return;
+                }
+                if (!isEmailVerified) {
+                  toastService.error(tCommon('email_verification_required_action'));
+                  return;
+                }
+                window.open(
+                  `/problems/${problemId}/solutions/create/${submissionId}`,
+                  '_blank'
+                );
+              }}
             >
-              <Button variant="outline" size="sm" className="h-9 w-9 p-0">
-                <PenSquare className="w-4 h-4" />
-              </Button>
-            </Link>
+              <PenSquare className="w-4 h-4" />
+            </Button>
           </Tooltip>
         )}
 

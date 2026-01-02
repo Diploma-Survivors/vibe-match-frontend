@@ -102,5 +102,22 @@
     "MEMORY_LIMIT_EXCEEDED": "Memory Limit Exceeded",
     "OUTPUT_LIMIT_EXCEEDED": "Output Limit Exceeded",
     "ascending": "Ascending",
-    "descending": "Descending"
+    "descending": "Descending",
+    "basic_info": "Basic Info",
+    "email_not_verified": "Email not verified",
+    "resend_verification_email": "Resend verification email",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "change_password": "Change Password",
+    "email_not_verified_warning": "Your email address has not been verified. Please verify your email address to continue.",
+    "current_password": "Current Password",
+    "change_password_description": "Make changes to your password here. Click save when you're done.",
+    "passwords_do_not_match": "Passwords do not match",
+    "password_changed_successfully": "Password changed successfully",
+    "failed_to_change_password": "Failed to change password",
+    "new_password": "New Password",
+    "confirm_new_password": "Confirm New Password",
+    "password_requirements": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
 }

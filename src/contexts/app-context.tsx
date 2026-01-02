@@ -23,6 +23,9 @@ interface AppContextType {
   user?: UserProfile;
   shouldHideNavigation: boolean;
   isLoading: boolean;
+  isLoggedin: boolean;
+  isPrenium: boolean;
+  isEmailVerified: boolean;
   clearUserData: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -38,10 +41,15 @@ export function AppProvider({
 }: AppProviderProps) {
   const { i18n } = useTranslation();
   const [user, setUser] = useState<UserProfile>();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!decodedAccessToken);
 
   const pathname = usePathname();
-  const shouldHideNavigation = pathname === '/login';
+  // const shouldHideNavigation = pathname === '/login';
+  const shouldHideNavigation = false;
+
+  const isLoggedin = !!decodedAccessToken;
+  const isPrenium = user?.isPremium || false;
+  const isEmailVerified = user?.emailVerified || false;
 
   const clearUserData = () => {
     setUser(undefined);
@@ -58,17 +66,6 @@ export function AppProvider({
       }
     } catch (error) {
       console.error('Failed to fetch user data:', error);
-      // Fallback to mock user on error for UI testing
-      setUser({
-        id: 'mock-user-id',
-        username: 'ui-tester',
-        email: 'tester@sfinx.com',
-        firstName: 'UI',
-        lastName: 'Tester',
-        role: 'USER',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      } as any);
     }
   };
 
@@ -79,21 +76,6 @@ export function AppProvider({
   };
 
   useEffect(() => {
-    // Mock user for UI testing
-    if (!decodedAccessToken) {
-      setUser({
-        id: 'mock-user-id',
-        username: 'ui-tester',
-        email: 'tester@sfinx.com',
-        firstName: 'UI',
-        lastName: 'Tester',
-        role: 'USER',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      } as any);
-      return;
-    }
-
     if (decodedAccessToken) {
       setIsLoading(true);
       fetchUser().finally(() => setIsLoading(false));
@@ -104,6 +86,9 @@ export function AppProvider({
     user,
     shouldHideNavigation,
     isLoading,
+    isLoggedin,
+    isPrenium,
+    isEmailVerified,
     clearUserData,
     refreshUser,
   };

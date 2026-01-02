@@ -5,6 +5,8 @@ import type { SubmissionRequest } from '@/types/submissions';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import { useApp } from '@/contexts/app-context';
+import { toastService } from '@/services/toasts-service';
 
 export function useCodeExecution() {
   const { t } = useTranslation('problems');
@@ -27,6 +29,21 @@ export function useCodeExecution() {
     };
   }, []);
 
+  const { isLoggedin, isEmailVerified } = useApp();
+  const { t: tCommon } = useTranslation('common');
+
+  const checkPermission = useCallback(() => {
+    if (!isLoggedin) {
+      toastService.error(tCommon('login_required_action'));
+      return false;
+    }
+    if (!isEmailVerified) {
+      toastService.error(tCommon('email_verification_required_action'));
+      return false;
+    }
+    return true;
+  }, [isLoggedin, isEmailVerified, tCommon]);
+
   const handleRun = useCallback(
     async (
       sourceCode: string,
@@ -34,6 +51,8 @@ export function useCodeExecution() {
       problemId: number,
       testCases: Array<{ input: string; output: string }>
     ) => {
+      if (!checkPermission()) return;
+
       setIsRunning(true);
       setTestResults(null);
       setRunError(null);
@@ -78,7 +97,7 @@ export function useCodeExecution() {
         setIsRunning(false);
       }
     },
-    []
+    [checkPermission, t]
   );
 
   const handleSubmit = useCallback(
@@ -88,6 +107,8 @@ export function useCodeExecution() {
       problemId: number,
       contestId?: number
     ) => {
+      if (!checkPermission()) return;
+
       setIsSubmitting(true);
       setSubmitResults(null);
 
@@ -145,7 +166,7 @@ export function useCodeExecution() {
         setIsSubmitting(false);
       }
     },
-    [contest.participation?.participationId]
+    [contest.participation?.participationId, checkPermission, t]
   );
 
   return {

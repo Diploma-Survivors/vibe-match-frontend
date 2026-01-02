@@ -29,5 +29,9 @@
     "my_profile": "Hồ sơ của tôi",
     "practice_history": "Lịch sử luyện tập",
     "go_to_login": "Đến trang đăng nhập",
-    "settings": "Cài đặt"
+    "settings": "Cài đặt",
+    "email_not_verified_warning": "Địa chỉ email của bạn chưa được xác minh. Vui lòng xác minh địa chỉ email của bạn để tiếp tục.",
+    "verify_email": "Xác minh email",
+    "email_verification_required_action": "Xác minh địa chỉ email của bạn để tiếp tục.",
+    "login_required_action": "Vui lòng đăng nhập để tiếp tục."
 }

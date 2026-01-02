@@ -8,6 +8,9 @@ import {
 } from '@/types/comments';
 import { useState } from 'react';
 import useSWR from 'swr';
+import { useApp } from '@/contexts/app-context';
+import { toastService } from '@/services/toasts-service';
+import { useTranslation } from 'react-i18next';
 
 export function useComments(problemId: string | number) {
   const [page, setPage] = useState(1);
@@ -104,7 +107,23 @@ export function useComments(problemId: string | number) {
     });
   };
 
+  const { isLoggedin, isEmailVerified } = useApp();
+  const { t: tCommon } = useTranslation('common');
+
+  const checkPermission = () => {
+    if (!isLoggedin) {
+      toastService.error(tCommon('login_required_action'));
+      return false;
+    }
+    if (!isEmailVerified) {
+      toastService.error(tCommon('email_verification_required_action'));
+      return false;
+    }
+    return true;
+  };
+
   const createComment = async (data: CreateProblemCommentRequest) => {
+    if (!checkPermission()) return;
     try {
       const newComment = await commentService.createComment(problemId, data);
       
@@ -141,6 +160,7 @@ export function useComments(problemId: string | number) {
     id: number,
     data: UpdateProblemCommentRequest
   ) => {
+    if (!checkPermission()) return;
     try {
       const updatedComment = await commentService.updateComment(id, data);
       
@@ -164,6 +184,7 @@ export function useComments(problemId: string | number) {
   };
 
   const deleteComment = async (id: number, parentId?: number | null) => {
+    if (!checkPermission()) return;
     try {
       await commentService.deleteComment(id);
       
@@ -200,6 +221,7 @@ export function useComments(problemId: string | number) {
   };
 
   const voteComment = async (id: number, data: VoteProblemCommentRequest) => {
+    if (!checkPermission()) return;
     try {
       // Optimistic update
       await mutate((currentData: any) => {
@@ -241,6 +263,7 @@ export function useComments(problemId: string | number) {
   };
 
   const unvoteComment = async (id: number) => {
+    if (!checkPermission()) return;
     try {
       // Optimistic update
       await mutate((currentData: any) => {
@@ -279,6 +302,7 @@ export function useComments(problemId: string | number) {
     id: number,
     data: ReportProblemCommentRequest
   ) => {
+    if (!checkPermission()) return;
     try {
       await commentService.reportComment(id, data);
     } catch (error) {
