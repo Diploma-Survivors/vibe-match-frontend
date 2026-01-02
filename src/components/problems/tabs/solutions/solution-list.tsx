@@ -3,6 +3,7 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Solution } from '@/types/solutions';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import SolutionItem from './solution-item';
 
@@ -23,6 +24,7 @@ export default function SolutionList({
   onLoadMore,
   isLoading,
 }: SolutionListProps) {
+  const { t } = useTranslation('problems');
   useEffect(() => {
     if (selectedId) {
       const element = document.getElementById(`solution-item-${selectedId}`);
@@ -61,7 +63,7 @@ export default function SolutionList({
   if (solutions.length === 0) {
     return (
       <div className="p-8 text-center text-slate-500">
-        Chưa có solution nào.
+        {t('no_solutions')}
       </div>
     );
   }

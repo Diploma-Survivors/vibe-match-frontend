@@ -1,15 +1,15 @@
-import { INITIAL_PROBLEM, type ProblemDescription } from '@/types/problems';
+import { initialProblemData, type Problem } from '@/types/problems';
 import { type PayloadAction, createSlice } from '@reduxjs/toolkit';
 import type { RootState } from '..';
 
-type ProblemState = ProblemDescription | null;
-const initialState: ProblemState = INITIAL_PROBLEM;
+type ProblemState = Problem | null;
+const initialState: ProblemState = initialProblemData;
 
 const ProblemSlice = createSlice({
   name: 'problem',
   initialState,
   reducers: {
-    setProblem: (state, action: PayloadAction<ProblemDescription>) =>
+    setProblem: (state, action: PayloadAction<Problem>) =>
       action.payload,
   },
 });

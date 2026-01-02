@@ -13,6 +13,7 @@ import type { Language } from '@/types/submissions';
 import type { Tag } from '@/types/tags';
 import { Plus, Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface TagLanguageSelectorProps {
   selectedTags: number[];
@@ -27,6 +28,7 @@ export default function TagLanguageSelector({
   selectedLanguages,
   onLanguagesChange,
 }: TagLanguageSelectorProps) {
+  const { t } = useTranslation('problems');
   const [tags, setTags] = useState<Tag[]>([]);
   const [languages, setLanguages] = useState<Language[]>([]);
   const [tagSearch, setTagSearch] = useState('');
@@ -35,7 +37,7 @@ export default function TagLanguageSelector({
   useEffect(() => {
     TagsService.getAllTags().then(setTags);
     SubmissionsService.getLanguageList().then((res) =>
-      setLanguages(res.data.data)
+      setLanguages(res)
     );
   }, []);
 
@@ -71,25 +73,25 @@ export default function TagLanguageSelector({
     <div className="flex items-center gap-4 mb-2 px-1">
       {/* Tags */}
       <div className="flex items-center gap-2">
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
               size="sm"
-              className="h-8 gap-1 rounded-full"
+              className="h-8 gap-1 rounded-full border-border/60 hover:bg-accent/10 hover:text-accent-foreground transition-colors"
             >
               <Plus className="w-3 h-3" />
-              Tag
+              {t('tag')}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56 p-2" align="start">
             <div className="relative mb-2">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400" />
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
               <Input
                 value={tagSearch}
                 onChange={(e) => setTagSearch(e.target.value)}
-                placeholder="Search tags..."
-                className="h-8 pl-7 text-xs"
+                placeholder={t('search_tags')}
+                className="h-8 pl-7 text-xs bg-muted/30 border-border/50"
               />
             </div>
             <div className="max-h-48 overflow-y-auto space-y-1">
@@ -97,14 +99,14 @@ export default function TagLanguageSelector({
                 <DropdownMenuItem
                   key={tag.id}
                   onClick={() => handleAddTag(tag.id)}
-                  className="text-xs cursor-pointer"
+                  className="text-xs cursor-pointer focus:bg-accent/10 focus:text-accent-foreground"
                 >
                   {tag.name}
                 </DropdownMenuItem>
               ))}
               {filteredTags.length === 0 && (
-                <div className="text-xs text-center text-slate-500 py-2">
-                  No tags found
+                <div className="text-xs text-center text-muted-foreground py-2">
+                  {t('no_tags_found')}
                 </div>
               )}
             </div>
@@ -119,11 +121,11 @@ export default function TagLanguageSelector({
               <Badge
                 key={id}
                 variant="secondary"
-                className="h-8 px-3 rounded-full gap-1 font-normal bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                className="h-8 px-3 rounded-full gap-1 font-normal bg-secondary/50 text-secondary-foreground hover:bg-secondary/70 border border-border/50"
               >
                 {tag.name}
                 <X
-                  className="w-3 h-3 cursor-pointer hover:text-red-500"
+                  className="w-3 h-3 cursor-pointer hover:text-destructive transition-colors"
                   onClick={() => handleRemoveTag(id)}
                 />
               </Badge>
@@ -132,29 +134,29 @@ export default function TagLanguageSelector({
         </div>
       </div>
 
-      <div className="h-6 w-px bg-slate-200 dark:bg-slate-800" />
+      <div className="h-6 w-px bg-border" />
 
       {/* Languages */}
       <div className="flex items-center gap-2">
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
               size="sm"
-              className="h-8 gap-1 rounded-full"
+              className="h-8 gap-1 rounded-full border-border/60 hover:bg-accent/10 hover:text-accent-foreground transition-colors"
             >
               <Plus className="w-3 h-3" />
-              Language
+              {t('language')}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56 p-2" align="start">
             <div className="relative mb-2">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400" />
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-muted-foreground" />
               <Input
                 value={langSearch}
                 onChange={(e) => setLangSearch(e.target.value)}
-                placeholder="Search languages..."
-                className="h-8 pl-7 text-xs"
+                placeholder={t('search_languages')}
+                className="h-8 pl-7 text-xs bg-muted/30 border-border/50"
               />
             </div>
             <div className="max-h-48 overflow-y-auto space-y-1">
@@ -162,14 +164,14 @@ export default function TagLanguageSelector({
                 <DropdownMenuItem
                   key={lang.id}
                   onClick={() => handleAddLang(lang.id)}
-                  className="text-xs cursor-pointer"
+                  className="text-xs cursor-pointer focus:bg-accent/10 focus:text-accent-foreground"
                 >
                   {lang.name}
                 </DropdownMenuItem>
               ))}
               {filteredLangs.length === 0 && (
-                <div className="text-xs text-center text-slate-500 py-2">
-                  No languages found
+                <div className="text-xs text-center text-muted-foreground py-2">
+                  {t('no_languages_found')}
                 </div>
               )}
             </div>
@@ -184,11 +186,11 @@ export default function TagLanguageSelector({
               <Badge
                 key={id}
                 variant="secondary"
-                className="h-8 px-3 rounded-full gap-1 font-normal bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                className="h-8 px-3 rounded-full gap-1 font-normal bg-secondary/50 text-secondary-foreground hover:bg-secondary/70 border border-border/50"
               >
                 {lang.name}
                 <X
-                  className="w-3 h-3 cursor-pointer hover:text-red-500"
+                  className="w-3 h-3 cursor-pointer hover:text-destructive transition-colors"
                   onClick={() => handleRemoveLang(id)}
                 />
               </Badge>

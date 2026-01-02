@@ -1,7 +1,9 @@
-'use client';
-
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 import type { Tag } from '@/types/tags';
-import { useState } from 'react';
+import { Check, CheckCircle2, Search } from 'lucide-react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface TagFilterProps {
   tags: Tag[];
@@ -18,37 +20,53 @@ export default function TagFilter({
   isLoading,
   onTagToggle,
   onClearAll,
-  displayLimit = 3,
 }: TagFilterProps) {
-  const [showAll, setShowAll] = useState(false);
+  const { t } = useTranslation('problems');
+  const [search, setSearch] = useState('');
 
-  const displayedTags = showAll ? tags : tags.slice(0, displayLimit);
+  const filteredTags = tags.filter((tag) =>
+    tag.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-          Lựa chọn tag:
+        <label className="block text-sm font-semibold text-foreground">
+          {t('select_tags')}:
         </label>
         {selectedTagIds.length > 0 && (
           <button
             type="button"
             onClick={onClearAll}
-            className="cursor-pointer text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 font-medium transition-colors"
+            className="cursor-pointer text-xs text-destructive hover:underline font-medium transition-colors"
           >
-            Xóa tất cả ({selectedTagIds.length})
+            {t('clear_all')} ({selectedTagIds.length})
           </button>
         )}
       </div>
 
+      <div className="relative">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+        <Input
+          placeholder={t('search_tags')}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="h-8 pl-8 text-xs bg-background"
+        />
+      </div>
+
       {isLoading ? (
-        <div className="p-4 text-center text-sm text-slate-500">
-          Đang tải...
+        <div className="p-4 text-center text-sm text-muted-foreground">
+          {t('loading')}
         </div>
       ) : (
-        <>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {displayedTags.map((tag) => {
+        <div className="flex flex-col gap-1 max-h-64 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-border">
+          {filteredTags.length === 0 ? (
+            <div className="text-xs text-muted-foreground text-center py-2">
+              {t('no_tags_found')}
+            </div>
+          ) : (
+            filteredTags.map((tag) => {
               const isSelected = selectedTagIds.includes(tag.id);
 
               return (
@@ -56,34 +74,31 @@ export default function TagFilter({
                   key={tag.id}
                   type="button"
                   onClick={() => onTagToggle(tag.id, isSelected)}
-                  className={`
-                    cursor-pointer font-medium px-3 py-1 rounded-lg border text-xs inline-block
-                    transition-all duration-200 hover:scale-105 hover:shadow-md
-                    ${
-                      isSelected
-                        ? 'bg-green-100 text-slate-700 border-2 border-slate-400 dark:bg-slate-600 dark:text-slate-200 dark:border-slate-500 shadow-sm'
-                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300 dark:bg-slate-700/50 dark:text-slate-400 dark:border-slate-600 dark:hover:border-slate-500'
-                    }
-                  `}
+                  className={cn(
+                    "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors border text-left",
+                    isSelected
+                      ? "bg-primary/10 text-primary border-primary/20"
+                      : "bg-background text-muted-foreground border-transparent hover:bg-muted"
+                  )}
                 >
-                  {tag.name}
+                  <div
+                    className={cn(
+                      "w-4 h-4 rounded border flex items-center justify-center flex-shrink-0",
+                      isSelected
+                        ? "bg-primary border-primary"
+                        : "bg-background border-muted-foreground/30"
+                    )}
+                  >
+                    {isSelected && (
+                      <Check className="w-3 h-3 text-primary-foreground" />
+                    )}
+                  </div>
+                  <span className="truncate">{tag.name}</span>
                 </button>
               );
-            })}
-          </div>
-
-          {tags.length > displayLimit && (
-            <div className="flex justify-center pt-2">
-              <button
-                type="button"
-                onClick={() => setShowAll(!showAll)}
-                className="cursor-pointer px-4 py-2 text-sm font-medium text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-all duration-200"
-              >
-                {showAll ? 'Thu gọn' : 'Xem thêm'}
-              </button>
-            </div>
+            })
           )}
-        </>
+        </div>
       )}
     </div>
   );

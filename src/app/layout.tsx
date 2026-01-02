@@ -1,6 +1,7 @@
 import type React from 'react';
 import './globals.css';
 import './styles/editor-theme.css';
+import { EmailVerificationBanner } from '@/components/email-verification-banner';
 import { ConditionalLayout } from '@/components/layout';
 import { ServerProvider } from '@/components/providers/server-provider';
 import { AppProvider } from '@/contexts/app-context';
@@ -15,9 +16,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Vibe Match - Decentralized Social Media',
+  title: 'SfinX - Ultimate Coding Platform',
   description:
-    'Empowering creators with decentralized ownership, privacy, and fair rewards.',
+    'Improve your coding skills with SfinX. Practice problems, compete in contests, and climb the leaderboard.',
 };
 
 export default function RootLayout({
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans`}>
         <ServerProvider>
+          <EmailVerificationBanner />
           <ConditionalLayout>{children}</ConditionalLayout>
         </ServerProvider>
       </body>

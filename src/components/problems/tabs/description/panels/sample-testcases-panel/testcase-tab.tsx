@@ -1,12 +1,12 @@
-import type { SampleTestcase } from '@/types/testcases';
+import type { SampleTestCase } from '@/types/testcases';
 import { useCallback, useEffect } from 'react';
 
 interface TestcaseTabProps {
-  testCases: SampleTestcase[];
+  testCases: SampleTestCase[];
   activeTestCase: number;
   onTestCaseChange: (
-    id: string,
-    field: 'input' | 'output',
+    id: number,
+    field: 'input' | 'expectedOutput',
     value: string
   ) => void;
 }
@@ -43,7 +43,7 @@ export function TestcaseTab({
 
   // Validation Flags
   const isInputEmpty = !currentCase.input;
-  const isOutputEmpty = !currentCase.output;
+  const isOutputEmpty = !currentCase.expectedOutput;
 
   // Helper to get classes based on error state
   const getTextAreaClasses = (hasError: boolean) => {
@@ -73,7 +73,7 @@ export function TestcaseTab({
             value={currentCase.input}
             onInput={(e) => autoResize(e.currentTarget)}
             onChange={(e) =>
-              onTestCaseChange(currentCase.id ?? '', 'input', e.target.value)
+              onTestCaseChange(currentCase.id ?? 0, 'input', e.target.value)
             }
             placeholder="Hãy nhập input..."
             className={getTextAreaClasses(isInputEmpty)}
@@ -95,10 +95,10 @@ export function TestcaseTab({
           <textarea
             id={`tc-output-${currentCase.id}`}
             rows={1}
-            value={currentCase.output}
+            value={currentCase.expectedOutput}
             onInput={(e) => autoResize(e.currentTarget)}
             onChange={(e) =>
-              onTestCaseChange(currentCase.id ?? '', 'output', e.target.value)
+              onTestCaseChange(currentCase.id ?? 0, 'expectedOutput', e.target.value)
             }
             placeholder="Hãy nhập output..."
             className={getTextAreaClasses(isOutputEmpty)}

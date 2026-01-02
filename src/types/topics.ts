@@ -1,9 +1,14 @@
 export interface Topic {
   id: number;
   name: string;
+  slug: string;
   description: string;
-  createdAt: Date;
-  updatedAt: Date;
+  iconUrl: string;
+  orderIndex: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+  postCount?: number; // Added for UI
 }
 
 export interface CreateTopicRequest {
@@ -12,11 +17,3 @@ export interface CreateTopicRequest {
 }
 
 export interface UpdateTopicRequest extends Partial<CreateTopicRequest> {}
-
-// Temporary constants - will be replaced by dynamic data from backend
-export const TOPIC_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'algorithms', label: 'Thuật toán' },
-  { value: 'data-structures', label: 'Cấu trúc dữ liệu' },
-  { value: 'math', label: 'Toán học' },
-];

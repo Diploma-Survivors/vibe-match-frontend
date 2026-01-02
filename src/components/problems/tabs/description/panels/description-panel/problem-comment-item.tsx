@@ -2,316 +2,342 @@
 
 import { useDialog } from '@/components/providers/dialog-provider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useApp } from '@/contexts/app-context';
-import type { ProblemComment } from '@/types/problems';
+import {
+  CreateProblemCommentRequest,
+  ProblemComment,
+  ProblemCommentType,
+  ProblemCommentVoteType,
+  UpdateProblemCommentRequest,
+} from '@/types/comments';
 import { formatDistanceToNow } from 'date-fns';
-import { vi } from 'date-fns/locale';
+import { enUS, vi } from 'date-fns/locale';
 import {
   ArrowBigDown,
   ArrowBigUp,
+  Flag,
   MessageSquare,
+  MoreHorizontal,
   Pencil,
   Trash2,
+  ChevronUp,
 } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { CommentInput } from './comment-input';
 
 interface ProblemCommentItemProps {
   comment: ProblemComment;
-  problemId: string;
-  onReplySuccess: (newComment: ProblemComment) => void;
-  onUpdate: (commentId: string, content: string) => void;
-  onDelete: (commentId: string) => void;
+  problemId: string | number;
+  onReply: (data: CreateProblemCommentRequest) => Promise<ProblemComment | void>;
+  onUpdate: (
+    id: number,
+    data: UpdateProblemCommentRequest
+  ) => Promise<ProblemComment | void>;
+  onDelete: (id: number, parentId?: number | null) => Promise<void>;
+  onVote: (id: number, voteType: ProblemCommentVoteType) => Promise<void>;
+  onUnvote: (id: number) => Promise<void>;
+  onReport: (id: number) => void;
+  fetchReplies: (id: number) => Promise<void>;
 }
 
+const locales: Record<string, any> = {
+  en: enUS,
+  vi: vi,
+};
+
 export default function ProblemCommentItem({
-  comment: initialComment,
+  comment,
   problemId,
-  onReplySuccess,
+  onReply,
   onUpdate,
   onDelete,
+  onVote,
+  onUnvote,
+  onReport,
+  fetchReplies,
 }: ProblemCommentItemProps) {
   const { user } = useApp();
   const { confirm } = useDialog();
-  const [comment, setComment] = useState(initialComment);
+  const { t, i18n } = useTranslation('problems');
   const [isReplying, setIsReplying] = useState(false);
-  const [replyContent, setReplyContent] = useState('');
-  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
-
-  // Edit state
   const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(initialComment.content);
-  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
 
-  const isAuthor = user?.id === comment.authorId;
+  const isAuthor = user?.id === comment.author.id;
 
-  const handleVote = async (type: 'up_vote' | 'down_vote') => {
-    // Mock voting logic
-    try {
-      if (comment.myVote === type) {
-        // Unvote
-        setComment((prev) => ({
-          ...prev,
-          myVote: null,
-          upvoteCount:
-            type === 'up_vote' ? prev.upvoteCount - 1 : prev.upvoteCount,
-          downvoteCount:
-            type === 'down_vote' ? prev.downvoteCount - 1 : prev.downvoteCount,
-        }));
-      } else {
-        // Vote
-        setComment((prev) => ({
-          ...prev,
-          myVote: type,
-          upvoteCount:
-            type === 'up_vote'
-              ? prev.upvoteCount + 1
-              : prev.myVote === 'up_vote'
-                ? prev.upvoteCount - 1
-                : prev.upvoteCount,
-          downvoteCount:
-            type === 'down_vote'
-              ? prev.downvoteCount + 1
-              : prev.myVote === 'down_vote'
-                ? prev.downvoteCount - 1
-                : prev.downvoteCount,
-        }));
-      }
-    } catch (error) {
-      console.error('Error voting comment:', error);
+  const handleVote = async (type: ProblemCommentVoteType) => {
+    if (comment.userVote === type) {
+      await onUnvote(comment.id);
+    } else {
+      await onVote(comment.id, type);
     }
   };
 
-  const handleReplySubmit = async () => {
-    if (!replyContent.trim()) return;
-    setIsSubmittingReply(true);
-    try {
-      // Mock reply creation
-      const newReply: ProblemComment = {
-        id: Math.random().toString(36).substr(2, 9),
-        problemId,
-        authorId: user?.id || 0,
-        content: replyContent,
-        upvoteCount: 0,
-        downvoteCount: 0,
-        myVote: null,
-        parentCommentId: comment.id,
-        replyCounts: 0,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      onReplySuccess(newReply);
-      setIsReplying(false);
-      setReplyContent('');
-    } catch (error) {
-      console.error('Error replying:', error);
-    } finally {
-      setIsSubmittingReply(false);
-    }
+  const handleReplySubmit = async (
+    content: string,
+    type: ProblemCommentType
+  ) => {
+    await onReply({
+      content,
+      type,
+      parentId: comment.id,
+    });
+    setIsReplying(false);
+    setShowReplies(true);
   };
 
-  const handleEditSubmit = async () => {
-    if (!editContent.trim()) return;
-    setIsSubmittingEdit(true);
-    try {
-      // Mock update
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      setComment((prev) => ({
-        ...prev,
-        content: editContent,
-        updatedAt: new Date().toISOString(),
-      }));
-      onUpdate(comment.id, editContent);
-      setIsEditing(false);
-    } catch (error) {
-      console.error('Error updating comment:', error);
-    } finally {
-      setIsSubmittingEdit(false);
-    }
+  const handleEditSubmit = async (
+    content: string,
+    type: ProblemCommentType
+  ) => {
+    await onUpdate(comment.id, {
+      content,
+      type,
+    });
+    setIsEditing(false);
   };
 
   const handleDelete = async () => {
     const result = await confirm({
-      title: 'Xóa bình luận',
-      message: 'Bạn có chắc chắn muốn xóa bình luận này không?',
-      confirmText: 'Xóa',
-      cancelText: 'Hủy',
+      title: t('delete_comment'),
+      message: t('confirm_delete_comment'),
+      confirmText: t('delete'),
+      cancelText: t('cancel'),
       color: 'red',
     });
 
     if (result) {
-      try {
-        // Mock delete
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        onDelete(comment.id);
-      } catch (error) {
-        console.error('Error deleting comment:', error);
-      }
+      await onDelete(comment.id, comment.parentId);
+    }
+  };
+
+  const getTypeColor = (type: ProblemCommentType) => {
+    switch (type) {
+      case ProblemCommentType.QUESTION:
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800';
+      case ProblemCommentType.TIP:
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200 dark:border-blue-800';
+      case ProblemCommentType.FEEDBACK:
+      default:
+        return 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300 border-slate-200 dark:border-slate-700';
     }
   };
 
   return (
-    <div className="flex gap-3 group">
-      <Avatar
-        userId={comment.authorId}
-        className="w-8 h-8 border border-slate-200 dark:border-slate-700 mt-1"
-      >
-        <AvatarImage src={comment.author?.avatarUrl} />
-        <AvatarFallback>
-          {comment.author?.firstName?.[0]}
-          {comment.author?.lastName?.[0]}
-        </AvatarFallback>
-      </Avatar>
+    <div className="space-y-4">
+      <div className="flex gap-3 group">
+        <Avatar
+          userId={comment.author.id}
+          className="w-8 h-8 border border-slate-200 dark:border-slate-700 mt-1"
+        >
+          <AvatarImage src={comment.author?.avatarUrl} />
+          <AvatarFallback>
+            {comment.author?.username?.[0]?.toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
 
-      <div className="flex-1 space-y-1.5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-xs">
-            <span className="font-semibold text-slate-900 dark:text-slate-200">
-              {comment.author?.firstName} {comment.author?.lastName}
-            </span>
-            <span className="text-slate-500 dark:text-slate-400">
-              {formatDistanceToNow(new Date(comment.createdAt), {
-                addSuffix: true,
-                locale: vi,
-              })}
-            </span>
-            {comment.updatedAt !== comment.createdAt && (
-              <span className="text-slate-400 italic">(đã chỉnh sửa)</span>
-            )}
-          </div>
-        </div>
-
-        {isEditing ? (
-          <div className="space-y-2">
-            <Textarea
-              value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
-              className="min-h-[80px] text-sm"
-            />
-            <div className="flex justify-end gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setIsEditing(false);
-                  setEditContent(comment.content);
-                }}
+        <div className="flex-1 space-y-1.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="font-semibold text-slate-900 dark:text-slate-200">
+                {comment.author?.username}
+              </span>
+              {comment.author?.isPremium && (
+                <Badge
+                  variant="secondary"
+                  className="h-4 px-1 text-[10px] bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                >
+                  Premium
+                </Badge>
+              )}
+              <span className="text-slate-500 dark:text-slate-400">
+                {formatDistanceToNow(new Date(comment.createdAt), {
+                  addSuffix: true,
+                  locale: locales[i18n.language] || enUS,
+                })}
+              </span>
+              {comment.isEdited && (
+                <span className="text-slate-400 italic">({t('edited')})</span>
+              )}
+              <Badge
+                variant="outline"
+                className={`h-5 px-1.5 text-[10px] font-normal ${getTypeColor(
+                  comment.type
+                )}`}
               >
-                Hủy
-              </Button>
-              <Button
-                size="sm"
-                onClick={handleEditSubmit}
-                disabled={!editContent.trim() || isSubmittingEdit}
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                {isSubmittingEdit ? 'Đang lưu...' : 'Lưu'}
-              </Button>
+                {t(comment.type.toLowerCase())}
+              </Badge>
             </div>
-          </div>
-        ) : (
-          <div className="text-sm text-slate-800 dark:text-slate-300 whitespace-pre-wrap">
-            {comment.content}
-          </div>
-        )}
 
-        <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <div className="flex items-center gap-1">
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <MoreHorizontal className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onReport(comment.id)}>
+                  <Flag className="w-4 h-4 mr-2" />
+                  {t('report')}
+                </DropdownMenuItem>
+                {isAuthor && (
+                  <>
+                    <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                      <Pencil className="w-4 h-4 mr-2" />
+                      {t('edit')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={handleDelete}
+                      className="text-red-600 focus:text-red-600"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      {t('delete')}
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {isEditing ? (
+            <CommentInput
+              onSubmit={handleEditSubmit}
+              onCancel={() => setIsEditing(false)}
+              initialContent={comment.content}
+              initialType={comment.type}
+            />
+          ) : (
+            <div className="text-sm text-slate-800 dark:text-slate-300 whitespace-pre-wrap">
+              {comment.content}
+            </div>
+          )}
+
+          <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => handleVote(ProblemCommentVoteType.UPVOTE)}
+                className={`flex cursor-pointer items-center gap-1 hover:text-green-600 transition-colors ${comment.userVote === ProblemCommentVoteType.UPVOTE
+                  ? 'text-green-600'
+                  : ''
+                  }`}
+              >
+                <ArrowBigUp
+                  className={`w-4 h-4 ${comment.userVote === ProblemCommentVoteType.UPVOTE
+                    ? 'fill-current'
+                    : ''
+                    }`}
+                />
+                <span>{comment.upvoteCount}</span>
+              </button>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => handleVote(ProblemCommentVoteType.DOWNVOTE)}
+                className={`flex cursor-pointer items-center gap-1 hover:text-red-600 transition-colors ${comment.userVote === ProblemCommentVoteType.DOWNVOTE
+                  ? 'text-red-600'
+                  : ''
+                  }`}
+              >
+                <ArrowBigDown
+                  className={`w-4 h-4 ${comment.userVote === ProblemCommentVoteType.DOWNVOTE
+                    ? 'fill-current'
+                    : ''
+                    }`}
+                />
+                <span>{comment.downvoteCount}</span>
+              </button>
+            </div>
+
             <button
-              onClick={() => handleVote('up_vote')}
-              className={`flex cursor-pointer items-center gap-1 hover:text-green-600 transition-colors ${
-                comment.myVote === 'up_vote' ? 'text-green-600' : ''
-              }`}
+              onClick={() => setIsReplying(!isReplying)}
+              className="cursor-pointer flex items-center gap-1 hover:text-blue-600 transition-colors"
             >
-              <ArrowBigUp
-                className={`w-4 h-4 ${
-                  comment.myVote === 'up_vote' ? 'fill-current' : ''
-                }`}
-              />
-              <span>{comment.upvoteCount}</span>
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>{t('reply')}</span>
             </button>
           </div>
 
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => handleVote('down_vote')}
-              className={`flex cursor-pointer items-center gap-1 hover:text-red-600 transition-colors ${
-                comment.myVote === 'down_vote' ? 'text-red-600' : ''
-              }`}
-            >
-              <ArrowBigDown
-                className={`w-4 h-4 ${
-                  comment.myVote === 'down_vote' ? 'fill-current' : ''
-                }`}
+          {isReplying && (
+            <div className="mt-3 animate-in fade-in slide-in-from-top-2 duration-200">
+              <CommentInput
+                onSubmit={handleReplySubmit}
+                onCancel={() => setIsReplying(false)}
+                isReply
+                initialType={comment.type}
               />
-              <span>{comment.downvoteCount}</span>
-            </button>
-          </div>
-
-          <button
-            onClick={() => setIsReplying(!isReplying)}
-            className="cursor-pointer flex items-center gap-1 hover:text-blue-600 transition-colors"
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>Reply</span>
-          </button>
-
-          {isAuthor && !isEditing && (
-            <>
-              <button
-                onClick={() => setIsEditing(true)}
-                className="cursor-pointer flex items-center gap-1 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
-              >
-                <Pencil className="w-3.5 h-3.5" />
-                <span>Chỉnh sửa</span>
-              </button>
-              <button
-                onClick={handleDelete}
-                className="cursor-pointer flex items-center gap-1 hover:text-red-600 transition-colors"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                <span>Xóa</span>
-              </button>
-            </>
+            </div>
           )}
         </div>
+      </div>
 
-        {isReplying && (
-          <div className="mt-3 space-y-2 animate-in fade-in slide-in-from-top-2 duration-200">
-            <Textarea
-              value={replyContent}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                setReplyContent(e.target.value)
-              }
-              placeholder="Viết câu trả lời..."
-              className="min-h-[80px] text-sm"
-            />
-            <div className="flex justify-end gap-2">
+      {/* Recursive Replies */}
+      {(comment.replyCount > 0 ||
+        (comment.replies && comment.replies.length > 0)) && (
+          <div className="pl-11 space-y-4">
+            {!showReplies ? (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsReplying(false)}
+                onClick={async () => {
+                  if (!comment.replies || comment.replies.length === 0) {
+                    await fetchReplies(comment.id);
+                  }
+                  setShowReplies(true);
+                }}
+                className="text-muted-foreground h-auto p-0 hover:bg-transparent hover:text-foreground"
               >
-                Hủy
+                <MoreHorizontal className="w-4 h-4 mr-1" />
+                {t('view_replies', { count: comment.replyCount })}
               </Button>
-              <Button
-                className="bg-green-600 hover:bg-green-700 text-white"
-                size="sm"
-                onClick={handleReplySubmit}
-                disabled={!replyContent.trim() || isSubmittingReply}
-              >
-                {isSubmittingReply ? 'Đang gửi...' : 'Trả lời'}
-              </Button>
-            </div>
+            ) : (
+              <>
+                {comment.replies?.map((reply) => (
+                  <div
+                    key={reply.id}
+                    className="relative"
+                  >
+                    {/* Connecting line for nested replies */}
+                    <div className="absolute -left-6 top-0 bottom-0 w-px bg-border/50" />
+                    <ProblemCommentItem
+                      comment={reply}
+                      problemId={problemId}
+                      onReply={onReply}
+                      onUpdate={onUpdate}
+                      onDelete={onDelete}
+                      onVote={onVote}
+                      onUnvote={onUnvote}
+                      onReport={onReport}
+                      fetchReplies={fetchReplies}
+                    />
+                  </div>
+                ))}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowReplies(false)}
+                  className="text-muted-foreground h-auto p-0 hover:bg-transparent hover:text-foreground mt-2"
+                >
+                  <ChevronUp className="w-4 h-4 mr-1" />
+                  {t('hide_replies')}
+                </Button>
+              </>
+            )}
           </div>
         )}
-      </div>
     </div>
   );
 }

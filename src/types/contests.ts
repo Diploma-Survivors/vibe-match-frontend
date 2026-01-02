@@ -27,12 +27,12 @@ export enum ContestProblemStatus {
 }
 
 export const ContestProblemStatusTooltip: Record<ContestProblemStatus, string> =
-  {
-    [ContestProblemStatus.UN_ATTEMPTED]: 'Unattempted',
-    [ContestProblemStatus.UNSOLVED]: 'Unsolved',
-    [ContestProblemStatus.SOLVED]: 'Solved',
-    [ContestProblemStatus.ATTEMPTED]: 'Attempted',
-  };
+{
+  [ContestProblemStatus.UN_ATTEMPTED]: 'Unattempted',
+  [ContestProblemStatus.UNSOLVED]: 'Unsolved',
+  [ContestProblemStatus.SOLVED]: 'Solved',
+  [ContestProblemStatus.ATTEMPTED]: 'Attempted',
+};
 
 // Contest Detail types
 export interface ContestProblem {
@@ -183,10 +183,10 @@ export const CONTEST_SUBMISSION_STRATEGY_LABELS: Record<
   ContestSubmissionStrategy,
   string
 > = {
-  [ContestSubmissionStrategy.SINGLE_SUBMISSION]: 'Nộp một lần',
-  [ContestSubmissionStrategy.BEST_SCORE]: 'Điểm cao nhất',
-  [ContestSubmissionStrategy.LATEST_SCORE]: 'Điểm lần nộp cuối',
-  [ContestSubmissionStrategy.AVERAGE_SCORE]: 'Điểm trung bình',
+  [ContestSubmissionStrategy.SINGLE_SUBMISSION]: 'Single Submission',
+  [ContestSubmissionStrategy.BEST_SCORE]: 'Best Score',
+  [ContestSubmissionStrategy.LATEST_SCORE]: 'Latest Score',
+  [ContestSubmissionStrategy.AVERAGE_SCORE]: 'Average Score',
 };
 
 export const CONTEST_SUBMISSION_STRATEGY_DESCRIPTION: Record<
@@ -194,25 +194,25 @@ export const CONTEST_SUBMISSION_STRATEGY_DESCRIPTION: Record<
   string
 > = {
   [ContestSubmissionStrategy.SINGLE_SUBMISSION]:
-    'Chỉ cho phép nộp một lần cho mỗi problem',
+    'Only one submission is allowed for each problem',
   [ContestSubmissionStrategy.BEST_SCORE]:
-    'Lấy điểm cao nhất trong tất cả các lần nộp',
-  [ContestSubmissionStrategy.LATEST_SCORE]: 'Lấy điểm của lần nộp cuối cùng',
+    'The best score from all submissions is taken',
+  [ContestSubmissionStrategy.LATEST_SCORE]: 'The latest submission score is taken',
   [ContestSubmissionStrategy.AVERAGE_SCORE]:
-    'Lấy điểm trung bình của tất cả các lần nộp',
+    'The average score from all submissions is taken',
 };
 
 export const CONTEST_STATUS_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'chưa bắt đầu', label: 'Chưa bắt đầu' },
-  { value: 'đang diễn ra', label: 'Đang diễn ra' },
-  { value: 'đã kết thúc', label: 'Đã kết thúc' },
+  { value: 'all', label: 'All' },
+  { value: 'not_started', label: 'Not Started' },
+  { value: 'ongoing', label: 'Ongoing' },
+  { value: 'finished', label: 'Finished' },
 ];
 
 export const CONTEST_ACCESS_RANGE_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'public', label: 'Công khai' },
-  { value: 'private', label: 'Riêng tư' },
+  { value: 'all', label: 'All' },
+  { value: 'public', label: 'Public' },
+  { value: 'private', label: 'Private' },
 ];
 
 export interface ContestProblemDTO {
@@ -241,11 +241,11 @@ export const CONTEST_STATUS_COLORS = {
 };
 
 export const CONTEST_STATUS_LABELS = {
-  upcoming: 'Sắp diễn ra',
+  upcoming: 'Upcoming',
   ongoing: 'Đang diễn ra',
-  ended: 'Đã kết thúc',
-  public: 'Công khai',
-  private: 'Riêng tư',
+  ended: 'Ended',
+  public: 'Public',
+  private: 'Private',
 } as const;
 
 export const PARTICIPATION_OPTIONS = [

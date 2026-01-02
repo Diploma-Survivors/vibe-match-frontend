@@ -1,6 +1,11 @@
 import type { Tag } from './tags';
 import type { UserProfile } from './user';
 
+export enum SolutionVoteType {
+  UPVOTE = 1,
+  DOWNVOTE = -1,
+}
+
 export interface Solution {
   id: string;
   problemId: string;
@@ -9,7 +14,7 @@ export interface Solution {
   author?: UserProfile;
   createdAt: string;
   updatedAt: string;
-  myVote: 'up_vote' | 'down_vote' | null;
+  userVote: SolutionVoteType | null;
   upvoteCount: number;
   downvoteCount: number;
   commentCount: number;
@@ -33,8 +38,8 @@ export interface SolutionListRequest {
   keyword?: string;
   filters?: SolutionFilters;
   sortBy?: SolutionSortBy;
-  after?: string;
-  first?: number;
+  page?: number;
+  limit?: number;
 }
 
 export interface SolutionEdge {
@@ -47,11 +52,26 @@ export interface PageInfo {
   endCursor: string;
 }
 
-export interface SolutionListResponse {
-  edges: SolutionEdge[];
-  pageInfos: PageInfo;
-  totalCount: number;
+export interface SolutionMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }
+
+
+export interface SolutionListResponse {
+  data: Solution[];
+  meta: SolutionMeta;
+}
+
+export enum SolutionCommentVoteType {
+  UPVOTE = 1,
+  DOWNVOTE = -1,
+}
+
 export interface SolutionComment {
   id: string;
   solutionId: string;
@@ -60,8 +80,8 @@ export interface SolutionComment {
   content: string;
   upvoteCount: number;
   downvoteCount: number;
-  myVote: 'up_vote' | 'down_vote' | null;
-  parentCommentId: string | null;
+  userVote: SolutionCommentVoteType | null;
+  parentId: string | null;
   replyCounts: number;
   createdAt: string;
   updatedAt: string;
@@ -73,7 +93,7 @@ export enum SolutionCommentSortBy {
 }
 
 export interface CreateSolutionRequest {
-  problemId: string;
+  problemId: number;
   title: string;
   content: string;
   tagIds: number[];

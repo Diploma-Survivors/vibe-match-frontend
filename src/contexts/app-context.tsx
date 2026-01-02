@@ -2,7 +2,7 @@
 
 import clientApi from '@/lib/apis/axios-client';
 import type { DecodedAccessToken, UserInfo } from '@/types/states';
-import { IssuerType } from '@/types/states';
+
 import { UserProfile } from '@/types/user';
 import { usePathname } from 'next/navigation';
 import {
@@ -12,6 +12,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -22,7 +23,11 @@ interface AppContextType {
   user?: UserProfile;
   shouldHideNavigation: boolean;
   isLoading: boolean;
+  isLoggedin: boolean;
+  isPrenium: boolean;
+  isEmailVerified: boolean;
   clearUserData: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -34,29 +39,46 @@ export function AppProvider({
   children,
   decodedAccessToken,
 }: AppProviderProps) {
+  const { i18n } = useTranslation();
   const [user, setUser] = useState<UserProfile>();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(!!decodedAccessToken);
 
   const pathname = usePathname();
-  const shouldHideNavigation = pathname === '/login';
+  // const shouldHideNavigation = pathname === '/login';
+  const shouldHideNavigation = false;
+
+  const isLoggedin = !!decodedAccessToken;
+  const isPrenium = user?.isPremium || false;
+  const isEmailVerified = user?.emailVerified || false;
 
   const clearUserData = () => {
     setUser(undefined);
   };
 
+  const fetchUser = async () => {
+    try {
+      const response = await clientApi.get('/auth/me');
+      const userData = response.data.data;
+      setUser(userData);
+
+      if (userData.preferredLanguage && i18n.language !== userData.preferredLanguage) {
+        i18n.changeLanguage(userData.preferredLanguage);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+    }
+  };
+
+  const refreshUser = async () => {
+    if (decodedAccessToken) {
+      await fetchUser();
+    }
+  };
+
   useEffect(() => {
     if (decodedAccessToken) {
       setIsLoading(true);
-      clientApi
-        .get('/auth/me')
-        .then((response) => {
-          setUser(response.data.data);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error('Failed to fetch user data:', error);
-          setIsLoading(false);
-        });
+      fetchUser().finally(() => setIsLoading(false));
     }
   }, [decodedAccessToken]);
 
@@ -64,7 +86,11 @@ export function AppProvider({
     user,
     shouldHideNavigation,
     isLoading,
+    isLoggedin,
+    isPrenium,
+    isEmailVerified,
     clearUserData,
+    refreshUser,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

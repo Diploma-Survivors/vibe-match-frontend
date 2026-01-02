@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface UserRanking extends UserProfile {
   totalScore: number;
@@ -41,6 +42,7 @@ type SortField = 'totalScore' | 'solvedCount' | 'acceptanceRate';
 type SortOrder = 'asc' | 'desc' | null;
 
 export default function RankingPage() {
+  const { t } = useTranslation('ranking');
   const [users, setUsers] = useState<UserRanking[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -191,7 +193,7 @@ export default function RankingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 dark:bg-gray-900/50 py-12">
+      <div className="min-h-screen bg-background py-12">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto space-y-8">
             {/* Header Skeleton */}
@@ -203,7 +205,7 @@ export default function RankingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Podium Skeleton (Left Panel) */}
               <div className="lg:col-span-5 xl:col-span-4 space-y-6">
-                <Card className="border-none shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                <Card className="border-none shadow-xl bg-card">
                   <CardHeader>
                     <Skeleton className="h-8 w-48 mx-auto" />
                   </CardHeader>
@@ -231,7 +233,7 @@ export default function RankingPage() {
 
               {/* Leaderboard Skeleton (Right Panel) */}
               <div className="lg:col-span-7 xl:col-span-8">
-                <Card className="border-none shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+                <Card className="border-none shadow-xl bg-card">
                   <CardHeader>
                     <div className="flex justify-between items-center">
                       <Skeleton className="h-8 w-32" />
@@ -265,27 +267,27 @@ export default function RankingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-gray-900/50 py-12">
+    <div className="min-h-screen bg-background py-12">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
           <div className="text-center space-y-4 mb-12">
-            <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-400">
-              Bảng xếp hạng
+            <h1 className="text-4xl font-bold text-foreground">
+              {t('ranking_title')}
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400">
-              Tranh tài cùng những người giỏi nhất và vươn tới đỉnh cao.
+            <p className="text-lg text-muted-foreground">
+              {t('ranking_subtitle')}
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Podium Panel */}
             <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-24">
-              <Card className="border-none shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm overflow-hidden">
+              <Card className="border-none shadow-xl bg-card overflow-hidden">
                 <CardHeader className="text-center pb-2">
                   <CardTitle className="flex items-center justify-center gap-2 text-xl">
                     <Trophy className="w-5 h-5 text-yellow-500" />
-                    Top Solvers
+                    {t('top_solvers')}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
@@ -305,14 +307,14 @@ export default function RankingPage() {
                           </div>
                         </div>
                         <div className="text-center">
-                          <div className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate max-w-[80px]">
+                          <div className="font-bold text-sm text-foreground truncate max-w-[80px]">
                             {topThree[1].username}
                           </div>
                           <div className="text-xs text-emerald-600 font-semibold">
-                            {topThree[1].totalScore} pts
+                            {topThree[1].totalScore} {t('pts')}
                           </div>
                         </div>
-                        <div className="w-20 sm:w-24 h-24 sm:h-32 bg-gradient-to-b from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 rounded-t-lg shadow-inner flex items-end justify-center pb-2">
+                        <div className="w-20 sm:w-24 h-24 sm:h-32 bg-gray-200 dark:bg-gray-800 rounded-t-lg shadow-inner flex items-end justify-center pb-2">
                           <span className="text-3xl font-bold text-gray-400/50">
                             2
                           </span>
@@ -336,14 +338,14 @@ export default function RankingPage() {
                           </div>
                         </div>
                         <div className="text-center">
-                          <div className="font-bold text-base text-gray-900 dark:text-gray-100 truncate max-w-[100px]">
+                          <div className="font-bold text-base text-foreground truncate max-w-[100px]">
                             {topThree[0].username}
                           </div>
                           <div className="text-emerald-600 font-bold text-sm">
-                            {topThree[0].totalScore} pts
+                            {topThree[0].totalScore} {t('pts')}
                           </div>
                         </div>
-                        <div className="w-24 sm:w-28 h-32 sm:h-40 bg-gradient-to-b from-yellow-100 to-yellow-200 dark:from-yellow-900/40 dark:to-yellow-900/20 rounded-t-lg shadow-inner flex items-end justify-center pb-2 border-t border-yellow-200 dark:border-yellow-800">
+                        <div className="w-24 sm:w-28 h-32 sm:h-40 bg-yellow-100 dark:bg-yellow-900/30 rounded-t-lg shadow-inner flex items-end justify-center pb-2 border-t border-yellow-200 dark:border-yellow-800">
                           <span className="text-4xl font-bold text-yellow-500/50">
                             1
                           </span>
@@ -364,14 +366,14 @@ export default function RankingPage() {
                           </div>
                         </div>
                         <div className="text-center">
-                          <div className="font-bold text-sm text-gray-900 dark:text-gray-100 truncate max-w-[80px]">
+                          <div className="font-bold text-sm text-foreground truncate max-w-[80px]">
                             {topThree[2].username}
                           </div>
                           <div className="text-xs text-emerald-600 font-semibold">
-                            {topThree[2].totalScore} pts
+                            {topThree[2].totalScore} {t('pts')}
                           </div>
                         </div>
-                        <div className="w-20 sm:w-24 h-16 sm:h-24 bg-gradient-to-b from-orange-100 to-orange-200 dark:from-orange-900/40 dark:to-orange-900/20 rounded-t-lg shadow-inner flex items-end justify-center pb-2 border-t border-orange-200 dark:border-orange-800">
+                        <div className="w-20 sm:w-24 h-16 sm:h-24 bg-orange-100 dark:bg-orange-900/30 rounded-t-lg shadow-inner flex items-end justify-center pb-2 border-t border-orange-200 dark:border-orange-800">
                           <span className="text-3xl font-bold text-orange-500/50">
                             3
                           </span>
@@ -379,8 +381,8 @@ export default function RankingPage() {
                       </div>
                     </div>
                   ) : (
-                    <div className="text-center py-8 text-gray-500">
-                      Chưa đủ dữ liệu để hiển thị Top 3.
+                    <div className="text-center py-8 text-muted-foreground">
+                      {t('not_enough_data')}
                     </div>
                   )}
                 </CardContent>
@@ -389,14 +391,14 @@ export default function RankingPage() {
 
             {/* Leaderboard Panel */}
             <div className="lg:col-span-7 xl:col-span-8">
-              <Card className="border-none shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+              <Card className="border-none shadow-xl bg-card">
                 <CardHeader>
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <CardTitle>Leaderboard</CardTitle>
+                    <CardTitle>{t('leaderboard')}</CardTitle>
                     <div className="relative w-full sm:w-64">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input
-                        placeholder="Tìm kiếm..."
+                        placeholder={t('search_placeholder')}
                         className="pl-9"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
@@ -408,32 +410,32 @@ export default function RankingPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-14 text-center">#</TableHead>
-                        <TableHead>User</TableHead>
+                        <TableHead className="w-14 text-center">{t('rank')}</TableHead>
+                        <TableHead>{t('user')}</TableHead>
                         <TableHead
-                          className="text-right cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                          className="text-right cursor-pointer hover:bg-muted/50 transition-colors"
                           onClick={() => handleSort('totalScore')}
                         >
                           <div className="flex items-center justify-end gap-1">
-                            Điểm
+                            {t('score')}
                             {getSortIcon('totalScore')}
                           </div>
                         </TableHead>
                         <TableHead
-                          className="text-right hidden sm:table-cell cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                          className="text-right hidden sm:table-cell cursor-pointer hover:bg-muted/50 transition-colors"
                           onClick={() => handleSort('solvedCount')}
                         >
                           <div className="flex items-center justify-end gap-1">
-                            Bài tập đã giải
+                            {t('solved_problems')}
                             {getSortIcon('solvedCount')}
                           </div>
                         </TableHead>
                         <TableHead
-                          className="text-right hidden md:table-cell cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                          className="text-right hidden md:table-cell cursor-pointer hover:bg-muted/50 transition-colors"
                           onClick={() => handleSort('acceptanceRate')}
                         >
                           <div className="flex items-center justify-end gap-1">
-                            Acceptance
+                            {t('acceptance')}
                             {getSortIcon('acceptanceRate')}
                           </div>
                         </TableHead>
@@ -443,7 +445,7 @@ export default function RankingPage() {
                       {paginatedUsers.map((user) => (
                         <TableRow
                           key={user.id}
-                          className="group hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                          className="group hover:bg-muted/50 transition-colors"
                         >
                           <TableCell className="text-center font-medium">
                             {user.position <= 3 ? (
@@ -459,7 +461,7 @@ export default function RankingPage() {
                                 )}
                               </div>
                             ) : (
-                              <span className="text-gray-500 text-sm">
+                              <span className="text-muted-foreground text-sm">
                                 #{user.position}
                               </span>
                             )}
@@ -469,17 +471,17 @@ export default function RankingPage() {
                               href={`/profile/${user.id}`}
                               className="flex items-center gap-3 hover:opacity-80 transition-opacity"
                             >
-                              <Avatar className="w-8 h-8 border border-gray-200">
+                              <Avatar className="w-8 h-8 border border-border">
                                 <AvatarImage src={user.avatarUrl} />
                                 <AvatarFallback>
                                   {user.firstName[0]}
                                 </AvatarFallback>
                               </Avatar>
                               <div className="flex flex-col">
-                                <span className="font-medium text-sm text-gray-900 dark:text-gray-100">
+                                <span className="font-medium text-sm text-foreground">
                                   {user.username}
                                 </span>
-                                <span className="text-[10px] text-gray-500 hidden sm:inline-block">{`${user.firstName}·${user.lastName}`}</span>
+                                <span className="text-[10px] text-muted-foreground hidden sm:inline-block">{`${user.firstName}·${user.lastName}`}</span>
                               </div>
                             </Link>
                           </TableCell>
@@ -491,15 +493,15 @@ export default function RankingPage() {
                               {user.totalScore.toLocaleString()}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-right font-medium text-gray-600 dark:text-gray-400 hidden sm:table-cell">
+                          <TableCell className="text-right font-medium text-muted-foreground hidden sm:table-cell">
                             {user.solvedCount}
                           </TableCell>
                           <TableCell className="text-right hidden md:table-cell">
                             <div className="flex items-center justify-end gap-2">
-                              <span className="text-xs text-gray-600 dark:text-gray-400">
+                              <span className="text-xs text-muted-foreground">
                                 {user.acceptanceRate.toFixed(0)}%
                               </span>
-                              <div className="w-12 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                              <div className="w-12 h-1.5 bg-muted rounded-full overflow-hidden">
                                 <div
                                   className="h-full bg-blue-500 rounded-full"
                                   style={{ width: `${user.acceptanceRate}%` }}
@@ -513,9 +515,9 @@ export default function RankingPage() {
                         <TableRow>
                           <TableCell
                             colSpan={5}
-                            className="text-center py-8 text-gray-500"
+                            className="text-center py-8 text-muted-foreground"
                           >
-                            Không tìm thấy người dùng nào.
+                            {t('no_users_found')}
                           </TableCell>
                         </TableRow>
                       )}
@@ -533,10 +535,10 @@ export default function RankingPage() {
                         }
                         disabled={currentPage === 1}
                       >
-                        Trang trước
+                        {t('previous')}
                       </Button>
-                      <span className="flex items-center px-4 text-sm text-gray-600">
-                        {currentPage} / {totalPages}
+                      <span className="flex items-center px-4 text-sm text-foreground">
+                        {t('page_info', { current: currentPage, total: totalPages })}
                       </span>
                       <Button
                         variant="outline"
@@ -546,7 +548,7 @@ export default function RankingPage() {
                         }
                         disabled={currentPage === totalPages}
                       >
-                        Trang sau
+                        {t('next')}
                       </Button>
                     </div>
                   )}

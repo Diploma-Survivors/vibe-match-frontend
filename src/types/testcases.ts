@@ -5,17 +5,20 @@ export interface TestCase {
   isSample: boolean;
 }
 
-export interface SampleTestcase {
-  id?: string;
+export interface SampleTestCase {
+  id?: number;
+  problem?: string;
   input: string;
-  output: string;
+  expectedOutput: string;
+  orderIndex?: number;
   explanation?: string;
   createdAt?: string;
   updatedAt?: string;
 }
 
+
 export interface CreateTestcaseRequest {
-  testcases: SampleTestcase[];
+  testcases: SampleTestCase[];
 }
 
 export interface CreateTestcaseFileResponse {

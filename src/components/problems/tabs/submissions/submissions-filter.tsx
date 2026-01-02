@@ -1,20 +1,22 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import { SubmissionsService } from '@/services/submissions-service';
 import { SubmissionStatus } from '@/types/submissions';
 import type {
-  GetSubmissionListRequest,
   Language,
   SubmissionFilters,
 } from '@/types/submissions';
+import { ChevronDown, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SubmissionsFilterProps {
   onFilterChange: (filters: SubmissionFilters) => void;
@@ -25,6 +27,7 @@ export default function SubmissionsFilter({
   onFilterChange,
   filters,
 }: SubmissionsFilterProps) {
+  const { t } = useTranslation('problems');
   const [statusFilter, setStatusFilter] = useState<string>(
     filters.status || 'ALL'
   );
@@ -32,12 +35,17 @@ export default function SubmissionsFilter({
     filters.languageId?.toString() || 'ALL'
   );
   const [languageList, setLanguageList] = useState<Language[]>([]);
+  const [languageSearch, setLanguageSearch] = useState('');
+
+  const filteredLanguages = languageList.filter((lang) =>
+    lang.name.toLowerCase().includes(languageSearch.toLowerCase())
+  );
 
   // Get language list
   useEffect(() => {
     const fetchLanguageList = async () => {
       const response = await SubmissionsService.getLanguageList();
-      setLanguageList(response.data.data);
+      setLanguageList(response);
     };
 
     fetchLanguageList();
@@ -61,44 +69,96 @@ export default function SubmissionsFilter({
     });
   };
 
+  const getStatusLabel = () => {
+    if (statusFilter === 'ALL') return t('all_status');
+    return t(`status_${statusFilter}`);
+  };
+
+  const getLanguageLabel = () => {
+    if (languageFilter === 'ALL') return t('all_languages');
+    const lang = languageList.find((l) => l.id.toString() === languageFilter);
+    return lang ? lang.name : t('language');
+  };
+
   return (
-    <div className="p-3 border-b bg-gray-50">
+    <div className="p-3 border-b border-border bg-muted/20">
       <div className="flex gap-2">
-        <div className="flex-1">
-          <Select value={statusFilter} onValueChange={handleStatusChange}>
-            <SelectTrigger className="h-8 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-xs">
-              <SelectValue placeholder="Trạng thái" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Status</SelectItem>
-              {(() => {
-                const items = [];
-                for (const [key, value] of Object.entries(SubmissionStatus)) {
-                  items.push(
-                    <SelectItem key={key} value={key}>
-                      {value}
-                    </SelectItem>
-                  );
-                }
-                return items;
-              })()}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex-1">
-          <Select value={languageFilter} onValueChange={handleLanguageChange}>
-            <SelectTrigger className="h-8 bg-white border-gray-300 focus:border-blue-500 focus:ring-blue-500 text-xs">
-              <SelectValue placeholder="Ngôn ngữ" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Languages</SelectItem>
-              {languageList.map((lang) => (
-                <SelectItem key={lang.id} value={lang.id.toString()}>
-                  {lang.name}
-                </SelectItem>
+        <div className="w-[180px]">
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full h-8 px-3 text-xs justify-between bg-background border-border hover:bg-muted/50 font-normal focus:ring-1 focus:ring-primary/20"
+              >
+                <span className="truncate">{getStatusLabel()}</span>
+                <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[180px]">
+              <DropdownMenuItem
+                onClick={() => handleStatusChange('ALL')}
+                className="text-xs"
+              >
+                {t('all_status')}
+              </DropdownMenuItem>
+              {Object.entries(SubmissionStatus).map(([key, value]) => (
+                <DropdownMenuItem
+                  key={key}
+                  onClick={() => handleStatusChange(key)}
+                  className="text-xs"
+                >
+                  {t(`status_${key}`)}
+                </DropdownMenuItem>
               ))}
-            </SelectContent>
-          </Select>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        <div className="w-[180px]">
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-full h-8 px-3 text-xs justify-between bg-background border-border hover:bg-muted/50 font-normal focus:ring-1 focus:ring-primary/20"
+              >
+                <span className="truncate">{getLanguageLabel()}</span>
+                <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-[180px] max-h-[300px] overflow-y-auto">
+              <div className="p-2 sticky top-0 bg-popover z-10">
+                <div className="relative">
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+                  <Input
+                    placeholder={t('search_language')}
+                    className="h-7 text-xs pl-7"
+                    value={languageSearch}
+                    onChange={(e) => setLanguageSearch(e.target.value)}
+                    onKeyDown={(e) => e.stopPropagation()}
+                  />
+                </div>
+              </div>
+              <DropdownMenuItem
+                onClick={() => handleLanguageChange('ALL')}
+                className="text-xs"
+              >
+                {t('all_languages')}
+              </DropdownMenuItem>
+              {filteredLanguages.map((lang) => (
+                <DropdownMenuItem
+                  key={lang.id}
+                  onClick={() => handleLanguageChange(lang.id.toString())}
+                  className="text-xs"
+                >
+                  {lang.name}
+                </DropdownMenuItem>
+              ))}
+              {filteredLanguages.length === 0 && (
+                <div className="p-2 text-xs text-muted-foreground text-center">
+                  {t('no_languages_found')}
+                </div>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>

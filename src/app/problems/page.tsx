@@ -1,12 +1,17 @@
 'use client';
 
 import ProblemFilter from '@/components/problems/problems-filter/problems-filter';
-import ProblemStats from '@/components/problems/problems-stats/problem-stats';
+import SortControls from '@/components/problems/problems-filter/sort-controls';
 import ProblemTable from '@/components/problems/problems-table/problems-table';
+import { Button } from '@/components/ui/button';
 import useProblems from '@/hooks/use-problems';
-import React from 'react';
+import { cn } from '@/lib/utils';
+import { LayoutGrid, List } from 'lucide-react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function ProblemsPage() {
+  const { t } = useTranslation('problems');
   const {
     // State
     problems,
@@ -14,6 +19,11 @@ export default function ProblemsPage() {
     totalCount,
     isLoading,
     error,
+
+    // Metadata
+    tags,
+    topics,
+    isMetadataLoading,
 
     // Request params (exposed for UI)
     filters,
@@ -26,88 +36,91 @@ export default function ProblemsPage() {
     handleKeywordChange,
     handleSortByChange,
     handleSortOrderChange,
-    handleSearch,
     handleReset,
     handleLoadMore,
   } = useProblems();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      {/* Header */}
-      {/* <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700">
-        <div className="container mx-auto px-6 py-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent mb-2">
-                Vibe Match Problems
-              </h1>
-              <p className="text-slate-600 dark:text-slate-400 text-lg">
-                Khám phá và chinh phục hàng ngàn bài tập lập trình
-              </p>
-            </div>
-            <ProblemStats problems={problems} />
-          </div>
-        </div>
-      </div> */}
-
-      {/* Main Content */}
-      <div className="container mx-auto px-6 py-4">
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
-          {/* Left Sidebar - Filters */}
-          <div className="xl:col-span-1">
-            <div className="xl:sticky xl:top-20 xl:max-h-[calc(100vh-6rem)] xl:overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="h-[calc(100vh-4rem)] overflow-hidden bg-background">
+      <div className="container mx-auto px-4 lg:px-6 h-full max-w-[1600px]">
+        <div className="flex h-full gap-6 pt-6">
+          {/* Left Sidebar - Fixed */}
+          <aside className="hidden lg:flex w-[260px] xl:w-[280px] shrink-0 flex-col gap-6 h-full overflow-hidden">
+            <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar pb-6">
               <ProblemFilter
                 keyWord={keyword}
                 filters={filters}
+                tags={tags}
+                topics={topics}
+                isLoading={isMetadataLoading}
                 onKeywordChange={handleKeywordChange}
                 onFiltersChange={handleFiltersChange}
-                onSearch={handleSearch}
                 onReset={handleReset}
-                isLoading={isLoading}
               />
             </div>
-          </div>
+          </aside>
 
-          {/* Right Content - Problem List */}
-          <div className="xl:col-span-3">
-            <div className="space-y-6">
-              {/* Controls moved into table header */}
-
-              {/* Loading State */}
-              {isLoading && problems.length === 0 && (
-                <div className="flex items-center justify-center py-12">
-                  <div className="text-center">
-                    <div className="w-16 h-16 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mx-auto mb-4" />
-                    <p className="text-slate-600 dark:text-slate-400">
-                      Đang tải dữ liệu...
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Error State */}
-              {error && !isLoading && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
-                  <p className="text-red-600 dark:text-red-400">{error}</p>
-                </div>
-              )}
-
-              {/* Problem Table */}
-              {!error && problems.length > 0 && (
-                <ProblemTable
-                  problems={problems}
-                  hasMore={pageInfo?.hasNextPage ?? false}
-                  onLoadMore={handleLoadMore}
-                  isLoading={isLoading}
-                  totalCount={totalCount}
+          {/* Main Content - Scrollable */}
+          <main className="flex-1 min-w-0 h-full overflow-y-auto scrollbar-none" id="problems-main-scroll">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                  {t('problems_list')}
+                </h1>
+                <p className="text-muted-foreground text-sm mt-1">
+                  {t('explore_problems')}
+                </p>
+              </div>
+              <div className="flex items-center gap-4">
+                <SortControls
                   sortBy={sortBy}
                   sortOrder={sortOrder}
                   onSortByChange={handleSortByChange}
                   onSortOrderChange={handleSortOrderChange}
                 />
-              )}
+              </div>
             </div>
-          </div>
+
+            {/* Mobile Filter Trigger (Visible only on mobile) */}
+            <div className="lg:hidden mb-6">
+              {/* TODO: Add Sheet/Drawer for mobile filters */}
+              <div className="p-4 rounded-lg border border-border bg-card">
+                <ProblemFilter
+                  keyWord={keyword}
+                  filters={filters}
+                  tags={tags}
+                  topics={topics}
+                  isLoading={isMetadataLoading}
+                  onKeywordChange={handleKeywordChange}
+                  onFiltersChange={handleFiltersChange}
+                  onReset={handleReset}
+                />
+              </div>
+            </div>
+
+            {/* Error State */}
+            {error && !isLoading && (
+              <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-6 text-center mb-6">
+                <p className="text-destructive font-medium">{error}</p>
+                <Button variant="outline" size="sm" onClick={handleReset} className="mt-4">
+                  {t('try_again')}
+                </Button>
+              </div>
+            )}
+
+            {/* Problem Table */}
+            <div className="rounded-xl border border-border shadow-sm bg-card">
+              <ProblemTable
+                problems={problems}
+                hasMore={pageInfo?.hasNextPage ?? false}
+                onLoadMore={handleLoadMore}
+                isLoading={isLoading}
+                totalCount={totalCount}
+                scrollableTarget="problems-main-scroll"
+              />
+            </div>
+          </main>
         </div>
       </div>
     </div>

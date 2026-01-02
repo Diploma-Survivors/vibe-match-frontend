@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function CreateSolutionSkeleton() {
   return (
     <div className="h-[calc(100vh-65px)] bg-white dark:bg-slate-950 flex flex-col overflow-hidden">
-      <div className="max-w-screen-2xl mx-auto w-full px-4 flex flex-col h-full">
+      <div className="max-w-screen-2xl mx-auto w-full px-20 flex flex-col h-full">
         {/* Header Skeleton */}
         <div className="h-12 flex items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 shrink-0">
           <Skeleton className="h-8 w-1/3" />

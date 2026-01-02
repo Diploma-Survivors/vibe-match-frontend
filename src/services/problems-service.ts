@@ -2,61 +2,57 @@ import clientApi from '@/lib/apis/axios-client';
 import type { ApiResponse } from '@/types/api';
 import {
   type GetProblemListRequest,
-  type ProblemDescription,
+  Problem,
   ProblemDifficulty,
   type ProblemListItem,
   type ProblemListResponse,
 } from '@/types/problems';
 import type { AxiosResponse } from 'axios';
 import qs from 'qs';
+import { MOCK_PROBLEMS } from '@/data/mock-problems';
+import { SampleTestCase } from '@/types/testcases';
 
-async function getProblemListForTraining(
+async function getProblemList(
   getProblemListRequest: GetProblemListRequest
 ): Promise<AxiosResponse<ApiResponse<ProblemListResponse>>> {
-  const queryString = qs.stringify(getProblemListRequest, {
-    allowDots: true,
-    skipNulls: true,
-  });
-
-  const url = queryString
-    ? `/problems/training?${queryString}`
-    : '/problems/training';
-  return await clientApi.get(url);
+  const { filters, ...rest } = getProblemListRequest;
+  const params = qs.stringify(
+    { ...rest, ...filters },
+    {
+      allowDots: true,
+      skipNulls: true,
+    }
+  );
+  const endpoint = '/problems';
+  const url = params ? `${endpoint}?${params}` : endpoint;
+  return await clientApi.get<ApiResponse<ProblemListResponse>>(url);
 }
 
-async function getProblemById(problemId: string): Promise<ProblemDescription> {
-  const response = await clientApi.get<ApiResponse<ProblemDescription>>(
-    `/problems/${problemId}`
-  );
+async function getProblemById(
+  problemId: number
+): Promise<AxiosResponse<ApiResponse<Problem>>> {
 
-  return response.data.data;
+  const [problemResponse, samplesResponse] = await Promise.all([
+    clientApi.get<ApiResponse<Problem>>(`/problems/${problemId}`),
+    clientApi.get<ApiResponse<SampleTestCase[]>>(`/problems/${problemId}/samples`).catch(() => null),
+  ]);
+
+  if (problemResponse.data?.data && samplesResponse?.data?.data) {
+    problemResponse.data.data.sampleTestcases = samplesResponse.data.data;
+  }
+  if(problemResponse.data?.data){
+    problemResponse.data.data.hasOfficialSolution = !!problemResponse.data.data.officialSolutionContent;
+  }
+
+  return problemResponse;
 }
 
 async function getAllProblems(): Promise<ProblemListItem[]> {
   // Mock data
   return new Promise((resolve) => {
     setTimeout(() => {
-      const problems: ProblemListItem[] = Array.from({ length: 100 }).map(
-        (_, i) => {
-          const id = (i + 1).toString();
-          const difficulties = [
-            ProblemDifficulty.EASY,
-            ProblemDifficulty.MEDIUM,
-            ProblemDifficulty.HARD,
-          ];
-          const difficulty =
-            difficulties[Math.floor(Math.random() * difficulties.length)];
-          return {
-            id,
-            title: `Bài tập ${id}`,
-            difficulty,
-            tags: [],
-            topics: [],
-          };
-        }
-      );
-      resolve(problems);
-    }, 5000);
+        resolve(MOCK_PROBLEMS);
+    }, 1000);
   });
 }
 
@@ -64,32 +60,13 @@ async function getSolvedProblems(userId?: number): Promise<ProblemListItem[]> {
   // Mock data
   return new Promise((resolve) => {
     setTimeout(() => {
-      const problems: ProblemListItem[] = Array.from({ length: 40 }).map(
-        (_, i) => {
-          const id = (i + 1).toString();
-          const difficulties = [
-            ProblemDifficulty.EASY,
-            ProblemDifficulty.MEDIUM,
-            ProblemDifficulty.HARD,
-          ];
-          const difficulty =
-            difficulties[Math.floor(Math.random() * difficulties.length)];
-          return {
-            id,
-            title: `Bài tập ${id}`,
-            difficulty,
-            tags: [],
-            topics: [],
-          };
-        }
-      );
-      resolve(problems);
-    }, 5000);
+      resolve(MOCK_PROBLEMS.filter(p => p.difficulty === ProblemDifficulty.EASY));
+    }, 1000);
   });
 }
 
 export const ProblemsService = {
-  getProblemListForTraining,
+  getProblemList,
   getProblemById,
   getAllProblems,
   getSolvedProblems,

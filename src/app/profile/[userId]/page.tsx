@@ -2,6 +2,7 @@
 
 import SolutionItem from '@/components/problems/tabs/solutions/solution-item';
 import { EditProfileModal } from '@/components/profile/edit-profile-modal';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,31 +26,41 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useApp } from '@/contexts/app-context';
-import { ProblemsService } from '@/services/problems-service';
-import { SolutionsService } from '@/services/solutions-service';
-import { SubmissionsService } from '@/services/submissions-service';
 import { UserService } from '@/services/user-service';
 import { ProblemDifficulty, type ProblemListItem } from '@/types/problems';
 import { type Solution, SolutionSortBy } from '@/types/solutions';
-import { type SubmissionListItem, SubmissionStatus } from '@/types/submissions';
-import type { UserProfile } from '@/types/user';
+import { type Submission, SubmissionStatus } from '@/types/submissions';
+import type {
+  UserActivityCalendar,
+  UserProblemStats,
+  UserRecentACProblem,
+  UserSubmissionStats,
+  UserProfile,
+} from '@/types/user';
 import { format } from 'date-fns';
 import {
   ArrowRight,
   Calendar,
   Clock,
   Edit,
+  Github,
+  Globe,
+  Linkedin,
   Loader2,
   Mail,
   MapPin,
+  MessageSquare,
   Phone,
   Search,
+  ThumbsDown,
+  ThumbsUp,
   Trophy,
   User,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { use, useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type MonthKey =
   | 'Jan'
@@ -83,28 +94,29 @@ const monthWidths: Record<string, number> = {
 export default function ProfilePage({
   params,
 }: { params: Promise<{ userId: string }> }) {
+  const { t, i18n } = useTranslation('profile');
   const { userId: userIdString } = use(params);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [solvedProblems, setSolvedProblems] = useState<ProblemListItem[]>([]);
-  const [allProblems, setAllProblems] = useState<ProblemListItem[]>([]);
-  const [submissions, setSubmissions] = useState<SubmissionListItem[]>([]);
+
+  // New State for Backend Data
+  const [problemStats, setProblemStats] = useState<UserProblemStats | null>(null);
+  const [submissionStats, setSubmissionStats] = useState<UserSubmissionStats | null>(null);
+  const [activityCalendar, setActivityCalendar] = useState<UserActivityCalendar | null>(null);
+  const [recentActivity, setRecentActivity] = useState<UserRecentACProblem[]>([]);
+  const [activityYears, setActivityYears] = useState<number[]>([]);
+
   const [selectedYear, setSelectedYear] = useState<string>(
     new Date().getFullYear().toString()
-  );
-
-  // Solved Problems Pagination & Sort
-  const [solvedPage, setSolvedPage] = useState(1);
-  const solvedPerPage = 10;
-  const [solvedSortOrder, setSolvedSortOrder] = useState<'newest' | 'oldest'>(
-    'newest'
   );
 
   // Solutions Tab State
   const [userSolutions, setUserSolutions] = useState<Solution[]>([]);
   const [solutionsLoading, setSolutionsLoading] = useState(false);
   const [solutionsPage, setSolutionsPage] = useState(1);
+  const [totalSolutions, setTotalSolutions] = useState(0);
+  const [totalSolutionsPages, setTotalSolutionsPages] = useState(0);
   const solutionsPerPage = 10;
   const [solutionsSortBy, setSolutionsSortBy] = useState<SolutionSortBy>(
     SolutionSortBy.RECENT
@@ -113,12 +125,18 @@ export default function ProfilePage({
   const router = useRouter();
   const { user: currentUser } = useApp();
   const isCurrentUser = currentUser?.id === Number(userIdString);
-  const fetchUserSolutions = useCallback(async (userId: number) => {
+
+  const fetchUserSolutions = useCallback(async (userId: number, page: number, sortBy: SolutionSortBy) => {
     setSolutionsLoading(true);
     try {
-      const data = await SolutionsService.getAllSolutions(userId);
-      console.log(data);
-      setUserSolutions(data);
+      const response = await UserService.getUserSolutions(userId, {
+        page,
+        limit: solutionsPerPage,
+        sortBy,
+      });
+      setUserSolutions(response.data.data.data);
+      setTotalSolutions(response.data.data.meta.total);
+      setTotalSolutionsPages(response.data.data.meta.totalPages);
     } catch (error) {
       console.error('Error fetching user solutions:', error);
     } finally {
@@ -130,20 +148,24 @@ export default function ProfilePage({
     const fetchData = async () => {
       try {
         const userId = Number(userIdString);
-        const [userData, solvedData, allData, submissionsData] =
+
+        // Fetch initial data (user, stats, years, recent activity)
+        const [userRes, statsRes, yearsRes, recentRes] =
           await Promise.all([
             UserService.getUserProfile(userId),
-            ProblemsService.getSolvedProblems(userId),
-            ProblemsService.getAllProblems(),
-            SubmissionsService.getAllSubmissions(userId),
+            UserService.getUserStats(userId),
+            UserService.getUserActivityYears(userId),
+            UserService.getUserRecentACProblems(userId),
           ]);
-        setUser(userData);
-        setSolvedProblems(solvedData);
-        setAllProblems(allData);
-        setSubmissions(submissionsData);
+
+        setUser(userRes.data.data);
+        setProblemStats(statsRes.data.data.problemStats);
+        setSubmissionStats(statsRes.data.data.submissionStats);
+        setActivityYears(yearsRes.data.data);
+        setRecentActivity(recentRes.data.data);
 
         // Fetch initial user solutions
-        fetchUserSolutions(userId);
+        fetchUserSolutions(userId, solutionsPage, solutionsSortBy);
       } catch (error) {
         console.error('Error fetching profile data:', error);
       } finally {
@@ -152,87 +174,70 @@ export default function ProfilePage({
     };
 
     fetchData();
-  }, [userIdString, fetchUserSolutions]);
+  }, [userIdString, fetchUserSolutions]); // Added fetchUserSolutions to deps, but it's useCallback'd
 
+  // Fetch calendar when year changes
   useEffect(() => {
-    fetchUserSolutions(Number(userIdString));
-  }, [fetchUserSolutions, userIdString]);
+    const fetchCalendar = async () => {
+      if (!userIdString) return;
+      try {
+        const userId = Number(userIdString);
+        const year = Number(selectedYear);
+        const response = await UserService.getUserActivityCalendar(userId, year);
+        setActivityCalendar(response.data.data);
+      } catch (error) {
+        console.error('Error fetching activity calendar:', error);
+      }
+    };
+
+    fetchCalendar();
+  }, [userIdString, selectedYear]);
+
+  // Fetch solutions when page or sort changes
+  useEffect(() => {
+    if (!userIdString) return;
+    fetchUserSolutions(Number(userIdString), solutionsPage, solutionsSortBy);
+  }, [userIdString, solutionsPage, solutionsSortBy, fetchUserSolutions]);
+
 
   const handleSaveProfile = (updatedUser: UserProfile) => {
     setUser(updatedUser);
     // In a real app, we would call an API to update the user here
   };
 
-  // Stats Calculation
-  const getDifficultyStats = (difficulty: ProblemDifficulty) => {
-    const solvedCount = solvedProblems.filter(
-      (p) => p.difficulty === difficulty
-    ).length;
-    const totalCount = allProblems.filter(
-      (p) => p.difficulty === difficulty
-    ).length;
-    return { solved: solvedCount, total: totalCount };
+  const handleProblemClick = (problemId: number) => {
+    router.push(`/problems/${problemId}/description`);
   };
 
-  const easyStats = getDifficultyStats(ProblemDifficulty.EASY);
-  const mediumStats = getDifficultyStats(ProblemDifficulty.MEDIUM);
-  const hardStats = getDifficultyStats(ProblemDifficulty.HARD);
-  const totalSolved = solvedProblems.length;
-  const totalProblems = allProblems.length;
-
-  // Submission Stats
-  const getSubmissionStats = () => {
-    const stats: Record<string, number> = {
-      [SubmissionStatus.ACCEPTED]: 0,
-      [SubmissionStatus.WRONG_ANSWER]: 0,
-      [SubmissionStatus.RUNTIME_ERROR]: 0,
-      [SubmissionStatus.TIME_LIMIT_EXCEEDED]: 0,
-      [SubmissionStatus.COMPILATION_ERROR]: 0,
-      others: 0,
-    };
-
-    for (const s of submissions) {
-      if (stats[s.status] !== undefined) {
-        stats[s.status]++;
-      } else {
-        stats.others++;
-      }
+  const handleSolutionClick = (solutionId: string) => {
+    const solution = userSolutions.find((s) => s.id === solutionId);
+    if (solution) {
+      router.push(
+        `/problems/${solution.problemId}/solutions/${solutionId}`
+      );
     }
-    return stats;
   };
 
-  const submissionStats = getSubmissionStats();
+  // Heatmap Rendering Logic
+  const renderHeatmap = () => {
+    if (!activityCalendar) return null;
 
-  // Heatmap Data
-  const getHeatmapData = () => {
-    const year = Number.parseInt(selectedYear);
+    const { activeDays } = activityCalendar;
+    const year = Number(selectedYear);
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year, 11, 31);
 
-    // Create a map of date -> submission count
+    // Create a map for quick lookup
     const submissionMap = new Map<string, number>();
-    const activeDays = new Set();
+    activeDays.forEach(day => submissionMap.set(day.date, day.count));
 
-    for (const sub of submissions) {
-      if (!sub.createdAt) continue;
-      const date = new Date(sub.createdAt);
-      if (date.getFullYear() === year) {
-        const dateStr = format(date, 'yyyy-MM-dd');
-        submissionMap.set(dateStr, (submissionMap.get(dateStr) || 0) + 1);
-        activeDays.add(dateStr);
-      }
-    }
-
-    // Generate grid data
     const grid = [];
     const months = [];
     let currentMonth = -1;
-    const weekCount = 0;
 
-    // Pad start to align with Sunday (0) or Monday (1)
-    // Let's assume Monday start for GitHub style
+    // Pad start to align with Monday
     const startDay = startDate.getDay(); // 0 is Sunday
-    const padding = startDay === 0 ? 6 : startDay - 1; // Adjust for Monday start
+    const padding = startDay === 0 ? 6 : startDay - 1;
 
     for (let i = 0; i < padding; i++) {
       grid.push({ id: `pad-${i}`, isPadding: true, date: '', count: 0 });
@@ -247,17 +252,11 @@ export default function ProfilePage({
       const month = d.getMonth();
 
       if (month !== currentMonth) {
-        months.push({ label: format(d, 'MMM'), weeks: 0 });
+        // Calculate week index for month label positioning
+        const totalDays = grid.length;
+        const weekIndex = Math.floor(totalDays / 7);
+        months.push({ label: format(d, 'MMM'), weekIndex });
         currentMonth = month;
-      }
-
-      // Increment week count for the current month
-      // This is a rough approximation, better to count weeks based on column index
-      if (months.length > 0) {
-        // Check if it's the start of a new column (Monday)
-        if (d.getDay() === 1) {
-          months[months.length - 1].weeks++;
-        }
       }
 
       grid.push({
@@ -268,273 +267,97 @@ export default function ProfilePage({
       });
     }
 
-    // Fix month week counts - simple distribution
-    // Total weeks approx 53. Distribute evenly or based on day count?
-    // Let's just use a fixed width for now in UI or calculate better.
-    // Re-calculating months based on grid columns
-    const totalDays = grid.length;
-    const totalWeeks = Math.ceil(totalDays / 7);
-    const monthLabels = [];
-    const currentWeekIndex = 0;
+    return (
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-semibold">{t('activity_calendar')}</h3>
+          <Select
+            value={selectedYear}
+            onValueChange={setSelectedYear}
+          >
+            <SelectTrigger className="w-[100px]">
+              <SelectValue placeholder="Year" />
+            </SelectTrigger>
+            <SelectContent>
+              {activityYears.map((y) => (
+                <SelectItem key={y} value={y.toString()}>
+                  {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-    for (let m = 0; m < 12; m++) {
-      const firstDayOfMonth = new Date(year, m, 1);
-      // Find which week index this day falls into
-      const dayOfYear =
-        Math.floor(
-          (firstDayOfMonth.getTime() - startDate.getTime()) /
-            (1000 * 60 * 60 * 24)
-        ) + padding;
-      const weekIndex = Math.floor(dayOfYear / 7);
+        <div className="relative overflow-x-auto pb-2">
+          {/* Month Labels */}
+          <div className="flex text-xs text-muted-foreground mb-2 relative h-4 ml-10">
+            {months.map((m, i) => (
+              <div
+                key={m.label}
+                className="absolute"
+                style={{ left: `${m.weekIndex * 16}px` }} // Approx 14px per cell+gap
+              >
+                {m.label}
+              </div>
+            ))}
+          </div>
 
-      // Calculate duration in weeks until next month
-      const nextMonth = new Date(year, m + 1, 1);
-      const nextMonthDayOfYear =
-        Math.floor(
-          (nextMonth.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-        ) + padding;
-      const nextMonthWeekIndex = Math.floor(nextMonthDayOfYear / 7);
+          <div className="flex gap-2">
+            {/* Day Labels */}
+            <div className="flex flex-col gap-1 text-[10px] text-muted-foreground pt-[2px]">
+              <div className="h-3"></div>
+              <div className="h-3">Mon</div>
+              <div className="h-3"></div>
+              <div className="h-3">Wed</div>
+              <div className="h-3"></div>
+              <div className="h-3">Fri</div>
+              <div className="h-3"></div>
+            </div>
 
-      monthLabels.push({
-        label: format(firstDayOfMonth, 'MMM'),
-        weeks: nextMonthWeekIndex - weekIndex,
-      });
-    }
-
-    return { grid, months: monthLabels, totalActiveDays: activeDays.size };
-  };
-
-  const heatmapData = getHeatmapData();
-  const totalActiveDays = heatmapData.totalActiveDays;
-
-  // Recent Activity (AC Problems)
-  const getRecentACProblems = () => {
-    const acSubmissions = submissions
-      .filter((s) => s.status === SubmissionStatus.ACCEPTED && s.createdAt)
-      .sort((a, b) => {
-        const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-        const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-        return timeB - timeA;
-      });
-
-    // Deduplicate by problemId, keeping the latest
-    const uniqueAC = new Map<string, SubmissionListItem>();
-    for (const s of acSubmissions) {
-      if (s.problemId && !uniqueAC.has(s.problemId)) {
-        uniqueAC.set(s.problemId, s);
-      }
-    }
-
-    return Array.from(uniqueAC.values()).map((s) => {
-      const problem = allProblems.find((p) => p.id === s.problemId);
-      return {
-        ...s,
-        problemTitle: problem?.title || 'Unknown Problem',
-      };
-    });
-  };
-
-  // Solved Problems Logic (Merged with Submissions for Time)
-  const solvedProblemsWithTime = useMemo(() => {
-    return solvedProblems
-      .map((problem) => {
-        // Find the latest accepted submission for this problem
-        const latestSubmission = submissions
-          .filter(
-            (s) =>
-              s.problemId === problem.id &&
-              s.status === SubmissionStatus.ACCEPTED
-          )
-          .sort(
-            (a, b) =>
-              new Date(b.createdAt || 0).getTime() -
-              new Date(a.createdAt || 0).getTime()
-          )[0];
-
-        return {
-          ...problem,
-          solvedAt: latestSubmission?.createdAt || null,
-        };
-      })
-      .sort((a, b) => {
-        const timeA = new Date(a.solvedAt || 0).getTime();
-        const timeB = new Date(b.solvedAt || 0).getTime();
-        return solvedSortOrder === 'newest' ? timeB - timeA : timeA - timeB;
-      });
-  }, [solvedProblems, submissions, solvedSortOrder]);
-
-  const paginatedSolvedProblems = useMemo(() => {
-    const startIndex = (solvedPage - 1) * solvedPerPage;
-    return solvedProblemsWithTime.slice(startIndex, startIndex + solvedPerPage);
-  }, [solvedProblemsWithTime, solvedPage]);
-
-  const totalSolvedPages = Math.ceil(
-    solvedProblemsWithTime.length / solvedPerPage
-  );
-
-  // Solutions Pagination & Sort Logic
-  const sortedSolutions = useMemo(() => {
-    const sorted = [...userSolutions];
-    if (solutionsSortBy === SolutionSortBy.MOST_VOTED) {
-      sorted.sort((a, b) => b.upvoteCount - a.upvoteCount);
-    } else {
-      sorted.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-    }
-    return sorted;
-  }, [userSolutions, solutionsSortBy]);
-
-  const paginatedSolutions = useMemo(() => {
-    const startIndex = (solutionsPage - 1) * solutionsPerPage;
-    return sortedSolutions.slice(startIndex, startIndex + solutionsPerPage);
-  }, [sortedSolutions, solutionsPage]);
-
-  const totalSolutionsPages = Math.ceil(
-    userSolutions.length / solutionsPerPage
-  );
-
-  const handleProblemClick = (problemId: string) => {
-    router.push(`/problems/${problemId}/description`);
-  };
-
-  const handleSolutionClick = (solutionId: string) => {
-    // Assuming we want to go to the problem's solution tab with this solution selected
-    // We need the problemId for the URL. The solution object has it?
-    // Wait, Solution type doesn't explicitly have problemId in the interface I saw earlier?
-    // Let's check the Solution type again.
-    // It has `id`, `title`, `content`, `authorId`, etc. It DOES NOT have `problemId` in the interface I saw.
-    // However, in a real app, a solution belongs to a problem.
-    // For now, I'll assume we can navigate to a generic solution page or I need to update the mock/type.
-    // The mock data doesn't seem to have problemId.
-    // But `SolutionListRequest` takes `problemId`.
-    // If I can't get problemId, I can't construct the URL `/problems/[id]/solutions`.
-    // I'll assume for now that I can't easily link to the specific problem context without problemId.
-    // BUT, the user wants "navigate to the solutions tab".
-    // I'll check if I can add `problemId` to the Solution type and mock.
-    // For now, I'll just log it or try to find a workaround.
-    // Actually, looking at `SolutionItem`, it displays tags and languages.
-    // If I don't have problemId, I can't link to the problem.
-    // I will add `problemId` to the `Solution` interface and mock data in a separate step if needed.
-    // For now, I will use a placeholder or assume it's available.
-    // Wait, I can't assume it if it's not in the type.
-    // I'll check `Solution` type again in my thought process.
-    // It was:
-    // export interface Solution { id: string; title: string; authorId: number; ... }
-    // No problemId.
-    // I should add `problemId` to `Solution` type and mock.
-    // I will do that in a separate tool call or just update it here if I can.
-    // I'll assume I'll fix the type/mock in the next step.
-    // For now, I'll use a dummy problem ID '1' or try to extract it from title? No.
-    // I'll just comment the navigation for now and fix it immediately after.
-    // Actually, I can just use `router.push` with a placeholder and fix it.
-    // Or better, I'll add `problemId` to the type in the previous file edit? Too late.
-    // I'll just use a hardcoded '1' for now and fix it.
-    const solution = userSolutions.find((s) => s.id === solutionId);
-    if (solution) {
-      router.push(
-        `/problems/${solution.problemId}/solutions?solutionId=${solutionId}`
-      );
-    }
+            {/* Grid */}
+            <div className="grid grid-rows-7 grid-flow-col gap-1">
+              {grid.map((cell) => (
+                <Tooltip
+                  key={cell.id}
+                  content={cell.isPadding ? '' : `${cell.count} submissions on ${cell.date}`}
+                >
+                  <div
+                    className={`w-3 h-3 rounded-sm ${cell.isPadding
+                      ? 'bg-transparent'
+                      : cell.count === 0
+                        ? 'bg-muted'
+                        : cell.count < 3
+                          ? 'bg-green-300'
+                          : cell.count < 6
+                            ? 'bg-green-500'
+                            : 'bg-green-700'
+                      }`}
+                  />
+                </Tooltip>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          {t('total_active_days')}: {activityCalendar.totalActiveDays}
+        </div>
+      </div>
+    );
   };
 
   if (loading) {
     return (
       <div className="container mx-auto p-6 space-y-6">
         <div className="grid grid-cols-12 gap-6">
-          {/* Left Column Skeleton */}
           <div className="col-span-12 lg:col-span-3 space-y-6">
-            <Card className="shadow-lg border-none">
-              <CardContent className="pt-6 flex flex-col items-center text-center space-y-4">
-                <Skeleton className="w-32 h-32 rounded-full" />
-                <div className="space-y-2 w-full flex flex-col items-center">
-                  <Skeleton className="h-8 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-                <Skeleton className="h-6 w-24 rounded-full" />
-                <Skeleton className="h-10 w-full" />
-                <div className="w-full space-y-3 pt-4">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-full" />
-                </div>
-              </CardContent>
-            </Card>
+            <Skeleton className="h-[400px] w-full rounded-xl" />
           </div>
-
-          {/* Right Column Skeleton */}
           <div className="col-span-12 lg:col-span-9 space-y-6">
-            {/* Stats Row Skeleton */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border-none shadow-md">
-                <CardHeader>
-                  <Skeleton className="h-6 w-32" />
-                </CardHeader>
-                <CardContent className="flex items-center justify-center space-x-8">
-                  <Skeleton className="w-32 h-32 rounded-full" />
-                  <div className="space-y-2 flex-1">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-2 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-2 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-2 w-full" />
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="border-none shadow-md">
-                <CardHeader>
-                  <Skeleton className="h-6 w-40" />
-                </CardHeader>
-                <CardContent className="flex items-center justify-between">
-                  <Skeleton className="w-32 h-32 rounded-full" />
-                  <div className="space-y-2 w-1/2">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                  </div>
-                </CardContent>
-              </Card>
+              <Skeleton className="h-[300px] w-full rounded-xl" />
+              <Skeleton className="h-[300px] w-full rounded-xl" />
             </div>
-
-            {/* Heatmap Skeleton */}
-            <Card className="border-none shadow-md">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <Skeleton className="h-6 w-64" />
-                <div className="flex items-center gap-4">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-10 w-[100px]" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-[120px] w-full" />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Recent Activity Skeleton */}
-            <Card className="border-none shadow-md">
-              <CardHeader>
-                <div className="flex gap-4">
-                  <Skeleton className="h-8 w-32" />
-                  <Skeleton className="h-8 w-24" />
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <Skeleton className="h-12 w-full" />
-                  <Skeleton className="h-12 w-full" />
-                  <Skeleton className="h-12 w-full" />
-                  <Skeleton className="h-12 w-full" />
-                </div>
-              </CardContent>
-            </Card>
+            <Skeleton className="h-[200px] w-full rounded-xl" />
           </div>
         </div>
       </div>
@@ -548,55 +371,109 @@ export default function ProfilePage({
       <div className="grid grid-cols-12 gap-6">
         {/* Left Column: User Profile Sidebar */}
         <div className="col-span-12 lg:col-span-3 space-y-6">
-          <Card className="shadow-lg border-none">
+          <Card className="shadow-lg border border-border bg-card">
             <CardContent className="pt-6 flex flex-col items-center text-center space-y-4">
               <div className="relative">
-                <img
-                  src={user.avatarUrl}
-                  alt={user.username}
-                  className="w-32 h-32 rounded-xl object-cover border-4 border-white shadow-md"
-                />
+                <Avatar className="w-32 h-32 rounded-xl border-4 border-background shadow-md">
+                  <AvatarImage src={user.avatarUrl} className="object-cover" />
+                  <AvatarFallback className="rounded-xl">
+                    <img
+                      src="/avatars/placeholder.png"
+                      alt={user.username}
+                      className="w-full h-full object-cover"
+                    />
+                  </AvatarFallback>
+                </Avatar>
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  {user.firstName} {user.lastName}
+                <h2 className="text-2xl font-bold text-foreground">
+                  {user.fullName}
                 </h2>
-                <p className="text-gray-500 font-medium">{user.username}</p>
+                <p className="text-muted-foreground font-medium">{user.username}</p>
               </div>
               <Badge
                 variant="secondary"
                 className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200 px-3 py-1"
               >
                 <Trophy className="w-3 h-3 mr-1" />
-                {`Rank ${user.rank}`}
+                {`${t('rank')} ${user.rank}`}
               </Badge>
 
               {isCurrentUser && (
                 <Button
-                  className="w-full bg-green-50 text-green-600 hover:bg-green-100 border border-green-200"
-                  onClick={() => setIsEditModalOpen(true)}
+                  className="w-full bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20"
+                  onClick={() => router.push('/settings')}
                 >
                   <Edit className="w-4 h-4 mr-2" />
-                  Chỉnh sửa hồ sơ
+                  {t('edit_profile')}
                 </Button>
               )}
 
               <div className="w-full space-y-3 pt-4 text-left">
-                <div className="flex items-center text-gray-600">
-                  <MapPin className="w-4 h-4 mr-3 text-gray-400" />
-                  <span className="text-sm truncate">{user.address}</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <Mail className="w-4 h-4 mr-3 text-gray-400" />
-                  <span className="text-sm truncate">{user.email}</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <Phone className="w-4 h-4 mr-3 text-gray-400" />
-                  <span className="text-sm truncate">{user.phone}</span>
-                </div>
-                <div className="flex items-center text-gray-600">
-                  <Calendar className="w-4 h-4 mr-3 text-gray-400" />
-                  <span className="text-sm truncate">Tham gia Dec 2024</span>
+                {user.bio && (
+                  <div className="text-sm text-muted-foreground italic border-l-2 border-primary/20 pl-3 py-1 mb-4">
+                    {user.bio}
+                  </div>
+                )}
+
+                {user.address && (
+                  <div className="flex items-center text-muted-foreground">
+                    <MapPin className="w-4 h-4 mr-3 text-muted-foreground/70" />
+                    <span className="text-sm truncate">{user.address}</span>
+                  </div>
+                )}
+                {user.email && (
+                  <div className="flex items-center text-muted-foreground">
+                    <Mail className="w-4 h-4 mr-3 text-muted-foreground/70" />
+                    <span className="text-sm truncate">{user.email}</span>
+                  </div>
+                )}
+                {user.phone && (
+                  <div className="flex items-center text-muted-foreground">
+                    <Phone className="w-4 h-4 mr-3 text-muted-foreground/70" />
+                    <span className="text-sm truncate">{user.phone}</span>
+                  </div>
+                )}
+
+                {user.githubUsername && (
+                  <a
+                    href={`https://github.com/${user.githubUsername}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Github className="w-4 h-4 mr-3 text-muted-foreground/70" />
+                    <span className="text-sm truncate">@{user.githubUsername}</span>
+                  </a>
+                )}
+
+                {user.linkedinUrl && (
+                  <a
+                    href={user.linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Linkedin className="w-4 h-4 mr-3 text-muted-foreground/70" />
+                    <span className="text-sm truncate">LinkedIn</span>
+                  </a>
+                )}
+
+                {user.websiteUrl && (
+                  <a
+                    href={user.websiteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Globe className="w-4 h-4 mr-3 text-muted-foreground/70" />
+                    <span className="text-sm truncate">Website</span>
+                  </a>
+                )}
+
+                <div className="flex items-center text-muted-foreground">
+                  <Calendar className="w-4 h-4 mr-3 text-muted-foreground/70" />
+                  <span className="text-sm truncate">{`${t('joined')} Dec 2024`}</span>
                 </div>
               </div>
             </CardContent>
@@ -608,463 +485,328 @@ export default function ProfilePage({
           {/* Stats Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Solved Problems Chart */}
-            <Card className="border-none shadow-md">
+            <Card className="border border-border shadow-md bg-card">
               <CardHeader>
-                <CardTitle>Bài tập đã giải</CardTitle>
+                <CardTitle>{t('solved_problems')}</CardTitle>
               </CardHeader>
               <CardContent className="flex items-center justify-center space-x-8">
-                <Tooltip
-                  content={`${((totalSolved / (totalProblems || 1)) * 100).toFixed(1)}%`}
-                >
-                  <div className="relative w-32 h-32 flex items-center justify-center cursor-pointer">
-                    <svg viewBox="0 0 36 36" className="w-full h-full">
-                      <title>Biểu đồ bài tập đã giải</title>
-                      <path
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="#eee"
-                        strokeWidth="3"
-                      />
-                      <path
-                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                        fill="none"
-                        stroke="#10b981"
-                        strokeWidth="3"
-                        strokeDasharray={`${(totalSolved / (totalProblems || 1)) * 100}, 100`}
-                      />
-                    </svg>
-                    <div className="absolute flex flex-col items-center">
-                      <span className="text-2xl font-bold text-gray-900">
-                        {totalSolved}/{totalProblems}
-                      </span>
-                      <span className="text-xs text-gray-500">Đã giải</span>
+                {problemStats && (
+                  <>
+                    <Tooltip
+                      content={`${((problemStats.total.solved / (problemStats.total.total || 1)) * 100).toFixed(1)}%`}
+                    >
+                      <div className="relative w-32 h-32 flex items-center justify-center cursor-pointer">
+                        <svg viewBox="0 0 36 36" className="w-full h-full">
+                          <title>{t('solved_problems_chart')}</title>
+                          <path
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="currentColor"
+                            className="text-muted"
+                            strokeWidth="3"
+                          />
+                          <path
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                            fill="none"
+                            stroke="#10b981"
+                            strokeWidth="3"
+                            strokeDasharray={`${(problemStats.total.solved / (problemStats.total.total || 1)) * 100}, 100`}
+                          />
+                        </svg>
+                        <div className="absolute flex flex-col items-center">
+                          <span className="text-2xl font-bold text-foreground">
+                            {problemStats.total.solved}/{problemStats.total.total}
+                          </span>
+                          <span className="text-xs text-muted-foreground">{t('solved')}</span>
+                        </div>
+                      </div>
+                    </Tooltip>
+
+                    <div className="space-y-2 flex-1">
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-green-600 font-medium">{t('easy')}</span>
+                        <span className="font-bold">
+                          {problemStats.easy.solved}
+                          <span className="text-muted-foreground font-normal">
+                            /{problemStats.easy.total}
+                          </span>
+                        </span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className="bg-green-500 h-2 rounded-full"
+                          style={{
+                            width: `${(problemStats.easy.solved / (problemStats.easy.total || 1)) * 100}%`,
+                          }}
+                        />
+                      </div>
+
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-yellow-600 font-medium">
+                          {t('medium')}
+                        </span>
+                        <span className="font-bold">
+                          {problemStats.medium.solved}
+                          <span className="text-muted-foreground font-normal">
+                            /{problemStats.medium.total}
+                          </span>
+                        </span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className="bg-yellow-500 h-2 rounded-full"
+                          style={{
+                            width: `${(problemStats.medium.solved / (problemStats.medium.total || 1)) * 100}%`,
+                          }}
+                        />
+                      </div>
+
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-red-600 font-medium">{t('hard')}</span>
+                        <span className="font-bold">
+                          {problemStats.hard.solved}
+                          <span className="text-muted-foreground font-normal">
+                            /{problemStats.hard.total}
+                          </span>
+                        </span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className="bg-red-500 h-2 rounded-full"
+                          style={{
+                            width: `${(problemStats.hard.solved / (problemStats.hard.total || 1)) * 100}%`,
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                </Tooltip>
-
-                <div className="space-y-2 flex-1">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-green-600 font-medium">Dễ</span>
-                    <span className="font-bold">
-                      {easyStats.solved}
-                      <span className="text-gray-400 font-normal">
-                        /{easyStats.total}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div
-                      className="bg-green-500 h-2 rounded-full"
-                      style={{
-                        width: `${(easyStats.solved / (easyStats.total || 1)) * 100}%`,
-                      }}
-                    />
-                  </div>
-
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-yellow-600 font-medium">
-                      Trung bình
-                    </span>
-                    <span className="font-bold">
-                      {mediumStats.solved}
-                      <span className="text-gray-400 font-normal">
-                        /{mediumStats.total}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div
-                      className="bg-yellow-500 h-2 rounded-full"
-                      style={{
-                        width: `${(mediumStats.solved / (mediumStats.total || 1)) * 100}%`,
-                      }}
-                    />
-                  </div>
-
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-red-600 font-medium">Khó</span>
-                    <span className="font-bold">
-                      {hardStats.solved}
-                      <span className="text-gray-400 font-normal">
-                        /{hardStats.total}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div
-                      className="bg-red-500 h-2 rounded-full"
-                      style={{
-                        width: `${(hardStats.solved / (hardStats.total || 1)) * 100}%`,
-                      }}
-                    />
-                  </div>
-                </div>
+                  </>
+                )}
               </CardContent>
             </Card>
 
             {/* Submission Status Chart */}
-            <Card className="border-none shadow-md">
+            <Card className="border border-border shadow-md bg-card">
               <CardHeader>
-                <CardTitle>Thống kê submissions</CardTitle>
+                <CardTitle>{t('submission_stats')}</CardTitle>
               </CardHeader>
               <CardContent className="flex items-center justify-between">
-                {/* Pie Chart */}
-                <div className="relative w-32 h-32">
-                  <svg
-                    viewBox="0 0 32 32"
-                    className="w-full h-full transform -rotate-90"
-                  >
-                    <title>Biểu đồ trạng thái nộp bài</title>
-                    {(() => {
-                      const total = submissions.length || 1;
-                      let cumulativePercent = 0;
-                      const data = [
-                        { status: SubmissionStatus.ACCEPTED, color: '#10b981' },
-                        {
-                          status: SubmissionStatus.WRONG_ANSWER,
-                          color: '#ef4444',
-                        },
-                        {
-                          status: SubmissionStatus.TIME_LIMIT_EXCEEDED,
-                          color: '#eab308',
-                        },
-                        {
-                          status: SubmissionStatus.RUNTIME_ERROR,
-                          color: '#f97316',
-                        },
-                        { status: 'others', color: '#6b7280' },
-                      ];
+                {submissionStats && (
+                  <>
+                    {/* Pie Chart */}
+                    <div className="relative w-32 h-32">
+                      <svg
+                        viewBox="0 0 32 32"
+                        className="w-full h-full transform -rotate-90"
+                      >
+                        <title>{t('submission_status_chart')}</title>
+                        {(() => {
+                          const total = submissionStats.total || 1;
+                          let cumulativePercent = 0;
+                          const data = [
+                            { status: SubmissionStatus.ACCEPTED, count: submissionStats.accepted, color: '#10b981' },
+                            { status: SubmissionStatus.WRONG_ANSWER, count: submissionStats.wrongAnswer, color: '#ef4444' },
+                            { status: SubmissionStatus.TIME_LIMIT_EXCEEDED, count: submissionStats.timeLimitExceeded, color: '#eab308' },
+                            { status: SubmissionStatus.RUNTIME_ERROR, count: submissionStats.runtimeError, color: '#f97316' },
+                            { status: 'others', count: submissionStats.others + submissionStats.compilationError, color: '#6b7280' },
+                          ];
 
-                      return data.map((item) => {
-                        const count =
-                          item.status === 'others'
-                            ? (submissionStats[
-                                SubmissionStatus.COMPILATION_ERROR
-                              ] || 0) + (submissionStats.others || 0)
-                            : submissionStats[
-                                item.status as SubmissionStatus
-                              ] || 0;
+                          return data.map((item) => {
+                            if (item.count === 0) return null;
 
-                        if (count === 0) return null;
+                            const percent = (item.count / total) * 100;
+                            const startPercent = cumulativePercent;
+                            cumulativePercent += percent;
 
-                        const percent = (count / total) * 100;
-                        const startPercent = cumulativePercent;
-                        cumulativePercent += percent;
+                            // Calculate SVG path for pie slice
+                            const x1 = 16 + 16 * Math.cos((2 * Math.PI * startPercent) / 100);
+                            const y1 = 16 + 16 * Math.sin((2 * Math.PI * startPercent) / 100);
+                            const x2 = 16 + 16 * Math.cos((2 * Math.PI * cumulativePercent) / 100);
+                            const y2 = 16 + 16 * Math.sin((2 * Math.PI * cumulativePercent) / 100);
 
-                        // Calculate SVG path for pie slice
-                        const x1 =
-                          16 +
-                          16 * Math.cos((2 * Math.PI * startPercent) / 100);
-                        const y1 =
-                          16 +
-                          16 * Math.sin((2 * Math.PI * startPercent) / 100);
-                        const x2 =
-                          16 +
-                          16 *
-                            Math.cos((2 * Math.PI * cumulativePercent) / 100);
-                        const y2 =
-                          16 +
-                          16 *
-                            Math.sin((2 * Math.PI * cumulativePercent) / 100);
+                            const largeArcFlag = percent > 50 ? 1 : 0;
 
-                        const largeArcFlag = percent > 50 ? 1 : 0;
+                            // Handle 100% case
+                            if (percent > 99.9) {
+                              return (
+                                <circle key={item.status} cx="16" cy="16" r="16" fill={item.color} />
+                              );
+                            }
 
-                        return (
-                          <Tooltip
-                            key={item.status}
-                            content={`${item.status}: ${percent.toFixed(1)}%`}
-                          >
-                            <path
-                              d={`M 16 16 L ${x1} ${y1} A 16 16 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
-                              fill={item.color}
-                              className="cursor-pointer hover:opacity-80 transition-opacity"
-                            />
-                          </Tooltip>
-                        );
-                      });
-                    })()}
-                  </svg>
-                </div>
+                            return (
+                              <Tooltip
+                                key={item.status}
+                                content={`${item.status === 'others' ? t('others') : item.status}: ${percent.toFixed(1)}%`}
+                              >
+                                <path
+                                  d={`M 16 16 L ${x1} ${y1} A 16 16 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
+                                  fill={item.color}
+                                  className="cursor-pointer hover:opacity-80 transition-opacity"
+                                />
+                              </Tooltip>
+                            );
+                          });
+                        })()}
+                      </svg>
+                    </div>
 
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-green-500" />
-                    <span className="text-gray-600">Accepted:</span>
-                    <span className="font-bold">
-                      {submissionStats[SubmissionStatus.ACCEPTED] || 0}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500" />
-                    <span className="text-gray-600">Wrong Answer:</span>
-                    <span className="font-bold">
-                      {submissionStats[SubmissionStatus.WRONG_ANSWER] || 0}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                    <span className="text-gray-600">Time Limit:</span>
-                    <span className="font-bold">
-                      {submissionStats[SubmissionStatus.TIME_LIMIT_EXCEEDED] ||
-                        0}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-orange-500" />
-                    <span className="text-gray-600">Runtime Error:</span>
-                    <span className="font-bold">
-                      {submissionStats[SubmissionStatus.RUNTIME_ERROR] || 0}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-gray-500" />
-                    <span className="text-gray-600">Others:</span>
-                    <span className="font-bold">
-                      {(submissionStats[SubmissionStatus.COMPILATION_ERROR] ||
-                        0) + (submissionStats.others || 0)}
-                    </span>
-                  </div>
-                </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-green-500" />
+                        <span className="text-muted-foreground">{t('accepted')}:</span>
+                        <span className="font-bold">{submissionStats.accepted}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500" />
+                        <span className="text-muted-foreground">{t('wrong_answer')}:</span>
+                        <span className="font-bold">{submissionStats.wrongAnswer}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                        <span className="text-muted-foreground">{t('time_limit')}:</span>
+                        <span className="font-bold">{submissionStats.timeLimitExceeded}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-orange-500" />
+                        <span className="text-muted-foreground">{t('runtime_error')}:</span>
+                        <span className="font-bold">{submissionStats.runtimeError}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-gray-500" />
+                        <span className="text-muted-foreground">{t('others')}:</span>
+                        <span className="font-bold">{submissionStats.others + submissionStats.compilationError}</span>
+                      </div>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           </div>
 
-          {/* Contribution Graph */}
-          <Card className="border-none shadow-md">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-base font-medium">
-                {submissions.length} submissions trong một năm qua
-              </CardTitle>
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-500">
-                  Số ngày hoạt động: {totalActiveDays}
-                </span>
-                <Select value={selectedYear} onValueChange={setSelectedYear}>
-                  <SelectTrigger className="w-[100px]">
-                    <SelectValue placeholder="Năm" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="2024">2024</SelectItem>
-                    <SelectItem value="2025">2025</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <div className="min-w-[820px]">
-                  {/* Month Labels */}
-                  <div className="flex text-xs text-gray-500 mb-2 ml-8">
-                    {heatmapData.months.map((month) => (
-                      <div
-                        key={month.label}
-                        style={{ width: `${monthWidths[month.label]}px` }} // Approx width per week
-                      >
-                        {month.label}
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex">
-                    {/* Day Labels */}
-                    <div className="flex flex-col gap-1 mr-2 text-xs text-gray-500 pt-5">
-                      <div className="h-3">Mon</div>
-                      <div className="h-3" />
-                      <div className="h-3">Wed</div>
-                      <div className="h-3" />
-                      <div className="h-3">Fri</div>
-                    </div>
-
-                    {/* Heatmap Grid */}
-                    <div className="grid grid-rows-7 grid-flow-col gap-1">
-                      {heatmapData.grid.map((day) => {
-                        if (day.isPadding) {
-                          return <div key={day.id} className="w-3 h-3" />;
-                        }
-                        return (
-                          <Tooltip
-                            key={day.id}
-                            content={`${day.count} submissions on ${day.date}`}
-                          >
-                            <div
-                              className={`w-3 h-3 rounded-sm ${
-                                day.count === 0
-                                  ? 'bg-gray-100'
-                                  : day.count < 3
-                                    ? 'bg-green-200'
-                                    : day.count < 6
-                                      ? 'bg-green-400'
-                                      : 'bg-green-600'
-                              }`}
-                            />
-                          </Tooltip>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              </div>
+          {/* Heatmap */}
+          <Card className="border border-border shadow-md bg-card">
+            <CardContent className="pt-6">
+              {renderHeatmap()}
             </CardContent>
           </Card>
 
-          {/* Recent Activity */}
-          <Card className="border-none shadow-md">
-            <CardHeader>
-              <Tabs defaultValue="ac_problems" className="w-full">
-                <div className="flex items-center justify-between mb-4">
-                  <TabsList>
-                    <TabsTrigger value="ac_problems">
-                      Bài tập đã giải
-                    </TabsTrigger>
-                    <TabsTrigger value="solutions">Solution</TabsTrigger>
-                  </TabsList>
-                  <Link href={`/profile/${userIdString}/practice`}>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      Đi đến lịch sử luyện tập
-                      <ArrowRight className="w-4 h-4" />
-                    </Button>
-                  </Link>
-                </div>
-                <TabsContent value="ac_problems" className="mt-4 space-y-4">
-                  <div className="flex justify-end mb-4">
-                    <Select
-                      value={solvedSortOrder}
-                      onValueChange={(v) =>
-                        setSolvedSortOrder(v as 'newest' | 'oldest')
-                      }
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Sắp xếp" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="newest">Mới nhất</SelectItem>
-                        <SelectItem value="oldest">Cũ nhất</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Bài tập</TableHead>
-                        <TableHead>Thời gian giải</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginatedSolvedProblems.map((problem) => (
-                        <TableRow
-                          key={problem.id}
-                          className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800"
-                          onClick={() => handleProblemClick(problem.id)}
-                        >
-                          <TableCell className="font-medium">
-                            {problem.title}
-                          </TableCell>
-                          <TableCell className="text-gray-500">
-                            {problem.solvedAt
-                              ? format(
-                                  new Date(problem.solvedAt),
-                                  'yyyy-MM-dd HH:mm'
-                                )
-                              : 'N/A'}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                      {paginatedSolvedProblems.length === 0 && (
-                        <TableRow>
-                          <TableCell
-                            colSpan={2}
-                            className="text-center text-gray-500"
-                          >
-                            Chưa có bài tập nào được giải.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
+          {/* Tabs: Recent AC & Solutions */}
+          <Tabs defaultValue="recent-ac" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 lg:w-[400px]">
+              <TabsTrigger value="recent-ac">{t('recent_ac_problems')}</TabsTrigger>
+              <TabsTrigger value="solutions">{t('solutions')}</TabsTrigger>
+            </TabsList>
 
-                  {/* Solved Problems Pagination Controls */}
-                  {totalSolvedPages > 1 && (
-                    <div className="flex justify-center space-x-2 mt-4">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setSolvedPage((p) => Math.max(1, p - 1))}
-                        disabled={solvedPage === 1}
+            <TabsContent value="recent-ac" className="mt-6">
+              <Card className="border border-border shadow-md bg-card">
+                <CardHeader>
+                  <CardTitle>{t('recent_ac_problems')}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {recentActivity.map((activity) => (
+                      <div
+                        key={new Date(activity.firstSolvedAt).getTime()}
+                        className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                        onClick={() => handleProblemClick(activity.problemId)}
                       >
-                        Trang trước
-                      </Button>
-                      <span className="flex items-center text-sm text-gray-600">
-                        Trang {solvedPage} / {totalSolvedPages}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setSolvedPage((p) =>
-                            Math.min(totalSolvedPages, p + 1)
-                          )
-                        }
-                        disabled={solvedPage === totalSolvedPages}
-                      >
-                        Trang sau
-                      </Button>
-                    </div>
-                  )}
-                </TabsContent>
-                <TabsContent value="solutions" className="mt-4 space-y-4">
-                  <div className="flex items-center justify-end gap-4">
+                        <div className="flex items-center gap-4">
+                          <div className="p-2 rounded-full bg-green-100 text-green-600">
+                            <CheckCircle className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-foreground">
+                              {activity.problem.title}
+                            </h4>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <span>{format(new Date(activity.firstSolvedAt), 'MMM d, yyyy')}</span>
+                            </div>
+
+                          </div>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                    ))}
+                    {recentActivity.length === 0 && (
+                      <div className="text-center text-muted-foreground py-8">
+                        {t('no_recent_activity')}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="solutions" className="mt-6">
+              <Card className="border border-border shadow-md bg-card">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>{t('solutions')}</CardTitle>
+                  <div className="flex items-center gap-4">
                     <Select
                       value={solutionsSortBy}
-                      onValueChange={(v) =>
-                        setSolutionsSortBy(v as SolutionSortBy)
+                      onValueChange={(value) =>
+                        setSolutionsSortBy(value as SolutionSortBy)
                       }
                     >
                       <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Sắp xếp" />
+                        <SelectValue placeholder={t('sort_by')} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value={SolutionSortBy.RECENT}>
-                          Mới nhất
+                          {t('most_recent')}
                         </SelectItem>
                         <SelectItem value={SolutionSortBy.MOST_VOTED}>
-                          Được bình chọn nhiều nhất
+                          {t('most_voted')}
                         </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-
+                </CardHeader>
+                <CardContent>
                   {solutionsLoading ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                    </div>
+                  ) : userSolutions.length > 0 ? (
                     <div className="space-y-4">
-                      {Array.from({ length: 3 }).map((_, i) => (
-                        <Skeleton key={i} className="h-32 w-full" />
+                      {userSolutions.map((solution) => (
+                        <div
+                          key={solution.id}
+                          className="flex items-center justify-between p-4 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
+                          onClick={() => handleSolutionClick(solution.id)}
+                        >
+                          <div className="space-y-1">
+                            <h4 className="font-medium text-foreground hover:text-primary transition-colors">
+                              {solution.title}
+                            </h4>
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                              <span>{format(new Date(solution.createdAt), 'MMM d, yyyy')}</span>
+                              <span className="flex items-center gap-1">
+                                <ThumbsUp className="w-3 h-3" />
+                                {solution.upvoteCount}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <ThumbsDown className="w-3 h-3" />
+                                {solution.downvoteCount}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <MessageSquare className="w-3 h-3" />
+                                {solution.commentCount}
+                              </span>
+                            </div>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                        </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="space-y-4">
-                      {paginatedSolutions.map((solution) => (
-                        <div
-                          key={solution.id}
-                          onClick={() => handleSolutionClick(solution.id)}
-                          className="cursor-pointer"
-                        >
-                          <SolutionItem
-                            solution={solution}
-                            isSelected={false}
-                            onClick={() => handleSolutionClick(solution.id)}
-                          />
-                        </div>
-                      ))}
-                      {paginatedSolutions.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                          Chưa có solution nào.
-                        </div>
-                      )}
+                    <div className="text-center py-8 text-muted-foreground">
+                      {t('no_solutions_found')}
                     </div>
                   )}
 
-                  {/* Solutions Pagination Controls */}
+                  {/* Solutions Pagination */}
                   {totalSolutionsPages > 1 && (
-                    <div className="flex justify-center space-x-2 mt-4">
+                    <div className="flex justify-center mt-6 gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -1073,10 +815,11 @@ export default function ProfilePage({
                         }
                         disabled={solutionsPage === 1}
                       >
-                        Trang trước
+                        {t('previous')}
                       </Button>
-                      <span className="flex items-center text-sm text-gray-600">
-                        Trang {solutionsPage} / {totalSolutionsPages}
+                      <span className="flex items-center px-4 text-sm">
+                        {t('page')} {solutionsPage} {t('of')}{' '}
+                        {totalSolutionsPages}
                       </span>
                       <Button
                         variant="outline"
@@ -1088,23 +831,36 @@ export default function ProfilePage({
                         }
                         disabled={solutionsPage === totalSolutionsPages}
                       >
-                        Trang sau
+                        {t('next')}
                       </Button>
                     </div>
                   )}
-                </TabsContent>
-              </Tabs>
-            </CardHeader>
-          </Card>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
 
-      <EditProfileModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        user={user}
-        onSave={handleSaveProfile}
-      />
+
     </div>
+  );
+}
+
+function CheckCircle({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+      <polyline points="22 4 12 14.01 9 11.01" />
+    </svg>
   );
 }

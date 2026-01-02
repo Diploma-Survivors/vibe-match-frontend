@@ -1,5 +1,5 @@
 import type { Tag } from './tags';
-import type { SampleTestcase } from './testcases';
+import type { SampleTestCase } from './testcases';
 import type { Topic } from './topics';
 import type { UserProfile } from './user';
 
@@ -10,175 +10,165 @@ export enum ProblemDifficulty {
 }
 
 export enum SortBy {
-  CREATED_AT = 'createdAt',
-  TITLE = 'title',
+  ID = 'id',
   DIFFICULTY = 'difficulty',
-  MAX_SCORE = 'maxScore',
+  ACCEPTANCE_RATE = 'acceptanceRate',
 }
+
 
 export enum SortOrder {
-  ASC = 'asc',
-  DESC = 'desc',
+  ASC = 'ASC',
+  DESC = 'DESC',
 }
 
-export enum MatchMode {
-  ANY = 'any',
-  ALL = 'all',
-}
-
-export enum ProblemType {
-  STANDALONE = 'standalone',
-  CONTEST = 'contest',
-  HYBRID = 'hybrid',
-}
 
 export enum ProblemStatus {
-  UNSOLVED = 'unsolved',
+  NOT_STARTED = 'not-started',
   ATTEMPTED = 'attempted',
-  UN_ATTEMPTED = 'un_attempted',
   SOLVED = 'solved',
 }
 
-export interface ProblemDescription {
-  id: string;
-  title: string;
-  description: string;
-  inputDescription: string;
-  outputDescription: string;
-  maxScore: number;
-  timeLimitMs: number;
-  memoryLimitKb: number;
-  difficulty: ProblemDifficulty | string;
-  type?: string;
-  createdAt?: string;
-  updatedAt?: string;
-  testcaseSamples?: SampleTestcase[];
-  score?: number; // For contest problems
-  status?: ProblemStatus;
-  tags?: Tag[];
-  topics?: Topic[];
-}
-
-export const INITIAL_PROBLEM: ProblemDescription = {
-  id: '',
-  title: '',
-  description: '',
-  inputDescription: '',
-  outputDescription: '',
-  maxScore: 0,
-  timeLimitMs: 0,
-  memoryLimitKb: 0,
-  difficulty: ProblemDifficulty.EASY,
-  type: ProblemType.STANDALONE,
-  createdAt: '',
-  updatedAt: '',
-  testcaseSamples: [],
-  score: 0,
-  status: ProblemStatus.UNSOLVED,
-  tags: [],
-  topics: [],
-};
-
 export interface ProblemFilters {
   difficulty?: ProblemDifficulty;
-  type?: ProblemType;
+  isActive?: boolean;
+  isPremium?: boolean;
+  status?: ProblemStatus;
   topicIds?: number[];
   tagIds?: number[];
 }
 
 export interface GetProblemListRequest {
-  keyword?: string;
-  after?: string;
-  before?: string;
-  first?: number;
-  last?: number;
+  page?: number;
+  limit?: number;
   sortOrder?: SortOrder;
-  matchMode?: MatchMode;
   sortBy?: SortBy;
   filters?: ProblemFilters;
+  search?: string;
 }
 
 export interface ProblemListItem {
-  id: string;
+  id: number;
   title: string;
   difficulty: ProblemDifficulty;
   tags: Tag[];
   topics: Topic[];
+  status?: ProblemStatus;
+  acceptanceRate?: number;
 }
 
-export interface ProblemEdge {
-  node: ProblemListItem;
-  cursor: string;
+// UI helpers removed in favor of component-level i18n and design system tokens
+export const DIFFICULTY_COLORS = {
+  [ProblemDifficulty.EASY]: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800',
+  [ProblemDifficulty.MEDIUM]: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800',
+  [ProblemDifficulty.HARD]: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800',
+};
+
+export const getDifficultyColor = (difficulty: ProblemDifficulty | string) => {
+  const normalized = (difficulty || '').toLowerCase() as ProblemDifficulty;
+  return DIFFICULTY_COLORS[normalized] || 'bg-slate-100 text-slate-700 border-slate-200';
+};
+
+
+
+export interface Hint {
+  order: number;
+  content: string;
 }
 
-export interface PageInfo {
-  hasNextPage: boolean;
+
+export interface Problem {
+  id: number;
+  title: string;
+  slug?: string;
+  description: string;
+  constraints: string;
+  difficulty: ProblemDifficulty;
+  isPremium: boolean;
+  isPublished?: boolean;
+  isActive: boolean;
+  status: ProblemStatus;
+  totalSubmissions?: number;
+  totalAccepted?: number;
+  acceptanceRate?: string;
+  totalAttempts?: number;
+  totalSolved?: number;
+  averageTimeToSolve?: number;
+  difficultyRating?: number;
+  testcaseFileKey?: any;
+  testcaseCount?: number;
+  timeLimitMs: number;
+  memoryLimitKb: number;
+  sampleTestcases: SampleTestCase[];
+  hints?: Hint[];
+  hasOfficialSolution?: boolean;
+  officialSolutionContent?: string;
+  createdBy?: UserProfile;
+  updatedBy?: UserProfile;
+  similarProblems?: number[];
+  topics: Topic[];
+  tags: Tag[];
+  createdAt?: string;
+  updatedAt?: string;
+
+  // Legacy/Form fields (optional to avoid breaking UI immediately)
+  inputDescription?: string;
+  outputDescription?: string;
+  testcase?: File | null;
+  testcaseSamples?: SampleTestCase[]; // Alias for sampleTestcases?
+  testcaseFileUrl?: string;
+}
+
+export interface ProblemMeta {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
   hasPreviousPage: boolean;
-  startCursor: string;
-  endCursor: string;
+  hasNextPage: boolean;
 }
 
 export interface ProblemListResponse {
-  edges: ProblemEdge[];
-  pageInfos: PageInfo;
-  totalCount: number;
+  data: Problem[];
+  meta: ProblemMeta;
 }
 
-export const DIFFICULTY_OPTIONS = [
-  { value: 'easy', label: 'Dễ' },
-  { value: 'medium', label: 'Trung bình' },
-  { value: 'hard', label: 'Khó' },
-];
+export const initialProblemData: Problem = {
+  id: 0,
+  title: '',
+  slug: '',
+  description: '',
+  constraints: '',
+  difficulty: ProblemDifficulty.EASY,
+  isPremium: false,
+  isPublished: true,
+  isActive: true,
+  status: ProblemStatus.NOT_STARTED,
+  totalSubmissions: 0,
+  totalAccepted: 0,
+  acceptanceRate: '0',
+  totalAttempts: 0,
+  totalSolved: 0,
+  averageTimeToSolve: 0,
+  difficultyRating: 0,
+  testcaseFileKey: {},
+  testcaseCount: 0,
+  timeLimitMs: 1000,
+  memoryLimitKb: 256000,
+  sampleTestcases: [],
+  hints: [],
+  hasOfficialSolution: false,
+  officialSolutionContent: '',
+  createdBy: {} as UserProfile, // Placeholder
+  updatedBy: {} as UserProfile, // Placeholder
+  similarProblems: [],
+  topics: [],
+  tags: [],
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
 
-export const TYPE_OPTIONS = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'standalone', label: 'Độc lập' },
-  { value: 'contest', label: 'Thi đấu' },
-  { value: 'hybrid', label: 'Linh hoạt' },
-];
-
-export const DIFFICULTY_LABELS = new Map([
-  [ProblemDifficulty.EASY, 'Dễ'],
-  [ProblemDifficulty.MEDIUM, 'Trung bình'],
-  [ProblemDifficulty.HARD, 'Khó'],
-]);
-
-export const DIFFICULTY_COLORS = new Map([
-  [ProblemDifficulty.EASY, 'bg-green-100 text-green-800 hover:bg-green-200'],
-  [
-    ProblemDifficulty.MEDIUM,
-    'bg-yellow-100 text-yellow-800 hover:bg-yellow-200',
-  ],
-  [ProblemDifficulty.HARD, 'bg-red-100 text-red-800 hover:bg-red-200'],
-]);
-
-export const DEFAULT_DIFFICULTY_COLOR =
-  'bg-gray-100 text-gray-800 hover:bg-gray-200';
-
-export const getDifficultyColor = (difficulty: ProblemDifficulty): string => {
-  return DIFFICULTY_COLORS.get(difficulty) || DEFAULT_DIFFICULTY_COLOR;
+  // Legacy
+  inputDescription: '',
+  outputDescription: '',
+  testcase: null,
+  testcaseSamples: [],
 };
-
-export const getDifficultyLabel = (difficulty: ProblemDifficulty): string => {
-  return DIFFICULTY_LABELS.get(difficulty) || difficulty;
-};
-
-export interface ProblemComment {
-  id: string;
-  problemId: string;
-  authorId: number;
-  author?: UserProfile;
-  content: string;
-  upvoteCount: number;
-  downvoteCount: number;
-  myVote: 'up_vote' | 'down_vote' | null;
-  parentCommentId: string | null;
-  replyCounts: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export enum ProblemCommentSortBy {
-  RECENT = 'recent',
-  MOST_VOTED = 'most_voted',
-}

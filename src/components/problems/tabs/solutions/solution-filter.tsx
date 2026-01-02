@@ -9,9 +9,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Tooltip } from '@/components/ui/tooltip';
+import { useApp } from '@/contexts/app-context';
+import { useProblemDetail } from '@/contexts/problem-detail-context';
 import { LanguagesService } from '@/services/languages';
 import { SubmissionsService } from '@/services/submissions-service';
 import { TagsService } from '@/services/tags-service';
+import { toastService } from '@/services/toasts-service';
 import { SolutionSortBy } from '@/types/solutions';
 import type { Language } from '@/types/submissions';
 import type { Tag } from '@/types/tags';
@@ -25,6 +28,9 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import ProblemStats from '../../problems-stats/problem-stats';
+import { ProblemStatus } from '@/types/problems';
 
 interface SolutionFilterProps {
   keyword: string;
@@ -53,17 +59,21 @@ export default function SolutionFilter({
   submissionId,
   problemId,
 }: SolutionFilterProps) {
+  const { t } = useTranslation('problems');
   const [showFilters, setShowFilters] = useState(false);
   const [tags, setTags] = useState<Tag[]>([]);
   const [languages, setLanguages] = useState<Language[]>([]);
   const [showAllTags, setShowAllTags] = useState(false);
   const [showAllLangs, setShowAllLangs] = useState(false);
+  const { problem } = useProblemDetail();
+  const { isLoggedin, isEmailVerified } = useApp();
+  const { t: tCommon } = useTranslation('common');
 
   useEffect(() => {
     TagsService.getAllTags().then(setTags);
     const getLanguageList = async () => {
       const response = await SubmissionsService.getLanguageList();
-      setLanguages(response.data.data);
+      setLanguages(response);
     };
     getLanguageList();
   }, []);
@@ -97,25 +107,38 @@ export default function SolutionFilter({
             value={keyword}
             onChange={(e) => onKeywordChange(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && onSearch()}
-            placeholder="Tìm kiếm solution..."
+            placeholder={t('search_solutions')}
             className="pl-9 h-9 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
           />
         </div>
 
-        {submissionId && problemId && (
-          <Tooltip content="Chia sẻ solution">
-            <Link
-              href={`/problems/${problemId}/solutions/create/${submissionId}`}
-              target="_blank"
+        {problem?.status === ProblemStatus.SOLVED && (
+          <Tooltip content={t('share_solution')}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-9 w-9 p-0"
+              onClick={() => {
+                if (!isLoggedin) {
+                  toastService.error(tCommon('login_required_action'));
+                  return;
+                }
+                if (!isEmailVerified) {
+                  toastService.error(tCommon('email_verification_required_action'));
+                  return;
+                }
+                window.open(
+                  `/problems/${problemId}/solutions/create/${submissionId}`,
+                  '_blank'
+                );
+              }}
             >
-              <Button variant="outline" size="sm" className="h-9 w-9 p-0">
-                <PenSquare className="w-4 h-4" />
-              </Button>
-            </Link>
+              <PenSquare className="w-4 h-4" />
+            </Button>
           </Tooltip>
         )}
 
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="h-9 gap-2">
               <ArrowDownWideNarrow className="w-4 h-4" />
@@ -126,12 +149,12 @@ export default function SolutionFilter({
             <DropdownMenuItem
               onClick={() => onSortChange(SolutionSortBy.RECENT)}
             >
-              Gần đây nhất
+              {t('sort_newest')}
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => onSortChange(SolutionSortBy.MOST_VOTED)}
             >
-              Nhiều vote nhất
+              {t('sort_most_voted')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -151,18 +174,17 @@ export default function SolutionFilter({
           {/* Languages */}
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Ngôn ngữ
+              {t('language')}
             </h4>
             <div className="flex flex-wrap gap-2">
               {displayedLangs.map((lang) => (
                 <button
                   key={lang.id}
                   onClick={() => toggleLang(lang.id)}
-                  className={`px-3 py-1 cursor-pointer rounded-full text-xs font-medium transition-colors border ${
-                    selectedLanguages.includes(lang.id)
-                      ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
-                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
-                  }`}
+                  className={`px-3 py-1 cursor-pointer rounded-full text-xs font-medium transition-colors border ${selectedLanguages.includes(lang.id)
+                    ? 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
+                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                    }`}
                 >
                   {lang.name}
                 </button>
@@ -172,7 +194,7 @@ export default function SolutionFilter({
                   onClick={() => setShowAllLangs(!showAllLangs)}
                   className="text-xs cursor-pointer text-blue-600 dark:text-blue-400 hover:underline px-2"
                 >
-                  {showAllLangs ? 'Thu gọn' : 'Xem thêm'}
+                  {showAllLangs ? t('show_less') : t('show_more')}
                 </button>
               )}
             </div>
@@ -183,18 +205,17 @@ export default function SolutionFilter({
           {/* Tags */}
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Tags
+              {t('tags')}
             </h4>
             <div className="flex flex-wrap gap-2">
               {displayedTags.map((tag) => (
                 <button
                   key={tag.id}
                   onClick={() => toggleTag(tag.id)}
-                  className={`px-3 cursor-pointer py-1 rounded-full text-xs font-medium transition-colors border ${
-                    selectedTags.includes(tag.id)
-                      ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800'
-                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
-                  }`}
+                  className={`px-3 cursor-pointer py-1 rounded-full text-xs font-medium transition-colors border ${selectedTags.includes(tag.id)
+                    ? 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800'
+                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                    }`}
                 >
                   {tag.name}
                 </button>
@@ -204,7 +225,7 @@ export default function SolutionFilter({
                   onClick={() => setShowAllTags(!showAllTags)}
                   className="text-xs text-blue-600 dark:text-blue-400 hover:underline px-2"
                 >
-                  {showAllTags ? 'Thu gọn' : 'Xem thêm'}
+                  {showAllTags ? t('show_less') : t('show_more')}
                 </button>
               )}
             </div>

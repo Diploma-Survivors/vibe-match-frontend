@@ -8,45 +8,31 @@ import EditorSplitPane, {
 import MarkdownToolbar from '@/components/problems/tabs/solutions/create/markdown-toolbar';
 import TagLanguageSelector from '@/components/problems/tabs/solutions/create/tag-language-selector';
 import { useDialog } from '@/components/providers/dialog-provider';
+import { useApp } from '@/contexts/app-context';
 import { SolutionsService } from '@/services/solutions-service';
 import { SubmissionsService } from '@/services/submissions-service';
 import { toastService } from '@/services/toasts-service';
 import type { RootState } from '@/store/index';
 import { resetDraft, setDraft } from '@/store/slides/create-solution-slice';
 import {
-  type SubmissionDetailData,
+  type Submission,
   SubmissionStatus,
 } from '@/types/submissions';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
-const DEFAULT_MARKDOWN = `# Intuition
 
-# Approach
-<!-- Mô tả phương pháp giải quyết bài toán của bạn. -->
-
-# Complexity
-- Time complexity:
-<!-- Điền độ phức tạp thời gian tại đây, ví dụ $$O(n)$$ -->
-
-- Space complexity:
-<!-- Điền độ phức tạp không gian tại đây, ví dụ $$O(n)$$ -->
-
-# Code
-\`\`\`cpp []
-// Code will be inserted here
-\`\`\`
-`;
 
 export default function CreateSolutionPage() {
+  const { t } = useTranslation('problems');
   const params = useParams();
   const router = useRouter();
   const dispatch = useDispatch();
-  const problemId = params.id as string;
-  // const submissionId = params.submissionId as string;
-  // TODO: replace this hardcode later
-  const submissionId = '51' as string;
+  const problemIdString = params.id as string;
+  const problemId = parseInt(problemIdString);
+  const submissionId = params.submissionId as string;
 
   const { confirm } = useDialog();
 
@@ -55,37 +41,52 @@ export default function CreateSolutionPage() {
   const [title, setTitle] = useState('');
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
   const [selectedLanguages, setSelectedLanguages] = useState<number[]>([]);
-  const [content, setContent] = useState(DEFAULT_MARKDOWN);
-  const [submission, setSubmission] = useState<SubmissionDetailData | null>(
+  const [content, setContent] = useState('');
+  const [submission, setSubmission] = useState<Submission | null>(
     null
   );
   const [isLoading, setIsLoading] = useState(true);
 
   const drafts = useSelector((state: RootState) => state.createSolution.drafts);
+  const draftsRef = useRef(drafts);
 
-  const loadDefaultContent = useCallback(async (sub: SubmissionDetailData) => {
+  useEffect(() => {
+    draftsRef.current = drafts;
+  }, [drafts]);
+
+  const loadDefaultContent = useCallback(async (sub: Submission) => {
     try {
-      // If we already have the full detail from getSubmissionById, we might not need to call it again?
-      // Actually getSubmissionById returns SubmissionDetailData, but setSubmission expects SubmissionListItem.
-      // Let's check the types.
-      // SubmissionsService.getSubmissionById returns ApiResponse<SubmissionDetailData>.
-      // SubmissionListItem is a subset of SubmissionDetailData mostly.
-      // But wait, in fetchSubmission I am calling getSubmissionById.
-
-      // Re-using the sub object passed in which is the full detail now.
       const sourceCode = sub.sourceCode;
-      const langName = sub.language.name.toLowerCase();
+      const langName = sub.language?.name.toLowerCase();
 
-      let newContent = DEFAULT_MARKDOWN.replace('cpp []', `${langName} []`);
+      const defaultMarkdown = `# ${t('intuition')}
+
+# ${t('approach')}
+<!-- ${t('description_placeholder')} -->
+
+# ${t('complexity')}
+- ${t('time_complexity')}:
+<!-- ${t('time_complexity_placeholder')} -->
+
+- ${t('space_complexity')}:
+<!-- ${t('space_complexity_placeholder')} -->
+
+# ${t('code')}
+\`\`\`${langName} []
+// ${t('code_placeholder')}
+\`\`\`
+`;
+
+      let newContent = defaultMarkdown.replace('cpp []', `${langName} []`);
       newContent = newContent.replace(
-        '// Code will be inserted here',
-        sourceCode
+        `// ${t('code_placeholder')}`,
+        sourceCode || ''
       );
       setContent(newContent);
     } catch (error) {
       console.error('Error loading default content:', error);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     const fetchSubmission = async () => {
@@ -98,7 +99,7 @@ export default function CreateSolutionPage() {
 
         setSubmission(sub);
 
-        const draft = drafts[sub.id.toString()];
+        const draft = draftsRef.current[sub.id.toString()];
         if (draft) {
           setContent(draft);
         } else {
@@ -113,7 +114,7 @@ export default function CreateSolutionPage() {
     };
 
     fetchSubmission();
-  }, [drafts, loadDefaultContent]);
+  }, [loadDefaultContent, submissionId]);
 
   // Save draft on content change
   useEffect(() => {
@@ -130,10 +131,10 @@ export default function CreateSolutionPage() {
   const handleReset = async () => {
     if (submission) {
       const result = await confirm({
-        title: 'Hủy bài viết',
-        message: 'Bạn có muốn hủy bài viết không?',
-        confirmText: 'Tiếp tục',
-        cancelText: 'Hủy',
+        title: t('cancel_post_title'),
+        message: t('cancel_post_message'),
+        confirmText: t('continue'),
+        cancelText: t('cancel'),
         color: 'red',
       });
       if (!result) return;
@@ -142,13 +143,25 @@ export default function CreateSolutionPage() {
     }
   };
 
+  const { isLoggedin, isEmailVerified } = useApp();
+  const { t: tCommon } = useTranslation('common');
+
   const handlePost = async () => {
+    if (!isLoggedin) {
+      toastService.error(tCommon('login_required_action'));
+      return;
+    }
+    if (!isEmailVerified) {
+      toastService.error(tCommon('email_verification_required_action'));
+      return;
+    }
+
     if (!title.trim()) {
-      toastService.error('Hãy nhập tiêu đề cho solution');
+      toastService.error(t('enter_solution_title_error'));
       return;
     }
     if (!content.trim()) {
-      toastService.error('Hãy nhập nội dung cho solution');
+      toastService.error(t('enter_solution_content_error'));
       return;
     }
     if (!submission) return;
@@ -166,19 +179,20 @@ export default function CreateSolutionPage() {
       dispatch(resetDraft(submission.id.toString()));
 
       // Navigate back to solutions tab
+      toastService.success(t('create_solution_success'));
       router.push(`/problems/${problemId}/solutions`);
     } catch (error) {
       console.error('Error creating solution:', error);
-      alert('Failed to create solution');
+      toastService.error(t('create_solution_failed'));
     }
   };
 
   const handleCancel = async () => {
     const result = await confirm({
-      title: 'Hủy bài viết',
-      message: 'Bạn có muốn hủy bài viết không?',
-      confirmText: 'Tiếp tục',
-      cancelText: 'Hủy',
+      title: t('cancel_post_title'),
+      message: t('cancel_post_message'),
+      confirmText: t('continue'),
+      cancelText: t('cancel'),
       color: 'red',
     });
     if (!result) return;
@@ -192,7 +206,7 @@ export default function CreateSolutionPage() {
 
   return (
     <div className="h-[calc(100vh-65px)] bg-white dark:bg-slate-950 flex flex-col overflow-hidden">
-      <div className="max-w-screen-2xl mx-auto w-full px-4 flex flex-col h-full">
+      <div className="max-w-screen-2xl mx-auto w-full px-20 flex flex-col h-full">
         <CreateSolutionHeader
           title={title}
           setTitle={setTitle}

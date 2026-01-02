@@ -1,9 +1,12 @@
 import clientApi from '@/lib/apis/axios-client';
 import { store } from '@/store';
 import { setLanguages } from '@/store/slides/workspace-slice';
+import { ApiResponse } from '@/types/api';
 import {
   type GetSubmissionListRequest,
-  type SubmissionListItem,
+  type Language,
+  type Submission,
+  SubmissionListResponse,
   type SubmissionRequest,
   SubmissionStatus,
 } from '@/types/submissions';
@@ -22,17 +25,31 @@ async function submit(submissionRequest: SubmissionRequest) {
   return await clientApi.post(path, payload);
 }
 
+let languageListPromise: Promise<Language[]> | null = null;
+
 async function getLanguageList() {
   const state = store.getState();
   const cachedLanguages = state.workspace.languages;
 
   if (cachedLanguages && cachedLanguages.length > 0) {
-    return { data: { data: cachedLanguages } };
+    return cachedLanguages;
   }
 
-  const response = await clientApi.get('/languages');
-  store.dispatch(setLanguages(response.data.data));
-  return response;
+  if (languageListPromise) {
+    return languageListPromise;
+  }
+
+  languageListPromise = clientApi.get<ApiResponse<Language[]>>('/programming-languages/active').then((response) => {
+    store.dispatch(setLanguages(response.data.data));
+    languageListPromise = null;
+    return response.data.data;
+  }).catch((error) => {
+    console.warn('API failed, using mock languages', error);
+    languageListPromise = null;
+    return [];
+  });
+
+  return languageListPromise;
 }
 
 async function getSubmissionList(
@@ -40,10 +57,14 @@ async function getSubmissionList(
   problemId: string,
   contestParticipationId?: number
 ) {
-  const queryString = qs.stringify(submissionListRequest, {
-    allowDots: true,
-    skipNulls: true,
-  });
+  const { filters, ...rest } = submissionListRequest;
+  const queryString = qs.stringify(
+    { ...rest, ...filters },
+    {
+      allowDots: true,
+      skipNulls: true,
+    }
+  );
   let url = '';
   if (contestParticipationId) {
     url = queryString
@@ -54,16 +75,17 @@ async function getSubmissionList(
       ? `/submissions/problem/${problemId}?${queryString}`
       : `/submissions/problem/${problemId}`;
   }
-  return await clientApi.get(url);
+
+  return await clientApi.get<ApiResponse<SubmissionListResponse>>(url);
 }
 
 async function getSubmissionById(submissionId: string) {
-  return await clientApi.get(`/submissions/${submissionId}`);
+  return await clientApi.get<ApiResponse<Submission>>(`/submissions/${submissionId}`);
 }
 
 async function getAllSubmissions(
   userId: number
-): Promise<SubmissionListItem[]> {
+): Promise<Submission[]> {
   // Mock data
   return new Promise((resolve) => {
     setTimeout(() => {
@@ -77,7 +99,7 @@ async function getAllSubmissions(
 
       const submissionCount = Math.floor(Math.random() * 50) + 10; // 10 to 60 submissions
 
-      const submissions: SubmissionListItem[] = Array.from({
+      const submissions: Submission[] = Array.from({
         length: submissionCount,
       }).map((_, i) => {
         const statuses = [
@@ -107,20 +129,37 @@ async function getAllSubmissions(
 
         return {
           id: i + 1,
-          language: { id: 1, name: 'Python' },
-          memory: Math.floor(Math.random() * 10000),
-          note: null,
-          runtime: Math.floor(Math.random() * 1000),
-          score: status === SubmissionStatus.ACCEPTED ? 100 : 0,
           status,
-          createdAt,
+          executionTime: Math.floor(Math.random() * 1000),
+          memoryUsed: Math.floor(Math.random() * 10000),
+          testcasesPassed: status === SubmissionStatus.ACCEPTED ? 10 : Math.floor(Math.random() * 10),
+          totalTestcases: 10,
+          testcaseResults: [],
+          failedResult: {
+            message: 'Wrong Answer',
+            input: '1 2',
+            expectedOutput: '3',
+            actualOutput: '4',
+            stderr: '',
+            compileOutput: '',
+          },
           user: {
             id: userId,
             firstName: 'User',
             lastName: `${userId}`,
             email: `user${userId}@example.com`,
           },
-          problemId: Math.floor(Math.random() * 100 + 1).toString(),
+          problem: {
+            id: Math.floor(Math.random() * 100 + 1),
+            title: `Problem ${Math.floor(Math.random() * 100 + 1)}`,
+            slug: `problem-${Math.floor(Math.random() * 100 + 1)}`,
+          },
+          compileError: '',
+          runtimeError: '',
+          submittedAt: createdAt,
+          problemId: Math.floor(Math.random() * 100 + 1),
+          languageId: 1,
+          sourceCode: 'print("Hello World")',
         };
       });
       resolve(submissions);
@@ -131,7 +170,7 @@ async function getAllSubmissions(
 async function getAllContestSubmissions(
   contestId: string,
   userId: number
-): Promise<SubmissionListItem[]> {
+): Promise<Submission[]> {
   // Mock data - similar to getAllSubmissions but conceptually for a specific contest
   return getAllSubmissions(userId);
 }

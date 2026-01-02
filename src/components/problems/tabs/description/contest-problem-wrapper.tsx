@@ -2,12 +2,18 @@
 
 import { useProblemDescription } from '@/hooks/use-problem-description';
 import type { ProblemDescription } from '@/types/problems';
-import React from 'react';
+import React, { useState } from 'react';
 import { ResizableDivider } from './dividers/resizable-divider';
 import { DescriptionPanel } from './panels/description-panel/description-panel';
 import { EditorPanel } from './panels/editor-panel/editor-panel';
 import { SampleTestCasesPanel } from './panels/sample-testcases-panel/sample-testcases-panel';
-import { SubmitResultTab } from './panels/submit-result/submit-result-tab';
+import SubmitResultTab from './panels/submit-result/submit-result-tab';
+import SubmissionsPage from '@/components/problems/tabs/submissions/submissions-page';
+import { ContestNavTabs } from '@/types/contests';
+import { Button } from '@/components/ui/button';
+import { FileText, CheckCircle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 
 interface ContestProblemWrapperProps {
   problem: ProblemDescription;
@@ -22,6 +28,9 @@ export default function ContestProblemWrapper({
   contestMode = false,
   onSubmitSuccess,
 }: ContestProblemWrapperProps) {
+  const { t } = useTranslation('contests');
+  const [activeTab, setActiveTab] = useState<ContestNavTabs>(ContestNavTabs.DESCRIPTION);
+
   const {
     containerRef,
     rightPanelRef,
@@ -68,6 +77,11 @@ export default function ContestProblemWrapper({
     }
   };
 
+  const tabs = [
+    { id: ContestNavTabs.DESCRIPTION, label: t('description'), icon: FileText },
+    { id: ContestNavTabs.SUBMISSIONS, label: t('submissions'), icon: CheckCircle },
+  ];
+
   return (
     <div className="h-full">
       <div
@@ -77,17 +91,56 @@ export default function ContestProblemWrapper({
           height: contestMode ? '100%' : 'calc(100vh - 65px)',
         }}
       >
-        {/* Left Panel - Problem Description or Submit Result */}
-        {isSubmitting || submitResults ? (
-          <SubmitResultTab
-            width={leftWidth}
-            result={submitResults}
-            isSubmitting={isSubmitting}
-            onClose={clearSubmitResults}
-          />
-        ) : (
-          <DescriptionPanel problem={problem} width={leftWidth} />
-        )}
+        {/* Left Panel Container */}
+        <div className="flex flex-col h-full" style={{ width: `${leftWidth}%` }}>
+            {/* Tabs Header */}
+            <div className="flex items-center h-12 px-2 border-b border-border bg-background/50 backdrop-blur-sm shrink-0 gap-2 mb-2">
+                {tabs.map((tab) => (
+                    <Button
+                        key={tab.id}
+                        variant={activeTab === tab.id ? "secondary" : "ghost"}
+                        size="sm"
+                        onClick={() => setActiveTab(tab.id)}
+                        className={cn(
+                            "h-8 text-xs font-medium gap-2 px-3",
+                            activeTab === tab.id
+                                ? "bg-primary/10 text-primary hover:bg-primary/20 hover:text-primary"
+                                : "text-muted-foreground hover:text-foreground"
+                        )}
+                    >
+                        <tab.icon className="w-3.5 h-3.5" />
+                        {tab.label}
+                    </Button>
+                ))}
+            </div>
+
+            {/* Left Panel Content */}
+            <div className="flex-1 overflow-hidden relative">
+                {isSubmitting || submitResults ? (
+                  <SubmitResultTab
+                    width={100}
+                    result={submitResults}
+                    isSubmitting={isSubmitting}
+                    onClose={clearSubmitResults}
+                  />
+                ) : (
+                  <>
+                    {activeTab === ContestNavTabs.DESCRIPTION && (
+                       <div className="h-full">
+                           <DescriptionPanel problem={problem} width={100} />
+                       </div>
+                    )}
+                    {activeTab === ContestNavTabs.SUBMISSIONS && (
+                        <div className="h-full pb-4 pr-1">
+                            <div className="h-full bg-card rounded-xl border border-border overflow-hidden">
+                                <SubmissionsPage problemId={problem.id} />
+                            </div>
+                        </div>
+                    )}
+                  </>
+                )}
+            </div>
+        </div>
 
         {/* Horizontal Resizer */}
         <ResizableDivider

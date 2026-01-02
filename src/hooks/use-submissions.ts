@@ -1,21 +1,19 @@
 import { SubmissionsService } from '@/services/submissions-service';
 import {
   type GetSubmissionListRequest,
-  type PageInfo,
-  type SubmissionEdge,
   type SubmissionFilters,
-  type SubmissionListItem,
-  type SubmissionListResponse,
-  SubmissionStatus,
+  type Submission,
+  SubmissionListResponse,
 } from '@/types/submissions';
 import { useCallback, useEffect, useState } from 'react';
 
 const ITEMS_PER_PAGE = 10;
 
 interface UseSubmissionsState {
-  submissions: SubmissionEdge[];
-  pageInfo: PageInfo | null;
+  submissions: Submission[];
   totalCount: number;
+  currentPage: number;
+  totalPages: number;
   isLoading: boolean;
   error: string | null;
 }
@@ -31,6 +29,7 @@ interface UseSubmissionsReturn
   // Request params (exposed for UI)
   filters: SubmissionFilters;
   problemId: string;
+  hasMore: boolean;
 }
 
 export default function useSubmissions(
@@ -40,18 +39,17 @@ export default function useSubmissions(
   // Main state to manage submissions and loading/error states
   const [state, setState] = useState<UseSubmissionsState>({
     submissions: [],
-    pageInfo: null,
     totalCount: 0,
+    currentPage: 1,
+    totalPages: 0,
     isLoading: false,
     error: null,
   });
 
   // Request state to manage API request parameters
   const [request, setRequest] = useState<GetSubmissionListRequest>({
-    first: ITEMS_PER_PAGE,
-    sortBy: 'createdAt',
-    sortOrder: 'desc',
-    matchMode: 'any',
+    page: 1,
+    limit: ITEMS_PER_PAGE,
   });
 
   // Filters state to manage filters
@@ -59,7 +57,7 @@ export default function useSubmissions(
 
   // Fetch submissions function
   const fetchSubmissions = useCallback(
-    async (requestParams: GetSubmissionListRequest) => {
+    async (requestParams: GetSubmissionListRequest, isLoadMore = false) => {
       if (!problemId) return;
 
       try {
@@ -69,24 +67,19 @@ export default function useSubmissions(
           problemId,
           contestParticipationId
         );
-        const response: SubmissionListResponse = axiosResponse?.data?.data;
-
-        // Extract submissions from edges
-        const submissionsData: SubmissionEdge[] =
-          response?.edges?.map(
-            (edge: { node: SubmissionListItem; cursor: string }) => ({
-              node: edge.node,
-              cursor: edge.cursor,
-            })
-          ) || [];
+        if (!axiosResponse?.data?.data) {
+          throw new Error('Failed to fetch submissions');
+        }
+        const response: SubmissionListResponse = axiosResponse.data.data;
 
         setState((prev) => ({
           ...prev,
-          submissions: requestParams.after
-            ? [...prev.submissions, ...submissionsData]
-            : submissionsData,
-          pageInfo: response?.pageInfos,
-          totalCount: response?.totalCount,
+          submissions: isLoadMore
+            ? [...prev.submissions, ...response.data]
+            : response.data,
+          totalCount: response.meta.total,
+          currentPage: response.meta.page,
+          totalPages: response.meta.totalPages,
           isLoading: false,
         }));
       } catch (err) {
@@ -102,9 +95,16 @@ export default function useSubmissions(
   );
 
   // Effect to fetch submissions when request or problemId changes
+  // We only trigger this effect if it's NOT a load more action initiated by handleLoadMore
+  // But handleLoadMore updates request, so we need to distinguish.
+  // Actually, simpler: useEffect watches request. handleLoadMore updates request.
   useEffect(() => {
     if (problemId) {
-      fetchSubmissions(request);
+      // Check if we are loading more (page > 1) or refreshing (page === 1)
+      // But wait, if we change filters, we reset page to 1.
+      // If we load more, we increment page.
+      const isLoadMore = (request.page || 1) > 1;
+      fetchSubmissions(request, isLoadMore);
     }
   }, [request, fetchSubmissions, problemId]);
 
@@ -112,7 +112,7 @@ export default function useSubmissions(
   const updateRequest = useCallback(
     (updates: Partial<GetSubmissionListRequest>, clearSubmissions = false) => {
       if (clearSubmissions) {
-        setState((prev) => ({ ...prev, submissions: [] }));
+        setState((prev) => ({ ...prev, submissions: [], currentPage: 1 }));
       }
 
       setRequest((prev) => ({
@@ -134,34 +134,33 @@ export default function useSubmissions(
       );
 
       setFilters(cleanFilters);
-      updateRequest({ filters: cleanFilters }, true);
+      updateRequest({ filters: cleanFilters, page: 1 }, true);
     },
     [updateRequest]
   );
 
   // Handle load more for pagination
   const handleLoadMore = useCallback(() => {
-    if (state.isLoading || !state.pageInfo?.hasNextPage) {
+    if (state.isLoading || state.currentPage >= state.totalPages) {
       return;
     }
     updateRequest(
       {
-        after: state.pageInfo.endCursor,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
+        page: state.currentPage + 1,
       },
       false
     );
-  }, [state.isLoading, state.pageInfo, updateRequest]);
+  }, [state.isLoading, state.currentPage, state.totalPages, updateRequest]);
 
   return {
     // State
     submissions: state.submissions,
-    pageInfo: state.pageInfo,
     totalCount: state.totalCount,
+    currentPage: state.currentPage,
+    totalPages: state.totalPages,
     isLoading: state.isLoading,
     error: state.error,
+    hasMore: state.currentPage < state.totalPages,
 
     // Request params (exposed for UI)
     filters,

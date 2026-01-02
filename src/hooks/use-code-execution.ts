@@ -4,8 +4,12 @@ import { selectContest } from '@/store/slides/contest-slice';
 import type { SubmissionRequest } from '@/types/submissions';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { useApp } from '@/contexts/app-context';
+import { toastService } from '@/services/toasts-service';
 
 export function useCodeExecution() {
+  const { t } = useTranslation('problems');
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [testResults, setTestResults] = useState<SSEResult | null>(null);
@@ -25,13 +29,30 @@ export function useCodeExecution() {
     };
   }, []);
 
+  const { isLoggedin, isEmailVerified } = useApp();
+  const { t: tCommon } = useTranslation('common');
+
+  const checkPermission = useCallback(() => {
+    if (!isLoggedin) {
+      toastService.error(tCommon('login_required_action'));
+      return false;
+    }
+    if (!isEmailVerified) {
+      toastService.error(tCommon('email_verification_required_action'));
+      return false;
+    }
+    return true;
+  }, [isLoggedin, isEmailVerified, tCommon]);
+
   const handleRun = useCallback(
     async (
       sourceCode: string,
       languageId: number,
-      problemId: string,
+      problemId: number,
       testCases: Array<{ input: string; output: string }>
     ) => {
+      if (!checkPermission()) return;
+
       setIsRunning(true);
       setTestResults(null);
       setRunError(null);
@@ -61,31 +82,33 @@ export function useCodeExecution() {
             },
             (error) => {
               console.error('SSE error:', error);
-              setRunError('Đã có lỗi xảy ra, vui lòng thử lại sau');
+              setRunError(t('error_occurred'));
               setIsRunning(false);
             }
           );
           sseConnectedRef.current = true;
         } else {
-          setRunError('Đã có lỗi xảy ra, vui lòng thử lại sau');
+          setRunError(t('error_occurred'));
           setIsRunning(false);
         }
       } catch (error) {
         console.error('Error running code:', error);
-        setRunError('Đã có lỗi xảy ra, vui lòng thử lại sau');
+        setRunError(t('error_occurred'));
         setIsRunning(false);
       }
     },
-    []
+    [checkPermission, t]
   );
 
   const handleSubmit = useCallback(
     async (
       sourceCode: string,
       languageId: number,
-      problemId: string,
+      problemId: number,
       contestId?: number
     ) => {
+      if (!checkPermission()) return;
+
       setIsSubmitting(true);
       setSubmitResults(null);
 
@@ -124,7 +147,7 @@ export function useCodeExecution() {
         }
       } catch (error) {
         console.error('Error submitting code:', error);
-        let errorMessage = 'Error: Failed to submit code. Please try again.';
+        let errorMessage = t('error_submitting_code');
 
         if (error instanceof Error) {
           errorMessage = `Error: ${error.message}`;
@@ -143,7 +166,7 @@ export function useCodeExecution() {
         setIsSubmitting(false);
       }
     },
-    [contest.participation?.participationId]
+    [contest.participation?.participationId, checkPermission, t]
   );
 
   return {

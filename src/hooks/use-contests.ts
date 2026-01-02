@@ -1,18 +1,19 @@
-import { ContestsService } from '@/services/contests-service';
+// import { ContestsService } from '@/services/contests-service';
+import { MOCK_CONTESTS } from '@/data/mock-contests';
 import {
   type ContestFilters,
   type ContestListItem,
   type ContestListRequest,
   type ContestListResponse,
-  ContestStatusLabels,
   MatchMode,
   type PageInfo,
   SortBy,
   SortOrder,
 } from '@/types/contests';
 import { useCallback, useEffect, useState } from 'react';
+import { useDebouncedCallback } from 'use-debounce';
 
-const ITEMS_PER_PAGE = 3;
+const ITEMS_PER_PAGE = 20;
 
 interface UseContestsState {
   contests: ContestListItem[];
@@ -25,7 +26,6 @@ interface UseContestsState {
 interface UseContestsActions {
   handleFiltersChange: (newFilters: ContestFilters) => void;
   handleKeywordChange: (newKeyword: string) => void;
-  handleSearch: () => void;
   handleReset: () => void;
   handleLoadMore: () => void;
 }
@@ -67,47 +67,62 @@ export default function useContests(): UseContestsReturn {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-        const axiosResponse =
-          await ContestsService.getContestList(requestParams);
+        // const axiosResponse =
+        //   await ContestsService.getContestList(requestParams);
 
-        const response: ContestListResponse = axiosResponse?.data?.data;
+        // const response: ContestListResponse = axiosResponse?.data?.data;
+
+        // SIMULATE API CALL WITH MOCK DATA
+        await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delay
+
+        let filteredContests = [...MOCK_CONTESTS];
+
+        // Apply keyword filter
+        if (requestParams.keyword) {
+          const lowerKeyword = requestParams.keyword.toLowerCase();
+          filteredContests = filteredContests.filter(c =>
+            c.name.toLowerCase().includes(lowerKeyword)
+          );
+        }
+
+        // Apply status filter
+        if (
+          requestParams.filters?.status &&
+          requestParams.filters.status.length > 0
+        ) {
+          filteredContests = filteredContests.filter((contest) =>
+            requestParams.filters?.status?.includes(contest.status)
+          );
+        }
+
+        const totalCount = filteredContests.length;
+
+        // Mock pagination
+        const itemsPerPage = requestParams.first || ITEMS_PER_PAGE;
+        let startIndex = 0;
+
+        if (requestParams.after) {
+          const lastIndex = filteredContests.findIndex(c => c.id === requestParams.after);
+          if (lastIndex !== -1) {
+            startIndex = lastIndex + 1;
+          }
+        }
+
+        const slicedContests = filteredContests.slice(startIndex, startIndex + itemsPerPage);
+
+        const hasNextPage = startIndex + itemsPerPage < totalCount;
+        const endCursor = slicedContests.length > 0 ? slicedContests[slicedContests.length - 1].id : '';
 
         // Extract contests from edges
+        let contestsData: ContestListItem[] = slicedContests;
+
+        /*
         let contestsData: ContestListItem[] =
           response?.edges?.map((edge) => ({
             ...edge.node,
           })) || [];
 
-        // Fetch overview for each contest to get full details for status calculation
-        // We need to do this because the list item doesn't have enough info (like participation)
-        // if (contestsData.length > 0) {
-        //   const contestsWithStatus = await Promise.all(
-        //     contestsData.map(async (contest) => {
-        //       try {
-        //         const overviewResponse =
-        //           await ContestsService.getContestOverview(contest.id);
-        //         const overview = overviewResponse.data.data;
-
-        //         const fullContest = { ...overview };
-        //         const status = ContestsService.getContestStatus(fullContest);
-        //         const statusLabel = ContestStatusLabels[status];
-        //         return {
-        //           ...contest,
-        //           status: statusLabel,
-        //         };
-        //       } catch (e) {
-        //         console.error(
-        //           `Error fetching overview for contest ${contest.id}`,
-        //           e
-        //         );
-        //         return contest;
-        //       }
-        //     })
-        //   );
-
-        //  contestsData = contestsWithStatus;
-
-        // Filter by status on frontend if status filters are present
+        // Filter by status on frontend if status filters are present (if backend doesn't support it fully or for extra safety)
         if (
           requestParams.filters?.status &&
           requestParams.filters.status.length > 0
@@ -116,14 +131,20 @@ export default function useContests(): UseContestsReturn {
             requestParams.filters?.status?.includes(contest.status)
           );
         }
+        */
 
         setState((prev) => ({
           ...prev,
           contests: requestParams.after
             ? [...prev.contests, ...contestsData]
             : contestsData,
-          pageInfo: response?.pageInfos,
-          totalCount: response?.totalCount,
+          pageInfo: {
+            hasNextPage,
+            hasPreviousPage: false, // Not implementing previous page for infinite scroll usually
+            startCursor: '',
+            endCursor
+          },
+          totalCount: totalCount,
           isLoading: false,
         }));
       } catch (err) {
@@ -158,14 +179,39 @@ export default function useContests(): UseContestsReturn {
     []
   );
 
-  // handle filter and keyword changes
+  // Debounced search for keyword
+  const debouncedSearch = useDebouncedCallback((searchKeyword: string, currentFilters: ContestFilters) => {
+    updateRequest(
+      {
+        keyword: searchKeyword.trim() || undefined,
+        filters: currentFilters,
+        after: undefined,
+        before: undefined,
+        first: ITEMS_PER_PAGE,
+      },
+      true
+    );
+  }, 500);
+
+  // handle filter changes
   const handleFiltersChange = useCallback((newFilters: ContestFilters) => {
     setFilters(newFilters);
-  }, []);
+    updateRequest(
+      {
+        filters: newFilters,
+        keyword: keyword.trim() || undefined,
+        after: undefined,
+        before: undefined,
+        first: ITEMS_PER_PAGE,
+      },
+      true
+    );
+  }, [keyword, updateRequest]);
 
   const handleKeywordChange = useCallback((newKeyword: string) => {
     setKeyword(newKeyword);
-  }, []);
+    debouncedSearch(newKeyword, filters);
+  }, [filters, debouncedSearch]);
 
   // Load more contests for pagination
   const handleLoadMore = useCallback(() => {
@@ -183,25 +229,6 @@ export default function useContests(): UseContestsReturn {
       false
     );
   }, [state.isLoading, state.pageInfo, updateRequest]);
-
-  // Search and Reset handlers
-  const handleSearch = useCallback(() => {
-    const trimmedKeyword = keyword.trim();
-
-    updateRequest(
-      {
-        filters: {
-          ...filters,
-        },
-        keyword: trimmedKeyword || undefined,
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
-      },
-      true
-    );
-  }, [filters, keyword, updateRequest]);
 
   const handleReset = useCallback(() => {
     setKeyword('');
@@ -241,7 +268,6 @@ export default function useContests(): UseContestsReturn {
     // Actions
     handleKeywordChange,
     handleFiltersChange,
-    handleSearch,
     handleReset,
     handleLoadMore,
   };

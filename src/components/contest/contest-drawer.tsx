@@ -7,9 +7,10 @@ import {
   ContestProblemStatus,
   ContestProblemStatusTooltip,
 } from '@/types/contests';
-import { DIFFICULTY_COLORS, getDifficultyColor } from '@/types/problems';
-import { CheckCircle, Circle, Minus, X } from 'lucide-react';
+import { getDifficultyColor } from '@/types/problems';
+import { CheckCircle, Minus, X } from 'lucide-react';
 import { type JSX, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Tooltip } from '../ui/tooltip';
 
 interface ContestDrawerProps {
@@ -42,6 +43,7 @@ export default function ContestDrawer({
   currentProblemId,
   onProblemClick,
 }: ContestDrawerProps) {
+  const { t } = useTranslation('contests');
   const [activeTab, setActiveTab] = useState<'problems' | 'ranking'>(
     'problems'
   );
@@ -51,7 +53,7 @@ export default function ContestDrawer({
       {/* Overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 transition-opacity"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 transition-opacity"
           onClick={onClose}
         />
       )}
@@ -59,54 +61,52 @@ export default function ContestDrawer({
       {/* Drawer */}
       <div
         className={`
-          fixed left-0 top-0 bottom-0 w-96 bg-white dark:bg-slate-800 
-          z-50 shadow-2xl flex flex-col
+          fixed left-0 top-0 bottom-0 w-96 bg-background border-r border-border
+          z-[60] shadow-2xl flex flex-col
           transform transition-transform duration-500 ease-in-out
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
         {/* Header */}
-        <div className="border-b border-slate-200 dark:border-slate-700 p-4 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-200">
+        <div className="border-b border-border p-4 flex items-center justify-between bg-card/50">
+          <h2 className="text-lg font-bold text-foreground">
             {contestName}
           </h2>
           <button
             onClick={onClose}
-            className="text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer"
+            className="text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
             type="button"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Tabs */}
-        {/* <div className="flex border-b border-slate-200 dark:border-slate-700">
+        {/* Tabs Control */}
+        <div className="flex border-b border-border bg-muted/20">
           <button
             onClick={() => setActiveTab('problems')}
-            className={`flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-              activeTab === 'problems'
-                ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
-                : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-            }`}
+            className={`flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${activeTab === 'problems'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
             type="button"
           >
-            Problems
+            {t('problems')}
           </button>
           <button
             onClick={() => setActiveTab('ranking')}
-            className={`flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
-              activeTab === 'ranking'
-                ? 'border-emerald-600 text-emerald-600 dark:text-emerald-400'
-                : 'border-transparent text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-            }`}
+            className={`flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${activeTab === 'ranking'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
             type="button"
           >
-            Ranking
+            {t('ranking')}
           </button>
-        </div> */}
+        </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto bg-background/50">
           {activeTab === 'problems' ? (
             <div className="p-4 space-y-2">
               {problems.map((problem, idx) => (
@@ -116,11 +116,10 @@ export default function ContestDrawer({
                     onProblemClick(problem.id);
                     onClose();
                   }}
-                  className={`w-full text-left p-4 rounded-lg border transition-all cursor-pointer ${
-                    currentProblemId === problem.id
-                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
-                      : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50'
-                  }`}
+                  className={`w-full text-left p-4 rounded-lg border transition-all cursor-pointer ${currentProblemId === problem.id
+                      ? 'border-primary/50 bg-primary/5 shadow-sm'
+                      : 'border-border hover:bg-accent/50 hover:border-accent'
+                    }`}
                   type="button"
                 >
                   <div className="flex items-start gap-3">
@@ -133,10 +132,10 @@ export default function ContestDrawer({
                     </Tooltip>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-mono text-slate-600 dark:text-slate-400">
+                        <span className="text-sm font-mono text-muted-foreground">
                           Q{idx + 1}.
                         </span>
-                        <span className="text-sm font-medium text-slate-800 dark:text-slate-200 truncate">
+                        <span className="text-sm font-medium text-foreground truncate">
                           {problem.title}
                         </span>
                       </div>
@@ -148,7 +147,7 @@ export default function ContestDrawer({
                         >
                           {problem.difficulty}
                         </Badge>
-                        <span className="text-xs text-slate-600 dark:text-slate-400">
+                        <span className="text-xs text-muted-foreground">
                           {`${problem.userScore ?? 0}/${problem.maxScore ?? 0} pts`}
                         </span>
                       </div>
@@ -163,38 +162,52 @@ export default function ContestDrawer({
                 {ranking.map((entry) => (
                   <div
                     key={entry.rank}
-                    className={`p-3 rounded-lg border ${
-                      entry.isCurrentUser
-                        ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
-                        : 'border-slate-200 dark:border-slate-700'
-                    }`}
+                    className={`p-3 rounded-lg border ${entry.isCurrentUser
+                        ? 'border-primary/50 bg-primary/5'
+                        : 'border-border bg-card'
+                      }`}
                   >
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-3">
                         <span
-                          className={`text-sm font-bold ${
-                            entry.rank === 1
-                              ? 'text-yellow-600'
+                          className={`text-sm font-bold ${entry.rank === 1
+                              ? 'text-yellow-500' // Gold
                               : entry.rank === 2
-                                ? 'text-slate-400'
+                                ? 'text-slate-400' // Silver
                                 : entry.rank === 3
-                                  ? 'text-orange-600'
-                                  : 'text-slate-600 dark:text-slate-400'
-                          }`}
+                                  ? 'text-amber-700' // Bronze
+                                  : 'text-muted-foreground'
+                            }`}
                         >
                           #{entry.rank}
                         </span>
-                        <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
+                        <span className="text-sm font-medium text-foreground">
                           {entry.username}
                         </span>
+                        {entry.country && (
+                          <span className="text-[10px] bg-muted px-1.5 rounded text-muted-foreground">{entry.country}</span>
+                        )}
                       </div>
-                      <span className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
-                        {entry.score}
-                      </span>
+                      <div className="text-right">
+                        <span className="text-sm font-bold text-primary block">
+                          {entry.score}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4 text-xs text-slate-600 dark:text-slate-400">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>Time: {entry.timeSpent}</span>
                       <span>Solved: {entry.problemsSolved}</span>
+                    </div>
+                    {/* Progress Bar Visual */}
+                    <div className="flex gap-1 mt-2 h-1.5">
+                      {Array.isArray(entry.progress) &&
+                        entry.progress.map((solved, i) => (
+                          <div
+                            key={i}
+                            className={`flex-1 rounded-full ${solved ? 'bg-green-500' : 'bg-muted'
+                              }`}
+                          />
+                        ))}
                     </div>
                   </div>
                 ))}

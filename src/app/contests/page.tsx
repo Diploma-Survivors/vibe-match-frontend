@@ -1,17 +1,17 @@
 'use client';
 
 import ContestFilter from '@/components/contest/contest-filter';
-import ContestList from '@/components/contest/contest-list';
+import ContestTable from '@/components/contest/contest-table';
 import useContests from '@/hooks/use-contests';
-import { motion } from 'framer-motion';
-import { NotebookPen } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 export default function ContestsPage() {
+  const { t } = useTranslation('contests');
   const {
     // State
     contests,
     pageInfo,
-    totalCount,
     isLoading,
     error,
 
@@ -22,63 +22,62 @@ export default function ContestsPage() {
     // Actions
     handleKeywordChange,
     handleFiltersChange,
-    handleSearch,
     handleReset,
     handleLoadMore,
   } = useContests();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="container mx-auto px-6 py-8">
-        {/* <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent mb-3 flex items-center gap-3">
-            <NotebookPen className="w-10 h-10 text-slate-700 dark:text-slate-200" />
-            Contests
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400 text-lg">
-            Tham gia các cuộc thi lập trình để thử thách bản thân và nâng cao kỹ
-            năng
-          </p>
-        </motion.div> */}
+    <div className="min-h-screen bg-background pb-12">
+      <div className="container mx-auto px-4 lg:px-6 py-6 max-w-[1600px]">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                {t('contests')}
+              </h1>
+              <p className="text-muted-foreground text-sm mt-1">
+                {t('explore_contests')}
+              </p>
+            </div>
+        </div>
 
-        <div className="flex flex-col xl:flex-row gap-8">
-          {/* Right Panel - Filter (30%) */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="xl:w-[30%] xl:min-w-[400px] xl:sticky xl:top-24 xl:self-start"
-          >
-            <ContestFilter
-              keyword={keyword}
-              filters={filters}
-              onKeywordChange={handleKeywordChange}
-              onFiltersChange={handleFiltersChange}
-              onSearch={handleSearch}
-              onReset={handleReset}
-            />
-          </motion.div>
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Left Sidebar - Sticky */}
+          <aside className="hidden lg:block w-[260px] xl:w-[280px] shrink-0">
+            <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 scrollbar-none">
+              <ContestFilter
+                keyword={keyword}
+                filters={filters}
+                onKeywordChange={handleKeywordChange}
+                onFiltersChange={handleFiltersChange}
+                onReset={handleReset}
+              />
+            </div>
+          </aside>
 
-          {/* Left Panel - Contest List (70%) */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex-1 xl:w-[70%]"
-          >
-            <ContestList
+          {/* Main Content */}
+          <main className="flex-1 min-w-0">
+             {/* Mobile Filter Trigger (Visible only on mobile) */}
+             <div className="lg:hidden mb-6">
+               <div className="p-4 rounded-lg border border-border bg-card">
+                 <ContestFilter
+                   keyword={keyword}
+                   filters={filters}
+                   onKeywordChange={handleKeywordChange}
+                   onFiltersChange={handleFiltersChange}
+                   onReset={handleReset}
+                 />
+               </div>
+             </div>
+            
+            <ContestTable
               contests={contests}
               isLoading={isLoading}
               error={error}
               pageInfo={pageInfo}
               onLoadMore={handleLoadMore}
             />
-          </motion.div>
+          </main>
         </div>
       </div>
     </div>

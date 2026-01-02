@@ -5,11 +5,11 @@
 const CPP_TEMPLATE = `#include <iostream>
 
 int main() {    
-    int soThuNhat, soThuHai, tong;
-    std::cin >> soThuNhat;
-    std::cin >> soThuHai;  
-    tong = soThuNhat + soThuHai;
-    std::cout << tong;
+    int firstNumber, secondNumber, sum;
+    std::cin >> firstNumber;
+    std::cin >> secondNumber;  
+    sum = firstNumber + secondNumber;
+    std::cout << sum;
 }`;
 
 const C_TEMPLATE = `#include <stdio.h>
