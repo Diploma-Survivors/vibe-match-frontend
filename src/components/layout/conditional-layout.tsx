@@ -28,7 +28,7 @@ export default function ConditionalLayout({
   return (
     <>
       <Header />
-      <main className="pt-4">{children}</main>
+      <main className="">{children}</main>
       <Footer />
     </>
   );

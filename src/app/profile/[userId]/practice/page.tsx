@@ -11,6 +11,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Table,
@@ -21,10 +28,15 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Tooltip } from '@/components/ui/tooltip';
-import { ProblemsService } from '@/services/problems-service';
-import { SubmissionsService } from '@/services/submissions-service';
-import { ProblemDifficulty, type ProblemListItem, ProblemStatus } from '@/types/problems';
-import { type Submission, SubmissionStatus } from '@/types/submissions';
+import { UserService } from '@/services/user-service';
+import { ProblemDifficulty, ProblemStatus } from '@/types/problems';
+import { SubmissionStatus } from '@/types/submissions';
+import {
+  PracticeHistorySortBy,
+  PracticeHistorySortOrder,
+  type UserPracticeHistoryItem,
+  type UserProblemStats,
+} from '@/types/user';
 import { format } from 'date-fns';
 import {
   ArrowDown,
@@ -41,18 +53,7 @@ import {
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Fragment, use, useEffect, useMemo, useState } from 'react';
-
-// Types for the view
-interface ProblemWithSubmissions extends Omit<ProblemListItem, 'status'> {
-  submissions: Submission[];
-  lastSubmittedAt: string | null;
-  status: ProblemStatus;
-  lastResult: SubmissionStatus | null;
-  submissionCount: number;
-}
-
-type SortField = 'lastSubmittedAt' | 'submissionCount';
-type SortOrder = 'asc' | 'desc' | null;
+import { useTranslation } from 'react-i18next';
 
 export default function PracticeHistoryPage({
   params,
@@ -61,22 +62,23 @@ export default function PracticeHistoryPage({
 }) {
   const { userId: userIdString } = use(params);
   const userId = Number(userIdString);
+  const { t } = useTranslation('profile');
 
   const [loading, setLoading] = useState(true);
-  const [problems, setProblems] = useState<ProblemWithSubmissions[]>([]);
+  const [historyItems, setHistoryItems] = useState<UserPracticeHistoryItem[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+
+  // Stats
+  const [problemStats, setProblemStats] = useState<UserProblemStats | null>(null);
 
   // Filtering
-  const [statusFilter, setStatusFilter] = useState<ProblemStatus[]>([
-    ProblemStatus.SOLVED,
-    ProblemStatus.ATTEMPTED,
-  ]);
-  const [difficultyFilter, setDifficultyFilter] = useState<ProblemDifficulty[]>(
-    [ProblemDifficulty.EASY, ProblemDifficulty.MEDIUM, ProblemDifficulty.HARD]
-  );
+  const [statusFilter, setStatusFilter] = useState<ProblemStatus | 'ALL'>('ALL');
+  const [difficultyFilter, setDifficultyFilter] = useState<ProblemDifficulty | 'ALL'>('ALL');
 
   // Sorting
-  const [sortField, setSortField] = useState<SortField | null>(null);
-  const [sortOrder, setSortOrder] = useState<SortOrder>(null);
+  const [sortBy, setSortBy] = useState<PracticeHistorySortBy>(PracticeHistorySortBy.LAST_SUBMITTED_AT);
+  const [sortOrder, setSortOrder] = useState<PracticeHistorySortOrder>(PracticeHistorySortOrder.DESC);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -87,61 +89,27 @@ export default function PracticeHistoryPage({
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
-        const [allProblems, allSubmissions] = await Promise.all([
-          ProblemsService.getAllProblems(),
-          SubmissionsService.getAllSubmissions(userId),
+        const [historyResponse, statsResponse] = await Promise.all([
+          UserService.getUserPracticeHistory(userId, {
+            page: currentPage,
+            limit: itemsPerPage,
+            status: statusFilter === 'ALL' ? undefined : [statusFilter],
+            difficulty: difficultyFilter === 'ALL' ? undefined : difficultyFilter,
+            sortBy: sortBy,
+            sortOrder: sortOrder,
+          }),
+
+          UserService.getUserStats(userId),
         ]);
+        const historyData = historyResponse.data.data;
+        const statsData = statsResponse.data.data;
 
-        // Process data
-        const problemsMap = new Map<string, ProblemWithSubmissions>();
-
-        // Initialize map with problems that have submissions
-        // Optimization: We only care about problems that have at least one submission
-        // But wait, the requirement says "This list shows only problems with submissions"
-        // So we iterate through submissions first?
-        // Or we iterate through all problems and check if they have submissions?
-        // Iterating through submissions is better if we only want problems with submissions.
-
-        // Group submissions by problemId
-        const submissionsByProblem = new Map<string, Submission[]>();
-        for (const sub of allSubmissions) {
-          if (sub.problemId) {
-            const existing = submissionsByProblem.get(sub.problemId) || [];
-            existing.push(sub);
-            submissionsByProblem.set(sub.problemId, existing);
-          }
-        }
-
-        const processedProblems: ProblemWithSubmissions[] = [];
-
-        for (const [problemId, subs] of submissionsByProblem.entries()) {
-          const problemDef = allProblems.find((p) => p.id === problemId);
-          if (!problemDef) continue;
-
-          // Sort submissions by date desc
-          subs.sort(
-            (a, b) =>
-              new Date(b.createdAt || 0).getTime() -
-              new Date(a.createdAt || 0).getTime()
-          );
-
-          const lastSubmission = subs[0];
-          const isSolved = subs.some(
-            (s) => s.status === SubmissionStatus.ACCEPTED
-          );
-
-          processedProblems.push({
-            ...problemDef,
-            submissions: subs,
-            lastSubmittedAt: lastSubmission.createdAt || null,
-            status: isSolved ? ProblemStatus.SOLVED : ProblemStatus.ATTEMPTED,
-            lastResult: lastSubmission.status,
-            submissionCount: subs.length,
-          });
-        }
-
-        setProblems(processedProblems);
+        setHistoryItems(historyData.data);
+        setTotalItems(historyData.meta.total);
+        setTotalPages(historyData.meta.totalPages);
+        setProblemStats(statsData.problemStats);
       } catch (error) {
         console.error('Error fetching practice history:', error);
       } finally {
@@ -150,99 +118,7 @@ export default function PracticeHistoryPage({
     };
 
     fetchData();
-  }, [userId]);
-
-  // Filter, Sort, Paginate
-  const filteredProblems = useMemo(() => {
-    return problems.filter((p) => {
-      if (!statusFilter.includes(p.status)) return false;
-      if (!difficultyFilter.includes(p.difficulty)) return false;
-      return true;
-    });
-  }, [problems, statusFilter, difficultyFilter]);
-
-  const sortedProblems = useMemo(() => {
-    if (!sortField || !sortOrder) return filteredProblems;
-
-    return [...filteredProblems].sort((a, b) => {
-      let valA: number | string = 0;
-      let valB: number | string = 0;
-
-      if (sortField === 'lastSubmittedAt') {
-        valA = new Date(a.lastSubmittedAt || 0).getTime();
-        valB = new Date(b.lastSubmittedAt || 0).getTime();
-      } else if (sortField === 'submissionCount') {
-        valA = a.submissionCount;
-        valB = b.submissionCount;
-      }
-
-      if (sortOrder === 'asc') {
-        return valA > valB ? 1 : -1;
-      }
-      return valA < valB ? 1 : -1;
-    });
-  }, [filteredProblems, sortField, sortOrder]);
-
-  const paginatedProblems = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    return sortedProblems.slice(startIndex, startIndex + itemsPerPage);
-  }, [sortedProblems, currentPage]);
-
-  const totalPages = Math.ceil(sortedProblems.length / itemsPerPage);
-
-  // Stats
-  const stats = useMemo(() => {
-    const totalSolved = problems.filter((p) => p.status === ProblemStatus.SOLVED).length;
-    const totalSubmissions = problems.reduce(
-      (acc, curr) => acc + curr.submissionCount,
-      0
-    );
-
-    // Acceptance Rate: (Total Accepted Submissions / Total Submissions) * 100
-    // Or is it (Solved Problems / Total Attempted Problems)?
-    // Usually it's based on submissions.
-    const totalAcceptedSubmissions = problems.reduce(
-      (acc, curr) =>
-        acc +
-        curr.submissions.filter((s) => s.status === SubmissionStatus.ACCEPTED)
-          .length,
-      0
-    );
-    const acceptanceRate =
-      totalSubmissions > 0
-        ? ((totalAcceptedSubmissions / totalSubmissions) * 100).toFixed(1)
-        : '0.0';
-
-    const easySolved = problems.filter(
-      (p) => p.status === ProblemStatus.SOLVED && p.difficulty === ProblemDifficulty.EASY
-    ).length;
-    const mediumSolved = problems.filter(
-      (p) => p.status === ProblemStatus.SOLVED && p.difficulty === ProblemDifficulty.MEDIUM
-    ).length;
-    const hardSolved = problems.filter(
-      (p) => p.status === ProblemStatus.SOLVED && p.difficulty === ProblemDifficulty.HARD
-    ).length;
-
-    return {
-      totalSolved,
-      totalSubmissions,
-      acceptanceRate,
-      easySolved,
-      mediumSolved,
-      hardSolved,
-    };
-  }, [problems]);
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      if (sortOrder === null) setSortOrder('desc');
-      else if (sortOrder === 'desc') setSortOrder('asc');
-      else setSortOrder(null);
-    } else {
-      setSortField(field);
-      setSortOrder('desc');
-    }
-  };
+  }, [userId, currentPage, statusFilter, difficultyFilter, sortBy, sortOrder]);
 
   const toggleRow = (problemId: string) => {
     const newSet = new Set(expandedRows);
@@ -252,13 +128,6 @@ export default function PracticeHistoryPage({
       newSet.add(problemId);
     }
     setExpandedRows(newSet);
-  };
-
-  const getSortIcon = (field: SortField) => {
-    if (sortField !== field) return <ArrowUpDown className="w-4 h-4 ml-1" />;
-    if (sortOrder === 'asc') return <ArrowUp className="w-4 h-4 ml-1" />;
-    if (sortOrder === 'desc') return <ArrowDown className="w-4 h-4 ml-1" />;
-    return <ArrowUpDown className="w-4 h-4 ml-1" />;
   };
 
   const getDifficultyStyles = (diff: ProblemDifficulty) => {
@@ -274,29 +143,22 @@ export default function PracticeHistoryPage({
     }
   };
 
-  const getStatusColor = (status: SubmissionStatus) => {
-    switch (status) {
-      case SubmissionStatus.ACCEPTED:
-        return 'text-green-600';
-      case SubmissionStatus.WRONG_ANSWER:
-        return 'text-red-600';
-      case SubmissionStatus.TIME_LIMIT_EXCEEDED:
-        return 'text-red-600';
-      case SubmissionStatus.COMPILATION_ERROR:
-        return 'text-red-600';
-      case SubmissionStatus.RUNTIME_ERROR:
-        return 'text-red-600';
-      default:
-        return 'text-gray-600';
+  const getStatusColor = (status: SubmissionStatus | ProblemStatus) => {
+    if (status === ProblemStatus.SOLVED || status === SubmissionStatus.ACCEPTED) {
+      return 'text-green-600';
     }
+    if (status === SubmissionStatus.WRONG_ANSWER || status === SubmissionStatus.TIME_LIMIT_EXCEEDED || status === SubmissionStatus.RUNTIME_ERROR || status === SubmissionStatus.COMPILATION_ERROR) {
+      return 'text-red-600';
+    }
+    return 'text-gray-600';
   };
 
   const router = useRouter();
-  const handleProblemClick = (problemId: string) => {
+  const handleProblemClick = (problemId: number) => {
     router.push(`/problems/${problemId}/submissions`);
   };
 
-  if (loading) {
+  if (loading && historyItems.length === 0) {
     return (
       <div className="container mx-auto p-6 space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
@@ -306,7 +168,7 @@ export default function PracticeHistoryPage({
               <Skeleton className="h-8 w-48" />
               <Skeleton className="h-10 w-24" />
             </div>
-            <Card className="border-none shadow-md overflow-hidden">
+            <Card className="border border-border shadow-md overflow-hidden">
               <div className="p-4 border-b">
                 <div className="grid grid-cols-4 gap-4">
                   <Skeleton className="h-6 w-full" />
@@ -341,7 +203,7 @@ export default function PracticeHistoryPage({
 
           {/* Right Section Skeleton */}
           <div className="col-span-1 lg:col-span-4 space-y-6 pt-[52px]">
-            <Card className="border-none shadow-md gap-2">
+            <Card className="border border-border shadow-md gap-2">
               <CardHeader className="pb-2">
                 <Skeleton className="h-4 w-24" />
               </CardHeader>
@@ -354,42 +216,9 @@ export default function PracticeHistoryPage({
                     </div>
                     <Skeleton className="h-4 w-32 mt-2" />
                   </div>
-                  <div className="grid grid-cols-3 gap-2 pt-2 border-t">
-                    <div className="flex flex-col items-center gap-1">
-                      <Skeleton className="h-4 w-8" />
-                      <Skeleton className="h-6 w-8" />
-                    </div>
-                    <div className="flex flex-col items-center gap-1 border-l border-r">
-                      <Skeleton className="h-4 w-8" />
-                      <Skeleton className="h-6 w-8" />
-                    </div>
-                    <div className="flex flex-col items-center gap-1">
-                      <Skeleton className="h-4 w-8" />
-                      <Skeleton className="h-6 w-8" />
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Card className="border-none shadow-md">
-                <CardHeader className="pb-2">
-                  <Skeleton className="h-4 w-24" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-16" />
-                </CardContent>
-              </Card>
-              <Card className="border-none shadow-md">
-                <CardHeader className="pb-2">
-                  <Skeleton className="h-4 w-24" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-16" />
-                </CardContent>
-              </Card>
-            </div>
           </div>
         </div>
       </div>
@@ -403,178 +232,173 @@ export default function PracticeHistoryPage({
         <div className="col-span-1 lg:col-span-8 space-y-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">
-              Lịch sử luyện tập
+              {t('practice_history')}
             </h1>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="gap-2">
-                  <Filter className="w-4 h-4" />
-                  Filter
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80 p-4">
-                <div className="space-y-4">
-                  {/* Status Filter */}
-                  <div className="space-y-2">
-                    <DropdownMenuLabel className="px-0 text-xs font-semibold text-gray-500 uppercase">
-                      Status
-                    </DropdownMenuLabel>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div
-                        className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-colors ${statusFilter.includes(ProblemStatus.SOLVED) &&
-                            !statusFilter.includes(ProblemStatus.ATTEMPTED)
+            <div className="flex items-center gap-2">
+              <Select
+                value={sortBy}
+                onValueChange={(value) => setSortBy(value as PracticeHistorySortBy)}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder={t('sort_by')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={PracticeHistorySortBy.LAST_SUBMITTED_AT}>
+                    {t('last_submitted')}
+                  </SelectItem>
+                  <SelectItem value={PracticeHistorySortBy.SUBMISSION_COUNT}>
+                    {t('submission_count')}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setSortOrder(sortOrder === PracticeHistorySortOrder.ASC ? PracticeHistorySortOrder.DESC : PracticeHistorySortOrder.ASC)}
+                title={sortOrder === PracticeHistorySortOrder.ASC ? t('ascending') : t('descending')}
+              >
+                {sortOrder === PracticeHistorySortOrder.ASC ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+              </Button>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    <Filter className="w-4 h-4" />
+                    {t('filter')}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-80 p-4">
+                  <div className="space-y-4">
+                    {/* Status Filter */}
+                    <div className="space-y-2">
+                      <DropdownMenuLabel className="px-0 text-xs font-semibold text-gray-500 uppercase">
+                        {t('status')}
+                      </DropdownMenuLabel>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div
+                          className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-colors ${statusFilter === ProblemStatus.SOLVED
                             ? 'bg-green-50 border-green-200 text-green-700'
                             : 'hover:bg-gray-50 border-gray-200 text-gray-600'
-                          }`}
-                        onClick={() => setStatusFilter([ProblemStatus.SOLVED])}
-                      >
-                        <CheckCircle
-                          className={`w-4 h-4 ${statusFilter.includes(ProblemStatus.SOLVED) &&
-                              !statusFilter.includes(ProblemStatus.ATTEMPTED)
+                            }`}
+                          onClick={() => setStatusFilter(statusFilter === ProblemStatus.SOLVED ? 'ALL' : ProblemStatus.SOLVED)}
+                        >
+                          <CheckCircle
+                            className={`w-4 h-4 ${statusFilter === ProblemStatus.SOLVED
                               ? 'text-green-600'
                               : 'text-gray-400'
-                            }`}
-                        />
-                        <span className="text-sm font-medium">Solved</span>
-                      </div>
-                      <div
-                        className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-colors ${statusFilter.includes(ProblemStatus.ATTEMPTED) &&
-                            !statusFilter.includes(ProblemStatus.SOLVED)
+                              }`}
+                          />
+                          <span className="text-sm font-medium">{t('solved')}</span>
+                        </div>
+                        <div
+                          className={`flex items-center gap-2 p-2 rounded-md border cursor-pointer transition-colors ${statusFilter === ProblemStatus.ATTEMPTED
                             ? 'bg-gray-100 border-gray-300 text-gray-900'
                             : 'hover:bg-gray-50 border-gray-200 text-gray-600'
-                          }`}
-                        onClick={() => setStatusFilter([ProblemStatus.ATTEMPTED])}
-                      >
-                        <Circle
-                          className={`w-4 h-4 ${statusFilter.includes(ProblemStatus.ATTEMPTED) &&
-                              !statusFilter.includes(ProblemStatus.SOLVED)
+                            }`}
+                          onClick={() => setStatusFilter(statusFilter === ProblemStatus.ATTEMPTED ? 'ALL' : ProblemStatus.ATTEMPTED)}
+                        >
+                          <Circle
+                            className={`w-4 h-4 ${statusFilter === ProblemStatus.ATTEMPTED
                               ? 'text-gray-900'
                               : 'text-gray-400'
-                            }`}
-                        />
-                        <span className="text-sm font-medium">Attempted</span>
+                              }`}
+                          />
+                          <span className="text-sm font-medium">{t('attempted')}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <DropdownMenuSeparator />
+                    <DropdownMenuSeparator />
 
-                  {/* Difficulty Filter */}
-                  <div className="space-y-2">
-                    <DropdownMenuLabel className="px-0 text-xs font-semibold text-gray-500 uppercase">
-                      Difficulty
-                    </DropdownMenuLabel>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        {
-                          value: ProblemDifficulty.EASY,
-                          label: 'Easy',
-                          color: getDifficultyStyles(ProblemDifficulty.EASY),
-                          hover: 'hover:bg-green-50/50',
-                        },
-                        {
-                          value: ProblemDifficulty.MEDIUM,
-                          label: 'Med.',
-                          color: getDifficultyStyles(ProblemDifficulty.MEDIUM),
-                          hover: 'hover:bg-orange-50/50',
-                        },
-                        {
-                          value: ProblemDifficulty.HARD,
-                          label: 'Hard',
-                          color: getDifficultyStyles(ProblemDifficulty.HARD),
-                          hover: 'hover:bg-red-50/50',
-                        },
-                      ].map((diff) => {
-                        const isSelected = difficultyFilter.includes(
-                          diff.value
-                        );
-                        return (
-                          <div
-                            key={diff.value}
-                            className={`flex items-center justify-center p-2 rounded-md border cursor-pointer transition-all ${isSelected
+                    {/* Difficulty Filter */}
+                    <div className="space-y-2">
+                      <DropdownMenuLabel className="px-0 text-xs font-semibold text-gray-500 uppercase">
+                        {t('difficulty')}
+                      </DropdownMenuLabel>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          {
+                            value: ProblemDifficulty.EASY,
+                            label: t('easy'),
+                            color: getDifficultyStyles(ProblemDifficulty.EASY),
+                            hover: 'hover:bg-green-50/50',
+                          },
+                          {
+                            value: ProblemDifficulty.MEDIUM,
+                            label: t('medium'),
+                            color: getDifficultyStyles(ProblemDifficulty.MEDIUM),
+                            hover: 'hover:bg-orange-50/50',
+                          },
+                          {
+                            value: ProblemDifficulty.HARD,
+                            label: t('hard'),
+                            color: getDifficultyStyles(ProblemDifficulty.HARD),
+                            hover: 'hover:bg-red-50/50',
+                          },
+                        ].map((diff) => {
+                          const isSelected = difficultyFilter === diff.value;
+                          return (
+                            <div
+                              key={diff.value}
+                              className={`flex items-center justify-center p-2 rounded-md border cursor-pointer transition-all ${isSelected
                                 ? diff.color
                                 : `border-gray-200 text-gray-500 ${diff.hover}`
-                              }`}
-                            onClick={() => {
-                              if (isSelected) {
-                                setDifficultyFilter(
-                                  difficultyFilter.filter(
-                                    (d) => d !== diff.value
-                                  )
-                                );
-                              } else {
-                                setDifficultyFilter([
-                                  ...difficultyFilter,
-                                  diff.value,
-                                ]);
-                              }
-                            }}
-                          >
-                            <span className="text-sm font-medium">
-                              {diff.label}
-                            </span>
-                          </div>
-                        );
-                      })}
+                                }`}
+                              onClick={() => {
+                                setDifficultyFilter(isSelected ? 'ALL' : diff.value);
+                              }}
+                            >
+                              <span className="text-sm font-medium">
+                                {diff.label}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
+
+                    <DropdownMenuSeparator />
+
+                    {/* Reset Button */}
+                    <Button
+                      variant="ghost"
+                      className="w-full text-gray-500 hover:text-gray-900"
+                      onClick={() => {
+                        setStatusFilter('ALL');
+                        setDifficultyFilter('ALL');
+                      }}
+                    >
+                      {t('reset_filters')}
+                    </Button>
                   </div>
-
-                  <DropdownMenuSeparator />
-
-                  {/* Reset Button */}
-                  <Button
-                    variant="ghost"
-                    className="w-full text-gray-500 hover:text-gray-900"
-                    onClick={() => {
-                      setStatusFilter([ProblemStatus.SOLVED, ProblemStatus.ATTEMPTED]);
-                      setDifficultyFilter([
-                        ProblemDifficulty.EASY,
-                        ProblemDifficulty.MEDIUM,
-                        ProblemDifficulty.HARD,
-                      ]);
-                    }}
-                  >
-                    Reset Filters
-                  </Button>
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
 
-          <Card className="border-none shadow-md overflow-hidden">
+          <Card className="border border-border shadow-md overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead
-                    className="cursor-pointer hover:bg-gray-50 w-[180px]"
-                    onClick={() => handleSort('lastSubmittedAt')}
-                  >
-                    <div className="flex items-center">
-                      Lần nộp cuối
-                      {getSortIcon('lastSubmittedAt')}
-                    </div>
+                  <TableHead className="w-[180px]">
+                    {t('last_submitted')}
                   </TableHead>
-                  <TableHead>Problem</TableHead>
-                  <TableHead>Kết quả gần nhất</TableHead>
-                  <TableHead
-                    className="cursor-pointer hover:bg-gray-50 text-right"
-                    onClick={() => handleSort('submissionCount')}
-                  >
-                    <div className="flex items-center justify-end">
-                      Submissions
-                      {getSortIcon('submissionCount')}
-                    </div>
+                  <TableHead>{t('problem')}</TableHead>
+                  <TableHead>{t('latest_result')}</TableHead>
+                  <TableHead className="text-right">
+                    {t('submissions')}
                   </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {paginatedProblems.map((problem) => (
-                  <Fragment key={problem.id}>
+                {historyItems.map((item) => (
+                  <Fragment key={item.problem.id}>
                     <TableRow className="group ">
                       <TableCell className="text-gray-500 font-medium">
-                        {problem.lastSubmittedAt
+                        {item.lastSubmittedAt
                           ? format(
-                            new Date(problem.lastSubmittedAt),
+                            new Date(item.lastSubmittedAt),
                             'MMM d, yyyy'
                           )
                           : '-'}
@@ -582,51 +406,50 @@ export default function PracticeHistoryPage({
                       <TableCell>
                         <div
                           className="flex items-start gap-3 cursor-pointer"
-                          onClick={() => handleProblemClick(problem.id)}
+                          onClick={() => handleProblemClick(item.problem.id)}
                         >
-                          {problem.status === ProblemStatus.SOLVED ? (
-                            <Tooltip content="Solved">
+                          {item.status === ProblemStatus.SOLVED ? (
+                            <Tooltip content={t('solved')}>
                               <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
                             </Tooltip>
                           ) : (
-                            <Tooltip content="Attempted">
+                            <Tooltip content={t('attempted')}>
                               <Circle className="w-5 h-5 text-gray-300 mt-0.5" />
                             </Tooltip>
                           )}
                           <div>
                             <div className="font-medium text-gray-900">
-                              {problem.title}
+                              {item.problem.title}
                             </div>
                             <Badge
                               variant="outline"
-                              className={`mt-1 text-xs font-normal border ${getDifficultyStyles(problem.difficulty)}`}
+                              className={`mt-1 text-xs font-normal border ${getDifficultyStyles(item.problem.difficulty)}`}
                             >
-                              {problem.difficulty === ProblemDifficulty.EASY
-                                ? 'Easy'
-                                : problem.difficulty ===
-                                  ProblemDifficulty.MEDIUM
-                                  ? 'Med.'
-                                  : 'Hard'}
+                              {item.problem.difficulty === ProblemDifficulty.EASY
+                                ? t('easy')
+                                : item.problem.difficulty === ProblemDifficulty.MEDIUM
+                                  ? t('medium')
+                                  : t('hard')}
                             </Badge>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
                         <span
-                          className={`font-medium ${getStatusColor(problem.lastResult || SubmissionStatus.UNKNOWN_ERROR)}`}
+                          className={`font-medium ${getStatusColor(item.lastResult)}`}
                         >
-                          {problem.lastResult}
+                          {t(item.lastResult)}
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
                         <div
                           className="flex items-center justify-end gap-2 cursor-pointer select-none"
-                          onClick={() => toggleRow(problem.id)}
+                          onClick={() => toggleRow(item.problem.id.toString())}
                         >
                           <span className="font-medium">
-                            {problem.submissionCount}
+                            {item.submissionCount}
                           </span>
-                          {expandedRows.has(problem.id) ? (
+                          {expandedRows.has(item.problem.id.toString()) ? (
                             <ChevronUp className="w-4 h-4 text-gray-400" />
                           ) : (
                             <ChevronDown className="w-4 h-4 text-gray-400" />
@@ -634,7 +457,7 @@ export default function PracticeHistoryPage({
                         </div>
                       </TableCell>
                     </TableRow>
-                    {expandedRows.has(problem.id) && (
+                    {expandedRows.has(item.problem.id.toString()) && (
                       <TableRow className="bg-gray-50/50 hover:bg-gray-50/50">
                         <TableCell colSpan={4} className="p-0">
                           <div className="p-4 pl-12 pr-8">
@@ -642,32 +465,32 @@ export default function PracticeHistoryPage({
                               <TableHeader>
                                 <TableRow className="border-b border-gray-200">
                                   <TableHead className="text-xs uppercase">
-                                    Thời gian
+                                    {t('time')}
                                   </TableHead>
                                   <TableHead className="text-xs uppercase">
-                                    Status
+                                    {t('status')}
                                   </TableHead>
                                   <TableHead className="text-xs uppercase">
-                                    Language
+                                    {t('language')}
                                   </TableHead>
                                   <TableHead className="text-xs uppercase">
-                                    Runtime
+                                    {t('runtime')}
                                   </TableHead>
                                   <TableHead className="text-xs uppercase">
-                                    Memory
+                                    {t('memory')}
                                   </TableHead>
                                 </TableRow>
                               </TableHeader>
                               <TableBody>
-                                {problem.submissions.map((sub) => (
+                                {item.submissions.map((sub) => (
                                   <TableRow
                                     key={sub.id}
                                     className="border-none hover:bg-transparent"
                                   >
                                     <TableCell className="text-gray-500">
-                                      {sub.createdAt
+                                      {sub.submittedAt
                                         ? format(
-                                          new Date(sub.createdAt),
+                                          new Date(sub.submittedAt),
                                           'yyyy.MM.dd'
                                         )
                                         : '-'}
@@ -675,24 +498,23 @@ export default function PracticeHistoryPage({
                                     <TableCell
                                       className={getStatusColor(sub.status)}
                                     >
-                                      {sub.status}
+                                      {t(sub.status)}
                                     </TableCell>
                                     <TableCell>
                                       <Badge
                                         variant="secondary"
                                         className="bg-gray-200 text-gray-700 hover:bg-gray-300"
                                       >
-                                        {sub.language.name}
+                                        {sub.language?.name || t('unknown')}
                                       </Badge>
                                     </TableCell>
 
                                     <TableCell className="text-gray-500">
-                                      {/* Use flex and items-center to align them horizontally and vertically center them */}
                                       <div className="flex items-center gap-2">
                                         <Clock className="h-4 w-4 text-gray-900" />
                                         <span>
-                                          {sub.runtime
-                                            ? `${sub.runtime} ms`
+                                          {sub.executionTime
+                                            ? `${sub.executionTime} ms`
                                             : 'N/A'}
                                         </span>
                                       </div>
@@ -702,8 +524,8 @@ export default function PracticeHistoryPage({
                                       <div className="flex items-center gap-2">
                                         <Cpu className="h-4 w-4 text-gray-900" />
                                         <span>
-                                          {sub.memory
-                                            ? `${sub.memory} MB`
+                                          {sub.memoryUsed
+                                            ? `${sub.memoryUsed} MB`
                                             : 'N/A'}
                                         </span>
                                       </div>
@@ -731,10 +553,10 @@ export default function PracticeHistoryPage({
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
                   >
-                    Trang trước
+                    {t('previous_page')}
                   </Button>
                   <span className="flex items-center px-4 text-sm text-gray-600">
-                    Trang {currentPage} / {totalPages}
+                    {t('page_info', { current: currentPage, total: totalPages })}
                   </span>
                   <Button
                     variant="outline"
@@ -744,7 +566,7 @@ export default function PracticeHistoryPage({
                     }
                     disabled={currentPage === totalPages}
                   >
-                    Trang sau
+                    {t('next_page')}
                   </Button>
                 </div>
               </div>
@@ -755,78 +577,52 @@ export default function PracticeHistoryPage({
         {/* Right Section: Summary Sidebar (30%) */}
         <div className="col-span-1 lg:col-span-4 space-y-6 pt-[52px]">
           {/* Total Solved Card */}
-          <Card className="border-none shadow-md">
+          <Card className="border border-border shadow-md">
             <CardHeader className="pb-2">
               <CardTitle className="text-gray-500 text-sm font-medium">
-                Bài tập đã giải
+                {t('solved_problems')}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="text-4xl font-bold text-blue-600">
-                    {stats.totalSolved}{' '}
-                    <span className="text-lg text-gray-400 font-normal">
-                      Problems
-                    </span>
+              {problemStats && (
+                <div className="space-y-4">
+                  <div>
+                    <div className="text-4xl font-bold text-blue-600">
+                      {problemStats.total.solved}{' '}
+                      <span className="text-lg text-gray-400 font-normal">
+                        {t('problems')}
+                      </span>
+                    </div>
                   </div>
-                </div>
 
-                <div className="grid grid-cols-3 gap-2 pt-2 border-t">
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-green-600">
-                      Easy
+                  <div className="grid grid-cols-3 gap-2 pt-2 border-t">
+                    <div className="text-center">
+                      <div className="text-sm font-medium text-green-600">
+                        {t('easy')}
+                      </div>
+                      <div className="text-lg font-bold text-gray-700">
+                        {problemStats.easy.solved}
+                      </div>
                     </div>
-                    <div className="text-lg font-bold text-gray-700">
-                      {stats.easySolved}
+                    <div className="text-center border-l border-r">
+                      <div className="text-sm font-medium text-orange-600">
+                        {t('medium')}
+                      </div>
+                      <div className="text-lg font-bold text-gray-700">
+                        {problemStats.medium.solved}
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-center border-l border-r">
-                    <div className="text-sm font-medium text-orange-600">
-                      Med.
-                    </div>
-                    <div className="text-lg font-bold text-gray-700">
-                      {stats.mediumSolved}
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-medium text-red-600">Hard</div>
-                    <div className="text-lg font-bold text-gray-700">
-                      {stats.hardSolved}
+                    <div className="text-center">
+                      <div className="text-sm font-medium text-red-600">{t('hard')}</div>
+                      <div className="text-lg font-bold text-gray-700">
+                        {problemStats.hard.solved}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-2 gap-4">
-            <Card className="border-none shadow-md">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-gray-500 text-xs font-medium uppercase">
-                  Submissions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-purple-600">
-                  {stats.totalSubmissions}
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="border-none shadow-md">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-gray-500 text-xs font-medium uppercase">
-                  Acceptance
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">
-                  {stats.acceptanceRate}%
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
     </div>

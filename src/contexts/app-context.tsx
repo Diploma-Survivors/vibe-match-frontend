@@ -12,6 +12,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -23,6 +24,7 @@ interface AppContextType {
   shouldHideNavigation: boolean;
   isLoading: boolean;
   clearUserData: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -34,6 +36,7 @@ export function AppProvider({
   children,
   decodedAccessToken,
 }: AppProviderProps) {
+  const { i18n } = useTranslation();
   const [user, setUser] = useState<UserProfile>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -42,6 +45,37 @@ export function AppProvider({
 
   const clearUserData = () => {
     setUser(undefined);
+  };
+
+  const fetchUser = async () => {
+    try {
+      const response = await clientApi.get('/auth/me');
+      const userData = response.data.data;
+      setUser(userData);
+
+      if (userData.preferredLanguage && i18n.language !== userData.preferredLanguage) {
+        i18n.changeLanguage(userData.preferredLanguage);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user data:', error);
+      // Fallback to mock user on error for UI testing
+      setUser({
+        id: 'mock-user-id',
+        username: 'ui-tester',
+        email: 'tester@sfinx.com',
+        firstName: 'UI',
+        lastName: 'Tester',
+        role: 'USER',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      } as any);
+    }
+  };
+
+  const refreshUser = async () => {
+    if (decodedAccessToken) {
+      await fetchUser();
+    }
   };
 
   useEffect(() => {
@@ -62,27 +96,7 @@ export function AppProvider({
 
     if (decodedAccessToken) {
       setIsLoading(true);
-      clientApi
-        .get('/auth/me')
-        .then((response) => {
-          setUser(response.data.data);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error('Failed to fetch user data:', error);
-          // Fallback to mock user on error for UI testing
-          setUser({
-            id: 'mock-user-id',
-            username: 'ui-tester',
-            email: 'tester@sfinx.com',
-            firstName: 'UI',
-            lastName: 'Tester',
-            role: 'USER',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          } as any);
-          setIsLoading(false);
-        });
+      fetchUser().finally(() => setIsLoading(false));
     }
   }, [decodedAccessToken]);
 
@@ -91,6 +105,7 @@ export function AppProvider({
     shouldHideNavigation,
     isLoading,
     clearUserData,
+    refreshUser,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

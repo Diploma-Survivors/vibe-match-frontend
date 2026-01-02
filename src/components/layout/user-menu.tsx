@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { UserProfile } from '@/types/user';
-import { History, LogIn, LogOut, User } from 'lucide-react';
+import { History, LogIn, LogOut, Settings, User } from 'lucide-react';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +28,7 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Avatar className="cursor-pointer hover:opacity-80 transition-opacity border border-border">
-            <AvatarImage src={user.avatarUrl || PLACEHOLDER_AVATAR} alt={user.firstName} />
+            <AvatarImage src={user.avatarUrl || PLACEHOLDER_AVATAR} alt={user.fullName} />
             <AvatarFallback className="bg-muted p-0 overflow-hidden">
               <img
                 src={PLACEHOLDER_AVATAR}
@@ -41,7 +41,7 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
         <DropdownMenuContent align="end" className="w-64 p-2">
           <div className="px-2 py-1.5">
             <p className="text-sm font-medium leading-none text-foreground truncate">
-              {user.firstName} {user.lastName}
+              {user.fullName}
             </p>
             <p className="text-xs leading-none text-muted-foreground mt-1 truncate">
               {user.email}
@@ -64,6 +64,15 @@ export function UserMenu({ user, onLogout }: UserMenuProps) {
             >
               <History className="mr-3 h-4 w-4 text-muted-foreground" />
               <span>{t('practice_history')}</span>
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <Link
+              href="/settings"
+              className="cursor-pointer w-full flex items-center py-2.5"
+            >
+              <Settings className="mr-3 h-4 w-4 text-muted-foreground" />
+              <span>{t('settings')}</span>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator />

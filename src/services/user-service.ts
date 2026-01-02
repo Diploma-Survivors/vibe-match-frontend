@@ -1,64 +1,47 @@
-import type { UserProfile } from '@/types/user';
+import clientApi from '@/lib/apis/axios-client';
+import { ApiResponse } from '@/types/api';
+import {
+  initialProblemData,
+  ProblemDifficulty,
+  ProblemStatus,
+} from '@/types/problems';
+import { SubmissionStatus } from '@/types/submissions';
+import {
+  AvatarUploadUrlRequest,
+  AvatarUploadUrlResponse,
+  ConfirmAvatarUploadRequest,
+  PracticeHistoryParams,
+  PracticeHistorySortBy,
+  UpdateUserProfileRequest,
+  UserActivityCalendar,
+  UserPracticeHistoryItem,
+  UserPracticeHistoryResponse,
+  UserProblemStats,
+  UserRecentACProblem,
+  UserSolutionsResponse,
+  UserSubmissionStats,
+  UserProfile,
+} from '@/types/user';
+import { AxiosResponse } from 'axios';
 
-async function getUserProfile(userId: number): Promise<UserProfile> {
-  // Mock data
-  if (userId === 3) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          id: userId,
-          username: '@nguyenvana',
-          firstName: 'Nguyen Van',
-          lastName: 'A',
-          email: 'nguyenvana@example.com',
-          address: '123 Le Loi, District 1, Ho Chi Minh City',
-          phone: '0901234567',
-          rank: 80,
-          // give another image
-          avatarUrl:
-            'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=800&q=80',
-        });
-      }, 500);
-    });
-  }
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        id: userId,
-        username: '@nguyenvana',
-        firstName: 'Nguyen Van',
-        lastName: 'A',
-        email: 'nguyenvana@example.com',
-        address: '123 Le Loi, District 1, Ho Chi Minh City',
-        phone: '0901234567',
-        rank: 80,
-        avatarUrl: 'https://github.com/shadcn.png',
-      });
-    }, 500);
-  });
+async function getUserProfile(userId: number): Promise<AxiosResponse<ApiResponse<UserProfile>>> {
+  return await clientApi.get<ApiResponse<UserProfile>>(`/users/profile?userId=${userId}`);
 }
 
-async function getMe(): Promise<any> {
-  // Mock data for current user
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        data: {
-          data: {
-            id: 101,
-            username: '@currentuser',
-            firstName: 'Current',
-            lastName: 'User',
-            email: 'current@example.com',
-            address: '456 Tran Hung Dao',
-            phone: '0909999999',
-            rank: 100,
-            avatarUrl: 'https://github.com/shadcn.png',
-          },
-        },
-      } as any);
-    }, 300);
-  });
+async function getMe(): Promise<AxiosResponse<ApiResponse<UserProfile>>> {
+  return await clientApi.get<ApiResponse<UserProfile>>(`/auth/me`);
+}
+
+async function updateMe(data: UpdateUserProfileRequest): Promise<AxiosResponse<ApiResponse<UserProfile>>> {
+  return await clientApi.patch<ApiResponse<UserProfile>>(`/auth/me`, data);
+}
+
+async function getAvatarUploadUrl(data: AvatarUploadUrlRequest): Promise<AxiosResponse<ApiResponse<AvatarUploadUrlResponse>>> {
+  return await clientApi.post<ApiResponse<AvatarUploadUrlResponse>>(`/auth/me/avatar/upload-url`, data);
+}
+
+async function confirmAvatarUpload(data: ConfirmAvatarUploadRequest): Promise<AxiosResponse<ApiResponse<void>>> {
+  return await clientApi.post<ApiResponse<void>>(`/auth/me/avatar/confirm`, data);
 }
 
 async function getAllUsers(): Promise<UserProfile[]> {
@@ -87,9 +70,61 @@ async function getAllContestParticipants(
   return getAllUsers();
 }
 
+async function getUserStats(
+  userId: number
+): Promise<AxiosResponse<ApiResponse<{ problemStats: UserProblemStats; submissionStats: UserSubmissionStats }>>> {
+  return await clientApi.get(`/users/${userId}/stats`);
+}
+
+async function getUserActivityCalendar(
+  userId: number,
+  year: number
+): Promise<AxiosResponse<ApiResponse<UserActivityCalendar>>> {
+  return await clientApi.get(`/users/${userId}/activity-calendar`, {
+    params: { year },
+  });
+}
+
+async function getUserActivityYears(userId: number): Promise<AxiosResponse<ApiResponse<number[]>>> {
+  return await clientApi.get(`/users/${userId}/activity-years`);
+}
+
+async function getUserRecentACProblems(
+  userId: number
+): Promise<AxiosResponse<ApiResponse<UserRecentACProblem[]>>> {
+  return await clientApi.get(`/users/${userId}/recent-ac-problems`);
+}
+
+async function getUserPracticeHistory(
+  userId: number,
+  params: PracticeHistoryParams
+): Promise<AxiosResponse<ApiResponse<UserPracticeHistoryResponse>>> {
+  return await clientApi.get(`/users/${userId}/practice-history`, {
+    params,
+  });
+}
+
+async function getUserSolutions(
+  userId: number,
+  params: { page?: number; limit?: number; sortBy?: string }
+): Promise<AxiosResponse<ApiResponse<UserSolutionsResponse>>> {
+  return await clientApi.get(`/solutions/user/${userId}`, {
+    params,
+  });
+}
+
 export const UserService = {
   getUserProfile,
   getMe,
+  updateMe,
+  getAvatarUploadUrl,
+  confirmAvatarUpload,
   getAllUsers,
   getAllContestParticipants,
+  getUserStats,
+  getUserActivityCalendar,
+  getUserActivityYears,
+  getUserRecentACProblems,
+  getUserPracticeHistory,
+  getUserSolutions,
 };
