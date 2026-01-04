@@ -44,44 +44,42 @@ function getContestStatus(contest: Contest): ContestStatus {
   const endTime = new Date(contest.endTime);
 
   if (now < startTime) {
-    return ContestStatus.NOT_STARTED;
+    return ContestStatus.SCHEDULED;
   }
 
   if (contest.participation?.startTime && !contest.participation?.finishedAt) {
-    return ContestStatus.IN_PROGRESS;
+    return ContestStatus.RUNNING;
   }
 
   if (contest.participation?.finishedAt) {
-    return ContestStatus.COMPLETED;
+    return ContestStatus.ENDED;
   }
 
   if (
     (!contest.lateDeadline && now > endTime) ||
     (contest.lateDeadline && now > new Date(contest.lateDeadline))
   ) {
-    return ContestStatus.FINISHED;
+    return ContestStatus.ENDED;
   }
 
   if (contest.lateDeadline && now <= new Date(contest.lateDeadline)) {
-    return ContestStatus.LATE_SUBMISSION;
+    return ContestStatus.RUNNING; // Or LATE_SUBMISSION if we want to keep that distinction, but enum doesn't have it
   }
 
-  return ContestStatus.ONGOING;
+  return ContestStatus.RUNNING;
 }
 
 function isInprogress(contest: Contest): boolean {
-  return getContestStatus(contest) === ContestStatus.IN_PROGRESS;
+  return getContestStatus(contest) === ContestStatus.RUNNING;
 }
 
 function getContestStatusColor(status: ContestStatus): string {
   switch (status) {
-    case ContestStatus.NOT_STARTED:
+    case ContestStatus.SCHEDULED:
       return CONTEST_STATUS_COLORS.upcoming;
-    case ContestStatus.ONGOING:
-    case ContestStatus.IN_PROGRESS:
+    case ContestStatus.RUNNING:
       return CONTEST_STATUS_COLORS.ongoing;
-    case ContestStatus.COMPLETED:
-    case ContestStatus.FINISHED:
+    case ContestStatus.ENDED:
       return CONTEST_STATUS_COLORS.finished;
     default:
       return CONTEST_STATUS_COLORS.finished;

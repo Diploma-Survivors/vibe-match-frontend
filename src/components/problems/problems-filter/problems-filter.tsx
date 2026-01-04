@@ -33,7 +33,8 @@ export default function ProblemFilter({
   onKeywordChange,
   onFiltersChange,
   onReset,
-}: ProblemFilterProps) {
+  className,
+}: ProblemFilterProps & { className?: string }) {
   const { t } = useTranslation('problems');
 
   // Helper function to toggle items in array filters (topicIds, tagIds)
@@ -50,7 +51,7 @@ export default function ProblemFilter({
   );
 
   return (
-    <div className="bg-card rounded-xl p-5 border border-border shadow-sm space-y-6">
+    <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">

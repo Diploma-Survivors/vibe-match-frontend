@@ -1,6 +1,6 @@
-import { ContestListItem, ContestStatus } from '@/types/contests';
+import { Contest, ContestStatus } from '@/types/contests';
 
-export const MOCK_CONTESTS: ContestListItem[] = Array.from({ length: 50 }).map(
+export const MOCK_CONTESTS: Contest[] = Array.from({ length: 50 }).map(
     (_, index) => {
         const id = (index + 1).toString();
         const now = new Date();
@@ -25,11 +25,15 @@ export const MOCK_CONTESTS: ContestListItem[] = Array.from({ length: 50 }).map(
 
         return {
             id,
-            name: `Weekly Contest ${300 + index}`,
+            title: `Weekly Contest ${300 + index}`,
+            description: `This is a description for Weekly Contest ${300 + index}`,
             startTime: startTime.toISOString(),
             endTime: endTime.toISOString(),
             durationMinutes,
             status,
+            participantCount: Math.floor(Math.random() * 1000),
+            maxParticipant: 5000,
+            contestProblems: [],
         };
     }
 );

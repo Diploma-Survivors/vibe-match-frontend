@@ -1,18 +1,12 @@
 import { CheckCircle, FileText } from 'lucide-react';
 import { JSX } from 'react';
-import type { ProblemDifficulty } from './problems';
+import type { Problem, ProblemDifficulty, SortOrder } from './problems';
 
-export enum SortBy {
-  NAME = 'name',
+export enum ContestSortBy {
+  ID = 'id',
   START_TIME = 'startTime',
-  END_TIME = 'endTime',
-  CREATED_AT = 'createdAt',
 }
 
-export enum SortOrder {
-  ASC = 'asc',
-  DESC = 'desc',
-}
 
 export enum MatchMode {
   ANY = 'any',
@@ -58,6 +52,13 @@ export enum ContestSubmissionStrategy {
   AVERAGE_SCORE = 'AVERAGE_SCORE',
 }
 
+export enum ContestStatus {
+  SCHEDULED = 'Scheduled',
+  RUNNING = 'Running',
+  ENDED = 'Ended',
+}
+
+
 export interface ContestParticipation {
   participationId?: number;
   startTime?: string;
@@ -67,35 +68,48 @@ export interface ContestParticipation {
 }
 
 export interface Contest {
-  id?: number;
-  name: string;
+  id: string;
+  title: string;
   description: string;
   startTime: string;
   endTime: string;
-  isHasDurationMinutes?: boolean;
+  participantCount?: number;
+  maxParticipant?: number;
   durationMinutes?: number;
-  lateDeadline?: string;
-  deadlineEnforcement: ContestDeadlineEnforcement;
-  submissionStrategy: ContestSubmissionStrategy;
-  problems: ContestProblem[];
+  // problems: {
+  //   problem: Problem;
+  //   orderIndex: number;
+  //   points?: number;
+  // }[];
   createdBy?: string;
   createdAt?: string;
+  status: ContestStatus; // derived field for UI convenience
+  contestProblems: {
+    problem: Problem;
+    orderIndex: number;
+    points?: number;
+  }[];
   participation?: ContestParticipation;
+  lateDeadline?: string;
 }
 
+
 export const INITIAL_CONTEST: Contest = {
-  name: '',
+  id: '',
+  title: '',
   description: '',
   startTime: '',
   endTime: '',
-  deadlineEnforcement: ContestDeadlineEnforcement.STRICT,
-  submissionStrategy: ContestSubmissionStrategy.SINGLE_SUBMISSION,
-  problems: [],
+  participantCount: 0,
+  maxParticipant: 0,
+  durationMinutes: 0,
+  contestProblems: [],
+  status: ContestStatus.SCHEDULED,
 };
 
 export interface ContestOverView {
   id?: number;
-  name: string;
+  title: string;
   description: string;
   startTime: string;
   endTime: string;
@@ -111,72 +125,52 @@ export interface ContestOverView {
   createdAt?: string;
 }
 
+export enum ContestUserStatus {
+  JOINED = 'JOINED',
+  NOT_JOINED = 'NOT_JOINED',
+}
+
+
+
 // Filter types
 export interface ContestFilters {
-  startTime?: string;
-  endTime?: string;
-  minDurationMinutes?: number;
-  maxDurationMinutes?: number;
-  status?: string[];
+  userStatus?: ContestUserStatus;
+  status?: ContestStatus;
+  startAfter?: string;
+  startBefore?: string;
 }
 
 // Request types
 export interface ContestListRequest {
-  keyword?: string;
-  after?: string;
-  before?: string;
-  first?: number;
-  last?: number;
+  page?: number;
+  limit?: number;
   sortOrder?: SortOrder;
-  matchMode?: MatchMode;
-  sortBy?: SortBy;
-  filters?: ContestFilters;
+  sortBy?: ContestSortBy;
+  search?: string;
+  status?: ContestStatus;
+  userStatus?: ContestUserStatus;
+  startAfter?: string;
+  startBefore?: string;
 }
 
 // Response types
-export interface ContestListItem {
-  id: string;
-  name: string;
-  startTime: string;
-  endTime: string;
-  durationMinutes: number;
-  status: string;
-}
-
-export interface ContestEdge {
-  cursor: string;
-  node: ContestListItem;
-}
-
-export interface PageInfo {
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-  startCursor: string;
-  endCursor: string;
-}
-
 export interface ContestListResponse {
-  edges: ContestEdge[];
-  pageInfos: PageInfo;
-  totalCount: number;
+  data: Contest[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
 }
 
-export enum ContestStatus {
-  NOT_STARTED = 'not_started', // chưa bắt đầu
-  ONGOING = 'ongoing', // đang diễn ra
-  FINISHED = 'finished', // đã kết thúc
-  IN_PROGRESS = 'in_progress', // đang làm
-  COMPLETED = 'completed', // đã hoàn thành
-  LATE_SUBMISSION = 'late_submission', // Trong thời gian gia hạn
-}
 
 export const ContestStatusLabels: Record<ContestStatus, string> = {
-  [ContestStatus.NOT_STARTED]: 'Chưa bắt đầu',
-  [ContestStatus.ONGOING]: 'Đang diễn ra',
-  [ContestStatus.FINISHED]: 'Đã kết thúc',
-  [ContestStatus.IN_PROGRESS]: 'Đang làm',
-  [ContestStatus.COMPLETED]: 'Đã hoàn thành',
-  [ContestStatus.LATE_SUBMISSION]: 'Trong thời gian gia hạn',
+  [ContestStatus.SCHEDULED]: 'Scheduled',
+  [ContestStatus.RUNNING]: 'Running',
+  [ContestStatus.ENDED]: 'Ended',
 };
 
 export const CONTEST_SUBMISSION_STRATEGY_LABELS: Record<
@@ -202,12 +196,6 @@ export const CONTEST_SUBMISSION_STRATEGY_DESCRIPTION: Record<
     'The average score from all submissions is taken',
 };
 
-export const CONTEST_STATUS_OPTIONS = [
-  { value: 'all', label: 'All' },
-  { value: 'not_started', label: 'Not Started' },
-  { value: 'ongoing', label: 'Ongoing' },
-  { value: 'finished', label: 'Finished' },
-];
 
 export const CONTEST_ACCESS_RANGE_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -241,11 +229,9 @@ export const CONTEST_STATUS_COLORS = {
 };
 
 export const CONTEST_STATUS_LABELS = {
-  upcoming: 'Upcoming',
-  ongoing: 'Đang diễn ra',
-  ended: 'Ended',
-  public: 'Public',
-  private: 'Private',
+  [ContestStatus.SCHEDULED]: 'Upcoming',
+  [ContestStatus.RUNNING]: 'Running',
+  [ContestStatus.ENDED]: 'Ended',
 } as const;
 
 export const PARTICIPATION_OPTIONS = [

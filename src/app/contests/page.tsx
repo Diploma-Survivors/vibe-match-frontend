@@ -1,10 +1,14 @@
 'use client';
 
 import ContestFilter from '@/components/contest/contest-filter';
+import ContestSortControls from '@/components/contest/contest-sort-controls';
 import ContestTable from '@/components/contest/contest-table';
 import useContests from '@/hooks/use-contests';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import { Filter } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useState } from 'react';
 
 export default function ContestsPage() {
   const { t } = useTranslation('contests');
@@ -16,60 +20,83 @@ export default function ContestsPage() {
     error,
 
     // state for controlled inputs
-    keyword,
+    search,
     filters,
 
     // Actions
-    handleKeywordChange,
+    handleSearchChange,
     handleFiltersChange,
     handleReset,
     handleLoadMore,
+    handleSortByChange,
+    handleSortOrderChange,
+    sortBy,
+    sortOrder,
   } = useContests();
 
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-background pb-12">
-      <div className="container mx-auto px-4 lg:px-6 py-6 max-w-[1600px]">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                {t('contests')}
-              </h1>
-              <p className="text-muted-foreground text-sm mt-1">
-                {t('explore_contests')}
-              </p>
-            </div>
-        </div>
+    <div className="min-h-screen bg-background">
+      <div className="flex min-h-screen">
+        {/* Left Sidebar - Fixed Desktop */}
+        <aside className="hidden lg:block w-[280px] shrink-0 border-r border-border bg-card fixed left-0 top-0 h-full z-30 pt-16">
+          <div className="h-full overflow-y-auto p-6">
+            <ContestFilter
+              search={search}
+              filters={filters}
+              onSearchChange={handleSearchChange}
+              onFiltersChange={handleFiltersChange}
+              onReset={handleReset}
+            />
+          </div>
+        </aside>
 
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Left Sidebar - Sticky */}
-          <aside className="hidden lg:block w-[260px] xl:w-[280px] shrink-0">
-            <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto pr-2 scrollbar-none">
-              <ContestFilter
-                keyword={keyword}
-                filters={filters}
-                onKeywordChange={handleKeywordChange}
-                onFiltersChange={handleFiltersChange}
-                onReset={handleReset}
-              />
-            </div>
-          </aside>
+        {/* Main Content */}
+        <main className="flex-1 min-w-0 lg:pl-[280px]">
+          <div className="container mx-auto px-4 lg:px-8 py-8 max-w-[1600px]">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                  {t('contests')}
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                  {t('explore_contests')}
+                </p>
+              </div>
 
-          {/* Main Content */}
-          <main className="flex-1 min-w-0">
-             {/* Mobile Filter Trigger (Visible only on mobile) */}
-             <div className="lg:hidden mb-6">
-               <div className="p-4 rounded-lg border border-border bg-card">
-                 <ContestFilter
-                   keyword={keyword}
-                   filters={filters}
-                   onKeywordChange={handleKeywordChange}
-                   onFiltersChange={handleFiltersChange}
-                   onReset={handleReset}
-                 />
-               </div>
-             </div>
-            
+              <div className="flex items-center gap-4">
+                <ContestSortControls
+                  sortBy={sortBy}
+                  sortOrder={sortOrder}
+                  onSortByChange={handleSortByChange}
+                  onSortOrderChange={handleSortOrderChange}
+                />
+
+                {/* Mobile Filter Trigger */}
+                <Sheet open={isMobileFilterOpen} onOpenChange={setIsMobileFilterOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" className="lg:hidden">
+                      <Filter className="mr-2 h-4 w-4" />
+                      {t('filters')}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-[300px] sm:w-[400px] p-6">
+                    <div className="mt-6">
+                      <ContestFilter
+                        search={search}
+                        filters={filters}
+                        onSearchChange={handleSearchChange}
+                        onFiltersChange={handleFiltersChange}
+                        onReset={handleReset}
+                      />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </div>
+
             <ContestTable
               contests={contests}
               isLoading={isLoading}
@@ -77,8 +104,8 @@ export default function ContestsPage() {
               pageInfo={pageInfo}
               onLoadMore={handleLoadMore}
             />
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </div>
   );

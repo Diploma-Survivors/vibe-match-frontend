@@ -25,7 +25,7 @@ export default function ContestInfoPage() {
   const userRank = contest.userRank;
 
   // Computed status (Mocked as ONGOING in data)
-  const contestStatus = ContestStatus.ONGOING;
+  const contestStatus = ContestStatus.RUNNING;
 
   const handleStart = () => {
     router.push(`/contests/${contest.id}/solve`);

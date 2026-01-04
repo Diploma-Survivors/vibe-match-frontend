@@ -15,8 +15,8 @@
     "all_contests_loaded": "Bạn đã xem hết danh sách cuộc thi!",
     "no_contests_found": "Không tìm thấy cuộc thi nào",
     "loading_data": "Đang tải dữ liệu...",
-    "upcoming": "Sắp diễn ra",
-    "ongoing": "Đang diễn ra",
+    "scheduled": "Đã lên kế hoạch",
+    "running": "Đang diễn ra",
     "ended": "Đã kết thúc",
     "start_date": "Ngày bắt đầu",
     "end_date": "Ngày kết thúc",
@@ -46,5 +46,7 @@
     "points": "điểm",
     "mock_unlimited": "(Mock: Không giới hạn)",
     "description": "Mô tả",
-    "submissions": "Bài nộp"
+    "submissions": "Bài nộp",
+    "start_after": "Bắt đầu trước",
+    "start_before": "Bắt đầu sau"
 }

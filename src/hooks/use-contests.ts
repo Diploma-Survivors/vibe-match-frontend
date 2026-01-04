@@ -1,23 +1,29 @@
-// import { ContestsService } from '@/services/contests-service';
+import page from '@/app/contests/page';
 import { MOCK_CONTESTS } from '@/data/mock-contests';
+import { ContestsService } from '@/services/contests-service';
 import {
+  type Contest,
   type ContestFilters,
-  type ContestListItem,
   type ContestListRequest,
   type ContestListResponse,
-  MatchMode,
-  type PageInfo,
-  SortBy,
-  SortOrder,
+  ContestSortBy,
+  ContestStatus,
 } from '@/types/contests';
+import { SortOrder } from '@/types/problems';
 import { useCallback, useEffect, useState } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 const ITEMS_PER_PAGE = 20;
 
 interface UseContestsState {
-  contests: ContestListItem[];
-  pageInfo: PageInfo | null;
+  contests: Contest[];
+  pageInfo: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    totalPages: number;
+    page: number;
+    limit: number;
+  };
   totalCount: number;
   isLoading: boolean;
   error: string | null;
@@ -25,40 +31,48 @@ interface UseContestsState {
 
 interface UseContestsActions {
   handleFiltersChange: (newFilters: ContestFilters) => void;
-  handleKeywordChange: (newKeyword: string) => void;
+  handleSearchChange: (newSearch: string) => void;
   handleReset: () => void;
   handleLoadMore: () => void;
+  handleSortByChange: (newSortBy: ContestSortBy) => void;
+  handleSortOrderChange: (newSortOrder: SortOrder) => void;
 }
 
 interface UseContestsReturn extends UseContestsState, UseContestsActions {
   // Request params (exposed for UI)
-  keyword: string;
+  search: string;
   filters: ContestFilters;
+  sortBy: ContestSortBy;
+  sortOrder: SortOrder;
 }
 
 export default function useContests(): UseContestsReturn {
   // Main state to manage contests and loading/error states
   const [state, setState] = useState<UseContestsState>({
     contests: [],
-    pageInfo: null,
+    pageInfo: {
+      hasNextPage: false,
+      hasPreviousPage: false,
+      totalPages: 0,
+      page: 1,
+      limit: ITEMS_PER_PAGE,
+    },
     totalCount: 0,
     isLoading: false,
     error: null,
   });
 
-  // states for filters and keyword to manage input values
+  // states for filters and search to manage input values
   const [filters, setFilters] = useState<ContestFilters>({});
-  const [keyword, setKeyword] = useState<string>('');
+  const [search, setSearch] = useState<string>('');
 
   // Request state to manage API request parameters
   const [request, setRequest] = useState<ContestListRequest>({
-    first: ITEMS_PER_PAGE,
-    sortBy: SortBy.START_TIME,
+    page: 1,
+    limit: ITEMS_PER_PAGE,
+    sortBy: ContestSortBy.START_TIME,
     sortOrder: SortOrder.DESC,
-    matchMode: MatchMode.ANY,
-    filters: {
-      ...filters,
-    },
+    ...filters,
   });
 
   // Fetch contests function
@@ -67,84 +81,26 @@ export default function useContests(): UseContestsReturn {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-        // const axiosResponse =
-        //   await ContestsService.getContestList(requestParams);
+        const axiosResponse =
+          await ContestsService.getContestList(requestParams);
 
-        // const response: ContestListResponse = axiosResponse?.data?.data;
+        const data = axiosResponse?.data?.data.data;
+        const pageInfo = axiosResponse?.data?.data.meta;
 
-        // SIMULATE API CALL WITH MOCK DATA
-        await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate delay
-
-        let filteredContests = [...MOCK_CONTESTS];
-
-        // Apply keyword filter
-        if (requestParams.keyword) {
-          const lowerKeyword = requestParams.keyword.toLowerCase();
-          filteredContests = filteredContests.filter(c =>
-            c.name.toLowerCase().includes(lowerKeyword)
-          );
-        }
-
-        // Apply status filter
-        if (
-          requestParams.filters?.status &&
-          requestParams.filters.status.length > 0
-        ) {
-          filteredContests = filteredContests.filter((contest) =>
-            requestParams.filters?.status?.includes(contest.status)
-          );
-        }
-
-        const totalCount = filteredContests.length;
-
-        // Mock pagination
-        const itemsPerPage = requestParams.first || ITEMS_PER_PAGE;
-        let startIndex = 0;
-
-        if (requestParams.after) {
-          const lastIndex = filteredContests.findIndex(c => c.id === requestParams.after);
-          if (lastIndex !== -1) {
-            startIndex = lastIndex + 1;
-          }
-        }
-
-        const slicedContests = filteredContests.slice(startIndex, startIndex + itemsPerPage);
-
-        const hasNextPage = startIndex + itemsPerPage < totalCount;
-        const endCursor = slicedContests.length > 0 ? slicedContests[slicedContests.length - 1].id : '';
-
-        // Extract contests from edges
-        let contestsData: ContestListItem[] = slicedContests;
-
-        /*
-        let contestsData: ContestListItem[] =
-          response?.edges?.map((edge) => ({
-            ...edge.node,
-          })) || [];
-
-        // Filter by status on frontend if status filters are present (if backend doesn't support it fully or for extra safety)
-        if (
-          requestParams.filters?.status &&
-          requestParams.filters.status.length > 0
-        ) {
-          contestsData = contestsData.filter((contest) =>
-            requestParams.filters?.status?.includes(contest.status)
-          );
-        }
-        */
 
         setState((prev) => ({
           ...prev,
-          contests: requestParams.after
-            ? [...prev.contests, ...contestsData]
-            : contestsData,
+          contests: requestParams.page === 1
+            ? data
+            : [...prev.contests, ...data],
           pageInfo: {
-            hasNextPage,
-            hasPreviousPage: false, // Not implementing previous page for infinite scroll usually
-            startCursor: '',
-            endCursor
+            hasNextPage: pageInfo.hasNextPage,
+            hasPreviousPage: pageInfo.hasPreviousPage,
+            totalPages: pageInfo.totalPages,
+            page: pageInfo.page,
+            limit: pageInfo.limit,
           },
-          totalCount: totalCount,
+          totalCount: pageInfo.total,
           isLoading: false,
         }));
       } catch (err) {
@@ -179,15 +135,13 @@ export default function useContests(): UseContestsReturn {
     []
   );
 
-  // Debounced search for keyword
-  const debouncedSearch = useDebouncedCallback((searchKeyword: string, currentFilters: ContestFilters) => {
+  // Debounced search for search term
+  const debouncedSearch = useDebouncedCallback((searchTerm: string, currentFilters: ContestFilters) => {
     updateRequest(
       {
-        keyword: searchKeyword.trim() || undefined,
-        filters: currentFilters,
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
+        search: searchTerm.trim() || undefined,
+        ...currentFilters,
+        page: 1,
       },
       true
     );
@@ -198,20 +152,33 @@ export default function useContests(): UseContestsReturn {
     setFilters(newFilters);
     updateRequest(
       {
-        filters: newFilters,
-        keyword: keyword.trim() || undefined,
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
+        ...newFilters,
+        search: search.trim() || undefined,
+        page: 1,
       },
       true
     );
-  }, [keyword, updateRequest]);
+  }, [search, updateRequest]);
 
-  const handleKeywordChange = useCallback((newKeyword: string) => {
-    setKeyword(newKeyword);
-    debouncedSearch(newKeyword, filters);
+  const handleSearchChange = useCallback((newSearch: string) => {
+    setSearch(newSearch);
+    debouncedSearch(newSearch, filters);
   }, [filters, debouncedSearch]);
+
+  // handle sorting changes
+  const handleSortByChange = useCallback(
+    (newSortBy: ContestSortBy) => {
+      updateRequest({ sortBy: newSortBy, page: 1 });
+    },
+    [updateRequest]
+  );
+
+  const handleSortOrderChange = useCallback(
+    (newSortOrder: SortOrder) => {
+      updateRequest({ sortOrder: newSortOrder, page: 1 });
+    },
+    [updateRequest]
+  );
 
   // Load more contests for pagination
   const handleLoadMore = useCallback(() => {
@@ -221,33 +188,31 @@ export default function useContests(): UseContestsReturn {
 
     updateRequest(
       {
-        after: state.pageInfo.endCursor,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
+        page: state.pageInfo.page + 1,
       },
       false
     );
   }, [state.isLoading, state.pageInfo, updateRequest]);
 
   const handleReset = useCallback(() => {
-    setKeyword('');
+    setSearch('');
     setFilters({
-      startTime: undefined,
-      endTime: undefined,
-      minDurationMinutes: undefined,
-      maxDurationMinutes: undefined,
-      status: [],
+      startAfter: undefined,
+      startBefore: undefined,
+      status: undefined,
+      userStatus: undefined,
     });
 
     updateRequest(
       {
-        filters: {},
-        keyword: undefined,
-        after: undefined,
-        before: undefined,
-        first: ITEMS_PER_PAGE,
-        last: undefined,
+        search: undefined,
+        startAfter: undefined,
+        startBefore: undefined,
+        status: undefined,
+        userStatus: undefined,
+        page: 1,
+        sortBy: ContestSortBy.START_TIME,
+        sortOrder: SortOrder.DESC,
       },
       true
     );
@@ -262,13 +227,17 @@ export default function useContests(): UseContestsReturn {
     error: state.error,
 
     // Expose request state for UI
-    keyword: keyword,
+    search: search,
     filters: filters,
+    sortBy: request.sortBy || ContestSortBy.START_TIME,
+    sortOrder: request.sortOrder || SortOrder.DESC,
 
     // Actions
-    handleKeywordChange,
+    handleSearchChange,
     handleFiltersChange,
     handleReset,
     handleLoadMore,
+    handleSortByChange,
+    handleSortOrderChange,
   };
 }
