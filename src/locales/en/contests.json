@@ -58,5 +58,7 @@
     },
     "user_status": "User Status",
     "joined": "Joined",
-    "not_joined": "Not Joined"
+    "not_joined": "Not Joined",
+    "continue_contest": "Continue Contest",
+    "yourRank": "Your Rank"
 }

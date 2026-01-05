@@ -69,7 +69,7 @@ export function EditorPanel({
   const contest = useSelector(selectContest);
 
   const isInProgress = contestMode
-    ? ContestsService.isInprogress(contest)
+    ? ContestsService.isInProgress(contest)
     : true;
 
   const onLanguageIdChange = (languageId: number) => {

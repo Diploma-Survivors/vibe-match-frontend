@@ -93,7 +93,7 @@ export default function SettingsPage() {
             await UserService.confirmAvatarUpload({
                 key: uploadData.data.key,
             });
-
+            toastService.success(t('avatarUploadedSuccessfully'));
             // 4. Refresh global user state (navbar)
             if (refreshUser) {
                 await refreshUser();
@@ -101,7 +101,7 @@ export default function SettingsPage() {
 
         } catch (error) {
             console.error('Error uploading avatar:', error);
-            alert('Failed to upload avatar');
+            toastService.error(t('avatarUploadFailed'));
         }
     };
 

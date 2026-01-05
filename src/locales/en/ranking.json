@@ -14,5 +14,6 @@
     "no_users_found": "No users found.",
     "previous": "Previous",
     "next": "Next",
-    "page_info": "{{current}} / {{total}}"
+    "page_info": "{{current}} / {{total}}",
+    "problem_status": "Problem Status"
 }

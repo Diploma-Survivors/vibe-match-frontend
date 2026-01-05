@@ -36,7 +36,7 @@ export default function ProblemTable({
   const { t } = useTranslation('problems');
 
   return (
-    <div className="w-full">
+    <div className="w-full border border-border rounded-xl">
       <InfiniteScroll
         dataLength={problems.length}
         next={onLoadMore}

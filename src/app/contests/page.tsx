@@ -3,6 +3,7 @@
 import ContestFilter from '@/components/contest/contest-filter';
 import ContestSortControls from '@/components/contest/contest-sort-controls';
 import ContestTable from '@/components/contest/contest-table';
+import ContestListSkeleton from '@/components/contest/contest-list-skeleton';
 import useContests from '@/hooks/use-contests';
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +41,7 @@ export default function ContestsPage() {
     <div className="min-h-screen bg-background">
       <div className="flex min-h-screen">
         {/* Left Sidebar - Fixed Desktop */}
-        <aside className="hidden lg:block w-[280px] shrink-0 border-r border-border bg-card fixed left-0 top-0 h-full z-30 pt-16">
+        <aside className="hidden lg:block w-[280px] shrink-0 border-r border-border bg-card sticky left-0 top-16 h-[calc(100vh-4rem)] z-30">
           <div className="h-full overflow-y-auto p-6">
             <ContestFilter
               search={search}
@@ -53,7 +54,7 @@ export default function ContestsPage() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 min-w-0 lg:pl-[280px]">
+        <main className="flex-1 min-w-0">
           <div className="container mx-auto px-4 lg:px-8 py-8 max-w-[1600px]">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -97,13 +98,17 @@ export default function ContestsPage() {
               </div>
             </div>
 
-            <ContestTable
-              contests={contests}
-              isLoading={isLoading}
-              error={error}
-              pageInfo={pageInfo}
-              onLoadMore={handleLoadMore}
-            />
+            {isLoading && contests.length === 0 ? (
+              <ContestListSkeleton />
+            ) : (
+              <ContestTable
+                contests={contests}
+                isLoading={isLoading}
+                error={error}
+                pageInfo={pageInfo}
+                onLoadMore={handleLoadMore}
+              />
+            )}
           </div>
         </main>
       </div>

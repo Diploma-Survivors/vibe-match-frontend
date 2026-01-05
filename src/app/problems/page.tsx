@@ -3,6 +3,7 @@
 import ProblemFilter from '@/components/problems/problems-filter/problems-filter';
 import SortControls from '@/components/problems/problems-filter/sort-controls';
 import ProblemTable from '@/components/problems/problems-table/problems-table';
+import ProblemListSkeleton from '@/components/problems/problem-list-skeleton';
 import { Button } from '@/components/ui/button';
 import useProblems from '@/hooks/use-problems';
 import { cn } from '@/lib/utils';
@@ -47,7 +48,7 @@ export default function ProblemsPage() {
     <div className="min-h-screen bg-background">
       <div className="flex min-h-screen">
         {/* Left Sidebar - Fixed Desktop */}
-        <aside className="hidden lg:block w-[280px] shrink-0 border-r border-border bg-card fixed left-0 top-0 h-full z-30 pt-16">
+        <aside className="hidden lg:block w-[280px] shrink-0 border-r border-border bg-card sticky left-0 top-16 h-[calc(100vh-4rem)] z-30">
           <div className="h-full overflow-y-auto p-6">
             <ProblemFilter
               keyWord={keyword}
@@ -63,7 +64,7 @@ export default function ProblemsPage() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 min-w-0 lg:pl-[280px]">
+        <main className="flex-1 min-w-0">
           <div className="container mx-auto px-4 lg:px-8 py-8 max-w-[1600px]">
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -120,13 +121,17 @@ export default function ProblemsPage() {
             )}
 
             {/* Problem Table */}
-            <ProblemTable
-              problems={problems}
-              hasMore={pageInfo?.hasNextPage ?? false}
-              onLoadMore={handleLoadMore}
-              isLoading={isLoading}
-              totalCount={totalCount}
-            />
+            {isLoading && problems.length === 0 ? (
+              <ProblemListSkeleton />
+            ) : (
+              <ProblemTable
+                problems={problems}
+                hasMore={pageInfo?.hasNextPage ?? false}
+                onLoadMore={handleLoadMore}
+                isLoading={isLoading}
+                totalCount={totalCount}
+              />
+            )}
           </div>
         </main>
       </div>

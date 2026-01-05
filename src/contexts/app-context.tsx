@@ -44,8 +44,8 @@ export function AppProvider({
   const [isLoading, setIsLoading] = useState(!!decodedAccessToken);
 
   const pathname = usePathname();
-  // const shouldHideNavigation = pathname === '/login';
-  const shouldHideNavigation = false;
+  // Hide navigation for contest solve page
+  const shouldHideNavigation = /^\/contests\/[^/]+\/solve$/.test(pathname);
 
   const isLoggedin = !!decodedAccessToken;
   const isPrenium = user?.isPremium || false;

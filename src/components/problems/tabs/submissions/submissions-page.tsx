@@ -6,13 +6,15 @@ import useSubmissions from '@/hooks/use-submissions';
 import { usePathname, useRouter } from 'next/navigation';
 
 interface SubmissionsPageProps {
-  problemId: string;
-  contestParticipationId?: number;
+  problemId: number;
+  contestId?: number;
+  onSubmissionSelect?: (submission: any) => void;
 }
 
 export default function SubmissionsPage({
   problemId,
-  contestParticipationId,
+  contestId,
+  onSubmissionSelect,
 }: SubmissionsPageProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -26,10 +28,14 @@ export default function SubmissionsPage({
     filters,
     handleFiltersChange,
     handleLoadMore,
-  } = useSubmissions(problemId, contestParticipationId);
+  } = useSubmissions(problemId, contestId);
 
   const handleSelectSubmission = (submission: any) => {
-    router.push(`${pathname}/${submission.id}`);
+    if (onSubmissionSelect) {
+      onSubmissionSelect(submission);
+    } else {
+      router.push(`${pathname}/${submission.id}`);
+    }
   };
 
   if (isLoading && submissions.length === 0) {

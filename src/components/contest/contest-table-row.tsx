@@ -2,10 +2,10 @@
 
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import type { Contest } from '@/types/contests';
+import { Contest, ContestStatus, ContestUserStatus } from '@/types/contests';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Clock, Timer, History, Calendar, User } from 'lucide-react';
+import { Clock, Timer, History, Calendar, User, Zap, CheckCircle, CalendarClock, CircleDashed } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface ContestTableRowProps {
@@ -16,23 +16,31 @@ export default function ContestTableRow({ contest }: ContestTableRowProps) {
   const router = useRouter();
   const { t, i18n } = useTranslation('contests');
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'upcoming':
-        return <Clock className="w-4 h-4 text-blue-500" />;
-      case 'ongoing':
-        return <Timer className="w-4 h-4 text-green-500" />;
-      case 'ended':
-        return <History className="w-4 h-4 text-muted-foreground" />;
-      default:
-        return <Clock className="w-4 h-4 text-muted-foreground" />;
+  const getStatusIcon = (status: ContestUserStatus, contestStatus: ContestStatus) => {
+    // 1. User has joined and contest is currently live (Active)
+    if (status === ContestUserStatus.JOINED && contestStatus === ContestStatus.RUNNING) {
+      return <CircleDashed className="w-4 h-4 text-yellow-500 fill-yellow-500" />;
+      // Alternatively: <PlayCircle className="w-4 h-4 text-green-500" />
     }
+
+    // 2. User joined and contest is over (Completed)
+    if (status === ContestUserStatus.JOINED && contestStatus === ContestStatus.ENDED) {
+      return <CheckCircle className="w-4 h-4 text-green-600" />;
+    }
+
+
+    // 4. Default / Not Joined
+    if (status === ContestUserStatus.NOT_JOINED) {
+      return <div className="w-4 h-4 text-muted-foreground" />;
+    }
+
+    return <div className="w-4 h-4 text-muted-foreground" />;
   };
 
-  const getStatusLabel = (status: string) => {
-    if (status === 'upcoming') return t('upcoming');
-    if (status === 'ongoing') return t('ongoing');
-    if (status === 'ended') return t('ended');
+  const getStatusLabel = (status: ContestStatus) => {
+    if (status === ContestStatus.SCHEDULED) return t('scheduled');
+    if (status === ContestStatus.RUNNING) return t('running');
+    if (status === ContestStatus.ENDED) return t('ended');
     return status;
   };
 
@@ -64,7 +72,7 @@ export default function ContestTableRow({ contest }: ContestTableRowProps) {
       {/* Status */}
       <TableCell className="text-center w-12 p-0">
         <div className="flex justify-center items-center">
-          {getStatusIcon(contest.status)}
+          {getStatusIcon(contest.userStatus, contest.status)}
         </div>
       </TableCell>
 
@@ -105,7 +113,7 @@ export default function ContestTableRow({ contest }: ContestTableRowProps) {
         {/* Assuming participant count isn't in ListItem yet, leaving blank or simple status text */}
         <Badge variant="outline" className={cn(
           "font-normal text-xs",
-          contest.status === 'ongoing' ? "text-green-600 border-green-200 bg-green-50" : "text-muted-foreground"
+          contest.status === ContestStatus.RUNNING ? "text-green-600 border-green-200 bg-green-50" : "text-muted-foreground"
         )}>
           {getStatusLabel(contest.status)}
         </Badge>

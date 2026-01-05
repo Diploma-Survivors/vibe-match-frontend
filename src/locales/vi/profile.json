@@ -119,5 +119,7 @@
     "failed_to_change_password": "Đổi mật khẩu thất bại",
     "new_password": "Mật khẩu mới",
     "confirm_new_password": "Xác nhận mật khẩu mới",
-    "password_requirements": "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt."
+    "password_requirements": "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.",
+    "avatarUploadedSuccessfully": "Tải ảnh đại diện thành công",
+    "avatarUploadFailed": "Tải ảnh đại diện thất bại"
 }

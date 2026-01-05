@@ -14,16 +14,15 @@ export enum MatchMode {
 }
 
 export enum ContestProblemStatus {
-  UN_ATTEMPTED = 'UNATTEMPTED',
-  UNSOLVED = 'UNSOLVED',
   SOLVED = 'SOLVED',
   ATTEMPTED = 'ATTEMPTED',
+  NOT_STARTED = 'NOT_STARTED',
 }
+
 
 export const ContestProblemStatusTooltip: Record<ContestProblemStatus, string> =
 {
-  [ContestProblemStatus.UN_ATTEMPTED]: 'Unattempted',
-  [ContestProblemStatus.UNSOLVED]: 'Unsolved',
+  [ContestProblemStatus.NOT_STARTED]: 'Not Started',
   [ContestProblemStatus.SOLVED]: 'Solved',
   [ContestProblemStatus.ATTEMPTED]: 'Attempted',
 };
@@ -68,7 +67,7 @@ export interface ContestParticipation {
 }
 
 export interface Contest {
-  id: string;
+  id: number;
   title: string;
   description: string;
   startTime: string;
@@ -84,6 +83,7 @@ export interface Contest {
   createdBy?: string;
   createdAt?: string;
   status: ContestStatus; // derived field for UI convenience
+  userStatus: ContestUserStatus;
   contestProblems: {
     problem: Problem;
     orderIndex: number;
@@ -94,18 +94,6 @@ export interface Contest {
 }
 
 
-export const INITIAL_CONTEST: Contest = {
-  id: '',
-  title: '',
-  description: '',
-  startTime: '',
-  endTime: '',
-  participantCount: 0,
-  maxParticipant: 0,
-  durationMinutes: 0,
-  contestProblems: [],
-  status: ContestStatus.SCHEDULED,
-};
 
 export interface ContestOverView {
   id?: number;
@@ -249,3 +237,54 @@ export const CONTEST_NAV_TABS_DETAIL = [
   { id: ContestNavTabs.DESCRIPTION, label: 'Problem', icon: FileText },
   { id: ContestNavTabs.SUBMISSIONS, label: 'Submissions', icon: CheckCircle },
 ];
+
+export const INITIAL_CONTEST: Contest = {
+  id: 0,
+  title: '',
+  description: '',
+  startTime: '',
+  endTime: '',
+  participantCount: 0,
+  maxParticipant: 0,
+  durationMinutes: 0,
+  contestProblems: [],
+  userStatus: ContestUserStatus.NOT_JOINED,
+  status: ContestStatus.SCHEDULED,
+};
+
+
+export interface ProblemStatus {
+  problemId: number;
+  problemOrder: number; // Q1, Q2, etc.
+  status: ContestProblemStatus;
+  score?: number;
+  time?: string; // Time of submission or time taken
+  attempts?: number;
+}
+
+export interface LeaderboardEntry {
+  rank: number;
+  user: {
+    id: number;
+    username: string;
+    avatarUrl?: string;
+    fullName?: string;
+  };
+  totalScore: number;
+  totalTime: string; // Format: HH:MM:SS
+  problemStatus: ProblemStatus[];
+}
+
+export interface LeaderboardResponse {
+  data: LeaderboardEntry[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+  };
+}
+
+

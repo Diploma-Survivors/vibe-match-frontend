@@ -109,7 +109,7 @@ export enum PracticeHistorySortOrder {
 export interface PracticeHistoryParams {
   page?: number;
   limit?: number;
-  status?: ProblemStatus[];
+  status?: ProblemStatus;
   difficulty?: ProblemDifficulty;
   sortBy?: PracticeHistorySortBy;
   sortOrder?: PracticeHistorySortOrder;

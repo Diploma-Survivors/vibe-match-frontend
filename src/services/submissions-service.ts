@@ -20,7 +20,7 @@ async function submit(submissionRequest: SubmissionRequest) {
   const { contestId, ...payload } = submissionRequest;
   let path = '/submissions/submit';
   if (contestId) {
-    path = `/contests/${contestId}/submit`;
+    path = `/contests/${contestId}/submissions`;
   }
   return await clientApi.post(path, payload);
 }
@@ -54,8 +54,8 @@ async function getLanguageList() {
 
 async function getSubmissionList(
   submissionListRequest: GetSubmissionListRequest,
-  problemId: string,
-  contestParticipationId?: number
+  problemId: number,
+  contestId?: number
 ) {
   const { filters, ...rest } = submissionListRequest;
   const queryString = qs.stringify(
@@ -66,20 +66,20 @@ async function getSubmissionList(
     }
   );
   let url = '';
-  if (contestParticipationId) {
+  if (contestId) {
     url = queryString
-      ? `/submissions/contest-participation/${contestParticipationId}/problem/${problemId}?${queryString}`
-      : `/submissions/contest-participation/${contestParticipationId}/problem/${problemId}`;
+      ? `/contests/${contestId}/my-submissions?problemId=${problemId}&${queryString}`
+      : `/contests/${contestId}/my-submissions?problemId=${problemId}`;
   } else {
     url = queryString
-      ? `/submissions/problem/${problemId}?${queryString}`
-      : `/submissions/problem/${problemId}`;
+      ? `/submissions/user/me?problemId=${problemId}&${queryString}`
+      : `/submissions/user/me?problemId=${problemId}`;
   }
 
   return await clientApi.get<ApiResponse<SubmissionListResponse>>(url);
 }
 
-async function getSubmissionById(submissionId: string) {
+async function getSubmissionById(submissionId: number) {
   return await clientApi.get<ApiResponse<Submission>>(`/submissions/${submissionId}`);
 }
 

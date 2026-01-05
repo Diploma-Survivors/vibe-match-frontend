@@ -14,13 +14,13 @@ export const MOCK_CONTESTS: Contest[] = Array.from({ length: 50 }).map(
         const durationMinutes = [60, 90, 120, 180, 300][Math.floor(Math.random() * 5)];
         const endTime = new Date(startTime.getTime() + durationMinutes * 60 * 1000);
 
-        let status = ContestStatus.NOT_STARTED;
+        let status = ContestStatus.SCHEDULED;
         if (now > endTime) {
-            status = ContestStatus.FINISHED;
+            status = ContestStatus.ENDED;
         } else if (now >= startTime && now <= endTime) {
-            status = ContestStatus.ONGOING;
+            status = ContestStatus.RUNNING;
         } else {
-            status = ContestStatus.NOT_STARTED;
+            status = ContestStatus.SCHEDULED;
         }
 
         return {
@@ -33,6 +33,7 @@ export const MOCK_CONTESTS: Contest[] = Array.from({ length: 50 }).map(
             status,
             participantCount: Math.floor(Math.random() * 1000),
             maxParticipant: 5000,
+            userStatus: 'NOT_JOINED' as any, // Mock value
             contestProblems: [],
         };
     }

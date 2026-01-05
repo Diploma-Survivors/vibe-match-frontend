@@ -33,16 +33,6 @@ export default function ContestTable({
   return (
     <div className="w-full">
       {/* Loading State */}
-      {isLoading && contests.length === 0 && (
-        <div className="flex items-center justify-center py-12">
-          <div className="text-center">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto mb-4" />
-            <p className="text-muted-foreground text-sm">
-              {t('loading_data')}
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Error State */}
       {error && !isLoading && (

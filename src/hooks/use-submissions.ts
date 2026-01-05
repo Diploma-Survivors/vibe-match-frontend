@@ -28,13 +28,13 @@ interface UseSubmissionsReturn
     UseSubmissionsActions {
   // Request params (exposed for UI)
   filters: SubmissionFilters;
-  problemId: string;
+  problemId: number;
   hasMore: boolean;
 }
 
 export default function useSubmissions(
-  problemId: string,
-  contestParticipationId?: number
+  problemId: number,
+  contestId?: number
 ): UseSubmissionsReturn {
   // Main state to manage submissions and loading/error states
   const [state, setState] = useState<UseSubmissionsState>({
@@ -65,7 +65,7 @@ export default function useSubmissions(
         const axiosResponse = await SubmissionsService.getSubmissionList(
           requestParams,
           problemId,
-          contestParticipationId
+          contestId
         );
         if (!axiosResponse?.data?.data) {
           throw new Error('Failed to fetch submissions');
@@ -91,7 +91,7 @@ export default function useSubmissions(
         }));
       }
     },
-    [problemId, contestParticipationId]
+    [problemId, contestId]
   );
 
   // Effect to fetch submissions when request or problemId changes

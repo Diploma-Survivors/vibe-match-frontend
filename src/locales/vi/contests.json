@@ -48,5 +48,7 @@
     "description": "Mô tả",
     "submissions": "Bài nộp",
     "start_after": "Bắt đầu trước",
-    "start_before": "Bắt đầu sau"
+    "start_before": "Bắt đầu sau",
+    "continue_contest": "Tiếp tục cuộc thi",
+    "yourRank": "Hạng của bạn"
 }

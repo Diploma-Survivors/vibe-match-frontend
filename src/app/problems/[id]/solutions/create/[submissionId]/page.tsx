@@ -32,7 +32,8 @@ export default function CreateSolutionPage() {
   const dispatch = useDispatch();
   const problemIdString = params.id as string;
   const problemId = parseInt(problemIdString);
-  const submissionId = params.submissionId as string;
+  const submissionIdString = params.submissionId as string;
+  const submissionId = parseInt(submissionIdString);
 
   const { confirm } = useDialog();
 

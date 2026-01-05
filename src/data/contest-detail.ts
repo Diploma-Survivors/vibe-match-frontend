@@ -6,7 +6,7 @@ export interface ContestDetailMock {
     title: string;
     startTime: string;
     endTime: string;
-    status: 'UPCOMING' | 'ONGOING' | 'ENDED';
+    status: 'SCHEDULED' | 'RUNNING' | 'ENDED';
     problems: {
         id: string;
         title: string;
@@ -32,7 +32,7 @@ export const MOCK_CONTEST_DETAIL: ContestDetailMock = {
     title: 'Weekly Contest 482',
     startTime: new Date(Date.now() - 1000 * 60 * 60).toISOString(), // Started 1 hour ago
     endTime: new Date(Date.now() + 1000 * 60 * 30).toISOString(), // Ends in 30 mins
-    status: 'ONGOING',
+    status: 'RUNNING',
     problems: [
         {
             id: 'p1',
