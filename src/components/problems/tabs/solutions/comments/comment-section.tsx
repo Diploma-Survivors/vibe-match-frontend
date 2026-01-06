@@ -47,7 +47,7 @@ export default function CommentSection({ solutionId }: CommentSectionProps) {
   useEffect(() => {
     // Fetch current user for the avatar in the input
     if (!user) return;
-    UserService.getUserProfile(user.id).then((res) => setCurrentUser(res));
+    UserService.getUserProfile(user.id).then((res) => setCurrentUser(res.data.data));
   }, [user]);
 
   const fetchComments = async () => {

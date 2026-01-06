@@ -6,8 +6,6 @@ import { Button } from '@/components/ui/button';
 import MarkdownRenderer from '@/components/ui/markdown-renderer';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useApp } from '@/contexts/app-context';
-import { ContestsService } from '@/services/contests-service';
-import { LanguagesService } from '@/services/languages';
 import { SolutionsService } from '@/services/solutions-service';
 import { SubmissionsService } from '@/services/submissions-service';
 import { toastService } from '@/services/toasts-service';

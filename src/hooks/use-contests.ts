@@ -1,5 +1,3 @@
-import page from '@/app/contests/page';
-import { MOCK_CONTESTS } from '@/data/mock-contests';
 import { ContestsService } from '@/services/contests-service';
 import {
   type Contest,

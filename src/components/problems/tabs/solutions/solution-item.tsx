@@ -1,7 +1,6 @@
 'use client';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { LanguagesService } from '@/services/languages';
 import { SubmissionsService } from '@/services/submissions-service';
 import { type Solution, SolutionVoteType } from '@/types/solutions';
 import type { Language } from '@/types/submissions';
