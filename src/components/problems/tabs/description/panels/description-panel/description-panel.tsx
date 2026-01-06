@@ -40,8 +40,8 @@ export function DescriptionPanel({ problem, width }: DescriptionPanelProps) {
   };
 
   return (
-    <div className="h-full pb-4 pr-1" style={{ width: `${width}%` }}>
-      <div className="rounded-xl h-full flex flex-col overflow-hidden border border-border bg-card">
+    <div className="h-full pb-4" style={{ width: `${width}%` }}>
+      <div className="h-full flex flex-col overflow-hidden border border-border bg-card">
         <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
           {/* Problem Title Header */}
           <div className="pb-6 border-b border-border space-y-4">

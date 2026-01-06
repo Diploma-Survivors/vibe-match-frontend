@@ -11,7 +11,6 @@ import { Input } from '@/components/ui/input';
 import { Tooltip } from '@/components/ui/tooltip';
 import { useApp } from '@/contexts/app-context';
 import { useProblemDetail } from '@/contexts/problem-detail-context';
-import { LanguagesService } from '@/services/languages';
 import { SubmissionsService } from '@/services/submissions-service';
 import { TagsService } from '@/services/tags-service';
 import { toastService } from '@/services/toasts-service';

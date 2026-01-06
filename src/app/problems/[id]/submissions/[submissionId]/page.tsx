@@ -13,9 +13,11 @@ export default function SubmissionDetailPage() {
   const { t } = useTranslation('problems');
   const params = useParams();
   const router = useRouter();
-  const submissionId = params.submissionId as string;
-  const problemId = params.id as string;
-  
+  const submissionIdString = params.submissionId as string;
+  const submissionId = parseInt(submissionIdString);
+  const problemIdString = params.id as string;
+  const problemId = parseInt(problemIdString);
+
   const [submission, setSubmission] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -49,9 +51,9 @@ export default function SubmissionDetailPage() {
   return (
     <div className="flex flex-col h-full bg-card">
       <div className="p-4 border-b border-border flex items-center gap-2">
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => router.push(`/problems/${problemId}/submissions`)}
           className="gap-2 text-muted-foreground hover:text-foreground"
         >

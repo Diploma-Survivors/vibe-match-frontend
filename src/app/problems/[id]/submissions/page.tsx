@@ -7,7 +7,8 @@ import { useEffect, useState } from 'react';
 
 export default function ProblemSubmissionsPage() {
   const params = useParams();
-  const problemId = params.id as string;
+  const problemIdString = params.id as string;
+  const problemId = parseInt(problemIdString);
 
   if (!problemId) {
     return <SubmissionsSkeleton showRightPanel={false} />;

@@ -119,5 +119,7 @@
     "failed_to_change_password": "Failed to change password",
     "new_password": "New Password",
     "confirm_new_password": "Confirm New Password",
-    "password_requirements": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+    "password_requirements": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
+    "avatarUploadedSuccessfully": "Avatar uploaded successfully",
+    "avatarUploadFailed": "Avatar upload failed"
 }

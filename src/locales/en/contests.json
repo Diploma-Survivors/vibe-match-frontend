@@ -15,8 +15,8 @@
     "all_contests_loaded": "You have viewed all contests!",
     "no_contests_found": "No contests found",
     "loading_data": "Loading data...",
-    "upcoming": "Upcoming",
-    "ongoing": "Ongoing",
+    "scheduled": "Scheduled",
+    "running": "Running",
     "ended": "Ended",
     "start_date": "Start Date",
     "end_date": "End Date",
@@ -46,5 +46,19 @@
     "points": "points",
     "mock_unlimited": "(Mock: Unlimited)",
     "description": "Description",
-    "submissions": "Submissions"
+    "submissions": "Submissions",
+    "start_after": "Start After",
+    "start_before": "Start Before",
+    "sort_by": "Sort by",
+    "sort_asc": "Ascending",
+    "sort_desc": "Descending",
+    "sort_options": {
+        "id": "ID",
+        "startTime": "Start Time"
+    },
+    "user_status": "User Status",
+    "joined": "Joined",
+    "not_joined": "Not Joined",
+    "continue_contest": "Continue Contest",
+    "yourRank": "Your Rank"
 }

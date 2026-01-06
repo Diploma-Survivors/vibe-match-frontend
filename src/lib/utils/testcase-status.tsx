@@ -46,17 +46,7 @@ export const getStatusMeta = (
         label: 'Compilation Error',
       };
     case SubmissionStatus.RUNTIME_ERROR:
-    case SubmissionStatus.SIGSEGV:
-    case SubmissionStatus.SIGXFSZ:
-    case SubmissionStatus.SIGFPE:
-    case SubmissionStatus.SIGABRT:
-    case SubmissionStatus.NZEC:
     case 'RUNTIME_ERROR':
-    case 'SIGSEGV':
-    case 'SIGXFSZ':
-    case 'SIGFPE':
-    case 'SIGABRT':
-    case 'NZEC':
       return {
         icon: <AlertTriangle className="w-4 h-4" />,
         color: 'text-red-600',

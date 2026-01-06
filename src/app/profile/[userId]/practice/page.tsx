@@ -95,7 +95,7 @@ export default function PracticeHistoryPage({
           UserService.getUserPracticeHistory(userId, {
             page: currentPage,
             limit: itemsPerPage,
-            status: statusFilter === 'ALL' ? undefined : [statusFilter],
+            status: statusFilter === 'ALL' ? undefined : statusFilter,
             difficulty: difficultyFilter === 'ALL' ? undefined : difficultyFilter,
             sortBy: sortBy,
             sortOrder: sortOrder,

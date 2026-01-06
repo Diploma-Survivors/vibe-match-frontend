@@ -6,6 +6,9 @@ import {
   type ContestListRequest,
   type ContestListResponse,
   ContestStatus,
+  ContestUserStatus,
+  type LeaderboardEntry,
+  type LeaderboardResponse,
 } from '@/types/contests';
 import type { AxiosResponse } from 'axios';
 import qs from 'qs';
@@ -23,7 +26,12 @@ async function getContestList(
 }
 
 async function getContestDetail(id: string) {
-  return await clientApi.get(`/contests/${id}`);
+  const response = await clientApi.get(`/contests/${id}`);
+
+  // TODO: Remove this after backend implements userStatus
+  // response.data.data.userStatus = ContestUserStatus.JOINED;
+
+  return response;
 }
 
 async function getContestOverview(id: string) {
@@ -35,53 +43,40 @@ async function finishContest(id: string) {
 }
 
 async function participateContest(id: string) {
-  return await clientApi.post(`/contests/${id}/participate`);
+  return await clientApi.post(`/contests/${id}/enter`);
 }
 
-function getContestStatus(contest: Contest): ContestStatus {
-  const now = new Date();
-  const startTime = new Date(contest.startTime);
-  const endTime = new Date(contest.endTime);
-
-  if (now < startTime) {
-    return ContestStatus.NOT_STARTED;
-  }
-
-  if (contest.participation?.startTime && !contest.participation?.finishedAt) {
-    return ContestStatus.IN_PROGRESS;
-  }
-
-  if (contest.participation?.finishedAt) {
-    return ContestStatus.COMPLETED;
-  }
-
-  if (
-    (!contest.lateDeadline && now > endTime) ||
-    (contest.lateDeadline && now > new Date(contest.lateDeadline))
-  ) {
-    return ContestStatus.FINISHED;
-  }
-
-  if (contest.lateDeadline && now <= new Date(contest.lateDeadline)) {
-    return ContestStatus.LATE_SUBMISSION;
-  }
-
-  return ContestStatus.ONGOING;
+async function getContestLeaderboard(
+  id: string,
+  params?: { page?: number; limit?: number; search?: string }
+): Promise<AxiosResponse<ApiResponse<LeaderboardResponse>>> {
+  const queryString = qs.stringify(params, {
+    allowDots: true,
+    skipNulls: true,
+  });
+  const url = queryString
+    ? `/contests/${id}/leaderboard?${queryString}`
+    : `/contests/${id}/leaderboard`;
+  return await clientApi.get(url);
 }
 
-function isInprogress(contest: Contest): boolean {
-  return getContestStatus(contest) === ContestStatus.IN_PROGRESS;
+async function getContestLeaderboardMe(
+  id: string
+): Promise<AxiosResponse<ApiResponse<LeaderboardEntry>>> {
+  return await clientApi.get(`/contests/${id}/leaderboard/me`);
+}
+
+function isInProgress(contest: Contest): boolean {
+  return contest.status === ContestStatus.RUNNING && contest.userStatus === ContestUserStatus.JOINED;
 }
 
 function getContestStatusColor(status: ContestStatus): string {
   switch (status) {
-    case ContestStatus.NOT_STARTED:
+    case ContestStatus.SCHEDULED:
       return CONTEST_STATUS_COLORS.upcoming;
-    case ContestStatus.ONGOING:
-    case ContestStatus.IN_PROGRESS:
+    case ContestStatus.RUNNING:
       return CONTEST_STATUS_COLORS.ongoing;
-    case ContestStatus.COMPLETED:
-    case ContestStatus.FINISHED:
+    case ContestStatus.ENDED:
       return CONTEST_STATUS_COLORS.finished;
     default:
       return CONTEST_STATUS_COLORS.finished;
@@ -91,10 +86,10 @@ function getContestStatusColor(status: ContestStatus): string {
 export const ContestsService = {
   getContestList,
   getContestDetail,
-  getContestStatus,
   getContestStatusColor,
   getContestOverview,
-  isInprogress,
-  finishContest,
+  isInProgress,
   participateContest,
+  getContestLeaderboard,
+  getContestLeaderboardMe,
 };

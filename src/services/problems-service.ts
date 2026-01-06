@@ -9,7 +9,6 @@ import {
 } from '@/types/problems';
 import type { AxiosResponse } from 'axios';
 import qs from 'qs';
-import { MOCK_PROBLEMS } from '@/data/mock-problems';
 import { SampleTestCase } from '@/types/testcases';
 
 async function getProblemList(
@@ -47,27 +46,9 @@ async function getProblemById(
   return problemResponse;
 }
 
-async function getAllProblems(): Promise<ProblemListItem[]> {
-  // Mock data
-  return new Promise((resolve) => {
-    setTimeout(() => {
-        resolve(MOCK_PROBLEMS);
-    }, 1000);
-  });
-}
 
-async function getSolvedProblems(userId?: number): Promise<ProblemListItem[]> {
-  // Mock data
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(MOCK_PROBLEMS.filter(p => p.difficulty === ProblemDifficulty.EASY));
-    }, 1000);
-  });
-}
 
 export const ProblemsService = {
   getProblemList,
   getProblemById,
-  getAllProblems,
-  getSolvedProblems,
 };
