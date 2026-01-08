@@ -1,49 +1,116 @@
-"use client";
+'use client';
 
-import { ContestList } from "@/components/contest";
-import { RankingList } from "@/components/ranking";
-import { motion } from "framer-motion";
+import ContestFilter from '@/components/contest/contest-filter';
+import ContestSortControls from '@/components/contest/contest-sort-controls';
+import ContestTable from '@/components/contest/contest-table';
+import ContestListSkeleton from '@/components/contest/contest-list-skeleton';
+import useContests from '@/hooks/use-contests';
+import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
+import { Filter } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { useState } from 'react';
 
 export default function ContestsPage() {
+  const { t } = useTranslation('contests');
+  const {
+    // State
+    contests,
+    pageInfo,
+    isLoading,
+    error,
+
+    // state for controlled inputs
+    search,
+    filters,
+
+    // Actions
+    handleSearchChange,
+    handleFiltersChange,
+    handleReset,
+    handleLoadMore,
+    handleSortByChange,
+    handleSortOrderChange,
+    sortBy,
+    sortOrder,
+  } = useContests();
+
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-emerald-50/30 to-blue-50/20 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="container mx-auto px-6 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="mb-8"
-        >
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 dark:from-slate-200 dark:to-slate-100 bg-clip-text text-transparent mb-3">
-            🏆 Contests
-          </h1>
-          <p className="text-slate-600 dark:text-slate-400 text-lg">
-            Tham gia các cuộc thi lập trình để thử thách bản thân và nâng cao kỹ
-            năng
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-background">
+      <div className="flex min-h-screen">
+        {/* Left Sidebar - Fixed Desktop */}
+        <aside className="hidden lg:block w-[280px] shrink-0 border-r border-border bg-card sticky left-0 top-16 h-[calc(100vh-4rem)] z-30">
+          <div className="h-full overflow-y-auto p-6">
+            <ContestFilter
+              search={search}
+              filters={filters}
+              onSearchChange={handleSearchChange}
+              onFiltersChange={handleFiltersChange}
+              onReset={handleReset}
+            />
+          </div>
+        </aside>
 
-        <div className="flex flex-col xl:flex-row gap-8">
-          {/* Left Panel - Contest List (70%) */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex-1 xl:w-[70%]"
-          >
-            <ContestList />
-          </motion.div>
+        {/* Main Content */}
+        <main className="flex-1 min-w-0">
+          <div className="container mx-auto px-4 lg:px-8 py-8 max-w-[1600px]">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+              <div>
+                <h1 className="text-3xl font-bold tracking-tight text-foreground">
+                  {t('contests')}
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                  {t('explore_contests')}
+                </p>
+              </div>
 
-          {/* Right Panel - Global Ranking (30%) */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="xl:w-[30%] xl:min-w-[400px] xl:sticky xl:top-24 xl:self-start"
-          >
-            <RankingList />
-          </motion.div>
-        </div>
+              <div className="flex items-center gap-4">
+                <ContestSortControls
+                  sortBy={sortBy}
+                  sortOrder={sortOrder}
+                  onSortByChange={handleSortByChange}
+                  onSortOrderChange={handleSortOrderChange}
+                />
+
+                {/* Mobile Filter Trigger */}
+                <Sheet open={isMobileFilterOpen} onOpenChange={setIsMobileFilterOpen}>
+                  <SheetTrigger asChild>
+                    <Button variant="outline" className="lg:hidden">
+                      <Filter className="mr-2 h-4 w-4" />
+                      {t('filters')}
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-[300px] sm:w-[400px] p-6">
+                    <div className="mt-6">
+                      <ContestFilter
+                        search={search}
+                        filters={filters}
+                        onSearchChange={handleSearchChange}
+                        onFiltersChange={handleFiltersChange}
+                        onReset={handleReset}
+                      />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </div>
+            </div>
+
+            {isLoading && contests.length === 0 ? (
+              <ContestListSkeleton />
+            ) : (
+              <ContestTable
+                contests={contests}
+                isLoading={isLoading}
+                error={error}
+                pageInfo={pageInfo}
+                onLoadMore={handleLoadMore}
+              />
+            )}
+          </div>
+        </main>
       </div>
     </div>
   );

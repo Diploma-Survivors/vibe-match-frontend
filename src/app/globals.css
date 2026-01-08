@@ -51,8 +51,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.54 0.17 142);
+  --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -62,7 +62,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --ring: oklch(0.54 0.17 142);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -85,8 +85,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: oklch(0.623 0.188 145.42);
+  --primary-foreground: oklch(0.145 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -96,7 +96,7 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --ring: oklch(0.623 0.188 145.42);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -116,37 +116,30 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    scrollbar-gutter: stable;
+  }
+
   body {
     @apply bg-background text-foreground;
     min-height: 100vh;
-    background: linear-gradient(
-      to bottom right,
-      rgb(248 250 252),
-      rgb(241 245 249),
-      rgb(248 250 252)
-    );
-    background-attachment: fixed;
+    /* Removed gradient for cleaner look */
   }
 
   .dark body {
-    background: linear-gradient(
-      to bottom right,
-      rgb(15 23 42),
-      rgb(30 41 59),
-      rgb(15 23 42)
-    );
-    background-attachment: fixed;
+    /* Removed gradient for cleaner look */
   }
 }
 
 /* Custom scrollbar for filter sidebar */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  scrollbar-color: var(--muted-foreground) transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -154,23 +147,56 @@
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.5);
-  border-radius: 3px;
-  transition: background 0.2s ease;
+  background-color: var(--muted-foreground);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  transition: background-color 0.2s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 163, 175, 0.8);
+  background-color: var(--foreground);
 }
 
 .dark .custom-scrollbar {
-  scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+  scrollbar-color: var(--muted-foreground) transparent;
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(75, 85, 99, 0.5);
+  background-color: var(--muted-foreground);
 }
 
 .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(75, 85, 99, 0.8);
+  background-color: var(--foreground);
+}
+
+/* Dots Loader Animation */
+.dots-loader {
+  width: 120px;
+  height: 20px;
+  -webkit-mask: radial-gradient(circle closest-side, #000 94%, #0000) left / 20% 100%;
+  mask: radial-gradient(circle closest-side, #000 94%, #0000) left / 20% 100%;
+  background: linear-gradient(#000000 0 0) left / 0% 100% no-repeat #e5e7eb;
+  animation: dotsLoader 2s infinite steps(6);
+}
+
+@keyframes dotsLoader {
+  100% {
+    background-size: 120% 100%;
+  }
+}
+
+.dark .dots-loader {
+  background: linear-gradient(#000000 0 0) left / 0% 100% no-repeat #374151;
+}
+
+@utility scrollbar-none {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+
+  /* Firefox */
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }

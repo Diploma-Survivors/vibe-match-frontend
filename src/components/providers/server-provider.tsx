@@ -1,10 +1,11 @@
+import { authOptions } from '@/lib/auth';
+import type { DecodedAccessToken, UserInfo } from '@/types/states';
+import { IssuerType } from '@/types/states';
+import { jwtDecode } from 'jwt-decode';
+import { getServerSession } from 'next-auth';
 // app/ServerProvider.tsx
-import { ReactNode } from "react";
-import { getServerSession } from "next-auth";
-import { jwtDecode } from "jwt-decode";
-import { DecodedAccessToken, UserInfo } from "@/types/states";
-import { ClientProvider } from "./client-provider";
-import { authOptions } from "@/lib/auth"; 
+import type { ReactNode } from 'react';
+import { ClientProvider } from './client-provider';
 
 interface ServerProviderProps {
   children: ReactNode;
@@ -13,31 +14,18 @@ interface ServerProviderProps {
 export async function ServerProvider({ children }: ServerProviderProps) {
   const session = await getServerSession(authOptions);
 
-  let initialUser: UserInfo | null = null;
-  let initialIssuer: "local" | "moodle" = "local";
+  let decodedAccessToken: DecodedAccessToken | null = null;
 
   if (session?.accessToken) {
     try {
-      const decoded: DecodedAccessToken = jwtDecode(session.accessToken);
-
-      initialUser = {
-        userId: decoded.userId,
-        email: decoded.email,
-        firstName: decoded.firstName,
-        lastName: decoded.lastName,
-        fullName: `${decoded.firstName} ${decoded.lastName}`.trim(),
-        roles: decoded.roles || [],
-      };
-
-      initialIssuer = decoded.iss?.includes(process.env.NEXT_PUBLIC_LOCAL_ISSUER_IDENTIFIER || "local_issuer") ? "local" : "moodle";
-
+      decodedAccessToken = jwtDecode(session.accessToken);
     } catch (err) {
-      console.error("❌ Failed to decode access token:", err);
+      console.error('❌ Failed to decode access token:', err);
     }
   }
 
   return (
-    <ClientProvider initialUser={initialUser} initialIssuer={initialIssuer}>
+    <ClientProvider decodedAccessToken={decodedAccessToken}>
       {children}
     </ClientProvider>
   );

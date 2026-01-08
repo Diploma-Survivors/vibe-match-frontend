@@ -1,133 +1,71 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Wallet } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useApp } from '@/contexts/app-context';
+import { cn } from '@/lib/utils';
+import { signOut } from 'next-auth/react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
+import { UserMenu } from './user-menu';
 
 export default function Header() {
-  const [walletConnected, setWalletConnected] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const { user, clearUserData } = useApp();
   const pathname = usePathname();
-
-  useEffect(() => {
-    setMounted(true);
-
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  const connectWallet = () => {
-    setWalletConnected(!walletConnected);
-    console.log("Connecting to Solana wallet...");
-  };
-
-  const scrollToSection = (id: string) => {
-    if (pathname === "/") {
-      const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
-      }
-    } else {
-      // Navigate to home page first, then scroll
-      window.location.href = `/#${id}`;
-    }
-  };
+  const { t } = useTranslation('common');
 
   const navItems = [
-    { name: "Home", href: "/", onClick: undefined },
-    { name: "Problems", href: "/problems", onClick: undefined },
-    { name: "Contests", href: "/contests", onClick: undefined },
+    { name: t('problems'), href: '/problems' },
+    { name: t('contests'), href: '/contests' },
+    { name: t('ranking'), href: '/ranking' },
   ];
 
-  // Prevent hydration mismatch by not rendering until mounted
-  if (!mounted) {
-    return (
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-3">
-            <img src="/logo.svg" alt="SolVibe Logo" className="w-8 h-8" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              SolVibe
-            </span>
-          </Link>
-          <div className="hidden md:flex items-center space-x-8">
-            {/* Placeholder for nav items during SSR */}
-          </div>
-          <Button className="flex items-center gap-2 bg-black hover:bg-black/90 text-white">
-            <Wallet size={18} />
-            Connect Wallet
-          </Button>
-        </div>
-      </nav>
-    );
-  }
+  const handleLogout = async () => {
+    clearUserData();
+    await signOut({
+      callbackUrl: '/login',
+      redirect: true,
+    });
+  };
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled ? "bg-white/80 backdrop-blur-md shadow-md" : "bg-transparent"
-      }`}
-    >
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center gap-3">
-          <img src="/logo.svg" alt="Vibe Match Logo" className="w-8 h-8" />
-          <span className="text-2xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-            Vibe Match
+    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/80">
+      <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 transition-opacity hover:opacity-90">
+          <span className="text-xl font-bold tracking-tight text-primary">
+            {t('app_name')}
           </span>
         </Link>
 
-        <div className="hidden md:flex items-center space-x-8">
-          {navItems.map((item) => (
-            <div key={item.name}>
-              {item.href.startsWith("/#") ? (
-                pathname === "/" ? (
-                  <button
-                    type="button"
-                    onClick={item.onClick}
-                    className="text-black hover:text-green-600 transition-colors"
-                  >
-                    {item.name}
-                  </button>
-                ) : (
-                  <Link
-                    href={item.href}
-                    className="text-black hover:text-green-600 transition-colors"
-                  >
-                    {item.name}
-                  </Link>
-                )
-              ) : (
+        {/* Right Side: Nav + User */}
+        <div className="flex items-center gap-4 sm:gap-6">
+          {/* Navigation - Desktop */}
+          <div className="hidden md:flex items-center gap-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+              return (
                 <Link
+                  key={item.href}
                   href={item.href}
-                  className={`transition-colors ${
-                    pathname === item.href
-                      ? "text-green-600 font-semibold"
-                      : "text-black hover:text-green-600"
-                  }`}
+                  className={cn(
+                    "px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                    isActive
+                      ? "text-primary bg-primary/10 font-semibold"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                  )}
                 >
                   {item.name}
                 </Link>
-              )}
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
 
-        <Button
-          onClick={connectWallet}
-          className="flex items-center gap-2 bg-black hover:bg-black/90 text-white"
-        >
-          <Wallet size={18} />
-          Vũ Thế Vỹ
-        </Button>
+          {/* Separator */}
+          <div className="hidden md:block h-5 w-px bg-border" />
+
+          {/* User Menu */}
+          <UserMenu user={user} onLogout={handleLogout} />
+        </div>
       </div>
     </nav>
   );

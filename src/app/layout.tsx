@@ -1,19 +1,24 @@
-import type React from "react";
-import "./globals.css";
-import { ThemeProvider, ClientProvider } from "@/components/providers";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { AppProvider } from "@/contexts/app-context";
-import { SessionProvider } from "next-auth/react";
-import { ConditionalLayout } from "@/components/layout";
-import { ServerProvider } from "@/components/providers/server-provider";
+import type React from 'react';
+import './globals.css';
+import './styles/editor-theme.css';
+import { EmailVerificationBanner } from '@/components/email-verification-banner';
+import { ConditionalLayout } from '@/components/layout';
+import { ServerProvider } from '@/components/providers/server-provider';
+import { AppProvider } from '@/contexts/app-context';
+import type { Metadata } from 'next';
+import { SessionProvider } from 'next-auth/react';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+});
 
 export const metadata: Metadata = {
-  title: "Vibe Match - Decentralized Social Media",
+  title: 'SfinX - Ultimate Coding Platform',
   description:
-    "Empowering creators with decentralized ownership, privacy, and fair rewards.",
+    'Improve your coding skills with SfinX. Practice problems, compete in contests, and climb the leaderboard.',
 };
 
 export default function RootLayout({
@@ -23,8 +28,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans`}>
         <ServerProvider>
+          <EmailVerificationBanner />
           <ConditionalLayout>{children}</ConditionalLayout>
         </ServerProvider>
       </body>
