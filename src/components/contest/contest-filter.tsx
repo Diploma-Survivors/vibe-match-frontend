@@ -1,164 +1,204 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import type { ContestFilters } from "@/types/contest";
-import { CONTEST_STATUS_OPTIONS, PARTICIPATION_OPTIONS } from "@/types/contest";
-import { RotateCcw, Search, Filter } from "lucide-react";
-import React from "react";
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { type ContestFilters, ContestStatus, ContestUserStatus } from '@/types/contests';
+import { RotateCcw, Search, Calendar, CheckCircle2, Circle, Clock, Timer, History } from 'lucide-react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
 
 interface ContestFilterProps {
+  search?: string;
   filters: ContestFilters;
+  onSearchChange: (search: string) => void;
   onFiltersChange: (filters: ContestFilters) => void;
-  onSearch: () => void;
   onReset: () => void;
+  isLoading?: boolean;
 }
 
 export default function ContestFilter({
+  search,
   filters,
+  onSearchChange,
   onFiltersChange,
-  onSearch,
   onReset,
-}: ContestFilterProps) {
-  const handleFilterChange = (key: keyof ContestFilters, value: string) => {
+  isLoading,
+  className,
+}: ContestFilterProps & { className?: string }) {
+  const { t } = useTranslation('contests');
+
+  const handleFilterChange = (
+    key: keyof ContestFilters,
+    value: string | number | string[] | undefined
+  ) => {
     onFiltersChange({
       ...filters,
       [key]: value,
     });
   };
 
+  const toggleUserStatus = (status: ContestUserStatus) => {
+    const isSelected = filters.userStatus === status;
+    handleFilterChange('userStatus', isSelected ? undefined : status);
+  };
+
+  const USER_STATUS_OPTIONS = [
+    { value: ContestUserStatus.JOINED, label: t('joined'), icon: CheckCircle2, color: 'text-green-500 bg-green-500/10 border-green-200' },
+    { value: ContestUserStatus.NOT_JOINED, label: t('not_joined'), icon: Circle, color: 'text-muted-foreground bg-muted border-transparent' },
+  ];
+
+  const toggleStatus = (status: string) => {
+    const isSelected = filters.status === status;
+    handleFilterChange('status', isSelected ? undefined : status);
+  };
+
+  const STATUS_OPTIONS = [
+    { value: ContestStatus.SCHEDULED, label: t('scheduled'), icon: Clock, color: 'text-blue-500 bg-blue-500/10 border-blue-200' },
+    { value: ContestStatus.RUNNING, label: t('running'), icon: Timer, color: 'text-green-500 bg-green-500/10 border-green-200' },
+    { value: ContestStatus.ENDED, label: t('ended'), icon: History, color: 'text-muted-foreground bg-muted border-transparent' },
+  ];
+
   return (
-    <div className="space-y-6">
-      {/* Filter Header */}
-      <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl rounded-2xl p-6 border border-white/20 dark:border-slate-700/50 shadow-xl">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600">
-              <Filter className="w-5 h-5 text-white" />
-            </div>
-            <h3 className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-              Bộ lọc contest
-            </h3>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onReset}
-            className="text-slate-500 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-all duration-200"
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Đặt lại
-          </Button>
-        </div>
+    <div className={cn("space-y-6", className)}>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+          {t('filters')}
+        </h3>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onReset}
+          className="h-8 px-2 text-xs text-muted-foreground hover:text-foreground hover:bg-muted"
+        >
+          <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
+          {t('reset')}
+        </Button>
+      </div>
 
-        <div className="space-y-4">
-          {/* Mã contest */}
-          <div className="space-y-2">
-            <label
-              htmlFor="contest-id"
-              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
-            >
-              Mã contest:
-            </label>
-            <Input
-              id="contest-id"
-              placeholder="Nhập mã contest..."
-              value={filters.id || ""}
-              onChange={(e) => handleFilterChange("id", e.target.value)}
-              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
-            />
-          </div>
+      {/* Search Input */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder={t('search_placeholder')}
+          value={search || ''}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-9 h-10 bg-background text-sm"
+        />
+      </div>
 
-          {/* Tên contest */}
-          <div className="space-y-2">
-            <label
-              htmlFor="contest-name"
-              className="block text-sm font-semibold text-slate-700 dark:text-slate-300"
-            >
-              Tên contest:
+      <div className="space-y-6">
+        {/* User Status Filter */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              {t('user_status')}
             </label>
-            <Input
-              id="contest-name"
-              placeholder="Nhập tên contest..."
-              value={filters.name || ""}
-              onChange={(e) => handleFilterChange("name", e.target.value)}
-              className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200"
-            />
+            {filters.userStatus && (
+              <button
+                type="button"
+                onClick={() => handleFilterChange('userStatus', undefined)}
+                className="text-[10px] font-medium text-muted-foreground hover:text-foreground"
+              >
+                {t('clear')}
+              </button>
+            )}
           </div>
-
-          {/* Trạng thái contest */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Trạng thái:
-            </label>
-            <Select
-              value={filters.status || "all"}
-              onValueChange={(value) =>
-                handleFilterChange("status", value === "all" ? "" : value)
-              }
-            >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200">
-                <SelectValue placeholder="Tất cả trạng thái" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-                {CONTEST_STATUS_OPTIONS.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="rounded-lg"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Tình trạng tham gia */}
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Tình trạng tham gia:
-            </label>
-            <Select
-              value={filters.participated || "all"}
-              onValueChange={(value) =>
-                handleFilterChange("participated", value === "all" ? "" : value)
-              }
-            >
-              <SelectTrigger className="h-12 rounded-xl border-0 bg-slate-50 dark:bg-slate-700/50 focus:ring-2 focus:ring-emerald-500 transition-all duration-200">
-                <SelectValue placeholder="Tất cả" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-0 bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl shadow-xl">
-                {PARTICIPATION_OPTIONS.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="rounded-lg"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col gap-2">
+            {USER_STATUS_OPTIONS.map((option) => {
+              const isSelected = filters.userStatus === option.value;
+              const Icon = option.icon;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => toggleUserStatus(option.value)}
+                  className={cn(
+                    "flex items-center w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors border",
+                    isSelected
+                      ? option.color
+                      : "bg-background text-muted-foreground border-transparent hover:bg-muted"
+                  )}
+                >
+                  <Icon className="w-4 h-4 mr-2" />
+                  {option.label}
+                </button>
+              );
+            })}
           </div>
         </div>
 
-        {/* Buttons */}
-        <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
-          <Button
-            onClick={onSearch}
-            className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
-          >
-            <Search className="w-5 h-5 mr-2" />
-            Tìm kiếm
-          </Button>
+        {/* Status Filter */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              {t('status')}
+            </label>
+            {filters.status && (
+              <button
+                type="button"
+                onClick={() => handleFilterChange('status', undefined)}
+                className="text-[10px] font-medium text-muted-foreground hover:text-foreground"
+              >
+                {t('clear')}
+              </button>
+            )}
+          </div>
+          <div className="flex flex-col gap-2">
+            {STATUS_OPTIONS.map((option) => {
+              const isSelected = filters.status === option.value;
+              const Icon = option.icon;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => toggleStatus(option.value)}
+                  className={cn(
+                    "flex items-center w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors border",
+                    isSelected
+                      ? option.color
+                      : "bg-background text-muted-foreground border-transparent hover:bg-muted"
+                  )}
+                >
+                  <Icon className="w-4 h-4 mr-2" />
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Start Time (After) */}
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            {t('start_after')}
+          </label>
+          <div className="relative">
+            <Input
+              type="datetime-local"
+              value={filters.startAfter || ''}
+              onChange={(e) =>
+                handleFilterChange('startAfter', e.target.value)
+              }
+              className="h-9 text-xs pl-2"
+            />
+          </div>
+        </div>
+
+        {/* Start Time (Before) */}
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            {t('start_before')}
+          </label>
+          <div className="relative">
+            <Input
+              type="datetime-local"
+              value={filters.startBefore || ''}
+              onChange={(e) => handleFilterChange('startBefore', e.target.value)}
+              className="h-9 text-xs pl-2"
+            />
+          </div>
         </div>
       </div>
     </div>

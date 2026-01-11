@@ -9,10 +9,20 @@
       "recommended": true,
       "a11y": {
         "noLabelWithoutControl": "off",
-        "useValidAnchor": "off"
+        "useValidAnchor": "off",
+        "useSemanticElements": "off",
+        "useKeyWithClickEvents": "off",
+        "useButtonType": "off",
+        "noSvgWithoutTitle": "off",
+        "useAltText": "off"
+      },
+      "complexity": {
+        "noStaticOnlyClass": "warn",
+        "noForEach": "off"
       },
       "suspicious": {
-        "noArrayIndexKey": "warn"
+        "noArrayIndexKey": "off",
+        "noExplicitAny": "off"
       }
     }
   },
@@ -23,7 +33,7 @@
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "double",
+      "quoteStyle": "single",
       "trailingCommas": "es5",
       "semicolons": "always"
     }

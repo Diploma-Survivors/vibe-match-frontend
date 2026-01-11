@@ -1,9 +1,17 @@
-// src/app/problems/[id]/page.tsx
+'use client';
 
-import { redirect } from "next/navigation";
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
+export default function ProblemRedirectPage() {
+  const params = useParams();
+  const router = useRouter();
+  const problemId = params.id as string;
 
-export default async function ProblemPage({ params }: {params: Promise<{id: string}>; }) {
-  const resolvedParams = await params;
-  redirect(`/problems/${resolvedParams.id}/problem`);
+  useEffect(() => {
+    router.replace(`/problems/${problemId}/description`);
+  }, [problemId, router]);
+
+  return null;
 }
+

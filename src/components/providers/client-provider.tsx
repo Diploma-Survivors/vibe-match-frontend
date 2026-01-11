@@ -1,27 +1,45 @@
-"use client";
+'use client';
 
-import { SessionProvider } from "next-auth/react";
-import { ThemeProvider } from "@/components/providers";
-import { AppProvider } from "@/contexts/app-context";
-import type { UserInfo } from "@/types/states";
+import '@/lib/i18n';
+
+import { ThemeProvider } from '@/components/providers/theme-provider';
+import { AppProvider } from '@/contexts/app-context';
+import { persistor, store } from '@/store';
+import { ReduxProvider } from '@/store/providers';
+import type { DecodedAccessToken, IssuerType, UserInfo } from '@/types/states';
+import { SessionProvider } from 'next-auth/react';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { DialogProvider } from './dialog-provider';
+import { ToastProvider } from './toast-provider';
 
 interface ClientProviderProps {
   children: React.ReactNode;
-  initialUser: UserInfo | null;
-  initialIssuer: "local" | "moodle";
+  decodedAccessToken: DecodedAccessToken | null;
 }
 
 export function ClientProvider({
   children,
-  initialUser,
-  initialIssuer,
+  decodedAccessToken,
 }: ClientProviderProps) {
   return (
     <SessionProvider>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-        <AppProvider initialUser={initialUser} initialIssuer={initialIssuer}>
-          {children}
-        </AppProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem={false}
+      >
+        <DialogProvider>
+          <ToastProvider>
+            <ReduxProvider>
+              <PersistGate loading={null} persistor={persistor}>
+                <AppProvider decodedAccessToken={decodedAccessToken}>
+                  {children}
+                </AppProvider>
+              </PersistGate>
+            </ReduxProvider>
+          </ToastProvider>
+        </DialogProvider>
       </ThemeProvider>
     </SessionProvider>
   );
