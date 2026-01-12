@@ -132,8 +132,8 @@ export default function ContestDrawer({
                       onClose();
                     }}
                     className={`w-full text-left p-4 rounded-lg border transition-all cursor-pointer ${currentProblemId === problem.id
-                        ? 'border-primary/50 bg-primary/5 shadow-sm'
-                        : 'border-border hover:bg-accent/50 hover:border-accent'
+                      ? 'border-primary/50 bg-primary/5 shadow-sm'
+                      : 'border-border hover:bg-accent/50 hover:border-accent'
                       }`}
                     type="button"
                   >

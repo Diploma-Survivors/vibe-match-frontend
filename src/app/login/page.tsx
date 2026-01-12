@@ -15,7 +15,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import clientApi from '@/lib/apis/axios-client';
 import { toastService } from '@/services/toasts-service';
 import { signIn } from 'next-auth/react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FcGoogle } from 'react-icons/fc';
@@ -31,6 +31,7 @@ export default function LoginPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/problems';
+  const router = useRouter();
 
   const toggleMode = () => {
     setIsSignUp(!isSignUp);
@@ -62,12 +63,15 @@ export default function LoginPage() {
         const result = await signIn('credentials', {
           username: finalUsername,
           password: finalPassword,
-          redirect: true,
-          callbackUrl,
+          redirect: false
         });
 
         if (result?.error) {
-          toastService.error(result.error);
+          toastService.error(t('login_failed'));
+        }
+        else {
+          router.push(callbackUrl);
+          router.refresh();
         }
       } catch (error: any) {
         toastService.error(
@@ -78,14 +82,14 @@ export default function LoginPage() {
       const result = await signIn('credentials', {
         username: finalUsername,
         password: finalPassword,
-        redirect: true,
-        callbackUrl,
+        redirect: false,
       });
 
       if (result?.error) {
-        toastService.error(result.error);
+        toastService.error(t('login_failed'));
       } else {
-        window.location.href = callbackUrl;
+        router.push(callbackUrl);
+        router.refresh();
       }
     }
   };
