@@ -42,7 +42,7 @@ export default function PricingPage() {
     const handleSubscribe = async (planId: number) => {
         setProcessingId(planId);
         try {
-            const redirectUrl = await PaymentService.createPayment(planId);
+            const redirectUrl = await PaymentService.createPayment(planId, 'NCB');
             router.push(redirectUrl);
         } catch (error) {
             console.error('Payment creation failed', error);
@@ -74,7 +74,7 @@ export default function PricingPage() {
 
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {plans.map((plan) => {
-                    const isPremium = plan.type === 'PREMIUM';
+                    const isPremium = plan.priceUsd > 0;
                     // Highlight the Monthly Premium plan (id: 2) as popular usually, or Yearly (id: 3)
                     const isPopular = plan.id === 3;
 

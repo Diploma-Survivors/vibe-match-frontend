@@ -8,8 +8,8 @@ export const PaymentService = {
         return response.data.data;
     },
 
-    createPayment: async (planId: number): Promise<string> => {
-        const response = await clientApi.post<ApiResponse<{ url: string }>>('/payments/create', { planId });
+    createPayment: async (planId: number, bankCode: string = 'NCB'): Promise<string> => {
+        const response = await clientApi.post<ApiResponse<{ url: string }>>('/payments/create', { planId, bankCode });
         return response.data.data.url;
     },
 };
