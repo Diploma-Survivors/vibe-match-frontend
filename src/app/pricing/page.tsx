@@ -19,6 +19,8 @@ import { cn } from '@/lib/utils';
 import { toastService } from '@/services/toasts-service';
 import { useApp } from '@/contexts/app-context';
 import { motion } from 'framer-motion';
+import Skeleton from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function PricingPage() {
     const { t } = useTranslation('common');
@@ -101,8 +103,42 @@ export default function PricingPage() {
 
     if (loading) {
         return (
-            <div className="flex min-h-[80vh] items-center justify-center bg-gradient-to-b from-background to-background/50">
-                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            <div className="relative min-h-screen overflow-hidden bg-gradient-to-b from-background to-background/50 py-20">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                    {/* Header Skeleton */}
+                    <div className="text-center mb-16 space-y-4">
+                        <Skeleton width={150} height={32} borderRadius={99} className="mx-auto" />
+                        <Skeleton width={600} height={48} borderRadius={8} className="mx-auto" />
+                        <Skeleton width={400} height={24} borderRadius={8} className="mx-auto" />
+                    </div>
+
+                    {/* Cards Skeleton */}
+                    <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+                        {[1, 2, 3].map((i) => (
+                            <Card key={i} className="bg-background/60 backdrop-blur-xl border-border/50 shadow-lg">
+                                <CardHeader className="pb-4 space-y-2">
+                                    <Skeleton width={32} height={32} borderRadius={12} />
+                                    <Skeleton width="50%" height={32} />
+                                    <Skeleton width="100%" height={16} count={2} />
+                                </CardHeader>
+                                <CardContent className="flex-1 space-y-6">
+                                    <Skeleton width="33%" height={48} />
+                                    <div className="space-y-4">
+                                        {[1, 2, 3, 4, 5].map((j) => (
+                                            <div key={j} className="flex items-center gap-3">
+                                                <Skeleton circle width={16} height={16} />
+                                                <Skeleton width="90%" height={16} />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="pt-6">
+                                    <Skeleton height={56} borderRadius={6} width="100%" />
+                                </CardFooter>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
             </div>
         );
     }
