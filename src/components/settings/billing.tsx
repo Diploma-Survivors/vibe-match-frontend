@@ -9,18 +9,35 @@ import Link from 'next/link';
 import { Loader2 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
+import { PaymentService } from '@/services/payments-service';
+import { PaymentTransaction, PaymentStatus } from '@/types/payment';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+
 export function BillingSettings() {
     const { t } = useTranslation('profile');
     const [loading, setLoading] = useState(true);
     const [isPremium, setIsPremium] = useState(false);
     const [expiryDate, setExpiryDate] = useState<string | null>(null);
+    const [transactions, setTransactions] = useState<PaymentTransaction[]>([]);
 
     useEffect(() => {
-        const fetchProfile = async () => {
+        const fetchData = async () => {
             try {
                 // Fetch fresh profile data to get latest subscription status
-                const response = await UserService.getMe();
-                const user = response.data.data; // Assuming ApiResponse structure
+                const [userResponse, historyData] = await Promise.all([
+                    UserService.getMe(),
+                    PaymentService.getPaymentHistory()
+                ]);
+
+                const user = userResponse.data.data; // Assuming ApiResponse structure
 
                 // Check if user object exists and has premium flag
                 if (user) {
@@ -29,14 +46,16 @@ export function BillingSettings() {
                         setExpiryDate(formatDate(user.premiumExpiresAt.toString()));
                     }
                 }
+
+                setTransactions(historyData);
             } catch (error) {
-                console.error("Failed to fetch user profile", error);
+                console.error("Failed to fetch billing data", error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchProfile();
+        fetchData();
     }, []);
 
     if (loading) {
@@ -82,10 +101,45 @@ export function BillingSettings() {
                     <CardDescription>{t('billing_info_desc', { defaultValue: 'View your billing status.' })}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="text-center py-8 text-muted-foreground bg-muted/20 rounded-lg border border-dashed border-border">
-                        <p>{t('billing_history_unavailable', { defaultValue: 'Detailed billing history is currently unavailable.' })}</p>
-                        <p className="text-sm mt-2">{t('contact_support_billing', { defaultValue: 'Please contact support if you need an invoice.' })}</p>
-                    </div>
+                    {transactions.length > 0 ? (
+                        <div className="rounded-md border">
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>{t('date', { defaultValue: 'Date' })}</TableHead>
+                                        <TableHead>{t('description', { defaultValue: 'Description' })}</TableHead>
+                                        <TableHead>{t('amount', { defaultValue: 'Amount' })}</TableHead>
+                                        <TableHead>{t('status', { defaultValue: 'Status' })}</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {transactions.map((transaction) => (
+                                        <TableRow key={transaction.id}>
+                                            <TableCell className="font-medium">
+                                                {formatDate(transaction.paymentDate || transaction.createdAt)}
+                                            </TableCell>
+                                            <TableCell>{transaction.description || transaction.plan?.name}</TableCell>
+                                            <TableCell>
+                                                {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(transaction.amount)}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Badge
+                                                    variant={transaction.status === PaymentStatus.SUCCESS ? "default" : "destructive"}
+                                                    className={transaction.status === PaymentStatus.SUCCESS ? "bg-green-100 text-green-700 hover:bg-green-100/80 border-green-200" : ""}
+                                                >
+                                                    {transaction.status}
+                                                </Badge>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                    ) : (
+                        <div className="text-center py-8 text-muted-foreground bg-muted/20 rounded-lg border border-dashed border-border">
+                            <p>{t('no_billing_history', { defaultValue: 'No billing history available.' })}</p>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </div>
