@@ -33,5 +33,18 @@
     "email_not_verified_warning": "Your email address has not been verified. Please verify your email address to continue.",
     "verify_email": "Verify Email",
     "email_verification_required_action": "Verify your email address to continue.",
-    "login_required_action": "Please login to continue."
+    "login_required_action": "Please login to continue.",
+    "most_popular": "Most Popular",
+    "free_forever": "Free Forever",
+    "free": "Free",
+    "payment_failed": "Payment Failed",
+    "payment_failed_desc": "We could not process your payment. Please try again or contact support.",
+    "try_again": "Try Again",
+    "return_settings": "Return to Settings",
+    "support_hint": "Need help? Contact our support team.",
+    "payment_success": "Payment Successful!",
+    "upgrade_complete_desc": "You are now a Premium member. Enjoy all the exclusive features!",
+    "view_billing_history": "View Billing & History",
+    "return_dashboard": "Return to Dashboard",
+    "auto_redirect_hint": "Check your email for the receipt."
 }

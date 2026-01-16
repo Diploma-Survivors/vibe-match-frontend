@@ -16,9 +16,12 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'SfinX - Ultimate Coding Platform',
+  title: 'SfinX',
   description:
     'Improve your coding skills with SfinX. Practice problems, compete in contests, and climb the leaderboard.',
+  icons: {
+    icon: '/icons/logo.svg',
+  },
 };
 
 export default function RootLayout({

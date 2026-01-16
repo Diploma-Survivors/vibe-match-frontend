@@ -121,5 +121,22 @@
     "confirm_new_password": "Confirm New Password",
     "password_requirements": "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.",
     "avatarUploadedSuccessfully": "Avatar uploaded successfully",
-    "avatarUploadFailed": "Avatar upload failed"
+    "avatarUploadFailed": "Avatar upload failed",
+    "subscription_plan": "Subscription Plan",
+    "manage_subscription": "Manage your subscription details.",
+    "premium_plan": "Premium Plan",
+    "free_plan": "Free Plan",
+    "premium_active_until": "Active until",
+    "upgrade_to_unlock": "Upgrade to unlock premium features.",
+    "extend_plan": "Extend Plan",
+    "upgrade_plan": "Upgrade Plan",
+    "billing_info": "Billing Information",
+    "billing_info_desc": "View your billing status.",
+    "date": "Date",
+    "description": "Description",
+    "amount": "Amount",
+    "status": "Status",
+    "no_billing_history": "No billing history available.",
+    "contact_support_billing": "Please contact support if you need an invoice.",
+    "billing_history_unavailable": "Detailed billing history is currently unavailable."
 }

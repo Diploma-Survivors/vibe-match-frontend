@@ -33,5 +33,18 @@
     "email_not_verified_warning": "Địa chỉ email của bạn chưa được xác minh. Vui lòng xác minh địa chỉ email của bạn để tiếp tục.",
     "verify_email": "Xác minh email",
     "email_verification_required_action": "Xác minh địa chỉ email của bạn để tiếp tục.",
-    "login_required_action": "Vui lòng đăng nhập để tiếp tục."
+    "login_required_action": "Vui lòng đăng nhập để tiếp tục.",
+    "most_popular": "Phổ biến nhất",
+    "free_forever": "Miễn phí mãi mãi",
+    "free": "Miễn phí",
+    "payment_failed": "Thanh toán thất bại",
+    "payment_failed_desc": "Chúng tôi không thể xử lý thanh toán của bạn. Vui lòng thử lại hoặc liên hệ hỗ trợ.",
+    "try_again": "Thử lại",
+    "return_settings": "Quay lại Cài đặt",
+    "support_hint": "Cần giúp đỡ? Liên hệ đội ngũ hỗ trợ của chúng tôi.",
+    "payment_success": "Thanh toán thành công!",
+    "upgrade_complete_desc": "Bạn đã là thành viên Premium. Tận hưởng tất cả các tính năng độc quyền!",
+    "view_billing_history": "Xem Thanh toán & Lịch sử",
+    "return_dashboard": "Quay lại Bảng điều khiển",
+    "auto_redirect_hint": "Kiểm tra email của bạn để nhận hóa đơn."
 }
