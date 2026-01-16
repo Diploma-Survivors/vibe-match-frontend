@@ -1,6 +1,7 @@
 'use client';
 
 import { AvatarUploadModal } from '@/components/profile/avatar-upload-modal';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { AccountSettings } from '@/components/settings/account';
 import { BasicInfoSettings } from '@/components/settings/basic-info';
 import { BillingSettings } from '@/components/settings/billing';
@@ -24,7 +25,15 @@ export default function SettingsPage() {
     const { t } = useTranslation('profile');
     const { user, refreshUser, isLoading } = useApp();
     const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'basic-info' | 'account' | 'billing'>('basic-info');
+
+    // Deep linking for tabs
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const currentTab = (searchParams.get('tab') as 'basic-info' | 'account' | 'billing') || 'basic-info';
+
+    const handleTabChange = (tab: string) => {
+        router.push(`/settings?tab=${tab}`);
+    };
 
     const handleAvatarClick = () => {
         setIsAvatarModalOpen(true);
@@ -34,7 +43,7 @@ export default function SettingsPage() {
         try {
             // 1. Get presigned URL
             const { data: uploadData } = await UserService.getAvatarUploadUrl({
-                fileName: 'avatar.jpg', // You might want to generate a unique name or use original extension if possible
+                fileName: 'avatar.jpg',
                 contentType: 'image/jpeg',
             });
 
@@ -137,30 +146,30 @@ export default function SettingsPage() {
                     {/* 2. Sidebar Navigation */}
                     <div className="col-span-12 md:col-span-3 space-y-1">
                         <NavItem
-                            active={activeTab === 'basic-info'}
+                            active={currentTab === 'basic-info'}
                             icon={<User className="w-4 h-4" />}
                             label={t('basic_info')}
-                            onClick={() => setActiveTab('basic-info')}
+                            onClick={() => handleTabChange('basic-info')}
                         />
                         <NavItem
-                            active={activeTab === 'account'}
+                            active={currentTab === 'account'}
                             icon={<Lock className="w-4 h-4" />}
                             label={t('account')}
-                            onClick={() => setActiveTab('account')}
+                            onClick={() => handleTabChange('account')}
                         />
                         <NavItem
-                            active={activeTab === 'billing'}
+                            active={currentTab === 'billing'}
                             icon={<CreditCard className="w-4 h-4" />}
                             label={t('billing')}
-                            onClick={() => setActiveTab('billing')}
+                            onClick={() => handleTabChange('billing')}
                         />
                     </div>
 
                     {/* 3. Main Content Area */}
                     <div className="col-span-12 md:col-span-9 space-y-6">
-                        {activeTab === 'basic-info' && refreshUser && <BasicInfoSettings user={user} refreshUser={refreshUser} />}
-                        {activeTab === 'account' && <AccountSettings user={user} />}
-                        {activeTab === 'billing' && <BillingSettings />}
+                        {currentTab === 'basic-info' && refreshUser && <BasicInfoSettings user={user} refreshUser={refreshUser} />}
+                        {currentTab === 'account' && <AccountSettings user={user} />}
+                        {currentTab === 'billing' && <BillingSettings />}
                     </div>
                 </div>
             </div>
@@ -184,4 +193,3 @@ function NavItem({ active, icon, label, external, onClick }: { active?: boolean;
         </div>
     );
 }
-
