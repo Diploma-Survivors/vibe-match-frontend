@@ -121,5 +121,22 @@
     "confirm_new_password": "Xác nhận mật khẩu mới",
     "password_requirements": "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt.",
     "avatarUploadedSuccessfully": "Tải ảnh đại diện thành công",
-    "avatarUploadFailed": "Tải ảnh đại diện thất bại"
+    "avatarUploadFailed": "Tải ảnh đại diện thất bại",
+    "subscription_plan": "Gói đăng ký",
+    "manage_subscription": "Quản lý chi tiết gói đăng ký của bạn.",
+    "premium_plan": "Gói Premium",
+    "free_plan": "Gói Miễn phí",
+    "premium_active_until": "Hiệu lực đến",
+    "upgrade_to_unlock": "Nâng cấp để mở khóa các tính năng cao cấp.",
+    "extend_plan": "Gia hạn gói",
+    "upgrade_plan": "Nâng cấp gói",
+    "billing_info": "Thông tin thanh toán",
+    "billing_info_desc": "Xem trạng thái thanh toán của bạn.",
+    "date": "Ngày",
+    "description": "Mô tả",
+    "amount": "Số tiền",
+    "status": "Trạng thái",
+    "no_billing_history": "Không có lịch sử thanh toán.",
+    "contact_support_billing": "Vui lòng liên hệ hỗ trợ nếu bạn cần hóa đơn.",
+    "billing_history_unavailable": "Lịch sử thanh toán chi tiết hiện không khả dụng."
 }

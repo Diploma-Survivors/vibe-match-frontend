@@ -23,7 +23,7 @@ import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function PricingPage() {
-    const { t } = useTranslation('common');
+    const { t, i18n } = useTranslation('common');
     const router = useRouter();
     const { isPrenium, user } = useApp(); // Note: Context uses 'isPrenium' typo
     const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
@@ -32,20 +32,21 @@ export default function PricingPage() {
 
     useEffect(() => {
         const fetchPlans = async () => {
+            setLoading(true);
             try {
-                const data = await PaymentService.getSubscriptionPlans();
+                const data = await PaymentService.getSubscriptionPlans(i18n.language);
                 const freePlan: SubscriptionPlan = {
                     id: 0,
-                    name: 'Free',
-                    description: 'For developers just getting started',
+                    name: t('free', { defaultValue: 'Free' }),
+                    description: t('free_plan_desc', { defaultValue: 'For developers just getting started' }),
                     priceUsd: 0,
                     durationMonths: 0,
                     isActive: true,
                     features: [
-                        'Unlimited practice problems',
-                        'Basic code evaluation',
-                        'Community support',
-                        'Limited performance insights'
+                        t('feature_unlimited_practice', { defaultValue: 'Unlimited practice problems' }),
+                        t('feature_basic_eval', { defaultValue: 'Basic code evaluation' }),
+                        t('feature_community', { defaultValue: 'Community support' }),
+                        t('feature_limited_metrics', { defaultValue: 'Limited performance insights' })
                     ],
                     type: 'FREE'
                 };
@@ -58,7 +59,7 @@ export default function PricingPage() {
             }
         };
         fetchPlans();
-    }, []);
+    }, [i18n.language, t]);
 
     const handleSubscribe = async (planId: number) => {
         if (!user) {
@@ -180,7 +181,7 @@ export default function PricingPage() {
                 >
                     {plans.map((plan) => {
                         const isPremiumPlan = plan.priceUsd > 0;
-                        const isPopular = plan.id === 3 || plan.name.toLowerCase().includes('year'); // Fallback logic for popular plan
+                        const isPopular = plan.id === 3 || plan.durationMonths === 12; // Check duration for language independence
                         const isCurrentPlan = isPrenium && isPremiumPlan; // Simplified logic: if user is premium, all premium plans show as active/owned contextually
 
                         return (
@@ -197,7 +198,7 @@ export default function PricingPage() {
                                     {isPopular && (
                                         <div className="absolute top-0 right-0">
                                             <div className="bg-gradient-to-l from-primary to-accent text-primary-foreground text-xs font-bold px-3 py-1 rounded-bl-xl shadow-lg">
-                                                MOST POPULAR
+                                                {t('most_popular', { defaultValue: 'Most Popular' })}
                                             </div>
                                         </div>
                                     )}
@@ -277,7 +278,7 @@ export default function PricingPage() {
                                                 variant="secondary"
                                                 disabled
                                             >
-                                                {t('current_plan', { defaultValue: 'Free Forever' })}
+                                                {t('free_forever', { defaultValue: 'Free Forever' })}
                                             </Button>
                                         )}
                                     </CardFooter>

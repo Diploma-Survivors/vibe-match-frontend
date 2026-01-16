@@ -33,5 +33,8 @@
     "email_not_verified_warning": "Your email address has not been verified. Please verify your email address to continue.",
     "verify_email": "Verify Email",
     "email_verification_required_action": "Verify your email address to continue.",
-    "login_required_action": "Please login to continue."
+    "login_required_action": "Please login to continue.",
+    "most_popular": "Most Popular",
+    "free_forever": "Free Forever",
+    "free": "Free"
 }

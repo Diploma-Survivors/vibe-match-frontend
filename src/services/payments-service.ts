@@ -3,8 +3,10 @@ import { PaymentTransaction, SubscriptionPlan, Currency, PaymentStatus } from '@
 import { ApiResponse } from '@/types/api';
 
 export const PaymentService = {
-    getSubscriptionPlans: async (): Promise<SubscriptionPlan[]> => {
-        const response = await clientApi.get<ApiResponse<SubscriptionPlan[]>>('/subscription-plans');
+    getSubscriptionPlans: async (lang?: string): Promise<SubscriptionPlan[]> => {
+        const response = await clientApi.get<ApiResponse<SubscriptionPlan[]>>('/subscription-plans', {
+            params: { lang }
+        });
         return response.data.data;
     },
 
