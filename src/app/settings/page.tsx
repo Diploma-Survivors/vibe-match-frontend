@@ -343,7 +343,7 @@ function NavItem({ active, icon, label, external, onClick }: { active?: boolean;
     return (
         <div
             onClick={onClick}
-            className={`flex items-center justify-between px-4 py-3 rounded-md cursor-pointer transition-colors ${active ? 'bg-[#4aa9f8] text-white' : 'text-gray-600 hover:bg-gray-100'
+            className={`flex items-center justify-between px-4 py-3 rounded-md cursor-pointer transition-colors ${active ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted/50'
                 }`}
         >
             <div className="flex items-center gap-3">
@@ -407,7 +407,7 @@ function DataRow({
                 {!isPlaceholder && (
                     isEditing ? (
                         <div className="flex gap-2">
-                            <button onClick={handleSave} className="text-sm font-medium text-[#4aa9f8] hover:underline">
+                            <button onClick={handleSave} className="text-sm font-medium text-primary hover:underline">
                                 {t('done')}
                             </button>
                             <button onClick={() => setIsEditing(false)} className="text-sm font-medium text-gray-400 hover:underline">
@@ -415,7 +415,7 @@ function DataRow({
                             </button>
                         </div>
                     ) : (
-                        <button onClick={() => setIsEditing(true)} className="text-sm cursor-pointer font-medium text-[#4aa9f8] hover:underline">
+                        <button onClick={() => setIsEditing(true)} className="text-sm cursor-pointer font-medium text-primary hover:underline">
                             {t('edit')}
                         </button>
                     )
@@ -466,7 +466,7 @@ function WebsiteRow({
                         <div className="flex gap-3">
                             <Button
                                 size="sm"
-                                className="bg-[#4aa9f8] hover:bg-[#3d91d6] text-white rounded-full px-6 h-8 text-xs font-medium"
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-full px-6 h-8 text-xs font-medium"
                                 onClick={() => onSave(tempValue)}
                             >
                                 {t('done')}
@@ -491,7 +491,7 @@ function WebsiteRow({
                                 href={value}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-sm text-[#4aa9f8] hover:underline flex items-center gap-2"
+                                className="text-sm text-primary hover:underline flex items-center gap-2"
                             >
                                 <Globe className="w-4 h-4 text-gray-400" />
                                 {value}
@@ -500,7 +500,7 @@ function WebsiteRow({
                             <span className="text-sm text-gray-400">{t('not_provided')}</span>
                         )}
                         <div className="flex justify-end items-center gap-4">
-                            <button onClick={() => setIsAdding(true)} className="text-sm cursor-pointer font-medium text-[#4aa9f8] hover:underline">
+                            <button onClick={() => setIsAdding(true)} className="text-sm cursor-pointer font-medium text-primary hover:underline">
                                 {t('edit')}
                             </button>
                         </div>
@@ -551,7 +551,7 @@ function LanguageRow({
             <div className="col-span-2 flex justify-end items-center gap-4">
                 {isEditing ? (
                     <div className="flex gap-2">
-                        <button onClick={handleSave} className="text-sm font-medium text-[#4aa9f8] hover:underline">
+                        <button onClick={handleSave} className="text-sm font-medium text-primary hover:underline">
                             {t('done')}
                         </button>
                         <button onClick={() => setIsEditing(false)} className="text-sm font-medium text-gray-400 hover:underline">
@@ -559,7 +559,7 @@ function LanguageRow({
                         </button>
                     </div>
                 ) : (
-                    <button onClick={() => setIsEditing(true)} className="text-sm font-medium text-[#4aa9f8] hover:underline">
+                    <button onClick={() => setIsEditing(true)} className="text-sm font-medium text-primary hover:underline">
                         {t('edit')}
                     </button>
                 )}
